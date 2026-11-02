@@ -1,0 +1,6 @@
+{"id":"arithmetic-en","scenario_id":"arithmetic-01","language":"en","split":"smoke","input":"What is 2 + 2? Reply with only the number.","target":"4"}
+{"id":"arithmetic-ko","scenario_id":"arithmetic-01","language":"ko","split":"smoke","input":"2 + 2는 얼마인가요? 숫자만 답하세요.","target":"4"}
+{"id":"arithmetic-zh","scenario_id":"arithmetic-01","language":"zh","split":"smoke","input":"2 + 2 等于多少？只输出数字。","target":"4"}
+{"id":"extract-en","scenario_id":"extract-01","language":"en","split":"smoke","input":"Extract the order ID from this message. Reply with only the ID: Order AB-204 shipped today.","target":"AB-204"}
+{"id":"extract-ko","scenario_id":"extract-01","language":"ko","split":"smoke","input":"다음 문장에서 주문 번호를 추출하세요. 주문 번호만 답하세요: 주문 AB-204가 오늘 발송되었습니다.","target":"AB-204"}
+{"id":"extract-zh","scenario_id":"extract-01","language":"zh","split":"smoke","input":"提取这句话中的订单编号，只输出编号：订单 AB-204 今天已发货。","target":"AB-204"}

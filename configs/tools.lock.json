@@ -1,0 +1,18 @@
+{
+  "SafeTune": {
+    "repository": "https://github.com/Lexsi-Labs/SafeTune.git",
+    "revision": "26f59e6d1bdcacafe5f2be3b8d982fb214369659",
+    "install": true
+  },
+  "AuditKIT": {
+    "repository": "https://github.com/Lexsi-Labs/AuditKIT.git",
+    "revision": "71316da345784ff220d5ed59337441a59ab31526",
+    "install": true
+  },
+  "CircuitKIT": {
+    "repository": "https://github.com/Lexsi-Labs/CircuitKIT.git",
+    "revision": "e71d5e17fe6e2abfde47ec9a7fbaf31649601b78",
+    "install": false,
+    "reason": "Source reviewed only. Requires a separate environment with huggingface-hub<2 and transformer-lens==3.8.0."
+  }
+}

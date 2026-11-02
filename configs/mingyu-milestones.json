@@ -1,0 +1,82 @@
+{
+  "owner": "Mingyu Kang",
+  "role": "ML and interpretability lead",
+  "source": "Updated team brief supplied November 2, 2026; dates are project milestones, not scheduled reminders.",
+  "current_model": "CohereLabs/aya-expanse-8b",
+  "model_decision": "User explicitly selected Aya Expanse 8B for local team smoke tests; document Tiny Aya default is superseded for this setup.",
+  "milestones": [
+    {
+      "due": "2026-11-03",
+      "deliverable": "GitHub repository and working environment",
+      "status": "environment_verified_repository_created",
+      "evidence": [
+        "scripts/bootstrap_local.py",
+        "requirements-local.txt",
+        "configs/tools.lock.json"
+      ],
+      "colab_scope": "Qwen quickstart passed previously; unquantized Aya8B on freeT4 unverified"
+    },
+    {
+      "due": "2026-11-04",
+      "deliverable": "SafeTune and AuditKIT smoke test on selected Aya model",
+      "status": "passed_aya_expanse_8b",
+      "evidence": [
+        "evidence/setup-summary.json",
+        "evidence/benign-smoke-predictions.json"
+      ],
+      "scope": "Six benign integration prompts, not safety evaluation"
+    },
+    {
+      "due": "2026-11-07",
+      "deliverable": "Plain fine-tuning config and baseline run",
+      "status": "pending_team_data",
+      "needs": [
+        "Agreed useful task and success metric",
+        "Aish attack categories and labels",
+        "Hannah versioned training/development/test data with scenario-family splits"
+      ]
+    },
+    {
+      "due": "2026-11-10",
+      "deliverable": "Plain and hardened fine-tunes; adapters on HF",
+      "status": "not_run",
+      "prerequisites": [
+        "Realistic-context memory test",
+        "Frozen data/config comparison",
+        "SafeGrad fit and surgery correctness test",
+        "Team HF artifact destination"
+      ]
+    },
+    {
+      "due": "2026-11-12",
+      "deliverable": "Probe and CircuitKIT analysis with one figure",
+      "status": "source_review_only",
+      "prerequisites": [
+        "Isolated CircuitKIT environment",
+        "Aya8B HF/TransformerLens compatibility test",
+        "Held-out scenario-level probe evaluation",
+        "Causal validation before explaining refusal"
+      ]
+    },
+    {
+      "due": "2026-11-14",
+      "deliverable": "Reproducibility notebook",
+      "status": "starter_prepared",
+      "evidence": [
+        "notebooks/02_local_aya_auditkit.ipynb"
+      ],
+      "remaining": "Replace smoke fixtures with actual experiment reproduction after datasets/methods are frozen"
+    }
+  ],
+  "next_work_package": [
+    "Agree task and dataset contract with Aish/Hannah",
+    "Test ordinary LoRA at intended context length",
+    "Run a bounded SafeGrad correctness and memory check",
+    "Build a separate CircuitKIT environment and check sequential model parity"
+  ],
+  "research_limits": [
+    "Safety drift is a hypothesis to test, not a required conclusion",
+    "The nonlinear-feature hypothesis requires held-out predictive and causal evidence",
+    "Never treat an English refusal phrase detector as a multilingual safety judge"
+  ]
+}

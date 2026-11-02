@@ -1,0 +1,9 @@
+# Tested Apple Silicon / Python 3.12 environment. See bootstrap_local.py.
+torch==2.15.0
+transformers==5.22.1
+accelerate==1.15.0
+peft==0.21.2
+trl==1.14.2
+huggingface-hub==2.4.0
+-e vendor/SafeTune
+-e vendor/AuditKIT
