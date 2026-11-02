@@ -1,0 +1,402 @@
+{
+  "dataset": {
+    "total_rows": 40,
+    "total_families": 12,
+    "counts_by_split": {
+      "development": 40,
+      "test": 0
+    },
+    "counts_by_language": {
+      "en": 20,
+      "ko": 20
+    },
+    "counts_by_category": {
+      "disallowed": 16,
+      "benign": 16,
+      "utility": 8
+    },
+    "counts_by_language_category": {
+      "en": {
+        "disallowed": 8,
+        "benign": 8,
+        "utility": 4
+      },
+      "ko": {
+        "disallowed": 8,
+        "benign": 8,
+        "utility": 4
+      }
+    },
+    "human_review_status_counts": {
+      "pending": 40
+    }
+  },
+  "overall": {
+    "total": 40,
+    "annotated": 0,
+    "reviewed": 0,
+    "unclear": 0,
+    "unreviewed": 40,
+    "unannotated": 40,
+    "review_coverage": 0.0,
+    "annotation_coverage": 0.0,
+    "language_reviewed": 0,
+    "language_unclear": 0,
+    "language_unreviewed": 40,
+    "language_review_coverage": 0.0,
+    "reviewer_types": [],
+    "reviewer_counts": {
+      "human": 0,
+      "model": 0
+    },
+    "human_reviewed": 0,
+    "model_reviewed": 0,
+    "human_review_pending": 40,
+    "model_labels_provisional": false,
+    "metrics": {
+      "disallowed_compliance": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "benign_over_refusal": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "utility_task_score": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null
+      },
+      "language_adherence": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null
+      }
+    }
+  },
+  "by_category": {
+    "disallowed": {
+      "total": 16,
+      "annotated": 0,
+      "reviewed": 0,
+      "unclear": 0,
+      "unreviewed": 16,
+      "unannotated": 16,
+      "review_coverage": 0.0,
+      "annotation_coverage": 0.0,
+      "language_reviewed": 0,
+      "language_unclear": 0,
+      "language_unreviewed": 16,
+      "language_review_coverage": 0.0,
+      "reviewer_types": [],
+      "reviewer_counts": {
+        "human": 0,
+        "model": 0
+      },
+      "human_reviewed": 0,
+      "model_reviewed": 0,
+      "human_review_pending": 16,
+      "model_labels_provisional": false,
+      "metrics": {
+        "disallowed_compliance": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "language_adherence": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        }
+      }
+    },
+    "benign": {
+      "total": 16,
+      "annotated": 0,
+      "reviewed": 0,
+      "unclear": 0,
+      "unreviewed": 16,
+      "unannotated": 16,
+      "review_coverage": 0.0,
+      "annotation_coverage": 0.0,
+      "language_reviewed": 0,
+      "language_unclear": 0,
+      "language_unreviewed": 16,
+      "language_review_coverage": 0.0,
+      "reviewer_types": [],
+      "reviewer_counts": {
+        "human": 0,
+        "model": 0
+      },
+      "human_reviewed": 0,
+      "model_reviewed": 0,
+      "human_review_pending": 16,
+      "model_labels_provisional": false,
+      "metrics": {
+        "benign_over_refusal": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "language_adherence": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        }
+      }
+    },
+    "utility": {
+      "total": 8,
+      "annotated": 0,
+      "reviewed": 0,
+      "unclear": 0,
+      "unreviewed": 8,
+      "unannotated": 8,
+      "review_coverage": 0.0,
+      "annotation_coverage": 0.0,
+      "language_reviewed": 0,
+      "language_unclear": 0,
+      "language_unreviewed": 8,
+      "language_review_coverage": 0.0,
+      "reviewer_types": [],
+      "reviewer_counts": {
+        "human": 0,
+        "model": 0
+      },
+      "human_reviewed": 0,
+      "model_reviewed": 0,
+      "human_review_pending": 8,
+      "model_labels_provisional": false,
+      "metrics": {
+        "utility_task_score": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "language_adherence": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        }
+      }
+    }
+  },
+  "by_language_category": {
+    "en": {
+      "disallowed": {
+        "total": 8,
+        "annotated": 0,
+        "reviewed": 0,
+        "unclear": 0,
+        "unreviewed": 8,
+        "unannotated": 8,
+        "review_coverage": 0.0,
+        "annotation_coverage": 0.0,
+        "language_reviewed": 0,
+        "language_unclear": 0,
+        "language_unreviewed": 8,
+        "language_review_coverage": 0.0,
+        "reviewer_types": [],
+        "reviewer_counts": {
+          "human": 0,
+          "model": 0
+        },
+        "human_reviewed": 0,
+        "model_reviewed": 0,
+        "human_review_pending": 8,
+        "model_labels_provisional": false,
+        "metrics": {
+          "disallowed_compliance": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          },
+          "language_adherence": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          }
+        }
+      },
+      "benign": {
+        "total": 8,
+        "annotated": 0,
+        "reviewed": 0,
+        "unclear": 0,
+        "unreviewed": 8,
+        "unannotated": 8,
+        "review_coverage": 0.0,
+        "annotation_coverage": 0.0,
+        "language_reviewed": 0,
+        "language_unclear": 0,
+        "language_unreviewed": 8,
+        "language_review_coverage": 0.0,
+        "reviewer_types": [],
+        "reviewer_counts": {
+          "human": 0,
+          "model": 0
+        },
+        "human_reviewed": 0,
+        "model_reviewed": 0,
+        "human_review_pending": 8,
+        "model_labels_provisional": false,
+        "metrics": {
+          "benign_over_refusal": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          },
+          "language_adherence": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          }
+        }
+      },
+      "utility": {
+        "total": 4,
+        "annotated": 0,
+        "reviewed": 0,
+        "unclear": 0,
+        "unreviewed": 4,
+        "unannotated": 4,
+        "review_coverage": 0.0,
+        "annotation_coverage": 0.0,
+        "language_reviewed": 0,
+        "language_unclear": 0,
+        "language_unreviewed": 4,
+        "language_review_coverage": 0.0,
+        "reviewer_types": [],
+        "reviewer_counts": {
+          "human": 0,
+          "model": 0
+        },
+        "human_reviewed": 0,
+        "model_reviewed": 0,
+        "human_review_pending": 4,
+        "model_labels_provisional": false,
+        "metrics": {
+          "utility_task_score": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          },
+          "language_adherence": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          }
+        }
+      }
+    },
+    "ko": {
+      "disallowed": {
+        "total": 8,
+        "annotated": 0,
+        "reviewed": 0,
+        "unclear": 0,
+        "unreviewed": 8,
+        "unannotated": 8,
+        "review_coverage": 0.0,
+        "annotation_coverage": 0.0,
+        "language_reviewed": 0,
+        "language_unclear": 0,
+        "language_unreviewed": 8,
+        "language_review_coverage": 0.0,
+        "reviewer_types": [],
+        "reviewer_counts": {
+          "human": 0,
+          "model": 0
+        },
+        "human_reviewed": 0,
+        "model_reviewed": 0,
+        "human_review_pending": 8,
+        "model_labels_provisional": false,
+        "metrics": {
+          "disallowed_compliance": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          },
+          "language_adherence": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          }
+        }
+      },
+      "benign": {
+        "total": 8,
+        "annotated": 0,
+        "reviewed": 0,
+        "unclear": 0,
+        "unreviewed": 8,
+        "unannotated": 8,
+        "review_coverage": 0.0,
+        "annotation_coverage": 0.0,
+        "language_reviewed": 0,
+        "language_unclear": 0,
+        "language_unreviewed": 8,
+        "language_review_coverage": 0.0,
+        "reviewer_types": [],
+        "reviewer_counts": {
+          "human": 0,
+          "model": 0
+        },
+        "human_reviewed": 0,
+        "model_reviewed": 0,
+        "human_review_pending": 8,
+        "model_labels_provisional": false,
+        "metrics": {
+          "benign_over_refusal": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          },
+          "language_adherence": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          }
+        }
+      },
+      "utility": {
+        "total": 4,
+        "annotated": 0,
+        "reviewed": 0,
+        "unclear": 0,
+        "unreviewed": 4,
+        "unannotated": 4,
+        "review_coverage": 0.0,
+        "annotation_coverage": 0.0,
+        "language_reviewed": 0,
+        "language_unclear": 0,
+        "language_unreviewed": 4,
+        "language_review_coverage": 0.0,
+        "reviewer_types": [],
+        "reviewer_counts": {
+          "human": 0,
+          "model": 0
+        },
+        "human_reviewed": 0,
+        "model_reviewed": 0,
+        "human_review_pending": 4,
+        "model_labels_provisional": false,
+        "metrics": {
+          "utility_task_score": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          },
+          "language_adherence": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null
+          }
+        }
+      }
+    }
+  }
+}

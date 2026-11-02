@@ -1,4 +1,9 @@
 {
+  "CuratorKIT": {
+    "repository": "https://github.com/Lexsi-Labs/CuratorKIT.git",
+    "revision": "dd9e835301fcddc74a37501d9e207a5a060d209f",
+    "install": true
+  },
   "SafeTune": {
     "repository": "https://github.com/Lexsi-Labs/SafeTune.git",
     "revision": "26f59e6d1bdcacafe5f2be3b8d982fb214369659",

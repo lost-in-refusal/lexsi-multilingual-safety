@@ -29,11 +29,19 @@
     {
       "due": "2026-11-07",
       "deliverable": "Plain fine-tuning config and baseline run",
-      "status": "pending_team_data",
+      "status": "independent_development_baseline_complete_fine_tuning_not_run",
       "needs": [
-        "Agreed useful task and success metric",
-        "Aish attack categories and labels",
-        "Hannah versioned training/development/test data with scenario-family splits"
+        "Human review of the original English-Korean policy/scenario drafts",
+        "Adjudicate contradictory refund responses and separate core correctness from unsupported policy details",
+        "Versioned training/calibration data separate from intervention-selection and test families"
+      ],
+      "evidence": [
+        "docs/pilot-baseline-review.md",
+        "evidence/pilot-development/report.json"
+      ],
+      "scope": "40 unmodified-model development responses; 20 candidate test cases unrun; model review provisional",
+      "remaining": [
+        "Plain fine-tuning configuration and substantive training experiment are not complete"
       ]
     },
     {
@@ -69,10 +77,10 @@
     }
   ],
   "next_work_package": [
-    "Agree task and dataset contract with Aish/Hannah",
-    "Test ordinary LoRA at intended context length",
-    "Run a bounded SafeGrad correctness and memory check",
-    "Build a separate CircuitKIT environment and check sequential model parity"
+    "Review Korean wording and provisional output labels with Mingyu",
+    "Define policy-faithfulness scoring separately from core correctness and over-refusal",
+    "Use the observed errors to choose a correction and a simple prompt-grounding control",
+    "Freeze the rubric, calibration split and intervention before the candidate test run"
   ],
   "research_limits": [
     "Safety drift is a hypothesis to test, not a required conclusion",

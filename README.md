@@ -2,7 +2,7 @@
 
 GitHub: [xtnayk](https://github.com/xtnayk) · Hugging Face: [xtnayk](https://huggingface.co/xtnayk)
 
-Current model: **Aya Expanse 8B**, selected by Mingyu on November 2, 2026 for local work. The original team brief used Tiny Aya; the model choice here supersedes that setup default. Current work verifies tooling and a tiny training loop, not a safety improvement.
+Current model: **Aya Expanse 8B**, selected by Mingyu on November 2, 2026 for local work. The original team brief used Tiny Aya; the model choice here supersedes that setup default. Current work builds a small English–Korean support-policy baseline. No safety improvement has been established.
 
 ## Start here
 
@@ -19,13 +19,15 @@ HF_HUB_OFFLINE=1 .venv/bin/python scripts/auditkit_smoke_check.py \
 
 Accept the [Aya Expanse 8B model conditions](https://huggingface.co/CohereLabs/aya-expanse-8b) in your own account first. Enter a read token only into the interactive login prompt. The cache script uses the immutable model revision in `configs/runtime.json`; it does not follow a changing model HEAD. Choose a new results directory for every experiment.
 
-`bootstrap_local.py` installs only SafeTune and AuditKIT with the tested local dependency pins. Existing source changes are never overwritten. `--verify-only` checks source revisions, editable import paths, Python, package pins, and dependency consistency. CircuitKIT is source-reviewed but excluded from this environment.
+`bootstrap_local.py` installs CuratorKIT, SafeTune and AuditKIT with the tested local dependency pins. Existing source changes are never overwritten. `--verify-only` checks source revisions, editable import paths, Python, package pins, and dependency consistency. CircuitKIT is source-reviewed but excluded from this environment.
 
 `notebooks/02_local_aya_auditkit.ipynb` wraps the same scripts for local notebook use. Its underlying runner is verified; the notebook is not a separate training or safety result. The older Colab notebook below remains a small-model fallback; unquantized Aya 8B is not validated on a free T4.
 
 Generated `results/` files and model weights are local and excluded from Git. A compact verified summary is in `evidence/setup-summary.json`; full logs and adapters still need publication to the team's Hugging Face destination. The private repository is a staging workspace, not the final public submission.
 
 ## Mingyu's work package
+
+Mingyu subsequently chose to begin an independent pilot with the assistant. The pilot below supplies draft data and a baseline without waiting for team handoffs. The team brief's larger fine-tuning and interpretability milestones remain separate; a small support-policy pilot does not complete them.
 
 Dates and assignments come from the updated team brief; model selection follows Mingyu's explicit choice above. The machine-readable checklist is `configs/mingyu-milestones.json`.
 
@@ -38,7 +40,40 @@ Dates and assignments come from the updated team brief; model selection follows 
 | Nov 12 | Probe/CircuitKIT analysis and one figure | Source compatibility reviewed; actual CircuitKIT checkpoint execution untested |
 | Nov 14 | Reproducibility notebook | Initial local wrapper prepared; final experiment reproduction remains |
 
-The first team handoff is the agreed task plus labeled scenario families and splits. Keep translated variants of a scenario in the same split. Preserve language, scenario ID, dataset revision and scoring provenance. Aish owns attack design/metric definitions and Hannah owns data/evaluation; the six prompts in `data/fixtures/` are integration fixtures only. Test whether fine-tuning causes drift rather than assuming it does.
+The team plan assigns attack design/metric definitions to Aish and data/evaluation to Hannah. The independent pilot is a draft for review, not their approval or a replacement for human-validated labels. Keep translated variants of a scenario in the same split and preserve dataset revision and scoring provenance. The six prompts in `data/fixtures/` remain integration fixtures only. Test whether fine-tuning causes drift rather than assuming it does.
+
+## English–Korean development pilot
+
+**First baseline completed:** [read the findings and review priorities](docs/pilot-baseline-review.md). All 40 development responses completed without truncation; 20 candidate test cases remain unrun. Model review found correct core utility facts alongside unsupported procedural details and two contradictory Korean refund responses. These are provisional findings requiring human review, not evidence of safety improvement. The full small run is versioned in `evidence/pilot-development/`.
+
+The [experiment specification](docs/pilot-spec.md) defines a fictional HarborCart support policy covering privacy, account access, and dishonest refund requests. [Original scenarios](data/pilot/scenarios.jsonl) contain 60 rows: 12 safety families with a disallowed/legitimate pair in both languages, plus six utility families in both languages. All labels and translations are assistant drafts awaiting human review.
+
+Development contains 40 rows across 12 families; the candidate test partition contains 20 rows across six families. Translations and paired variants stay in one partition. Both partitions share policy concepts: the test cases hold out wording and fact combinations, not new domains or unseen rules. This is a small policy-compliance experiment, not a general safety benchmark.
+
+Run the tests and a fresh development baseline:
+
+```sh
+.venv/bin/python -m unittest discover -s tests -v
+HF_HUB_OFFLINE=1 .venv/bin/python scripts/run_pilot_baseline.py \
+  --output results/pilot-development-next-run
+```
+
+Add `--curate-only` to validate and curate without loading the model. Each output directory must be new. The runner intentionally has no test-split option.
+
+CuratorKIT normalizes and deduplicates requests with per-row provenance, preserving raw drafts. SafeTune generates responses from one cached Aya 8B checkpoint, with batch size 1, greedy decoding and a 512-token limit. An initial 128-token development calibration was stopped after responses were truncated; those partial results stay separate. AuditKIT records the full run's outputs. The runner verifies that the complete bilingual system policy reaches the model, records actual generated token IDs and EOS/cap status, and flushes each response before moving on. A fresh cache identity and callback counts distinguish live generation from replay.
+
+Artifacts include `report.json`, `curation.json`, raw/curated sample copies, `responses.jsonl`, `auditkit-result.json`, an annotation template, and `semantic-summary.json`. The automatic nonempty-output score is only an execution diagnostic. Review substantive compliance, over-refusal and utility separately from language adherence; see the spec for the exact rubric. Null metrics mean no reviewed denominator, not zero failures. Truncated or unclear outputs are flagged for review. Model annotations remain provisional even after every row is annotated.
+
+To score a review, copy the annotation template, fill only cases actually reviewed, and remove unfinished entries. Set `reviewer` to the reviewer's name and `reviewer_type` to `human` only for genuine human review. Preserve the baseline outputs and run identity. The CLI accepts partial reviews but rejects null templates, mixed-run records, incomplete executions, and overwriting an existing summary:
+
+```sh
+.venv/bin/python scripts/score_pilot.py \
+  --run results/pilot-development-next-run \
+  --annotations results/pilot-development-next-run/annotations-reviewed.json \
+  --output results/pilot-development-next-run/semantic-summary-reviewed.json
+```
+
+Before correction experiments, review the Korean wording and labels, inspect the baseline errors, and choose one intervention supported by those errors. Tune it on development cases; freeze data, rubric and settings before running the held-out partition. Fine-tuning and CircuitKIT remain later work.
 
 ## SafeTune and AuditKIT integration
 

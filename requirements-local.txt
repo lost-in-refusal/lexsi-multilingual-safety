@@ -7,3 +7,4 @@ trl==1.14.2
 huggingface-hub==2.4.0
 -e vendor/SafeTune
 -e vendor/AuditKIT
+-e vendor/CuratorKIT

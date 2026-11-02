@@ -1,0 +1,2000 @@
+{
+  "source_uri": "data/pilot/scenarios.jsonl",
+  "input_count": 60,
+  "output_count": 60,
+  "changed_ids": [],
+  "removed_ids": [],
+  "cleaning_transforms": {
+    "strip_html": false,
+    "normalise_unicode": true,
+    "fix_encoding_artifacts": false,
+    "collapse_whitespace": true,
+    "remove_control_chars": true
+  },
+  "deduplication_group_by": [
+    "language",
+    "split"
+  ],
+  "per_sample": {
+    "privacy_address_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_address_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_address_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_address_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_gift_receipt_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_gift_receipt_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_gift_receipt_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_gift_receipt_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_order_history_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_order_history_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_order_history_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_order_history_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "privacy_data_request_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "privacy_data_request_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "privacy_data_request_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "privacy_data_request_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "account_skip_verification_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "account_skip_verification_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "account_skip_verification_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "account_skip_verification_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "account_code_handling_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "account_code_handling_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "account_code_handling_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "account_code_handling_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "account_recovery_answers_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "account_recovery_answers_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "account_recovery_answers_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "account_recovery_answers_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "account_claimed_consent_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "account_claimed_consent_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "account_claimed_consent_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "account_claimed_consent_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "refund_delivery_date_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_delivery_date_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_delivery_date_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_delivery_date_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_payment_destination_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_payment_destination_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_payment_destination_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_payment_destination_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_receipt_authenticity_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_receipt_authenticity_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_receipt_authenticity_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_receipt_authenticity_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "refund_duplicate_claim_disallowed_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "refund_duplicate_claim_disallowed_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "refund_duplicate_claim_benign_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "refund_duplicate_claim_benign_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "utility_return_window_utility_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "utility_return_window_utility_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "utility_refund_timeline_utility_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "utility_refund_timeline_utility_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "utility_credentials_utility_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "utility_credentials_utility_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "utility_verification_capability_utility_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "utility_verification_capability_utility_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "utility_privacy_boundary_utility_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383157",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "utility_privacy_boundary_utility_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383333",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 20
+          }
+        }
+      ]
+    },
+    "utility_own_records_utility_en": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383478",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    },
+    "utility_own_records_utility_ko": {
+      "source_uri": "data/pilot/scenarios.jsonl",
+      "status": "kept",
+      "duplicate_of": null,
+      "provenance_chain": [
+        {
+          "step_name": "TextCleaner",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.374179",
+          "config_hash": "b2a0efecd582582e",
+          "notes": {
+            "transforms_applied": [
+              "normalise_unicode",
+              "collapse_whitespace",
+              "remove_control_chars"
+            ],
+            "fields_cleaned": [
+              "instruction"
+            ]
+          }
+        },
+        {
+          "step_name": "ExactDeduplicator",
+          "step_version": "0.1.0",
+          "timestamp": "2026-11-02T22:57:45.383646",
+          "config_hash": "b9ae1c09dc1dfe75",
+          "notes": {
+            "exact_duplicates_removed": 0,
+            "surviving_count": 10
+          }
+        }
+      ]
+    }
+  }
+}

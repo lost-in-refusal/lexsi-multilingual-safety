@@ -49,7 +49,7 @@ root = pathlib.Path(sys.argv[1])
 for name, expected in json.loads(sys.argv[2]).items():
     actual = importlib.metadata.version(name)
     assert actual == expected, f'{name}: installed {actual}, required {expected}'
-for package, directory in [('safetune', 'SafeTune'), ('auditkit', 'AuditKIT')]:
+for package, directory in [('safetune', 'SafeTune'), ('auditkit', 'AuditKIT'), ('curatorkit', 'CuratorKIT')]:
     module = importlib.import_module(package)
     assert pathlib.Path(module.__file__).resolve().is_relative_to((root / 'vendor' / directory).resolve()), f'{package}: imported unexpected source'
 import torch

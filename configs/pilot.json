@@ -1,0 +1,11 @@
+{
+  "experiment": "harborcart-bilingual-development-baseline-v1",
+  "split": "development",
+  "max_new_tokens": 512,
+  "temperature": 0.0,
+  "batch_size": 1,
+  "mps_memory_fraction": 0.8,
+  "semantic_review": "pending",
+  "length_calibration": "Initial 128-token development attempt truncated responses; retained as interrupted calibration. Full baseline uses 512 for both languages.",
+  "test_partition": "unrun; shared policy concepts, held-out wording and fact combinations"
+}
