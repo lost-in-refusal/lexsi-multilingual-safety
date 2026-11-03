@@ -108,6 +108,29 @@ Give reviewers only the pack's `review-items.json`, `rubric.md`, and `policy.jso
 
 All output paths must be new. Partial reviews report coverage and null rates where nothing is decided. Paired comparisons use the same sample with decisive reviews in both variants; marginal percentage-point differences are labeled separately. For human review, preserve model annotations, save only genuinely reviewed items with a human reviewer identity, and generate a separate human-only summary. Do not combine an annotation with its replacement: duplicate review IDs are rejected.
 
+## Conciseness ablation
+
+**Completed:** [results and changed cases](docs/conciseness-ablation-results.md). Removing conciseness gained complete required-fact coverage in four answers and lost it in one, but unsupported claims regressed in four cases and improved in two. This is a mixed, provisional model-reviewed result; human adjudication remains pending.
+
+The [ablation protocol](docs/conciseness-ablation-spec.md) removes only the English and Korean conciseness clauses from the grounding appendix. Its reference is the saved grounded run, not the original policy-only baseline. The original policy, all 40 development cases, model weights, decoding settings, and rubric v2 remain unchanged. The 20 test cases remain unrun.
+
+```sh
+HF_HUB_OFFLINE=1 .venv/bin/python scripts/run_pilot_baseline.py \
+  --intervention configs/grounding-no-conciseness.json \
+  --rubric docs/grounding-comparison-spec.md \
+  --output results/no-conciseness-next-run
+.venv/bin/python scripts/grounding_comparison.py pack \
+  --reference evidence/pilot-grounded \
+  --candidate results/no-conciseness-next-run \
+  --reference-mode grounded \
+  --reference-label grounded_with_conciseness \
+  --candidate-label grounded_without_conciseness \
+  --rubric docs/grounding-comparison-spec.md \
+  --output results/no-conciseness-next-review
+```
+
+For a new run, first verify and record the protocol/configuration/rubric hashes as described in the protocol. Re-review all 80 shuffled outputs with variant names withheld; do not copy earlier annotations into a new pack. Use the same `summarize` command shown above on the new pack and its own annotations. Explicit reference/candidate roles determine comparison direction independently of label spelling or ordering.
+
 ## SafeTune and AuditKIT integration
 
 The runner reuses one SafeTune-loaded checkpoint through AuditKIT's public `CallableModel` API, avoiding a second full model in memory. It scores six benign English/Korean/Mandarin prompts using exact match and token F1, saves every prompt/output/score, records immutable model/tool revisions, and forces a fresh run with a unique cache identity. Generation limits are set on the SafeTune backend as well as AuditKIT.

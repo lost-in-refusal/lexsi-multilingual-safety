@@ -1,0 +1,25 @@
+{
+  "frozen_utc": "2026-11-03T01:39:04.805675+00:00",
+  "protocol": "docs/conciseness-ablation-spec.md",
+  "reference": "evidence/pilot-grounded",
+  "candidate": "results/pilot-grounded-no-conciseness-20261102",
+  "intended_text_changes": "Only remove the final conciseness clause in English and Korean; direct answer and request-language guidance retained.",
+  "exact_two_language_change_verified": true,
+  "files": {
+    "configs/grounding-no-conciseness.json": "8f172f5e934c3580e9381fc9ca3d0dd2c3b79c66322d2a3f01f870cbbfd4feec",
+    "docs/conciseness-ablation-spec.md": "02a096e69bcceb5ec34df33cca94dbb27a5547f36e091415d04e6da1878c6b66",
+    "docs/grounding-comparison-spec.md": "bee14f87e810729106a54b9a57548e60e25c6726b3fee84627d54d06d4d8a352",
+    "data/pilot/scenarios.jsonl": "f0b2ea2aafe90fb84f058e04ffd13e84b5bf144d352faaf426574d03a823a6cd",
+    "data/pilot/policy.json": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+    "evidence/pilot-grounded/responses.jsonl": "c9c016c40e7f715cb7144be5822a3fee8804c084cb84d7c20d14fa5f91d9a77e",
+    "evidence/pilot-grounded/curated-samples.json": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
+    "configs/grounding-intervention.json": "431f97ce58448cef1a902e3edd377386df1befd48849bd635f17287110c43d5b",
+    "configs/runtime.json": "e0a03038012113b28715fe8bcdc6858a5df476a9be61ec2258393bd8da8e068b",
+    "configs/pilot.json": "895079e104f01e1a33fe7a3a54c5b4f099c3e9613f85976c020df11c7d81c432",
+    "configs/tools.lock.json": "c079cb7b04d9c59bc8443aaf37b3bc1ff08d0f0623f4123e850b6bc7a4170fa2",
+    "scripts/run_pilot_baseline.py": "a01122ae22d83d9f51a8697ce20ab6d9e241d08e662a95071d2e641fdafb0e2e",
+    "scripts/pilot_curation.py": "d96e469b5edbfa9d0da5c393eb217a62ac3ddc888b8a48bec5c6cddadd26ba67",
+    "scripts/pilot_validation.py": "3c15257090ccb660bba0ad76a56286b8e3bb7f9d6789c40569699543e9781fc2"
+  },
+  "test_generated_samples": 0
+}

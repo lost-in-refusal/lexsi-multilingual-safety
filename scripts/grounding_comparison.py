@@ -70,6 +70,17 @@ def _unique_map(records, key, context):
     return result
 
 
+def _comparison(reference_mode, reference_label, candidate_label):
+    _require(reference_mode in ("baseline", "grounded"), "Reference mode must be baseline or grounded")
+    _text(reference_label, "reference label")
+    _text(candidate_label, "candidate label")
+    _require(reference_label != candidate_label, "Reference and candidate labels must differ")
+    _require(candidate_label != "baseline" and (reference_mode == "baseline" or reference_label != "baseline"),
+             "A grounded run cannot be labeled baseline")
+    return {"reference": {"label": reference_label, "mode": reference_mode},
+            "candidate": {"label": candidate_label, "mode": "grounded"}}
+
+
 def _load_run(directory, variant, rubric_sha):
     blobs = {}
 
@@ -126,7 +137,7 @@ def _load_run(directory, variant, rubric_sha):
         _text(texts.get(language), f"policy.texts.{language}")
 
     if variant == "grounded":
-        _require(report.get("variant") == "grounded", "Candidate variant must be grounded")
+        _require(report.get("variant") == "grounded", "Grounded run must record variant=grounded")
         intervention = _object(read("intervention.json"), "intervention")
         _require(intervention == report.get("intervention"), "Intervention metadata differs from report")
         _require(_sha(blobs["intervention.json"]) == report.get("intervention_sha256"), "Intervention hash mismatch")
@@ -142,10 +153,16 @@ def _load_run(directory, variant, rubric_sha):
                  "Effective prompts must be exactly the original policy plus the frozen appendix")
         blobs["rubric.md"] = (directory / "rubric.md").read_bytes()
         _require(_sha(blobs["rubric.md"]) == report.get("rubric_sha256") == rubric_sha,
-                 "Candidate frozen rubric differs from the supplied review rubric")
+                 "Grounded run frozen rubric differs from the supplied review rubric")
     else:
         _require(report.get("variant") in (None, "baseline") and not report.get("intervention"),
                  "Baseline must be an unmodified-policy run")
+        if "effective_prompts_sha256" in report or (directory / "effective-prompts.json").exists():
+            effective = read("effective-prompts.json")
+            _require(_sha(blobs["effective-prompts.json"]) == report.get("effective_prompts_sha256"),
+                     "Effective-prompts hash mismatch")
+            _require(effective == {language: texts[language] for language in LANGUAGES},
+                     "Baseline effective prompts must be exactly the unmodified base policy")
 
     blobs["responses.jsonl"] = (directory / "responses.jsonl").read_bytes()
     response_hash = _sha(blobs["responses.jsonl"])
@@ -161,7 +178,7 @@ def _load_run(directory, variant, rubric_sha):
         _require(response.get("policy_sha256") == report["policy_sha256"], f"Response {sample_id}: policy mismatch")
         for field in ("cap_reached", "ended_with_eos"):
             _require(type(response.get(field)) is bool, f"Response {sample_id}: {field} must be boolean")
-        if variant == "grounded":
+        if "effective-prompts.json" in blobs:
             _require(response.get("effective_prompts_sha256") == report["effective_prompts_sha256"],
                      f"Response {sample_id}: effective prompt mismatch")
 
@@ -189,21 +206,29 @@ def _load_run(directory, variant, rubric_sha):
             "policy_bytes": blobs["policy.json"], "files": {name: _sha(content) for name, content in blobs.items()}}
 
 
-def create_review_pack(baseline_dir, candidate_dir, rubric_path, output_dir):
+def create_review_pack(baseline_dir, candidate_dir, rubric_path, output_dir, *,
+                       reference_mode="baseline", reference_label="baseline", candidate_label="grounded"):
     """Validate two matched runs and create a new 80-item blinded review pack.
 
     Give reviewers only review-items.json, rubric.md and policy.json. mapping.json
     and manifest.json reveal variant identities and belong with the coordinator.
     Returns the saved manifest. Existing output directories are never reused.
+
+    The first directory is the reference. Defaults retain the legacy baseline vs
+    grounded pack. A grounded reference requires explicit non-baseline labels;
+    both runs then undergo the same frozen-intervention integrity checks.
     """
     baseline_dir, candidate_dir, rubric_path, output_dir = map(Path, (baseline_dir, candidate_dir, rubric_path, output_dir))
     if output_dir.exists():
         raise FileExistsError(f"Refusing to overwrite {output_dir}")
     rubric_bytes = rubric_path.read_bytes()
     _require(bool(rubric_bytes.strip()), "Review rubric cannot be empty")
-    runs = {"baseline": _load_run(baseline_dir, "baseline", _sha(rubric_bytes)),
-            "grounded": _load_run(candidate_dir, "grounded", _sha(rubric_bytes))}
-    left, right = (runs[v]["report"] for v in VARIANTS)
+    comparison = _comparison(reference_mode, reference_label, candidate_label)
+    labels = (reference_label, candidate_label)
+    legacy = reference_mode == "baseline" and labels == VARIANTS
+    runs = {reference_label: _load_run(baseline_dir, reference_mode, _sha(rubric_bytes)),
+            candidate_label: _load_run(candidate_dir, "grounded", _sha(rubric_bytes))}
+    left, right = (runs[v]["report"] for v in labels)
     for field in ("dataset_sha256", "curated_sha256", "policy_sha256", "dtype", "model_device", "tools", "packages"):
         _require(left[field] == right[field], f"Run mismatch: {field}")
     for field in ("model", "model_revision", "dtype", "seed", "batch_size", "local_device"):
@@ -211,20 +236,30 @@ def create_review_pack(baseline_dir, candidate_dir, rubric_path, output_dir):
     for field in ("temperature", "max_new_tokens", "batch_size", "mps_memory_fraction"):
         _require(left["config"][field] == right["config"][field], f"Run generation mismatch: {field}")
     _require(left["selected_ids"] == right["selected_ids"], "Ordered selected IDs differ between runs")
-    _require(runs["baseline"]["raw_rows"] == runs["grounded"]["raw_rows"], "Original source rows differ between runs")
+    _require(runs[reference_label]["raw_rows"] == runs[candidate_label]["raw_rows"], "Original source rows differ between runs")
     for sample_id in left["selected_ids"]:
-        _require(runs["baseline"]["responses"][sample_id]["request"] == runs["grounded"]["responses"][sample_id]["request"],
+        _require(runs[reference_label]["responses"][sample_id]["request"] == runs[candidate_label]["responses"][sample_id]["request"],
                  f"Actual user prompts differ for {sample_id}")
 
     review_context = {
         "version": 1,
-        "baseline_responses_sha256": runs["baseline"]["files"]["responses.jsonl"],
-        "grounded_responses_sha256": runs["grounded"]["files"]["responses.jsonl"],
+        "baseline_responses_sha256": runs[reference_label]["files"]["responses.jsonl"],
+        "grounded_responses_sha256": runs[candidate_label]["files"]["responses.jsonl"],
         "curated_sha256": left["curated_sha256"], "policy_sha256": left["policy_sha256"],
         "rubric_sha256": _sha(rubric_bytes), "ordered_selected_ids": left["selected_ids"],
     }
+    if not legacy:
+        review_context = {
+            "version": 2, "comparison": comparison,
+            "runs": {label: {"responses_sha256": runs[label]["files"]["responses.jsonl"],
+                              "intervention_sha256": runs[label]["report"].get("intervention_sha256"),
+                              "effective_prompts_sha256": runs[label]["report"].get("effective_prompts_sha256")}
+                     for label in labels},
+            "curated_sha256": left["curated_sha256"], "policy_sha256": left["policy_sha256"],
+            "rubric_sha256": _sha(rubric_bytes), "ordered_selected_ids": left["selected_ids"],
+        }
     context_hash = _sha(_json_bytes(review_context))
-    pairs = [(variant, row) for variant in VARIANTS for row in runs[variant]["rows"]]
+    pairs = [(variant, row) for variant in labels for row in runs[variant]["rows"]]
     rng = random.Random(SHUFFLE_SEED)
     rng.shuffle(pairs)
     items, mapping = [], {}
@@ -241,11 +276,11 @@ def create_review_pack(baseline_dir, candidate_dir, rubric_path, output_dir):
                       "cap_reached": response["cap_reached"], "ended_with_eos": response["ended_with_eos"]})
         mapping[review_id] = {"variant": variant, "sample_id": row["id"]}
     files = {"review-items.json": _json_bytes(items), "mapping.json": _json_bytes(mapping),
-             "rubric.md": rubric_bytes, "policy.json": runs["baseline"]["policy_bytes"]}
+             "rubric.md": rubric_bytes, "policy.json": runs[reference_label]["policy_bytes"]}
     manifest = {
         "schema_version": 1, "shuffle_seed": SHUFFLE_SEED, "review_item_count": 80,
         "review_context": review_context, "review_context_sha256": context_hash,
-        "sample_count": 40, "family_count": len({row["family_id"] for row in runs["baseline"]["rows"]}),
+        "sample_count": 40, "family_count": len({row["family_id"] for row in runs[reference_label]["rows"]}),
         "selected_ids": left["selected_ids"], "files": {name: _sha(content) for name, content in files.items()},
         "reviewer_files": ["review-items.json", "rubric.md", "policy.json"],
         "coordinator_only_files": ["mapping.json", "manifest.json"],
@@ -255,12 +290,14 @@ def create_review_pack(baseline_dir, candidate_dir, rubric_path, output_dir):
                       "run_nonce": runs[variant]["report"]["run_nonce"],
                       "runtime": runs[variant]["report"]["runtime"], "config": runs[variant]["report"]["config"],
                       "tools": runs[variant]["report"]["tools"]}
-            for variant, directory in (("baseline", baseline_dir), ("grounded", candidate_dir))
+            for variant, directory in ((reference_label, baseline_dir), (candidate_label, candidate_dir))
         },
         "dataset_sha256": left["dataset_sha256"], "curated_sha256": left["curated_sha256"],
         "policy_sha256": left["policy_sha256"], "rubric_sha256": _sha(rubric_bytes),
         "script_sha256": _sha(Path(__file__).read_bytes()),
     }
+    if not legacy:
+        manifest.update(schema_version=2, comparison=comparison)
     output_dir.mkdir(parents=True, exist_ok=False)
     for name, content in files.items():
         with (output_dir / name).open("xb") as handle:
@@ -276,6 +313,31 @@ def _load_pack(pack_dir):
     hashes = _object(manifest.get("files"), "pack manifest.files")
     _require(_sha(_json_bytes(manifest.get("review_context"))) == manifest.get("review_context_sha256"),
              "Review-context hash mismatch")
+    schema = manifest.get("schema_version")
+    _require(schema in (1, 2), "Unsupported review-pack schema")
+    if schema == 1:
+        _require("comparison" not in manifest and manifest["review_context"].get("version") == 1,
+                 "Legacy pack must use the original comparison context")
+        labels = VARIANTS
+    else:
+        comparison = _object(manifest.get("comparison"), "pack comparison")
+        reference = _object(comparison.get("reference"), "comparison reference")
+        candidate = _object(comparison.get("candidate"), "comparison candidate")
+        expected = _comparison(reference.get("mode"), reference.get("label"), candidate.get("label"))
+        _require(comparison == expected, "Invalid comparison roles or modes")
+        context = _object(manifest["review_context"], "review context")
+        _require(context.get("version") == 2 and context.get("comparison") == comparison,
+                 "Comparison roles differ from bound review context")
+        labels = (reference["label"], candidate["label"])
+        _require(set(manifest.get("runs", {})) == set(labels) == set(context.get("runs", {})),
+                 "Run labels differ from comparison roles")
+        for label in labels:
+            files = manifest["runs"][label]["files"]
+            _require(context["runs"][label] == {
+                "responses_sha256": files.get("responses.jsonl"),
+                "intervention_sha256": files.get("intervention.json"),
+                "effective_prompts_sha256": files.get("effective-prompts.json"),
+            }, "Run evidence differs from bound review context")
     blobs = {}
     for name in ("review-items.json", "mapping.json", "rubric.md", "policy.json"):
         blobs[name] = (pack_dir / name).read_bytes()
@@ -283,11 +345,11 @@ def _load_pack(pack_dir):
     items = _unique_map(json.loads(blobs["review-items.json"]), "review_id", "review item")
     mapping = _object(json.loads(blobs["mapping.json"]), "mapping")
     _require(len(items) == 80 and set(mapping) == set(items), "Pack must have 80 unique mapped review items")
-    by_variant = {variant: {} for variant in VARIANTS}
+    by_variant = {variant: {} for variant in labels}
     for review_id, item in items.items():
         entry = _object(mapping[review_id], "mapping entry")
         variant = entry.get("variant")
-        _require(variant in VARIANTS and entry.get("sample_id") == item.get("sample_id"), "Invalid variant/sample mapping")
+        _require(variant in labels and entry.get("sample_id") == item.get("sample_id"), "Invalid variant/sample mapping")
         sample_id = _text(item.get("sample_id"), "review sample_id")
         _require(sample_id not in by_variant[variant], "Duplicate sample within variant mapping")
         _require(item.get("language") in LANGUAGES and item.get("category") in CATEGORIES, "Invalid review language/category")
@@ -300,10 +362,10 @@ def _load_pack(pack_dir):
     selected = manifest.get("selected_ids")
     _require(isinstance(selected, list) and len(selected) == 40 and all(isinstance(x, str) for x in selected)
              and len(set(selected)) == 40, "Invalid pack selected IDs")
-    for variant in VARIANTS:
+    for variant in labels:
         _require(set(by_variant[variant]) == set(selected), "Pack variant does not cover selected IDs")
     for sample_id in selected:
-        baseline, grounded = (by_variant[v][sample_id] for v in VARIANTS)
+        baseline, grounded = (by_variant[v][sample_id] for v in labels)
         for field in ("family_id", "language", "category", "request", "required_points", "forbidden_features"):
             _require(baseline.get(field) == grounded.get(field), f"Unmatched review-pair field: {field}")
     return manifest, manifest_bytes, items, by_variant
@@ -422,18 +484,67 @@ def _group_summary(items, annotations):
     }
 
 
-def _paired_summary(sample_ids, by_variant, annotations):
+def _paired_point_summary(sample_ids, by_variant, annotations, labels):
+    """Compare fulfillment of each matched (sample_id, zero-based point index)."""
+    reference = by_variant[labels[0]]
+    total = sum(len(reference[sid]["required_points"]) for sid in sample_ids)
+    result = {
+        "unit": "required_point", "point_index_base": 0,
+        "total_pairs": total, "eligible_pairs": total, "compared_pairs": 0,
+        "total_families": len({reference[sid]["family_id"] for sid in sample_ids}),
+        "excluded_unreviewed": 0, "excluded_unclear": 0, "not_applicable": 0,
+        "improvements": 0, "regressions": 0, "unchanged": 0,
+        "improvement_point_ids": [], "regression_point_ids": [],
+        "excluded_unreviewed_point_ids": [], "excluded_unclear_point_ids": [],
+        "became_unclear_point_ids": [],
+    }
+    compared_families = set()
+    for sample_id in sample_ids:
+        left, right = (annotations.get(by_variant[label][sample_id]["review_id"]) for label in labels)
+        for index in range(len(reference[sample_id]["required_points"])):
+            point_id = {"sample_id": sample_id, "point_index": index}
+            if left is None or right is None:
+                result["excluded_unreviewed"] += 1
+                result["excluded_unreviewed_point_ids"].append(point_id)
+                continue
+            before, after = left["point_statuses"][index], right["point_statuses"][index]
+            if "unclear" in (before, after):
+                result["excluded_unclear"] += 1
+                result["excluded_unclear_point_ids"].append(point_id)
+                if before != "unclear" and after == "unclear":
+                    result["became_unclear_point_ids"].append(point_id)
+                continue
+            result["compared_pairs"] += 1
+            compared_families.add(reference[sample_id]["family_id"])
+            # Missing and contradicted are both not met for this dimension.
+            # Policy contradiction is assessed independently at response level.
+            if (before == "met") == (after == "met"):
+                result["unchanged"] += 1
+            elif after == "met":
+                result["improvements"] += 1
+                result["improvement_point_ids"].append(point_id)
+            else:
+                result["regressions"] += 1
+                result["regression_point_ids"].append(point_id)
+    result["compared_families"] = len(compared_families)
+    result["coverage"] = result["compared_pairs"] / total if total else None
+    return result
+
+
+def _paired_summary(sample_ids, by_variant, annotations, labels=VARIANTS, include_protocol_metrics=False):
     summary = {}
-    for metric in PAIR_METRICS:
+    metrics = PAIR_METRICS + (("language_adherence",) if include_protocol_metrics else ())
+    for metric in metrics:
+        compared_families = set()
         result = {"total_pairs": len(sample_ids), "eligible_pairs": 0, "compared_pairs": 0,
-                  "total_families": len({by_variant["baseline"][sid]["family_id"] for sid in sample_ids}),
+                  "total_families": len({by_variant[labels[0]][sid]["family_id"] for sid in sample_ids}),
                   "excluded_unreviewed": 0, "excluded_unclear": 0, "not_applicable": 0,
                   "improvements": 0, "regressions": 0, "unchanged": 0,
                   "improvement_sample_ids": [], "regression_sample_ids": [],
                   "excluded_unreviewed_sample_ids": [], "excluded_unclear_sample_ids": [],
                   "became_unclear_sample_ids": []}
         for sample_id in sample_ids:
-            baseline, grounded = (by_variant[v][sample_id] for v in VARIANTS)
+            baseline, grounded = (by_variant[v][sample_id] for v in labels)
             if not _eligible(baseline, metric):
                 result["not_applicable"] += 1
                 continue
@@ -451,26 +562,31 @@ def _paired_summary(sample_ids, by_variant, annotations):
                     result["became_unclear_sample_ids"].append(sample_id)
                 continue
             result["compared_pairs"] += 1
+            compared_families.add(baseline["family_id"])
             if before == after:
                 result["unchanged"] += 1
             else:
-                improved = after if metric == "core_completion" else not after
+                improved = after if metric in ("core_completion", "language_adherence") else not after
                 result["improvements" if improved else "regressions"] += 1
                 result["improvement_sample_ids" if improved else "regression_sample_ids"].append(sample_id)
         result["coverage"] = result["compared_pairs"] / result["eligible_pairs"] if result["eligible_pairs"] else None
+        if include_protocol_metrics:
+            result["compared_families"] = len(compared_families)
         summary[metric] = result
+    if include_protocol_metrics:
+        summary["required_points"] = _paired_point_summary(sample_ids, by_variant, annotations, labels)
     return summary
 
 
-def _rate_differences(baseline, grounded):
+def _rate_differences(baseline, grounded, prefixes=VARIANTS):
     """Descriptive marginal differences; paired counts handle matched changes."""
     result = {}
     for metric in METRICS:
         left, right = baseline["metrics"][metric], grounded["metrics"][metric]
         result[metric] = {
-            "baseline_rate": left["rate"], "grounded_rate": right["rate"],
-            "baseline_denominator": left["denominator"], "grounded_denominator": right["denominator"],
-            "baseline_coverage": left["coverage"], "grounded_coverage": right["coverage"],
+            f"{prefixes[0]}_rate": left["rate"], f"{prefixes[1]}_rate": right["rate"],
+            f"{prefixes[0]}_denominator": left["denominator"], f"{prefixes[1]}_denominator": right["denominator"],
+            f"{prefixes[0]}_coverage": left["coverage"], f"{prefixes[1]}_coverage": right["coverage"],
             "percentage_point_delta": (right["rate"] - left["rate"]) * 100
             if left["rate"] is not None and right["rate"] is not None else None,
         }
@@ -490,8 +606,12 @@ def summarize_review(pack_dir, annotation_paths, output_path):
     _require(isinstance(annotation_paths, (list, tuple)) and len(annotation_paths) > 0, "Supply at least one annotation file")
     manifest, manifest_bytes, items, by_variant = _load_pack(pack_dir)
     annotations, annotation_provenance = _load_annotations(annotation_paths, items)
+    # _load_pack constructs this order from explicit roles, never label sorting
+    # or mapping JSON order. Legacy schema 1 retains its original ordered pair.
+    labels = tuple(by_variant)
+    reference_label, candidate_label = labels
     variants = {}
-    for variant in VARIANTS:
+    for variant in labels:
         values = list(by_variant[variant].values())
         variants[variant] = {
             "overall": _group_summary(values, annotations),
@@ -499,16 +619,18 @@ def summarize_review(pack_dir, annotation_paths, output_path):
             "by_category": {category: _group_summary([item for item in values if item["category"] == category], annotations) for category in CATEGORIES},
         }
     sample_ids = manifest["selected_ids"]
-    baseline = by_variant["baseline"]
+    reference = by_variant[reference_label]
+    protocol_metrics = manifest["schema_version"] == 2
     paired = {
-        "overall": _paired_summary(sample_ids, by_variant, annotations),
-        "by_language": {language: _paired_summary([sid for sid in sample_ids if baseline[sid]["language"] == language], by_variant, annotations) for language in LANGUAGES},
-        "by_category": {category: _paired_summary([sid for sid in sample_ids if baseline[sid]["category"] == category], by_variant, annotations) for category in CATEGORIES},
+        "overall": _paired_summary(sample_ids, by_variant, annotations, labels, protocol_metrics),
+        "by_language": {language: _paired_summary([sid for sid in sample_ids if reference[sid]["language"] == language], by_variant, annotations, labels, protocol_metrics) for language in LANGUAGES},
+        "by_category": {category: _paired_summary([sid for sid in sample_ids if reference[sid]["category"] == category], by_variant, annotations, labels, protocol_metrics) for category in CATEGORIES},
     }
+    prefixes = VARIANTS if manifest["schema_version"] == 1 else ("reference", "candidate")
     differences = {
-        "overall": _rate_differences(variants["baseline"]["overall"], variants["grounded"]["overall"]),
-        "by_language": {language: _rate_differences(variants["baseline"]["by_language"][language], variants["grounded"]["by_language"][language]) for language in LANGUAGES},
-        "by_category": {category: _rate_differences(variants["baseline"]["by_category"][category], variants["grounded"]["by_category"][category]) for category in CATEGORIES},
+        "overall": _rate_differences(variants[reference_label]["overall"], variants[candidate_label]["overall"], prefixes),
+        "by_language": {language: _rate_differences(variants[reference_label]["by_language"][language], variants[candidate_label]["by_language"][language], prefixes) for language in LANGUAGES},
+        "by_category": {category: _rate_differences(variants[reference_label]["by_category"][category], variants[candidate_label]["by_category"][category], prefixes) for category in CATEGORIES},
     }
     summary = {
         "provenance": {
@@ -526,6 +648,14 @@ def summarize_review(pack_dir, annotation_paths, output_path):
         },
         "variants": variants, "paired": paired, "differences": differences,
     }
+    if manifest["schema_version"] == 2:
+        summary["provenance"]["comparison"] = manifest["comparison"]
+        summary["provenance"]["pair_exclusion_rule"] = (
+            "Compare only two annotated, decisive values for each dimension; absent annotations and unclear "
+            "judgments are excluded separately. Required-point missing and contradicted statuses are decisive and unmet.")
+        summary["provenance"]["difference_definition"] = (
+            f"Candidate ({candidate_label}) minus reference ({reference_label}) marginal rates in percentage points; "
+            "review coverage can differ. Use paired counts for matched changes.")
     payload = _json_bytes(summary)
     with output_path.open("xb") as handle:
         handle.write(payload)
@@ -536,8 +666,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     pack = commands.add_parser("pack", help="Create a matched, blinded review pack")
-    pack.add_argument("--baseline", type=Path, required=True)
+    pack.add_argument("--baseline", "--reference", dest="baseline", type=Path, required=True)
     pack.add_argument("--candidate", type=Path, required=True)
+    pack.add_argument("--reference-mode", choices=("baseline", "grounded"), default="baseline")
+    pack.add_argument("--reference-label", default="baseline")
+    pack.add_argument("--candidate-label", default="grounded")
     pack.add_argument("--rubric", type=Path, required=True)
     pack.add_argument("--output", type=Path, required=True)
     summarize = commands.add_parser("summarize", help="Summarize explicit review annotations")
@@ -547,7 +680,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         if args.command == "pack":
-            create_review_pack(args.baseline, args.candidate, args.rubric, args.output)
+            create_review_pack(args.baseline, args.candidate, args.rubric, args.output,
+                               reference_mode=args.reference_mode, reference_label=args.reference_label,
+                               candidate_label=args.candidate_label)
         else:
             summarize_review(args.pack, args.annotations, args.output)
     except (ValueError, OSError) as exc:

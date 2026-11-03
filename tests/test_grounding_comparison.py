@@ -143,6 +143,291 @@ class GroundingComparisonTests(unittest.TestCase):
         write_json(path, labels)
         return self.api.summarize_review(self.pack, [path], self.root / "summary.json")
 
+    def make_grounded_reference(self):
+        reference = self.root / "grounded-reference"
+        original = self.intervention
+        self.intervention = deepcopy(original)
+        self.intervention["intervention_id"] = "grounding-with-conciseness-v1"
+        self.intervention["texts"]["en"] += " Be concise."
+        self.intervention["texts"]["ko"] += " 간결하게 답하세요."
+        try:
+            self.make_run(reference, True)
+        finally:
+            self.intervention = original
+        return reference
+
+    def create_ablation(self, reference, output=None, **changes):
+        options = {"reference_mode": "grounded", "reference_label": "grounded_with_conciseness",
+                   "candidate_label": "grounded_without_conciseness"}
+        options.update(changes)
+        try:
+            return self.api.create_review_pack(reference, self.candidate, self.rubric, output or self.pack,
+                                               **options)
+        except TypeError as exc:
+            self.fail(f"Explicit grounded-reference comparison is missing: {exc}")
+
+    def make_modern_baseline(self):
+        write_json(self.baseline / "effective-prompts.json", self.policy["texts"])
+        effective_hash = digest(self.baseline / "effective-prompts.json")
+        self.mutate_report(self.baseline, ("variant",), "baseline")
+        self.mutate_report(self.baseline, ("effective_prompts_sha256",), effective_hash)
+        responses = [json.loads(line) for line in (self.baseline / "responses.jsonl").read_text().splitlines()]
+        for response in responses:
+            response["effective_prompts_sha256"] = effective_hash
+        self.write_responses(self.baseline, responses)
+        self.mutate_report(self.baseline, ("responses_sha256",), digest(self.baseline / "responses.jsonl"))
+
+    def test_modern_baseline_custom_labels_roundtrip_includes_effective_policy_snapshot(self):
+        self.make_modern_baseline()
+        manifest = self.create_ablation(self.baseline, reference_mode="baseline", reference_label="policy_reference")
+        self.assertIn("effective-prompts.json", manifest["runs"]["policy_reference"]["files"])
+        self.assertEqual(manifest["runs"]["policy_reference"]["files"]["effective-prompts.json"],
+                         digest(self.baseline / "effective-prompts.json"))
+        summary = self.summarize([
+            self.label("policy_reference"), self.label("grounded_without_conciseness"),
+        ])
+        self.assertEqual(summary["provenance"]["comparison"]["reference"],
+                         {"label": "policy_reference", "mode": "baseline"})
+        self.assertEqual(summary["paired"]["overall"]["core_completion"]["compared_pairs"], 1)
+
+    def test_modern_baseline_rejects_wrong_snapshot_hash_and_modified_policy(self):
+        self.make_modern_baseline()
+        original_report = (self.baseline / "report.json").read_bytes()
+        self.mutate_report(self.baseline, ("effective_prompts_sha256",), "0" * 64)
+        with self.assertRaisesRegex(ValueError, "Effective-prompts hash mismatch"):
+            self.create_ablation(self.baseline, reference_mode="baseline", reference_label="policy_reference")
+        (self.baseline / "report.json").write_bytes(original_report)
+        effective = deepcopy(self.policy["texts"])
+        effective["ko"] += " Added unauthorized instruction."
+        write_json(self.baseline / "effective-prompts.json", effective)
+        self.mutate_report(self.baseline, ("effective_prompts_sha256",), digest(self.baseline / "effective-prompts.json"))
+        with self.assertRaisesRegex(ValueError, "unmodified base policy"):
+            self.create_ablation(self.baseline, reference_mode="baseline", reference_label="policy_reference")
+        self.assertFalse(self.pack.exists())
+
+    def test_modern_baseline_rejects_response_effective_prompt_mismatch(self):
+        self.make_modern_baseline()
+        responses = [json.loads(line) for line in (self.baseline / "responses.jsonl").read_text().splitlines()]
+        responses[0]["effective_prompts_sha256"] = "0" * 64
+        self.write_responses(self.baseline, responses)
+        self.mutate_report(self.baseline, ("responses_sha256",), digest(self.baseline / "responses.jsonl"))
+        with self.assertRaisesRegex(ValueError, "effective prompt mismatch"):
+            self.create_ablation(self.baseline, reference_mode="baseline", reference_label="policy_reference")
+
+    def test_two_grounded_runs_keep_true_labels_and_reference_to_candidate_direction(self):
+        reference = self.make_grounded_reference()
+        manifest = self.create_ablation(reference)
+        self.assertEqual(manifest["comparison"], {
+            "reference": {"label": "grounded_with_conciseness", "mode": "grounded"},
+            "candidate": {"label": "grounded_without_conciseness", "mode": "grounded"},
+        })
+        self.assertEqual(set(manifest["runs"]), {"grounded_with_conciseness", "grounded_without_conciseness"})
+        summary = self.summarize([
+            self.label("grounded_with_conciseness", point_statuses=["met", "missing"],
+                       unsupported_details="yes", unsupported_evidence=["Invented process"]),
+            self.label("grounded_without_conciseness", policy_contradiction="unclear"),
+        ])
+        self.assertEqual(summary["provenance"]["comparison"], manifest["comparison"])
+        self.assertEqual(set(summary["variants"]), set(manifest["runs"]))
+        for metric in ("core_completion", "unsupported_details"):
+            self.assertEqual(summary["paired"]["overall"][metric]["improvements"], 1)
+            self.assertEqual(summary["paired"]["overall"][metric]["regressions"], 0)
+        self.assertEqual(summary["paired"]["overall"]["policy_contradiction"]["excluded_unclear"], 1)
+        delta = summary["differences"]["overall"]["core_completion"]
+        self.assertEqual((delta["reference_rate"], delta["candidate_rate"], delta["percentage_point_delta"]),
+                         (0.0, 1.0, 100.0))
+        self.assertNotIn("baseline_rate", delta)
+        self.assertNotIn("baseline", json.dumps(summary))
+
+    def test_grounded_reference_validates_intervention_effective_prompt_and_frozen_rubric(self):
+        reference = self.make_grounded_reference()
+        originals = {p.name: p.read_bytes() for p in reference.iterdir()}
+        mutations = [
+            (("intervention_sha256",), "0" * 64, "Intervention hash"),
+            (("effective_prompts_sha256",), "0" * 64, "Effective-prompts hash"),
+            (("rubric_sha256",), "0" * 64, "frozen rubric"),
+            (("packages", "torch"), "other", "packages"),
+        ]
+        for keys, value, message in mutations:
+            with self.subTest(keys=keys):
+                self.mutate_report(reference, keys, value)
+                with self.assertRaisesRegex(ValueError, message):
+                    self.create_ablation(reference)
+                self.assertFalse(self.pack.exists())
+                for name, content in originals.items():
+                    (reference / name).write_bytes(content)
+        effective = self.read(reference / "effective-prompts.json")
+        effective["en"] = "Different base policy with a valid new file hash"
+        write_json(reference / "effective-prompts.json", effective)
+        self.mutate_report(reference, ("effective_prompts_sha256",), digest(reference / "effective-prompts.json"))
+        with self.assertRaisesRegex(ValueError, "exactly the original policy"):
+            self.create_ablation(reference)
+
+    def test_changed_grounded_reference_intervention_identity_rejects_stale_labels(self):
+        reference = self.make_grounded_reference()
+        self.create_ablation(reference)
+        old_label = self.label("grounded_with_conciseness")
+        old_ids = set(self.read(self.pack / "mapping.json"))
+        intervention = self.read(reference / "intervention.json")
+        intervention["version"] = "2"
+        write_json(reference / "intervention.json", intervention)
+        self.mutate_report(reference, ("intervention",), intervention)
+        self.mutate_report(reference, ("intervention_sha256",), digest(reference / "intervention.json"))
+        new_pack = self.root / "rebound-pack"
+        self.create_ablation(reference, new_pack)
+        self.assertTrue(old_ids.isdisjoint(self.read(new_pack / "mapping.json")))
+        annotations = self.root / "stale-label.json"
+        write_json(annotations, [old_label])
+        with self.assertRaisesRegex(ValueError, "Unknown review ID"):
+            self.api.summarize_review(new_pack, [annotations], self.root / "stale-summary.json")
+
+    def test_explicit_labels_are_bound_into_review_ids_and_cannot_alias_roles(self):
+        reference = self.make_grounded_reference()
+        self.create_ablation(reference)
+        old_ids = set(self.read(self.pack / "mapping.json"))
+        second = self.root / "relabeled-pack"
+        self.create_ablation(reference, second, reference_label="reference_grounded", candidate_label="candidate_grounded")
+        self.assertTrue(old_ids.isdisjoint(self.read(second / "mapping.json")))
+        for changes in ({"reference_label": "baseline"}, {"reference_label": "same", "candidate_label": "same"},
+                        {"candidate_label": "baseline"}, {"reference_mode": "unknown"}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                self.create_ablation(reference, self.root / "invalid", **changes)
+
+    def test_labeled_pack_rejects_missing_or_reversed_role_metadata(self):
+        reference = self.make_grounded_reference()
+        self.create_ablation(reference)
+        path = self.pack / "manifest.json"
+        manifest = self.read(path)
+        for comparison in (None, {"reference": manifest["comparison"]["candidate"],
+                                  "candidate": manifest["comparison"]["reference"]}):
+            with self.subTest(comparison=comparison):
+                changed = deepcopy(manifest)
+                if comparison is None:
+                    del changed["comparison"]
+                else:
+                    changed["comparison"] = comparison
+                write_json(path, changed)
+                with self.assertRaises(ValueError):
+                    self.summarize([])
+
+    def test_cli_accepts_grounded_reference_and_explicit_variant_labels(self):
+        reference = self.make_grounded_reference()
+        try:
+            result = self.api.main([
+                "pack", "--reference", str(reference), "--candidate", str(self.candidate),
+                "--rubric", str(self.rubric), "--output", str(self.pack), "--reference-mode", "grounded",
+                "--reference-label", "grounded_with_conciseness", "--candidate-label", "grounded_without_conciseness",
+            ])
+        except SystemExit as exc:
+            self.fail(f"Grounded-reference CLI is missing: {exc}")
+        self.assertEqual(result, 0)
+        self.assertEqual(set(self.read(self.pack / "manifest.json")["runs"]),
+                         {"grounded_with_conciseness", "grounded_without_conciseness"})
+
+    def test_pair_direction_follows_roles_not_alphabetical_labels_or_run_order(self):
+        reference = self.make_grounded_reference()
+        self.create_ablation(reference, reference_label="z_reference", candidate_label="a_candidate")
+        path = self.pack / "manifest.json"
+        manifest = self.read(path)
+        manifest["runs"] = dict(sorted(manifest["runs"].items()))
+        write_json(path, manifest)
+        summary = self.summarize([
+            self.label("z_reference"),
+            self.label("a_candidate", point_statuses=["missing", "met"],
+                       unsupported_details="yes", unsupported_evidence=["Added claim"]),
+        ])
+        self.assertEqual(summary["paired"]["overall"]["core_completion"]["regressions"], 1)
+        self.assertEqual(summary["paired"]["overall"]["unsupported_details"]["regressions"], 1)
+        delta = summary["differences"]["overall"]["core_completion"]
+        self.assertEqual((delta["reference_rate"], delta["candidate_rate"], delta["percentage_point_delta"]),
+                         (1.0, 0.0, -100.0))
+
+    def test_schema2_pairs_each_required_point_with_explicit_unknown_and_missing_reviews(self):
+        reference = self.make_grounded_reference()
+        self.create_ablation(reference, reference_label="z_reference", candidate_label="a_candidate")
+        summary = self.summarize([
+            self.label("z_reference", "f0-disallowed-en", point_statuses=["missing", "contradicted"]),
+            self.label("a_candidate", "f0-disallowed-en", point_statuses=["met", "met"]),
+            self.label("z_reference", "f1-benign-ko", point_statuses=["met", "met"]),
+            self.label("a_candidate", "f1-benign-ko", point_statuses=["missing", "unclear"]),
+            self.label("z_reference", "f2-disallowed-en", point_statuses=["unclear", "missing"]),
+            self.label("a_candidate", "f2-disallowed-en", point_statuses=["met", "contradicted"]),
+            self.label("z_reference", "f8-utility-en"),
+        ])
+        self.assertIn("required_points", summary["paired"]["overall"])
+        points = summary["paired"]["overall"]["required_points"]
+        self.assertEqual({key: points[key] for key in (
+            "total_pairs", "eligible_pairs", "compared_pairs", "excluded_unclear", "excluded_unreviewed",
+            "improvements", "regressions", "unchanged", "total_families", "compared_families")}, {
+                "total_pairs": 80, "eligible_pairs": 80, "compared_pairs": 4, "excluded_unclear": 2,
+                "excluded_unreviewed": 74, "improvements": 2, "regressions": 1, "unchanged": 1,
+                "total_families": 12, "compared_families": 3,
+            })
+        self.assertEqual(points["coverage"], 0.05)
+        self.assertEqual(points["improvement_point_ids"], [
+            {"sample_id": "f0-disallowed-en", "point_index": 0},
+            {"sample_id": "f0-disallowed-en", "point_index": 1},
+        ])
+        self.assertEqual(points["regression_point_ids"], [{"sample_id": "f1-benign-ko", "point_index": 0}])
+        self.assertEqual(points["became_unclear_point_ids"], [{"sample_id": "f1-benign-ko", "point_index": 1}])
+        self.assertEqual(points["excluded_unclear_point_ids"], [
+            {"sample_id": "f1-benign-ko", "point_index": 1},
+            {"sample_id": "f2-disallowed-en", "point_index": 0},
+        ])
+        self.assertIn({"sample_id": "f8-utility-en", "point_index": 0}, points["excluded_unreviewed_point_ids"])
+        for group, name, expected in [
+            ("by_language", "en", (40, 3, 1, 36, 2, 0)),
+            ("by_language", "ko", (40, 1, 1, 38, 0, 1)),
+            ("by_category", "disallowed", (32, 3, 1, 28, 2, 0)),
+            ("by_category", "benign", (32, 1, 1, 30, 0, 1)),
+            ("by_category", "utility", (16, 0, 0, 16, 0, 0)),
+        ]:
+            with self.subTest(group=group, name=name):
+                actual = summary["paired"][group][name]["required_points"]
+                self.assertEqual(tuple(actual[key] for key in (
+                    "total_pairs", "compared_pairs", "excluded_unclear", "excluded_unreviewed",
+                    "improvements", "regressions")), expected)
+
+    def test_schema2_pairs_language_adherence_in_reference_to_candidate_direction(self):
+        reference = self.make_grounded_reference()
+        self.create_ablation(reference, reference_label="z_reference", candidate_label="a_candidate")
+        summary = self.summarize([
+            self.label("z_reference", "f0-disallowed-en", language_adherence="yes"),
+            self.label("a_candidate", "f0-disallowed-en", language_adherence="no"),
+            self.label("z_reference", "f0-benign-ko", language_adherence="no"),
+            self.label("a_candidate", "f0-benign-ko", language_adherence="yes"),
+            self.label("z_reference", "f1-disallowed-ko", language_adherence="yes"),
+            self.label("a_candidate", "f1-disallowed-ko", language_adherence="unclear"),
+            self.label("z_reference", "f1-benign-en", language_adherence="unclear"),
+            self.label("a_candidate", "f1-benign-en", language_adherence="yes"),
+            self.label("a_candidate", "f2-disallowed-en", language_adherence="yes"),
+        ])
+        self.assertIn("language_adherence", summary["paired"]["overall"])
+        language = summary["paired"]["overall"]["language_adherence"]
+        self.assertEqual(tuple(language[key] for key in (
+            "total_pairs", "eligible_pairs", "compared_pairs", "excluded_unclear", "excluded_unreviewed",
+            "improvements", "regressions", "total_families", "compared_families")),
+            (40, 40, 2, 2, 36, 1, 1, 12, 1))
+        self.assertEqual(language["improvement_sample_ids"], ["f0-benign-ko"])
+        self.assertEqual(language["regression_sample_ids"], ["f0-disallowed-en"])
+        self.assertEqual(language["became_unclear_sample_ids"], ["f1-disallowed-ko"])
+        for name, gains, losses in (("en", 0, 1), ("ko", 1, 0)):
+            actual = summary["paired"]["by_language"][name]["language_adherence"]
+            self.assertEqual((actual["compared_pairs"], actual["excluded_unclear"], actual["excluded_unreviewed"],
+                              actual["improvements"], actual["regressions"]), (1, 1, 18, gains, losses))
+        for name in ("disallowed", "benign"):
+            actual = summary["paired"]["by_category"][name]["language_adherence"]
+            self.assertEqual((actual["eligible_pairs"], actual["compared_pairs"], actual["excluded_unclear"]), (16, 1, 1))
+
+    def test_schema1_retains_original_paired_metrics(self):
+        self.create_pack()
+        summary = self.summarize([])
+        expected = {"core_completion", "unsupported_details", "policy_contradiction", "disallowed_provided", "over_refusal"}
+        groups = [summary["paired"]["overall"], *summary["paired"]["by_language"].values(),
+                  *summary["paired"]["by_category"].values()]
+        for group in groups:
+            self.assertEqual(set(group), expected)
+
     def test_pack_is_shuffled_blinded_complete_and_preserves_source_rows(self):
         source_before = (self.baseline / "curated-samples.json").read_bytes()
         manifest = self.create_pack()

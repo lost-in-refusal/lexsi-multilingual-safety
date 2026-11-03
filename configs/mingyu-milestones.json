@@ -29,19 +29,22 @@
     {
       "due": "2026-11-07",
       "deliverable": "Plain fine-tuning config and baseline run",
-      "status": "independent_development_prompt_control_complete_fine_tuning_not_run",
+      "status": "independent_development_prompt_ablation_complete_fine_tuning_not_run",
       "needs": [
         "Human review of original English-Korean policy/scenarios and v2 output judgments",
-        "Adjudicate new credential/refund regressions and unclear labels",
+        "Adjudicate repeat-review disagreement and credential/refund/access failures",
         "Separate training/calibration families from intervention-selection/test families"
       ],
       "evidence": [
         "docs/pilot-baseline-review.md",
         "evidence/pilot-development/report.json",
         "docs/grounding-comparison-results.md",
-        "evidence/grounding-comparison/summary-model.json"
+        "evidence/grounding-comparison/summary-model.json",
+        "docs/conciseness-ablation-results.md",
+        "evidence/conciseness-ablation/summary-model.json",
+        "evidence/conciseness-ablation/review-consistency.json"
       ],
-      "scope": "40baseline+40prompt-control development responses, re-reviewed under v2;20test cases unrun;model review provisional",
+      "scope": "120 generated development responses across baseline and two prompt controls; latest comparison freshly reviews80 outputs under v2;20test cases unrun;model judgments provisional",
       "remaining": [
         "Plain fine-tuning configuration and substantive training experiment are not complete"
       ]
@@ -79,9 +82,9 @@
     }
   ],
   "next_work_package": [
-    "Review Korean credential/refund regressions and unresolved v2 cases with Mingyu",
-    "Separate grounding guidance from conciseness in a development-only ablation",
-    "Select any further correction using required facts, policy contradictions, unsupported details and over-refusal together",
+    "Adjudicate conflicting reference labels and credential/refund/access failures with Mingyu",
+    "Author targeted correction examples and a separate training/calibration design before LoRA or steering",
+    "Compare corrections on required facts, policy contradictions, unsupported details and over-refusal together",
     "Freeze reviewed labels and selected intervention before the candidate test run"
   ],
   "research_limits": [
