@@ -1,0 +1,26 @@
+{
+  "reviewer": "heldout_audit",
+  "reviewer_type": "model",
+  "recorded_by": "root",
+  "scope": "Independent read-only audit of v2 training configuration, partitions, canonical paths, full epochs, masking, memory preflight, calibration isolation and adapter validation; prior held-out implementation audit also found no material defects.",
+  "input_hashes": {
+    "scripts/prepare_corrections.py": "05ac17a6d3c1958d599ef08ca059d87b5799705502b7771e8a6c730dbd384f36",
+    "scripts/train_correction_lora.py": "dc9037903a7cb77e948faca2fad15f887d57f79802af71a2e093bd72d007be05",
+    "scripts/run_pilot_baseline.py": "4d44eaf77765c35d5ab2db564d2aa2318a53a06ad000b1d10a152c58de6cda00",
+    "tests/test_prepare_corrections.py": "e0e56f2220ec569f6025de127919583e2acf2955d9a74e26613cd7e14d1d19b1",
+    "tests/test_train_correction_lora.py": "c27f2a86f67a0179cb0e61e87ea0af6d0e98456fb677516f621f1fb5023ba28f",
+    "tests/test_pilot_adapter.py": "89652c249419207eef9f1b52833664b769e4979b02e6a8e2ddc84d2e4ff24b8a",
+    "configs/correction-lora-v2.json": "1d8563937bf18932e6b0810c260e943cd6c85609f8424c12f67e5b32f6f7c3e1"
+  },
+  "material_defects": [],
+  "tests_observed_by_root": {
+    "command": ".venv/bin/python -m unittest discover -s tests",
+    "passed": 182,
+    "failed": 0
+  },
+  "heldout_execution": false,
+  "limitations": [
+    "Read-only code audit is not model-performance evidence.",
+    "Actual reviewer independence and one-time held-out use remain coordinator responsibilities."
+  ]
+}

@@ -1,0 +1,244 @@
+{
+  "schema_version": 3,
+  "shuffle_seed": 7261,
+  "review_item_count": 80,
+  "review_context": {
+    "version": 3,
+    "comparison": {
+      "reference": {
+        "label": "baseline",
+        "mode": "baseline"
+      },
+      "candidate": {
+        "label": "plain_lora",
+        "mode": "adapted"
+      }
+    },
+    "runs": {
+      "baseline": {
+        "responses_sha256": "8e7c0ffc3cbe48c7dc7717db60d85aa377d9ab876f424826c98eb5aeab1d5f8e",
+        "intervention_sha256": null,
+        "effective_prompts_sha256": null,
+        "adapter_provenance_sha256": null,
+        "training_report_sha256": null,
+        "training_config_sha256": null,
+        "adapter_config_sha256": null
+      },
+      "plain_lora": {
+        "responses_sha256": "2a431db938b198cc9b162f85dc08f951ca3682cc31350c6faea9a52413d95172",
+        "intervention_sha256": null,
+        "effective_prompts_sha256": "298f348272b5dd6997e055b80ad02fea32634f6bf9cfed474056d9e6f5e85f06",
+        "adapter_provenance_sha256": "9aeeb70cbf389e65cfa4c001bdd5aa0f2d236df50cebeb96736894d9e8af3ee5",
+        "training_report_sha256": "739d392dbd70fc4f602835771715f9a4a59cdf6676dbda2ea40607d117c4aafc",
+        "training_config_sha256": "0380ce93c2199be9a89d1b84c1c6e24cc80e6ec75cb7dc117ed9aad8b33ac130",
+        "adapter_config_sha256": "cd37632e9fb31b15c40e19b1d9c637637afa8b7c5341c5e70d6aac74318d8095"
+      }
+    },
+    "curated_sha256": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
+    "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+    "rubric_sha256": "bee14f87e810729106a54b9a57548e60e25c6726b3fee84627d54d06d4d8a352",
+    "ordered_selected_ids": [
+      "privacy_address_disallowed_en",
+      "privacy_address_disallowed_ko",
+      "privacy_address_benign_en",
+      "privacy_address_benign_ko",
+      "privacy_gift_receipt_disallowed_en",
+      "privacy_gift_receipt_disallowed_ko",
+      "privacy_gift_receipt_benign_en",
+      "privacy_gift_receipt_benign_ko",
+      "privacy_order_history_disallowed_en",
+      "privacy_order_history_disallowed_ko",
+      "privacy_order_history_benign_en",
+      "privacy_order_history_benign_ko",
+      "account_skip_verification_disallowed_en",
+      "account_skip_verification_disallowed_ko",
+      "account_skip_verification_benign_en",
+      "account_skip_verification_benign_ko",
+      "account_code_handling_disallowed_en",
+      "account_code_handling_disallowed_ko",
+      "account_code_handling_benign_en",
+      "account_code_handling_benign_ko",
+      "refund_delivery_date_disallowed_en",
+      "refund_delivery_date_disallowed_ko",
+      "refund_delivery_date_benign_en",
+      "refund_delivery_date_benign_ko",
+      "refund_payment_destination_disallowed_en",
+      "refund_payment_destination_disallowed_ko",
+      "refund_payment_destination_benign_en",
+      "refund_payment_destination_benign_ko",
+      "refund_receipt_authenticity_disallowed_en",
+      "refund_receipt_authenticity_disallowed_ko",
+      "refund_receipt_authenticity_benign_en",
+      "refund_receipt_authenticity_benign_ko",
+      "utility_return_window_utility_en",
+      "utility_return_window_utility_ko",
+      "utility_credentials_utility_en",
+      "utility_credentials_utility_ko",
+      "utility_verification_capability_utility_en",
+      "utility_verification_capability_utility_ko",
+      "utility_privacy_boundary_utility_en",
+      "utility_privacy_boundary_utility_ko"
+    ]
+  },
+  "review_context_sha256": "d286303821ac7622589700a4dc959d7876b05b6c7a824111108e99e6e9a57e3f",
+  "sample_count": 40,
+  "family_count": 12,
+  "selected_ids": [
+    "privacy_address_disallowed_en",
+    "privacy_address_disallowed_ko",
+    "privacy_address_benign_en",
+    "privacy_address_benign_ko",
+    "privacy_gift_receipt_disallowed_en",
+    "privacy_gift_receipt_disallowed_ko",
+    "privacy_gift_receipt_benign_en",
+    "privacy_gift_receipt_benign_ko",
+    "privacy_order_history_disallowed_en",
+    "privacy_order_history_disallowed_ko",
+    "privacy_order_history_benign_en",
+    "privacy_order_history_benign_ko",
+    "account_skip_verification_disallowed_en",
+    "account_skip_verification_disallowed_ko",
+    "account_skip_verification_benign_en",
+    "account_skip_verification_benign_ko",
+    "account_code_handling_disallowed_en",
+    "account_code_handling_disallowed_ko",
+    "account_code_handling_benign_en",
+    "account_code_handling_benign_ko",
+    "refund_delivery_date_disallowed_en",
+    "refund_delivery_date_disallowed_ko",
+    "refund_delivery_date_benign_en",
+    "refund_delivery_date_benign_ko",
+    "refund_payment_destination_disallowed_en",
+    "refund_payment_destination_disallowed_ko",
+    "refund_payment_destination_benign_en",
+    "refund_payment_destination_benign_ko",
+    "refund_receipt_authenticity_disallowed_en",
+    "refund_receipt_authenticity_disallowed_ko",
+    "refund_receipt_authenticity_benign_en",
+    "refund_receipt_authenticity_benign_ko",
+    "utility_return_window_utility_en",
+    "utility_return_window_utility_ko",
+    "utility_credentials_utility_en",
+    "utility_credentials_utility_ko",
+    "utility_verification_capability_utility_en",
+    "utility_verification_capability_utility_ko",
+    "utility_privacy_boundary_utility_en",
+    "utility_privacy_boundary_utility_ko"
+  ],
+  "files": {
+    "review-items.json": "6d7396f1c0009a5ca509c464627c5c227aad3b106f50459fb48b03b45ae26ef4",
+    "mapping.json": "00bc8a2e7ce97fb547deafbe9121261999ce78a0254401c40a74f8084e989299",
+    "rubric.md": "bee14f87e810729106a54b9a57548e60e25c6726b3fee84627d54d06d4d8a352",
+    "policy.json": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08"
+  },
+  "reviewer_files": [
+    "review-items.json",
+    "rubric.md",
+    "policy.json"
+  ],
+  "coordinator_only_files": [
+    "mapping.json",
+    "manifest.json"
+  ],
+  "scope": "Matched fictional-policy development comparison; no statistical significance or general safety claim.",
+  "runs": {
+    "baseline": {
+      "directory": "/Users/kyle/Lexsi/evidence/pilot-development",
+      "files": {
+        "report.json": "45afb437e5317cc2dcd3463552bdbd7e88b4ad13feb3446c8378ea058f7762f6",
+        "curated-samples.json": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
+        "raw-samples.json": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
+        "policy.json": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+        "responses.jsonl": "8e7c0ffc3cbe48c7dc7717db60d85aa377d9ab876f424826c98eb5aeab1d5f8e",
+        "auditkit-result.json": "974e4a4e354631bde7d26fe771acd7587b769a384bee5083ef47ace164bf083c"
+      },
+      "run_nonce": "ba45bdc02d894a199ff8340c093c504c",
+      "runtime": {
+        "model": "CohereLabs/aya-expanse-8b",
+        "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+        "local_device": "mps",
+        "dtype": "bfloat16",
+        "seed": 42,
+        "batch_size": 1,
+        "smoke_max_new_tokens": 32,
+        "decision": "Mingyu selected Aya Expanse 8B for current local team smoke tests on November 2, 2026. Tiny Aya remains an untested fallback."
+      },
+      "config": {
+        "experiment": "harborcart-bilingual-development-baseline-v1",
+        "split": "development",
+        "max_new_tokens": 512,
+        "temperature": 0.0,
+        "batch_size": 1,
+        "mps_memory_fraction": 0.8,
+        "semantic_review": "pending",
+        "length_calibration": "Initial 128-token development attempt truncated responses; retained as interrupted calibration. Full baseline uses 512 for both languages.",
+        "test_partition": "unrun; shared policy concepts, held-out wording and fact combinations"
+      },
+      "tools": {
+        "CuratorKIT": "dd9e835301fcddc74a37501d9e207a5a060d209f",
+        "SafeTune": "26f59e6d1bdcacafe5f2be3b8d982fb214369659",
+        "AuditKIT": "71316da345784ff220d5ed59337441a59ab31526"
+      }
+    },
+    "plain_lora": {
+      "directory": "/Users/kyle/Lexsi/evidence/pilot-lora-development",
+      "files": {
+        "report.json": "7be0efa39351aa81385a9691ceb1ade13ac0cb69c0df2cd2bdcaa40502ea8dc5",
+        "curated-samples.json": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
+        "raw-samples.json": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
+        "policy.json": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+        "effective-prompts.json": "298f348272b5dd6997e055b80ad02fea32634f6bf9cfed474056d9e6f5e85f06",
+        "adapter-training-report.json": "739d392dbd70fc4f602835771715f9a4a59cdf6676dbda2ea40607d117c4aafc",
+        "adapter-training-config.json": "0380ce93c2199be9a89d1b84c1c6e24cc80e6ec75cb7dc117ed9aad8b33ac130",
+        "adapter-config.json": "cd37632e9fb31b15c40e19b1d9c637637afa8b7c5341c5e70d6aac74318d8095",
+        "adapter-provenance.json": "9aeeb70cbf389e65cfa4c001bdd5aa0f2d236df50cebeb96736894d9e8af3ee5",
+        "rubric.md": "bee14f87e810729106a54b9a57548e60e25c6726b3fee84627d54d06d4d8a352",
+        "responses.jsonl": "2a431db938b198cc9b162f85dc08f951ca3682cc31350c6faea9a52413d95172",
+        "auditkit-result.json": "9582da0d942a6329645bfd7544cb51b3b2e451961fa2d99c6a7c1a255614aa47"
+      },
+      "run_nonce": "d1d8dfd2407d47c5bc72bc1e250291fd",
+      "runtime": {
+        "model": "CohereLabs/aya-expanse-8b",
+        "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+        "local_device": "mps",
+        "dtype": "bfloat16",
+        "seed": 42,
+        "batch_size": 1,
+        "smoke_max_new_tokens": 32,
+        "decision": "Mingyu selected Aya Expanse 8B for current local team smoke tests on November 2, 2026. Tiny Aya remains an untested fallback."
+      },
+      "config": {
+        "experiment": "harborcart-bilingual-adapter-9aeeb70cbf38",
+        "split": "development",
+        "max_new_tokens": 512,
+        "temperature": 0.0,
+        "batch_size": 1,
+        "mps_memory_fraction": 0.8,
+        "semantic_review": "pending",
+        "length_calibration": "Initial 128-token development attempt truncated responses; retained as interrupted calibration. Full baseline uses 512 for both languages.",
+        "test_partition": "unrun; shared policy concepts, held-out wording and fact combinations"
+      },
+      "tools": {
+        "CuratorKIT": "dd9e835301fcddc74a37501d9e207a5a060d209f",
+        "SafeTune": "26f59e6d1bdcacafe5f2be3b8d982fb214369659",
+        "AuditKIT": "71316da345784ff220d5ed59337441a59ab31526"
+      }
+    }
+  },
+  "dataset_sha256": "f0b2ea2aafe90fb84f058e04ffd13e84b5bf144d352faaf426574d03a823a6cd",
+  "curated_sha256": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
+  "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+  "rubric_sha256": "bee14f87e810729106a54b9a57548e60e25c6726b3fee84627d54d06d4d8a352",
+  "script_sha256": "eea557e02e65a15f5495faca328d436bd3afea3a07b6e88fd9a4252ede89b481",
+  "comparison": {
+    "reference": {
+      "label": "baseline",
+      "mode": "baseline"
+    },
+    "candidate": {
+      "label": "plain_lora",
+      "mode": "adapted"
+    }
+  },
+  "adapter_validation_script_sha256": "03b356b61bc264555bbac2d612a12601755e732398658868b22da4f4a58128db"
+}

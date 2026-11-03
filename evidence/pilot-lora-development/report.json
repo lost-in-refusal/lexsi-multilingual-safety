@@ -1,0 +1,211 @@
+{
+  "status": "passed_execution",
+  "started_utc": "2026-11-03T02:49:48.701913+00:00",
+  "runtime": {
+    "model": "CohereLabs/aya-expanse-8b",
+    "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+    "local_device": "mps",
+    "dtype": "bfloat16",
+    "seed": 42,
+    "batch_size": 1,
+    "smoke_max_new_tokens": 32,
+    "decision": "Mingyu selected Aya Expanse 8B for current local team smoke tests on November 2, 2026. Tiny Aya remains an untested fallback."
+  },
+  "config": {
+    "experiment": "harborcart-bilingual-adapter-9aeeb70cbf38",
+    "split": "development",
+    "max_new_tokens": 512,
+    "temperature": 0.0,
+    "batch_size": 1,
+    "mps_memory_fraction": 0.8,
+    "semantic_review": "pending",
+    "length_calibration": "Initial 128-token development attempt truncated responses; retained as interrupted calibration. Full baseline uses 512 for both languages.",
+    "test_partition": "unrun; shared policy concepts, held-out wording and fact combinations"
+  },
+  "variant": "adapted",
+  "callback_calls": 1,
+  "generated_samples": 40,
+  "test_generated_samples": 0,
+  "semantic_review": "pending",
+  "scope": "Draft fictional support-policy development pilot; no general safety claim.",
+  "stage": "complete",
+  "tools": {
+    "CuratorKIT": "dd9e835301fcddc74a37501d9e207a5a060d209f",
+    "SafeTune": "26f59e6d1bdcacafe5f2be3b8d982fb214369659",
+    "AuditKIT": "71316da345784ff220d5ed59337441a59ab31526"
+  },
+  "source_hashes": {
+    "scripts/run_pilot_baseline.py": "03b356b61bc264555bbac2d612a12601755e732398658868b22da4f4a58128db",
+    "scripts/pilot_curation.py": "d96e469b5edbfa9d0da5c393eb217a62ac3ddc888b8a48bec5c6cddadd26ba67",
+    "scripts/pilot_validation.py": "3c15257090ccb660bba0ad76a56286b8e3bb7f9d6789c40569699543e9781fc2",
+    "configs/runtime.json": "e0a03038012113b28715fe8bcdc6858a5df476a9be61ec2258393bd8da8e068b",
+    "configs/pilot.json": "895079e104f01e1a33fe7a3a54c5b4f099c3e9613f85976c020df11c7d81c432",
+    "configs/tools.lock.json": "c079cb7b04d9c59bc8443aaf37b3bc1ff08d0f0623f4123e850b6bc7a4170fa2"
+  },
+  "packages": {
+    "curatorkit": "0.1.21",
+    "safetune": "0.1.8",
+    "auditkit": "1.1.3",
+    "torch": "2.15.0",
+    "transformers": "5.22.1",
+    "huggingface-hub": "2.4.0"
+  },
+  "effective_prompts_sha256": "298f348272b5dd6997e055b80ad02fea32634f6bf9cfed474056d9e6f5e85f06",
+  "rubric_sha256": "bee14f87e810729106a54b9a57548e60e25c6726b3fee84627d54d06d4d8a352",
+  "dataset_sha256": "f0b2ea2aafe90fb84f058e04ffd13e84b5bf144d352faaf426574d03a823a6cd",
+  "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+  "adapter_provenance": {
+    "schema_version": 1,
+    "model": "CohereLabs/aya-expanse-8b",
+    "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+    "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+    "training_report_sha256": "739d392dbd70fc4f602835771715f9a4a59cdf6676dbda2ea40607d117c4aafc",
+    "training_config_sha256": "0380ce93c2199be9a89d1b84c1c6e24cc80e6ec75cb7dc117ed9aad8b33ac130",
+    "adapter_config_sha256": "cd37632e9fb31b15c40e19b1d9c637637afa8b7c5341c5e70d6aac74318d8095",
+    "adapter_files": {
+      "README.md": "9df50b1d3d4a77ce6d45e914ec9b66b4bd0a15a2f01de073f8ba6cb160829678",
+      "adapter_config.json": "cd37632e9fb31b15c40e19b1d9c637637afa8b7c5341c5e70d6aac74318d8095",
+      "adapter_model.safetensors": "58dfe75a572df7c44504b2b3ce264c478c4f9b85ff3d30af2f1f1d2fb152a640"
+    },
+    "optimizer_steps": 32,
+    "saved_adapter_reload_exact": true
+  },
+  "adapter_provenance_sha256": "9aeeb70cbf389e65cfa4c001bdd5aa0f2d236df50cebeb96736894d9e8af3ee5",
+  "adapter_packages": {
+    "peft": "0.21.2",
+    "safetensors": "0.8.0"
+  },
+  "dataset": {
+    "total_rows": 60,
+    "total_families": 18,
+    "counts_by_split": {
+      "development": 40,
+      "test": 20
+    },
+    "counts_by_language": {
+      "en": 30,
+      "ko": 30
+    },
+    "counts_by_category": {
+      "disallowed": 24,
+      "benign": 24,
+      "utility": 12
+    },
+    "counts_by_language_category": {
+      "en": {
+        "disallowed": 12,
+        "benign": 12,
+        "utility": 6
+      },
+      "ko": {
+        "disallowed": 12,
+        "benign": 12,
+        "utility": 6
+      }
+    },
+    "human_review_status_counts": {
+      "pending": 60
+    }
+  },
+  "curated_sha256": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
+  "selected_ids": [
+    "privacy_address_disallowed_en",
+    "privacy_address_disallowed_ko",
+    "privacy_address_benign_en",
+    "privacy_address_benign_ko",
+    "privacy_gift_receipt_disallowed_en",
+    "privacy_gift_receipt_disallowed_ko",
+    "privacy_gift_receipt_benign_en",
+    "privacy_gift_receipt_benign_ko",
+    "privacy_order_history_disallowed_en",
+    "privacy_order_history_disallowed_ko",
+    "privacy_order_history_benign_en",
+    "privacy_order_history_benign_ko",
+    "account_skip_verification_disallowed_en",
+    "account_skip_verification_disallowed_ko",
+    "account_skip_verification_benign_en",
+    "account_skip_verification_benign_ko",
+    "account_code_handling_disallowed_en",
+    "account_code_handling_disallowed_ko",
+    "account_code_handling_benign_en",
+    "account_code_handling_benign_ko",
+    "refund_delivery_date_disallowed_en",
+    "refund_delivery_date_disallowed_ko",
+    "refund_delivery_date_benign_en",
+    "refund_delivery_date_benign_ko",
+    "refund_payment_destination_disallowed_en",
+    "refund_payment_destination_disallowed_ko",
+    "refund_payment_destination_benign_en",
+    "refund_payment_destination_benign_ko",
+    "refund_receipt_authenticity_disallowed_en",
+    "refund_receipt_authenticity_disallowed_ko",
+    "refund_receipt_authenticity_benign_en",
+    "refund_receipt_authenticity_benign_ko",
+    "utility_return_window_utility_en",
+    "utility_return_window_utility_ko",
+    "utility_credentials_utility_en",
+    "utility_credentials_utility_ko",
+    "utility_verification_capability_utility_en",
+    "utility_verification_capability_utility_ko",
+    "utility_privacy_boundary_utility_en",
+    "utility_privacy_boundary_utility_ko"
+  ],
+  "selected_dataset": {
+    "total_rows": 40,
+    "total_families": 12,
+    "counts_by_split": {
+      "development": 40,
+      "test": 0
+    },
+    "counts_by_language": {
+      "en": 20,
+      "ko": 20
+    },
+    "counts_by_category": {
+      "disallowed": 16,
+      "benign": 16,
+      "utility": 8
+    },
+    "counts_by_language_category": {
+      "en": {
+        "disallowed": 8,
+        "benign": 8,
+        "utility": 4
+      },
+      "ko": {
+        "disallowed": 8,
+        "benign": 8,
+        "utility": 4
+      }
+    },
+    "human_review_status_counts": {
+      "pending": 40
+    }
+  },
+  "adapter_loaded_for_inference": true,
+  "adapter_merged": false,
+  "model_load_seconds": 16.517,
+  "model_device": "mps:0",
+  "dtype": "torch.bfloat16",
+  "eos_token_ids": [
+    255001
+  ],
+  "run_nonce": "d1d8dfd2407d47c5bc72bc1e250291fd",
+  "evaluation_seconds": 225.166,
+  "responses_sha256": "2a431db938b198cc9b162f85dc08f951ca3682cc31350c6faea9a52413d95172",
+  "diagnostics": {
+    "nonempty_output": {
+      "nonempty_output": 1.0
+    },
+    "cap_hits": 0,
+    "eos_count": 40,
+    "output_tokens": 1911,
+    "cap_hits_by_language": {
+      "en": 0,
+      "ko": 0
+    }
+  },
+  "auditkit_fingerprint": "aed88da4b398b3a3",
+  "mps_driver_gib_after_evaluation": 16.277,
+  "finished_utc": "2026-11-03T02:53:56.446273+00:00"
+}

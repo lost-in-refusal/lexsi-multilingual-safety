@@ -1,0 +1,732 @@
+{
+  "review_type": "independent_model_semantic_policy_and_translation_data_quality_review",
+  "reviewed_at_utc": "2026-11-03T03:17:37.784432+00:00",
+  "reviewer_identity": {
+    "name": "Codex AI reviewer",
+    "agent": "/root/correction_v2_review",
+    "role": "Independent model review of proposed corpus; not its author and not a human approver",
+    "human_reviewer": false
+  },
+  "status": "clear",
+  "status_meaning": "No blocking policy, request-relative completeness, or English–Korean semantic-equivalence error identified. Optional wording suggestions do not require a corpus change. This status is not human approval or evidence of model performance.",
+  "input": {
+    "path": "data/corrections-v2/examples.jsonl",
+    "sha256": "410421b89d0996e12203b1bf0b70f5d028f0e75788e56261e142aa1aa0479b86",
+    "policy_path": "data/pilot/policy.json",
+    "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+    "policy_id": "harborcart_support_pilot_v1",
+    "policy_version": "0.1.0",
+    "sole_store_fact_authority": "data/pilot/policy.json",
+    "design_path": "docs/correction-data-v2-design.md",
+    "design_sha256": "9a0a0031723c1de4db14ac835ad7841b8ff525bf8d3509114a130546cba74cf7",
+    "design_read": true,
+    "design_note": "The design file was absent on the initial read and present and fully read before this final record. Claims about prior corpora or runs in that document were not independently checked."
+  },
+  "scope": {
+    "rows_reviewed": 96,
+    "semantic_language_pairs_reviewed": 48,
+    "splits": {
+      "train": 80,
+      "calibration": 16
+    },
+    "languages": {
+      "en": 48,
+      "ko": 48
+    },
+    "categories": {
+      "benign": 40,
+      "disallowed": 40,
+      "utility": 16
+    },
+    "method": "Read every complete row, including each request, target, category, rule list, summary, provenance, and review status. Compared all English/Korean request-and-target pairs and applied the supplied policy to each answer. Structural assertions only supplemented this semantic inspection.",
+    "completeness_standard": "Answer all relevant parts of the actual request and preserve conditions necessary for the proposed allowed route; do not require unrelated policy text in each answer.",
+    "read_paths": [
+      "data/pilot/policy.json",
+      "data/corrections-v2/examples.jsonl",
+      "docs/correction-data-v2-design.md"
+    ],
+    "excluded_sources": [
+      "Evaluation datasets",
+      "Evaluation outputs",
+      "Review annotations",
+      "V1 score artifacts",
+      "Model mappings",
+      "Other corpus files"
+    ],
+    "network_used": false,
+    "gpu_used": false,
+    "model_performance_evaluation": false,
+    "corpus_modified": false
+  },
+  "reviewed_ids": [
+    "v2_attachment_credentials_benign_en",
+    "v2_attachment_credentials_benign_ko",
+    "v2_attachment_credentials_disallowed_en",
+    "v2_attachment_credentials_disallowed_ko",
+    "v2_shared_device_session_benign_en",
+    "v2_shared_device_session_benign_ko",
+    "v2_shared_device_session_disallowed_en",
+    "v2_shared_device_session_disallowed_ko",
+    "v2_replaced_card_benign_en",
+    "v2_replaced_card_benign_ko",
+    "v2_replaced_card_disallowed_en",
+    "v2_replaced_card_disallowed_ko",
+    "v2_duplicate_credit_benign_en",
+    "v2_duplicate_credit_benign_ko",
+    "v2_duplicate_credit_disallowed_en",
+    "v2_duplicate_credit_disallowed_ko",
+    "v2_calendar_boundary_benign_en",
+    "v2_calendar_boundary_benign_ko",
+    "v2_calendar_boundary_disallowed_en",
+    "v2_calendar_boundary_disallowed_ko",
+    "v2_unspecified_return_interface_benign_en",
+    "v2_unspecified_return_interface_benign_ko",
+    "v2_unspecified_return_interface_disallowed_en",
+    "v2_unspecified_return_interface_disallowed_ko",
+    "v2_receipt_contents_benign_en",
+    "v2_receipt_contents_benign_ko",
+    "v2_receipt_contents_disallowed_en",
+    "v2_receipt_contents_disallowed_ko",
+    "v2_verification_unknown_answers_benign_en",
+    "v2_verification_unknown_answers_benign_ko",
+    "v2_verification_unknown_answers_disallowed_en",
+    "v2_verification_unknown_answers_disallowed_ko",
+    "v2_owner_history_review_benign_en",
+    "v2_owner_history_review_benign_ko",
+    "v2_owner_history_review_disallowed_en",
+    "v2_owner_history_review_disallowed_ko",
+    "v2_owner_delivery_address_benign_en",
+    "v2_owner_delivery_address_benign_ko",
+    "v2_owner_delivery_address_disallowed_en",
+    "v2_owner_delivery_address_disallowed_ko",
+    "v2_missing_receipt_benign_en",
+    "v2_missing_receipt_benign_ko",
+    "v2_missing_receipt_disallowed_en",
+    "v2_missing_receipt_disallowed_ko",
+    "v2_assistant_return_submission_benign_en",
+    "v2_assistant_return_submission_benign_ko",
+    "v2_assistant_return_submission_disallowed_en",
+    "v2_assistant_return_submission_disallowed_ko",
+    "v2_account_address_change_benign_en",
+    "v2_account_address_change_benign_ko",
+    "v2_account_address_change_disallowed_en",
+    "v2_account_address_change_disallowed_ko",
+    "v2_travel_deadline_benign_en",
+    "v2_travel_deadline_benign_ko",
+    "v2_travel_deadline_disallowed_en",
+    "v2_travel_deadline_disallowed_ko",
+    "v2_partner_order_number_benign_en",
+    "v2_partner_order_number_benign_ko",
+    "v2_partner_order_number_disallowed_en",
+    "v2_partner_order_number_disallowed_ko",
+    "v2_support_draft_status_benign_en",
+    "v2_support_draft_status_benign_ko",
+    "v2_support_draft_status_disallowed_en",
+    "v2_support_draft_status_disallowed_ko",
+    "v2_utility_return_window_utility_en",
+    "v2_utility_return_window_utility_ko",
+    "v2_utility_return_receipt_utility_en",
+    "v2_utility_return_receipt_utility_ko",
+    "v2_utility_refund_rule_utility_en",
+    "v2_utility_refund_rule_utility_ko",
+    "v2_utility_credential_location_utility_en",
+    "v2_utility_credential_location_utility_ko",
+    "v2_utility_owner_records_utility_en",
+    "v2_utility_owner_records_utility_ko",
+    "v2_utility_assistant_capabilities_utility_en",
+    "v2_utility_assistant_capabilities_utility_ko",
+    "v2_utility_policy_gaps_utility_en",
+    "v2_utility_policy_gaps_utility_ko",
+    "v2_utility_data_request_utility_en",
+    "v2_utility_data_request_utility_ko",
+    "correction_delegated_translation_benign_en",
+    "correction_delegated_translation_benign_ko",
+    "correction_delegated_translation_disallowed_en",
+    "correction_delegated_translation_disallowed_ko",
+    "correction_refund_notice_verification_benign_en",
+    "correction_refund_notice_verification_benign_ko",
+    "correction_refund_notice_verification_disallowed_en",
+    "correction_refund_notice_verification_disallowed_ko",
+    "correction_data_access_request_benign_en",
+    "correction_data_access_request_benign_ko",
+    "correction_data_access_request_disallowed_en",
+    "correction_data_access_request_disallowed_ko",
+    "correction_conflicting_delivery_evidence_benign_en",
+    "correction_conflicting_delivery_evidence_benign_ko",
+    "correction_conflicting_delivery_evidence_disallowed_en",
+    "correction_conflicting_delivery_evidence_disallowed_ko"
+  ],
+  "reviewed_pairs": [
+    {
+      "family_id": "v2_attachment_credentials",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_attachment_credentials_benign_en",
+      "korean_id": "v2_attachment_credentials_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_attachment_credentials",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_attachment_credentials_disallowed_en",
+      "korean_id": "v2_attachment_credentials_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_shared_device_session",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_shared_device_session_benign_en",
+      "korean_id": "v2_shared_device_session_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_shared_device_session",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_shared_device_session_disallowed_en",
+      "korean_id": "v2_shared_device_session_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_replaced_card",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_replaced_card_benign_en",
+      "korean_id": "v2_replaced_card_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_replaced_card",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_replaced_card_disallowed_en",
+      "korean_id": "v2_replaced_card_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_duplicate_credit",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_duplicate_credit_benign_en",
+      "korean_id": "v2_duplicate_credit_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_duplicate_credit",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_duplicate_credit_disallowed_en",
+      "korean_id": "v2_duplicate_credit_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_calendar_boundary",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_calendar_boundary_benign_en",
+      "korean_id": "v2_calendar_boundary_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_calendar_boundary",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_calendar_boundary_disallowed_en",
+      "korean_id": "v2_calendar_boundary_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_unspecified_return_interface",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_unspecified_return_interface_benign_en",
+      "korean_id": "v2_unspecified_return_interface_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_unspecified_return_interface",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_unspecified_return_interface_disallowed_en",
+      "korean_id": "v2_unspecified_return_interface_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_receipt_contents",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_receipt_contents_benign_en",
+      "korean_id": "v2_receipt_contents_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_receipt_contents",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_receipt_contents_disallowed_en",
+      "korean_id": "v2_receipt_contents_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_verification_unknown_answers",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_verification_unknown_answers_benign_en",
+      "korean_id": "v2_verification_unknown_answers_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_verification_unknown_answers",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_verification_unknown_answers_disallowed_en",
+      "korean_id": "v2_verification_unknown_answers_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_owner_history_review",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_owner_history_review_benign_en",
+      "korean_id": "v2_owner_history_review_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_owner_history_review",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_owner_history_review_disallowed_en",
+      "korean_id": "v2_owner_history_review_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_owner_delivery_address",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_owner_delivery_address_benign_en",
+      "korean_id": "v2_owner_delivery_address_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_owner_delivery_address",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_owner_delivery_address_disallowed_en",
+      "korean_id": "v2_owner_delivery_address_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_missing_receipt",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_missing_receipt_benign_en",
+      "korean_id": "v2_missing_receipt_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_missing_receipt",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_missing_receipt_disallowed_en",
+      "korean_id": "v2_missing_receipt_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_assistant_return_submission",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_assistant_return_submission_benign_en",
+      "korean_id": "v2_assistant_return_submission_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_assistant_return_submission",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_assistant_return_submission_disallowed_en",
+      "korean_id": "v2_assistant_return_submission_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_account_address_change",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_account_address_change_benign_en",
+      "korean_id": "v2_account_address_change_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_account_address_change",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_account_address_change_disallowed_en",
+      "korean_id": "v2_account_address_change_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_travel_deadline",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_travel_deadline_benign_en",
+      "korean_id": "v2_travel_deadline_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_travel_deadline",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_travel_deadline_disallowed_en",
+      "korean_id": "v2_travel_deadline_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_partner_order_number",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_partner_order_number_benign_en",
+      "korean_id": "v2_partner_order_number_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_partner_order_number",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_partner_order_number_disallowed_en",
+      "korean_id": "v2_partner_order_number_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_support_draft_status",
+      "category": "benign",
+      "split": "train",
+      "english_id": "v2_support_draft_status_benign_en",
+      "korean_id": "v2_support_draft_status_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_support_draft_status",
+      "category": "disallowed",
+      "split": "train",
+      "english_id": "v2_support_draft_status_disallowed_en",
+      "korean_id": "v2_support_draft_status_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_utility_return_window",
+      "category": "utility",
+      "split": "train",
+      "english_id": "v2_utility_return_window_utility_en",
+      "korean_id": "v2_utility_return_window_utility_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_utility_return_receipt",
+      "category": "utility",
+      "split": "train",
+      "english_id": "v2_utility_return_receipt_utility_en",
+      "korean_id": "v2_utility_return_receipt_utility_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_utility_refund_rule",
+      "category": "utility",
+      "split": "train",
+      "english_id": "v2_utility_refund_rule_utility_en",
+      "korean_id": "v2_utility_refund_rule_utility_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_utility_credential_location",
+      "category": "utility",
+      "split": "train",
+      "english_id": "v2_utility_credential_location_utility_en",
+      "korean_id": "v2_utility_credential_location_utility_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_utility_owner_records",
+      "category": "utility",
+      "split": "train",
+      "english_id": "v2_utility_owner_records_utility_en",
+      "korean_id": "v2_utility_owner_records_utility_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_utility_assistant_capabilities",
+      "category": "utility",
+      "split": "train",
+      "english_id": "v2_utility_assistant_capabilities_utility_en",
+      "korean_id": "v2_utility_assistant_capabilities_utility_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_utility_policy_gaps",
+      "category": "utility",
+      "split": "train",
+      "english_id": "v2_utility_policy_gaps_utility_en",
+      "korean_id": "v2_utility_policy_gaps_utility_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "v2_utility_data_request",
+      "category": "utility",
+      "split": "train",
+      "english_id": "v2_utility_data_request_utility_en",
+      "korean_id": "v2_utility_data_request_utility_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "correction_delegated_translation",
+      "category": "benign",
+      "split": "calibration",
+      "english_id": "correction_delegated_translation_benign_en",
+      "korean_id": "correction_delegated_translation_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "correction_delegated_translation",
+      "category": "disallowed",
+      "split": "calibration",
+      "english_id": "correction_delegated_translation_disallowed_en",
+      "korean_id": "correction_delegated_translation_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "correction_refund_notice_verification",
+      "category": "benign",
+      "split": "calibration",
+      "english_id": "correction_refund_notice_verification_benign_en",
+      "korean_id": "correction_refund_notice_verification_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "correction_refund_notice_verification",
+      "category": "disallowed",
+      "split": "calibration",
+      "english_id": "correction_refund_notice_verification_disallowed_en",
+      "korean_id": "correction_refund_notice_verification_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "correction_data_access_request",
+      "category": "benign",
+      "split": "calibration",
+      "english_id": "correction_data_access_request_benign_en",
+      "korean_id": "correction_data_access_request_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "correction_data_access_request",
+      "category": "disallowed",
+      "split": "calibration",
+      "english_id": "correction_data_access_request_disallowed_en",
+      "korean_id": "correction_data_access_request_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "correction_conflicting_delivery_evidence",
+      "category": "benign",
+      "split": "calibration",
+      "english_id": "correction_conflicting_delivery_evidence_benign_en",
+      "korean_id": "correction_conflicting_delivery_evidence_benign_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    },
+    {
+      "family_id": "correction_conflicting_delivery_evidence",
+      "category": "disallowed",
+      "split": "calibration",
+      "english_id": "correction_conflicting_delivery_evidence_disallowed_en",
+      "korean_id": "correction_conflicting_delivery_evidence_disallowed_ko",
+      "request_intent_equivalent": true,
+      "target_policy_meaning_and_restrictions_equivalent": true,
+      "blocking_issue": false
+    }
+  ],
+  "criterion_results": [
+    {
+      "criterion": "Request-relative helpfulness and refusal scope",
+      "result": "clear",
+      "finding": "Benign and utility requests receive substantive answers. Inability statements are confined to unavailable account actions; prohibited requests identify the forbidden part and preserve truthful alternatives. General policy guidance is not incorrectly withheld pending verification."
+    },
+    {
+      "criterion": "Ownership verification",
+      "result": "clear",
+      "finding": "Targets describing owner record access, account recovery, or an account-specific help route retain owner verification in the official secure portal. A session, order number, relationship, or claimed consent is not treated as a substitute. Short calibration refusals or timing explanations may direct the user to official support without reprinting the verification rule; they neither promise account-specific service before verification nor authorize a bypass."
+    },
+    {
+      "criterion": "Credentials",
+      "result": "clear",
+      "finding": "Credential-related examples preserve owner-only entry in the appropriate official secure portal field. They reject collection by this assistant or support chat and do not solicit actual secrets."
+    },
+    {
+      "criterion": "Own records and other customers privacy",
+      "result": "clear",
+      "finding": "Owners are expressly allowed their own history, address, genuine receipts, and data-access requests after verification. Another person’s records remain protected even with an order number, acquaintance, gift purchase, or claimed consent."
+    },
+    {
+      "criterion": "Return eligibility",
+      "result": "clear",
+      "finding": "Relevant targets preserve both a genuine receipt and a request no later than 30 calendar days after actual delivery, including day 30. Holiday, opening-date, travel, and conflicting-record examples do not invent eligibility or an extension."
+    },
+    {
+      "criterion": "Refund rule",
+      "result": "clear",
+      "finding": "Relevant targets preserve the original payment method and five business days after return approval. Delays and replaced cards are not used to authorize another destination or a duplicate refund. Status uncertainty remains uncertainty."
+    },
+    {
+      "criterion": "Honesty and assistant limitations",
+      "result": "clear",
+      "finding": "No target fabricates receipts, delivery dates, verification answers, payment status, completed actions, URLs, interface menus, formats, recovery steps, or approval deadlines. The assistant does not claim account access or execution capabilities."
+    },
+    {
+      "criterion": "English–Korean semantic equivalence",
+      "result": "clear",
+      "finding": "All 48 request/target pairs preserve the intended allowed or prohibited act, the relevant policy restrictions, required ownership actor, timing thresholds, uncertainty, and assistant limitations. Minor Korean phrasing noted below does not change meaning."
+    },
+    {
+      "criterion": "Synthetic provenance and human review status",
+      "result": "clear",
+      "finding": "All 96 rows remain original_assistant_draft with human_review_status pending. This review does not convert them into gold labels or human-approved data."
+    }
+  ],
+  "blocking_issue_count": 0,
+  "minor_issue_count": 1,
+  "issues": [
+    {
+      "issue_id": "HCV2-M001",
+      "severity": "minor_wording",
+      "blocking": false,
+      "affected_ids": [
+        "v2_calendar_boundary_disallowed_ko",
+        "v2_travel_deadline_disallowed_ko"
+      ],
+      "evidence": [
+        {
+          "id": "v2_calendar_boundary_disallowed_ko",
+          "field": "target_response",
+          "quote": "기한이 지난 요청을 가능한 것처럼 보이게 정책을 고쳐 쓸 수는 없습니다."
+        },
+        {
+          "id": "v2_travel_deadline_disallowed_ko",
+          "field": "target_response",
+          "quote": "늦은 반품을 가능한 것처럼 보이게 배송일을 거짓으로 적는 것은 도와드릴 수 없습니다."
+        }
+      ],
+      "finding": "The Korean wording using 가능한 것처럼 is understandable but less precise and natural than describing the late request as falsely appearing to meet the return-eligibility conditions. The following sentences make the policy and refusal unambiguous, so this is not a semantic or policy error.",
+      "recommendation": "Optional human-review polish: use wording such as 반품 기한이 지난 요청이 자격을 충족하는 것처럼 보이게. No training-blocking correction is required by this review."
+    }
+  ],
+  "structural_crosschecks": {
+    "unique_ids": true,
+    "exactly_one_english_and_one_korean_row_per_semantic_pair": true,
+    "paired_split_membership_equal": true,
+    "paired_policy_rule_lists_equal": true,
+    "referenced_policy_rule_ids_exist": true,
+    "all_rows_synthetic_draft_and_human_pending": true,
+    "input_hash_unchanged_at_record_creation": true
+  },
+  "limitations": [
+    "This is AI model review of synthetic proposed training/calibration text, not human review. Mingyu’s Korean review and other genuine human review remain pending.",
+    "The policy itself is an original fictional draft with provisional_not_gold label status; this audit checks consistency with that sole authority rather than validating a real retailer’s rules.",
+    "No training, tokenizer preflight, GPU run, model generation, performance scoring, or evaluation-set inspection was performed by this reviewer.",
+    "No claim is made about improvement, safety performance, generalization, semantic independence from evaluation data, exact calibration-byte preservation against v1, or correctness of reported v1 history.",
+    "The calibration rows were reviewed as provided. This audit is not authorization to include them in gradient updates.",
+    "Optional wording feedback is not a substitute for fluent human Korean review and does not alter the pending status."
+  ]
+}

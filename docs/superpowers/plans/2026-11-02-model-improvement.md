@@ -4,7 +4,7 @@
 
 **Goal:** Obtain a substantial, verified improvement in correct policy-grounded English/Korean answers without degrading policy-safety boundaries or legitimate assistance.
 
-**Architecture:** Train a small unmerged LoRA adapter using the frozen correction train partition, compare it with the original base-policy baseline through the same CuratorKIT/SafeTune/AuditKIT generation pipeline, and select on development data before a frozen held-out confirmation. Preserve all historical artifacts. The precise practical-versus-statistical acceptance standard is being clarified with Mingyu; do not claim either standard before its evidence exists.
+**Architecture:** Train a small unmerged LoRA adapter using the frozen correction train partition, compare it with the original base-policy baseline through the same CuratorKIT/SafeTune/AuditKIT generation pipeline, and select on development data before a frozen held-out confirmation. Preserve all historical artifacts. Mingyu selected a practical gain of at least 20 percentage points on held-out clean answers without worse safety or over-refusal; the frozen protocol also imposes bilingual coverage and nonregression gates.
 
 **Inputs:** `configs/correction-lora.json`, `evidence/correction-preparation/preflight/`, immutable base policy/data/rubric, original baseline `evidence/pilot-development/`.
 
@@ -16,8 +16,8 @@
 - [x] Save an adapter without merging, verify frozen base samples and finite updates, reload adapter tensors exactly, and verify calibration replay.
 - [x] Add adapter-aware development generation and comparison provenance without changing legacy behavior.
 - [x] Freeze an explicit primary success metric and safety/coverage guardrails before seeing candidate outputs.
-- [ ] Generate 40 fresh adapted development outputs under the original system policy, unchanged decoding and exact model revision.
-- [ ] Freshly review baseline/candidate outputs with variant names withheld; quantify clean-answer improvement and all adverse changes with uncertainty and family dependence visible.
+- [x] Generate 40 fresh adapted development outputs under the original system policy, unchanged decoding and exact model revision.
+- [x] Freshly review baseline/candidate outputs with variant names withheld; quantify clean-answer improvement and all adverse changes with uncertainty and family dependence visible.
 - [ ] If development is insufficient, use only training/calibration/development evidence to revise the approach and rerun; keep the final test sealed.
 - [ ] Freeze the selected adapter, scoring and confirmation procedure before opening held-out cases. Confirm the actual improvement against the selected acceptance standard.
 - [ ] Audit evidence before completing the goal. Model-only review remains identified as provisional; do not substitute loss, memorized targets, or software tests for behavior improvement.
@@ -25,3 +25,9 @@
 ## Invariants
 
 One cached MPS bfloat16 base model at a time; existing memory fraction0.8; no model/publication/adapter merge. Original model revision, policy and all previous artifacts stay fixed. New training targets remain explicitly assistant-authored drafts, with no invented human approval. Existing40development rows and20test rows never enter optimizer batches. Preserve failed runs and distinguish execution failure from behavioral failure.
+
+## Second experiment decision
+
+The first adapter failed the selection gate: 4/40 to 11/40 clean answers (+17.5pp), no English clean-answer gain, and required facts declined. See `docs/plain-lora-development.md` and immutable v1 evidence. Do not open the held-out set.
+
+The next authorized iteration uses separate v2 data/configuration: 80 training rows across 24 families (64 paired benign/disallowed rows and 16 utility rows), the unchanged 16 diagnostic calibration rows, two epochs/160 updates at learning rate 0.00005, all other settings unchanged. Train from the original base, not the first adapter. New targets must pass independent policy/translation review and exact tokenizer preflight. Acceptance gates and test set stay fixed. The old preflight source hash is preserved in its archive; changing the preparation implementation requires a newly frozen preflight for new runs.

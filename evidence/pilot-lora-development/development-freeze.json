@@ -1,0 +1,28 @@
+{
+  "frozen_utc": "2026-11-03T02:49:48.575909+00:00",
+  "phase": "development_selection_only",
+  "source_commit": "39ad1bf9fa12d8dc9abd59c22a0d6ad0548143fa",
+  "reference": "evidence/pilot-development",
+  "candidate": "results/pilot-lora-development-20261102",
+  "training_run": "results/correction-lora-20261102",
+  "adapter_files": {
+    "README.md": "9df50b1d3d4a77ce6d45e914ec9b66b4bd0a15a2f01de073f8ba6cb160829678",
+    "adapter_config.json": "cd37632e9fb31b15c40e19b1d9c637637afa8b7c5341c5e70d6aac74318d8095",
+    "adapter_model.safetensors": "58dfe75a572df7c44504b2b3ce264c478c4f9b85ff3d30af2f1f1d2fb152a640"
+  },
+  "files": {
+    "docs/model-improvement-protocol.md": "3a1849be7f2067176435a344257a9109e877967824dd1faf14acd952034eb65a",
+    "configs/model-improvement-goal.json": "fa9d112b623e8cc6d9e4b843c8610212a8b709571ebc272e4ef69c186001d3d5",
+    "scripts/model_improvement_metrics.py": "259e00cfb552605ba5cb1c9ca524019bc0d54fc5db64aed8613889937a28be12",
+    "scripts/run_pilot_baseline.py": "03b356b61bc264555bbac2d612a12601755e732398658868b22da4f4a58128db",
+    "scripts/grounding_comparison.py": "eea557e02e65a15f5495faca328d436bd3afea3a07b6e88fd9a4252ede89b481",
+    "configs/runtime.json": "e0a03038012113b28715fe8bcdc6858a5df476a9be61ec2258393bd8da8e068b",
+    "configs/pilot.json": "895079e104f01e1a33fe7a3a54c5b4f099c3e9613f85976c020df11c7d81c432",
+    "configs/tools.lock.json": "c079cb7b04d9c59bc8443aaf37b3bc1ff08d0f0623f4123e850b6bc7a4170fa2",
+    "data/pilot/policy.json": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+    "data/pilot/scenarios.jsonl": "f0b2ea2aafe90fb84f058e04ffd13e84b5bf144d352faaf426574d03a823a6cd",
+    "docs/grounding-comparison-spec.md": "bee14f87e810729106a54b9a57548e60e25c6726b3fee84627d54d06d4d8a352",
+    "results/correction-lora-20261102/report.json": "739d392dbd70fc4f602835771715f9a4a59cdf6676dbda2ea40607d117c4aafc"
+  },
+  "test_generation_authorized_by_this_freeze": false
+}

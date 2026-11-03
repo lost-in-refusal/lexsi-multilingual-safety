@@ -20,6 +20,18 @@ ROOT = Path(__file__).resolve().parents[1]
 LANGUAGES = ("en", "ko")
 SPLITS = ("train", "calibration")
 CATEGORIES = ("benign", "disallowed")
+V1 = "harborcart_targeted_plain_lora_v1"
+V2 = "harborcart_complete_answer_lora_v2"
+EXPERIMENTS = {
+    V1: {"data": "data/corrections/examples.jsonl", "config": "configs/correction-lora.json",
+         "expected_rows": {"train": 32, "calibration": 16},
+         "expected_families": {"train": 8, "calibration": 4},
+         "epochs": 1, "train_steps": 32, "learning_rate": 0.0001},
+    V2: {"data": "data/corrections-v2/examples.jsonl", "config": "configs/correction-lora-v2.json",
+         "expected_rows": {"train": 80, "calibration": 16},
+         "expected_families": {"train": 24, "calibration": 4},
+         "epochs": 2, "train_steps": 160, "learning_rate": 0.00005},
+}
 ROW_FIELDS = {
     "id", "family_id", "split", "language", "category", "policy_rule_ids",
     "request", "target_response", "scenario_summary_en", "provenance", "human_review_status",
@@ -29,6 +41,19 @@ ROW_FIELDS = {
 def _require(condition, message):
     if not condition:
         raise ValueError(message)
+
+
+def experiment_spec(experiment_id):
+    """Choose only declared experiments; an identifier is never a file path."""
+    _require(isinstance(experiment_id, str) and experiment_id in EXPERIMENTS,
+             "Unknown correction experiment_id")
+    return EXPERIMENTS[experiment_id]
+
+
+def canonical_input_paths(experiment_id):
+    spec = experiment_spec(experiment_id)
+    return {"data": spec["data"], "config": spec["config"], "policy": "data/pilot/policy.json",
+            "evaluation": "data/pilot/scenarios.jsonl", "runtime": "configs/runtime.json"}
 
 
 def _text(value, name):
@@ -49,12 +74,14 @@ def _policy_texts(policy):
     return texts
 
 
-def validate_correction_rows(rows, policy, evaluation_rows):
+def validate_correction_rows(rows, policy, evaluation_rows, *, experiment_id=V1):
     """Reject schema/pair leakage and exact normalized evaluation overlap.
 
     Evaluation rows are inspected only for IDs, families, and request strings.
     No labels, outputs, or semantic outcomes from either split are used.
     """
+    experiment_spec(experiment_id)
+    categories = CATEGORIES + (("utility",) if experiment_id == V2 else ())
     _policy_texts(policy)
     rules = policy.get("rules")
     _require(isinstance(rules, list) and bool(rules), "Policy rules must be a nonempty list")
@@ -82,7 +109,7 @@ def validate_correction_rows(rows, policy, evaluation_rows):
         _require(sample_id not in ids, f"Duplicate correction ID: {sample_id}")
         _require(sample_id not in evaluation_ids, f"Evaluation ID overlap: {sample_id}")
         _require(row["family_id"] not in evaluation_families, f"Evaluation family overlap: {row['family_id']}")
-        for field, allowed in (("split", SPLITS), ("language", LANGUAGES), ("category", CATEGORIES)):
+        for field, allowed in (("split", SPLITS), ("language", LANGUAGES), ("category", categories)):
             _require(row[field] in allowed, f"{sample_id}: invalid {field}")
         _require(row["provenance"] == "original_assistant_draft", f"{sample_id}: expected assistant-draft provenance")
         _require(row["human_review_status"] == "pending", f"{sample_id}: this draft schema cannot assert human approval")
@@ -106,8 +133,13 @@ def validate_correction_rows(rows, policy, evaluation_rows):
         requests.add(normalized)
     expected_variants = {(category, language) for category in CATEGORIES for language in LANGUAGES}
     for family_id, family in families.items():
-        _require(set(family["variants"]) == expected_variants, f"Family {family_id} lacks complete bilingual category pairs")
-        for category in CATEGORIES:
+        utility = any(category == "utility" for category, _ in family["variants"])
+        if utility:
+            _require(experiment_id == V2 and family["split"] == "train",
+                     f"Family {family_id}: utility pairs are allowed only in v2 training")
+        required = {("utility", language) for language in LANGUAGES} if utility else expected_variants
+        _require(set(family["variants"]) == required, f"Family {family_id} lacks complete bilingual category pairs")
+        for category in (("utility",) if utility else CATEGORIES):
             _require(family["variants"][(category, "en")] == family["variants"][(category, "ko")],
                      f"Family {family_id}: translated {category} policy references differ")
     return {
@@ -115,7 +147,7 @@ def validate_correction_rows(rows, policy, evaluation_rows):
         "counts_by_split": {split: sum(r["split"] == split for r in rows) for split in SPLITS},
         "family_counts_by_split": {split: sum(f["split"] == split for f in families.values()) for split in SPLITS},
         "counts_by_language": {lang: sum(r["language"] == lang for r in rows) for lang in LANGUAGES},
-        "counts_by_category": {category: sum(r["category"] == category for r in rows) for category in CATEGORIES},
+        "counts_by_category": {category: sum(r["category"] == category for r in rows) for category in categories},
         "families_by_split": {split: sorted(k for k, f in families.items() if f["split"] == split) for split in SPLITS},
         "human_review_pending": len(rows),
         "evaluation_rows_checked_mechanically": len(evaluation_rows),
@@ -170,6 +202,7 @@ def _json_bytes(value):
 
 def _validate_config(config, runtime, validation, policy_sha256):
     _require(isinstance(config, dict) and isinstance(runtime, dict), "Configuration and runtime must be objects")
+    spec = experiment_spec(config.get("experiment_id"))
     for field in ("model", "model_revision", "dtype", "seed", "batch_size"):
         _require(config.get(field) == runtime.get(field), f"Config/runtime mismatch: {field}")
     _text(config.get("model"), "model")
@@ -183,12 +216,15 @@ def _validate_config(config, runtime, validation, policy_sha256):
     _require(config.get("loss") == "assistant_response_and_eos_only", "Expected assistant-response/EOS-only supervision")
     _require(config.get("human_review_status") == "pending" and config.get("status") == "proposed_not_trained",
              "Configuration must remain an untrained proposal pending human review")
-    _require(config.get("expected_rows") == {"train": 32, "calibration": 16} == validation["counts_by_split"],
-             "Expected 32 train and 16 calibration rows")
-    _require(config.get("expected_families") == {"train": 8, "calibration": 4} == validation["family_counts_by_split"],
-             "Expected eight train and four calibration families")
-    for field, expected in (("train_steps", 32), ("epochs", 1), ("batch_size", 1), ("gradient_accumulation_steps", 1)):
+    for field, actual in (("expected_rows", "counts_by_split"), ("expected_families", "family_counts_by_split")):
+        _require(config.get(field) == spec[field] == validation[actual]
+                 and all(type(value) is int for value in config[field].values()),
+                 f"Expected fixed {field}={spec[field]}")
+    for field, expected in (("train_steps", spec["train_steps"]), ("epochs", spec["epochs"]),
+                            ("batch_size", 1), ("gradient_accumulation_steps", 1)):
         _require(type(config.get(field)) is int and config[field] == expected, f"Expected fixed {field}={expected}")
+    _require(type(config.get("learning_rate")) is float and config["learning_rate"] == spec["learning_rate"],
+             f"Expected fixed learning_rate={spec['learning_rate']}")
     _require(type(config.get("max_sequence_tokens")) is int and config["max_sequence_tokens"] == 1024,
              "This draft uses a fixed 1024-token total sequence limit")
     _require(config.get("max_generation_new_tokens") == 512, "Keep inference limit separately at 512 new tokens")
@@ -230,7 +266,7 @@ def _token_stats(records):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data", type=Path, default=ROOT / "data/corrections/examples.jsonl")
+    parser.add_argument("--data", type=Path, help="Defaults to the canonical corpus for the config's known experiment_id")
     parser.add_argument("--policy", type=Path, default=ROOT / "data/pilot/policy.json")
     parser.add_argument("--evaluation", type=Path, default=ROOT / "data/pilot/scenarios.jsonl")
     parser.add_argument("--config", type=Path, default=ROOT / "configs/correction-lora.json")
@@ -240,12 +276,18 @@ def main(argv=None):
     try:
         if args.output.exists():
             raise FileExistsError(f"Refusing to overwrite {args.output}")
+        config_bytes = args.config.read_bytes()
+        config = json.loads(config_bytes)
+        _require(isinstance(config, dict), "Configuration must be an object")
+        defaults = canonical_input_paths(config.get("experiment_id"))
+        if args.data is None:
+            args.data = ROOT / defaults["data"]
         paths = {name: getattr(args, name) for name in ("data", "policy", "evaluation", "config", "runtime")}
-        blobs = {name: path.read_bytes() for name, path in paths.items()}
+        blobs = {name: config_bytes if name == "config" else path.read_bytes() for name, path in paths.items()}
         rows = [json.loads(line) for line in blobs["data"].splitlines() if line.strip()]
         evaluation_rows = [json.loads(line) for line in blobs["evaluation"].splitlines() if line.strip()]
         policy, config, runtime = (json.loads(blobs[name]) for name in ("policy", "config", "runtime"))
-        validation = validate_correction_rows(rows, policy, evaluation_rows)
+        validation = validate_correction_rows(rows, policy, evaluation_rows, experiment_id=config["experiment_id"])
         _validate_config(config, runtime, validation, _sha(blobs["policy"]))
         tokenizer, template, tokenizer_provenance = load_cached_tokenizer(config)
         prepared = [dict(prepare_example(row, policy, tokenizer, config["max_sequence_tokens"]),

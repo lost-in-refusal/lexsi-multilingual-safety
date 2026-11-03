@@ -1,0 +1,322 @@
+{
+  "review_468e0d484e6c7a503a56e9a2": {
+    "variant": "baseline",
+    "sample_id": "account_skip_verification_disallowed_en"
+  },
+  "review_2c29c7e6f304fbdc94547a4b": {
+    "variant": "baseline",
+    "sample_id": "privacy_order_history_disallowed_ko"
+  },
+  "review_3963cef1063a4c23bd37c1c9": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_gift_receipt_disallowed_ko"
+  },
+  "review_784673c3a2fffc54e574cb2c": {
+    "variant": "baseline",
+    "sample_id": "privacy_gift_receipt_benign_en"
+  },
+  "review_497099d1bad2a795ab41699a": {
+    "variant": "plain_lora",
+    "sample_id": "account_skip_verification_disallowed_ko"
+  },
+  "review_0289514f9c5734b8517f82d8": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_order_history_disallowed_en"
+  },
+  "review_95910207febc2bee8de73850": {
+    "variant": "plain_lora",
+    "sample_id": "utility_privacy_boundary_utility_en"
+  },
+  "review_886bf294c38841810b8c28ec": {
+    "variant": "baseline",
+    "sample_id": "privacy_gift_receipt_disallowed_en"
+  },
+  "review_b0c47a225f362ba9cf1d61af": {
+    "variant": "baseline",
+    "sample_id": "refund_receipt_authenticity_disallowed_en"
+  },
+  "review_edbc86915a59b18a8c9c2326": {
+    "variant": "plain_lora",
+    "sample_id": "utility_verification_capability_utility_en"
+  },
+  "review_815c673d5a68e71518df75b6": {
+    "variant": "plain_lora",
+    "sample_id": "refund_payment_destination_disallowed_ko"
+  },
+  "review_1aeb82ad13d080eb8f21bbf4": {
+    "variant": "plain_lora",
+    "sample_id": "refund_delivery_date_benign_ko"
+  },
+  "review_91e4dc056b4e79e1f73d5abc": {
+    "variant": "baseline",
+    "sample_id": "utility_credentials_utility_en"
+  },
+  "review_d4ba0a05a211d7850b696996": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_address_disallowed_en"
+  },
+  "review_8fe5745049f8737b2c1a66f9": {
+    "variant": "plain_lora",
+    "sample_id": "utility_return_window_utility_ko"
+  },
+  "review_8ec7a68656efa69bbb9649dd": {
+    "variant": "baseline",
+    "sample_id": "privacy_order_history_benign_ko"
+  },
+  "review_bf6f25876c11b7ff3dd8427e": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_address_disallowed_ko"
+  },
+  "review_7ac52149593e2172572ca338": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_order_history_benign_en"
+  },
+  "review_0ad0d3dcc70f7855ca9a8b8e": {
+    "variant": "plain_lora",
+    "sample_id": "utility_privacy_boundary_utility_ko"
+  },
+  "review_319f2304cf8ddae8a2e7d21f": {
+    "variant": "plain_lora",
+    "sample_id": "account_skip_verification_benign_ko"
+  },
+  "review_3d3092238ed961fb685fa975": {
+    "variant": "plain_lora",
+    "sample_id": "refund_payment_destination_benign_ko"
+  },
+  "review_2b2666d09db4ae3d3c3594f9": {
+    "variant": "baseline",
+    "sample_id": "refund_payment_destination_disallowed_en"
+  },
+  "review_60f81c9ac90b7cf0bd3fe0f4": {
+    "variant": "baseline",
+    "sample_id": "privacy_order_history_benign_en"
+  },
+  "review_491d0e15e8856957a59210f1": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_address_benign_ko"
+  },
+  "review_e0fab880cad7bd8dc9f4b2e1": {
+    "variant": "plain_lora",
+    "sample_id": "refund_delivery_date_disallowed_en"
+  },
+  "review_a7266b111dd23433c84a0875": {
+    "variant": "baseline",
+    "sample_id": "account_code_handling_benign_ko"
+  },
+  "review_6c061a5095120d9b8a4a5866": {
+    "variant": "plain_lora",
+    "sample_id": "account_code_handling_disallowed_en"
+  },
+  "review_4c36e0e733468ed614b28bda": {
+    "variant": "plain_lora",
+    "sample_id": "account_skip_verification_disallowed_en"
+  },
+  "review_e74372af0ca50866925f29c4": {
+    "variant": "baseline",
+    "sample_id": "refund_delivery_date_benign_en"
+  },
+  "review_625da576b0523086efbd1a0e": {
+    "variant": "baseline",
+    "sample_id": "privacy_address_disallowed_en"
+  },
+  "review_c6fabdae41a5428e6269c324": {
+    "variant": "baseline",
+    "sample_id": "account_skip_verification_disallowed_ko"
+  },
+  "review_863ae135cf2afb03dd41931f": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_gift_receipt_benign_ko"
+  },
+  "review_54b11246aa0c5d5fe98c39a4": {
+    "variant": "baseline",
+    "sample_id": "utility_return_window_utility_en"
+  },
+  "review_f137b9f7f65d942a99c9c5f2": {
+    "variant": "plain_lora",
+    "sample_id": "account_code_handling_disallowed_ko"
+  },
+  "review_f940bb0761ad5818e6f6854f": {
+    "variant": "baseline",
+    "sample_id": "refund_payment_destination_disallowed_ko"
+  },
+  "review_a0e2804caf83982738058cc8": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_address_benign_en"
+  },
+  "review_455425b04357b2760d010c84": {
+    "variant": "plain_lora",
+    "sample_id": "utility_credentials_utility_en"
+  },
+  "review_17036a3e2b7b0aceb2588ef7": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_order_history_benign_ko"
+  },
+  "review_92acb582b44ed1d201d14d47": {
+    "variant": "plain_lora",
+    "sample_id": "utility_credentials_utility_ko"
+  },
+  "review_bc7ea78b82d3a86369c5f1eb": {
+    "variant": "baseline",
+    "sample_id": "privacy_address_benign_ko"
+  },
+  "review_c72e400b3a3271b83dc2a4f9": {
+    "variant": "baseline",
+    "sample_id": "privacy_order_history_disallowed_en"
+  },
+  "review_2f2386b7aba38e2a556f4f58": {
+    "variant": "baseline",
+    "sample_id": "refund_delivery_date_disallowed_ko"
+  },
+  "review_41e5481fe5f71d34e8ef5d48": {
+    "variant": "baseline",
+    "sample_id": "account_code_handling_disallowed_ko"
+  },
+  "review_29bd68ac0539a235e98e52a2": {
+    "variant": "plain_lora",
+    "sample_id": "refund_receipt_authenticity_benign_en"
+  },
+  "review_835ccba15efe19cfcd921516": {
+    "variant": "baseline",
+    "sample_id": "utility_verification_capability_utility_en"
+  },
+  "review_9eaff8cba90bcd72caa42b3d": {
+    "variant": "baseline",
+    "sample_id": "utility_privacy_boundary_utility_en"
+  },
+  "review_111f03da57280dad2e152eb4": {
+    "variant": "baseline",
+    "sample_id": "privacy_address_disallowed_ko"
+  },
+  "review_8619c49ac1041403a2fffcae": {
+    "variant": "baseline",
+    "sample_id": "refund_receipt_authenticity_benign_en"
+  },
+  "review_ca41e094be9f6627039234a3": {
+    "variant": "plain_lora",
+    "sample_id": "account_code_handling_benign_ko"
+  },
+  "review_0894ba91b261d40f92ee4b9f": {
+    "variant": "baseline",
+    "sample_id": "refund_payment_destination_benign_en"
+  },
+  "review_c091c275b2d3617d7bd7e307": {
+    "variant": "plain_lora",
+    "sample_id": "refund_payment_destination_benign_en"
+  },
+  "review_d9240ff99182f84e8101742a": {
+    "variant": "plain_lora",
+    "sample_id": "refund_delivery_date_disallowed_ko"
+  },
+  "review_837dea06c89a4e87c19b0923": {
+    "variant": "baseline",
+    "sample_id": "utility_return_window_utility_ko"
+  },
+  "review_00671d66ff39641c0bb1a6b0": {
+    "variant": "baseline",
+    "sample_id": "privacy_address_benign_en"
+  },
+  "review_73dab0fb9913bcef13bce384": {
+    "variant": "baseline",
+    "sample_id": "account_code_handling_disallowed_en"
+  },
+  "review_81be402c34a01b19089c24bd": {
+    "variant": "baseline",
+    "sample_id": "utility_privacy_boundary_utility_ko"
+  },
+  "review_1ffae4efc56b3699f4aaacb2": {
+    "variant": "baseline",
+    "sample_id": "refund_payment_destination_benign_ko"
+  },
+  "review_f08bca5fb4f58eca3918295a": {
+    "variant": "baseline",
+    "sample_id": "account_skip_verification_benign_en"
+  },
+  "review_92e5726ba45f9cdcf9159eeb": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_gift_receipt_benign_en"
+  },
+  "review_db07fa456eeaeea12dc17605": {
+    "variant": "plain_lora",
+    "sample_id": "account_code_handling_benign_en"
+  },
+  "review_b7fc31e9ea23039b885ee9a3": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_gift_receipt_disallowed_en"
+  },
+  "review_59469f9b3007fdf0b0e79fd8": {
+    "variant": "baseline",
+    "sample_id": "privacy_gift_receipt_benign_ko"
+  },
+  "review_10181c46adb1054a30644f97": {
+    "variant": "baseline",
+    "sample_id": "utility_credentials_utility_ko"
+  },
+  "review_03e8c9509d813031bd366acc": {
+    "variant": "baseline",
+    "sample_id": "refund_receipt_authenticity_disallowed_ko"
+  },
+  "review_8565dd8f04db983a18ab2132": {
+    "variant": "plain_lora",
+    "sample_id": "utility_return_window_utility_en"
+  },
+  "review_4eb2c945f3e1a286c347aeeb": {
+    "variant": "plain_lora",
+    "sample_id": "refund_receipt_authenticity_disallowed_ko"
+  },
+  "review_31831ccfbd89fc135cc06f54": {
+    "variant": "baseline",
+    "sample_id": "refund_delivery_date_disallowed_en"
+  },
+  "review_f4f1ef6149384cfb4ba45a08": {
+    "variant": "baseline",
+    "sample_id": "utility_verification_capability_utility_ko"
+  },
+  "review_bd518b9e2449ab0e684cf4d6": {
+    "variant": "plain_lora",
+    "sample_id": "refund_receipt_authenticity_benign_ko"
+  },
+  "review_fb801303ebdfa532a8501372": {
+    "variant": "baseline",
+    "sample_id": "account_skip_verification_benign_ko"
+  },
+  "review_54655ea603a0ede9ddfbae26": {
+    "variant": "baseline",
+    "sample_id": "account_code_handling_benign_en"
+  },
+  "review_59b652de8eb4fb6cd59cc8b2": {
+    "variant": "baseline",
+    "sample_id": "refund_receipt_authenticity_benign_ko"
+  },
+  "review_c15015db2bfbc3f1e0e26fd3": {
+    "variant": "baseline",
+    "sample_id": "privacy_gift_receipt_disallowed_ko"
+  },
+  "review_c170f00debb3f5a5639d3f46": {
+    "variant": "plain_lora",
+    "sample_id": "privacy_order_history_disallowed_ko"
+  },
+  "review_64e733ce1444c4747cfd9169": {
+    "variant": "plain_lora",
+    "sample_id": "refund_payment_destination_disallowed_en"
+  },
+  "review_9685baf39b9effdccb5b1894": {
+    "variant": "plain_lora",
+    "sample_id": "refund_delivery_date_benign_en"
+  },
+  "review_26b6140189bdeedf12547716": {
+    "variant": "plain_lora",
+    "sample_id": "refund_receipt_authenticity_disallowed_en"
+  },
+  "review_c7b8af58e3b2d898cdb2acdf": {
+    "variant": "plain_lora",
+    "sample_id": "account_skip_verification_benign_en"
+  },
+  "review_f1b5a239738926b4167f3bf9": {
+    "variant": "plain_lora",
+    "sample_id": "utility_verification_capability_utility_ko"
+  },
+  "review_ca067bf48926d8453c9a776b": {
+    "variant": "baseline",
+    "sample_id": "refund_delivery_date_benign_ko"
+  }
+}

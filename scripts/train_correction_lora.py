@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Train one fixed, adapter-only correction pilot from a verified token archive.
 
-The complete policy stays in every input. Only the 32 training examples enter
+The complete policy stays in every input. Only the declared training rows enter
 optimizer updates. Calibration loss is diagnostic, not evidence of repair.
+
+Preparation source hashes are strict: historical v1 archives need their original
+source revision, or new preparation in a separate directory with current source.
 """
 from __future__ import annotations
 
@@ -23,18 +26,15 @@ import time
 import traceback
 
 try:
-    from .prepare_corrections import (_validate_config, load_cached_tokenizer,
+    from .prepare_corrections import (_validate_config, canonical_input_paths, experiment_spec, load_cached_tokenizer,
                                      prepare_example, validate_correction_rows)
 except ImportError:
-    from prepare_corrections import (_validate_config, load_cached_tokenizer,
+    from prepare_corrections import (_validate_config, canonical_input_paths, experiment_spec, load_cached_tokenizer,
                                     prepare_example, validate_correction_rows)
 
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS = {'train.jsonl', 'calibration.jsonl', 'examples.jsonl', 'policy.json',
              'config.json', 'runtime.json', 'chat-template.txt'}
-INPUT_PATHS = {'data': 'data/corrections/examples.jsonl', 'policy': 'data/pilot/policy.json',
-               'evaluation': 'data/pilot/scenarios.jsonl', 'config': 'configs/correction-lora.json',
-               'runtime': 'configs/runtime.json'}
 CORE_FIELDS = ('id', 'input_ids', 'attention_mask', 'labels', 'prompt_tokens',
                'sequence_tokens', 'supervised_tokens')
 TARGETS = {'q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj'}
@@ -60,10 +60,13 @@ def _write_json(path, value):
 
 
 def validate_training_config(config):
-    """Reject settings unsupported by this fixed, one-epoch implementation."""
+    """Reject any schedule or optimizer setting outside the named experiments."""
+    _require(isinstance(config, dict), 'Training configuration must be an object')
+    spec = experiment_spec(config.get('experiment_id'))
     expected = {
-        'dtype': 'bfloat16', 'device': 'mps', 'seed': 42, 'train_steps': 32, 'epochs': 1,
-        'batch_size': 1, 'gradient_accumulation_steps': 1, 'learning_rate': 0.0001,
+        'dtype': 'bfloat16', 'device': 'mps', 'seed': 42,
+        'train_steps': spec['train_steps'], 'epochs': spec['epochs'],
+        'batch_size': 1, 'gradient_accumulation_steps': 1, 'learning_rate': spec['learning_rate'],
         'weight_decay': 0.0, 'optimizer': 'AdamW', 'foreach': False, 'max_grad_norm': 1.0,
         'lora_r': 4, 'lora_alpha': 8, 'lora_dropout': 0.0, 'gradient_checkpointing': True,
         'use_reentrant': False, 'use_cache_during_training': False, 'max_sequence_tokens': 1024,
@@ -71,9 +74,11 @@ def validate_training_config(config):
         'system_prompt': 'original_policy_only', 'save': 'adapter_only_no_merge_no_publication',
         'calibration': 'forward_only_token_weighted_loss_before_and_after_no_optimizer_or_checkpoint_selection',
     }
-    _require(isinstance(config, dict), 'Training configuration must be an object')
     for key, value in expected.items():
         _require(type(config.get(key)) is type(value) and config[key] == value,
+                 f'Unsupported fixed training setting: {key}')
+    for key in ('expected_rows', 'expected_families'):
+        _require(config.get(key) == spec[key] and all(type(value) is int for value in config[key].values()),
                  f'Unsupported fixed training setting: {key}')
     modules = config.get('target_modules')
     _require(isinstance(modules, list) and len(modules) == len(TARGETS)
@@ -81,7 +86,7 @@ def validate_training_config(config):
              'Expected exactly the seven frozen LoRA target modules')
 
 
-def load_prepared(directory, root=ROOT):
+def load_prepared(directory, root=None):
     """Validate saved bytes and partition identities before token/model loading.
 
     Archived data is authoritative for training. Current canonical inputs must
@@ -89,7 +94,7 @@ def load_prepared(directory, root=ROOT):
     followed. Exact retokenization is a separate mandatory check before loading
     model weights.
     """
-    directory, root = Path(directory), Path(root)
+    directory, root = Path(directory), Path(ROOT if root is None else root)
     manifest_bytes = (directory / 'manifest.json').read_bytes()
     manifest = json.loads(manifest_bytes)
     _require(manifest.get('status') == 'passed_tokenization_preflight', 'Prepared archive has not passed preflight')
@@ -100,8 +105,14 @@ def load_prepared(directory, root=ROOT):
     for name in sorted(ARTIFACTS):
         blobs[name] = (directory / name).read_bytes()
         _require(_sha(blobs[name]) == manifest['files'][name], f'Archive file hash mismatch: {name}')
-    _require(set(manifest.get('inputs', {})) == set(INPUT_PATHS), 'Prepared input identities differ')
-    for name, relative in INPUT_PATHS.items():
+    config, runtime, policy = (json.loads(blobs[name]) for name in ('config.json', 'runtime.json', 'policy.json'))
+    _require(isinstance(config, dict), 'Training configuration must be an object')
+    input_paths = canonical_input_paths(config.get('experiment_id'))
+    _require(set(manifest.get('inputs', {})) == set(input_paths), 'Prepared input identities differ')
+    for name, relative in input_paths.items():
+        recorded_path = manifest['inputs'][name].get('path')
+        _require(isinstance(recorded_path, str) and Path(recorded_path) == (root / relative).resolve(),
+                 f'Prepared canonical input path differs: {name}')
         _require(_sha((root / relative).read_bytes()) == manifest['inputs'][name].get('sha256'),
                  f'Current canonical input hash differs: {name}')
     for name, filename in [('data', 'examples.jsonl'), ('policy', 'policy.json'),
@@ -109,10 +120,9 @@ def load_prepared(directory, root=ROOT):
         _require(_sha(blobs[filename]) == manifest['inputs'][name]['sha256'], f'Archived input hash differs: {name}')
     _require(_sha((root / 'scripts/prepare_corrections.py').read_bytes()) == manifest.get('script_sha256'),
              'Preflight implementation hash differs; prepare a new archive')
-    config, runtime, policy = (json.loads(blobs[name]) for name in ('config.json', 'runtime.json', 'policy.json'))
     examples = _read_lines(blobs['examples.jsonl'])
-    evaluation = _read_lines((root / INPUT_PATHS['evaluation']).read_bytes())
-    validation = validate_correction_rows(examples, policy, evaluation)
+    evaluation = _read_lines((root / input_paths['evaluation']).read_bytes())
+    validation = validate_correction_rows(examples, policy, evaluation, experiment_id=config['experiment_id'])
     _require(validation == manifest.get('validation'), 'Saved validation differs from actual authored examples')
     _validate_config(config, runtime, validation, _sha(blobs['policy.json']))
     validate_training_config(config)
@@ -173,14 +183,20 @@ def verify_retokenized(bundle):
     return tokenizer, provenance
 
 
-def training_order(records, *, seed, steps):
+def training_order(records, *, seed, steps, epochs=1):
     _require(type(seed) is int and type(steps) is int and steps > 0, 'Seed and steps must be integers')
-    _require(isinstance(records, list) and len(records) == steps, 'Steps must cover one complete training epoch')
+    _require(type(epochs) is int and epochs > 0, 'Epoch count must be a positive integer')
+    _require(isinstance(records, list) and bool(records) and len(records) * epochs == steps,
+             'Steps must cover exactly the declared complete training epochs')
     _require(all(r.get('split') == 'train' for r in records), 'Only train records can enter optimizer order')
     ids = [r.get('id') for r in records]
     _require(all(isinstance(i, str) and i for i in ids) and len(set(ids)) == len(ids), 'Training IDs must be unique')
-    random.Random(seed).shuffle(ids)
-    return ids
+    rng, order = random.Random(seed), []
+    for _ in range(epochs):
+        epoch_ids = list(ids)
+        rng.shuffle(epoch_ids)
+        order.extend(epoch_ids)
+    return order
 
 
 def aggregate_calibration(rows):
@@ -239,7 +255,7 @@ def main(argv=None):
         tokenizer, provenance = verify_retokenized(bundle)
         report['tokenizer'] = provenance
         report['exact_retokenization_verified'] = len(bundle['examples'])
-        order = training_order(bundle['train'], seed=config['seed'], steps=config['train_steps'])
+        order = training_order(bundle['train'], seed=config['seed'], steps=config['train_steps'], epochs=config['epochs'])
         report['training_order'] = order
         report['calibration_example_ids'] = [r['id'] for r in bundle['calibration']]
         if args.prepare_only:
@@ -364,7 +380,8 @@ def main(argv=None):
 
         report['calibration_before'] = calibrate('calibration_before', disable_adapter=True)
         reset_seed()
-        _require(order == training_order(bundle['train'], seed=config['seed'], steps=config['train_steps']), 'Training order drift')
+        _require(order == training_order(bundle['train'], seed=config['seed'], steps=config['train_steps'],
+                                        epochs=config['epochs']), 'Training order drift')
         by_id = {row['id']: row for row in bundle['train']}
         optimizer = torch.optim.AdamW(list(trainable.values()), lr=config['learning_rate'], weight_decay=config['weight_decay'], foreach=False)
         started_training = time.perf_counter()
@@ -392,8 +409,9 @@ def main(argv=None):
                 memory(f'step_{step_number}_optimizer')
                 del loss, batch
         report['training_seconds'] = round(time.perf_counter() - started_training, 3)
-        _require(report['optimizer_steps'] == config['train_steps'] == 32 and [x['sample_id'] for x in report['steps']] == order,
-                 'Optimizer did not execute exactly the complete frozen epoch')
+        _require(report['optimizer_steps'] == config['train_steps'] == len(bundle['train']) * config['epochs']
+                 and [x['sample_id'] for x in report['steps']] == order,
+                 'Optimizer did not execute exactly the complete frozen epochs')
         changes = [(p.detach().cpu() - initial_adapter[name]).abs().max().item() for name, p in trainable.items()]
         report['changed_adapter_tensors'] = sum(value > 0 for value in changes)
         report['maximum_adapter_absolute_change'] = max(changes)

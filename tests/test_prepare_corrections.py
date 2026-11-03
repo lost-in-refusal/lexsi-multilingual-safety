@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 POLICY = {"texts": {"en": "Exact English policy.\nKeep it.", "ko": "정확한 정책입니다."},
           "rules": [{"id": "secrets"}, {"id": "refunds"}]}
+V2 = "harborcart_complete_answer_lora_v2"
 
 
 def family(name="train_a", split="train"):
@@ -22,6 +23,23 @@ def family(name="train_a", split="train"):
              "scenario_summary_en": f"The circumstance for {name}.",
              "provenance": "original_assistant_draft", "human_review_status": "pending"}
             for category in ("benign", "disallowed") for language in ("en", "ko")]
+
+
+def utility_family(name="utility_a", split="train"):
+    rows = family(name, split)[:2]
+    for row in rows:
+        row["category"] = "utility"
+        row["id"] = f"{name}_utility_{row['language']}"
+        row["request"] = f"{name} utility {row['language']}: Explain this distinct request."
+    return rows
+
+
+def v2_config(config):
+    result = deepcopy(config)
+    result.update(experiment_id=V2, expected_rows={"train": 80, "calibration": 16},
+                  expected_families={"train": 24, "calibration": 4},
+                  train_steps=160, epochs=2, learning_rate=0.00005)
+    return result
 
 
 class FakeTokenizer:
@@ -62,6 +80,31 @@ class ContractTest(unittest.TestCase):
 
 
 class ValidateCorrectionRowsTests(ContractTest):
+    def test_v2_allows_complete_utility_pairs_alongside_full_category_pairs(self):
+        rows = family() + utility_family() + family("cal_a", "calibration")
+        result = self.api.validate_correction_rows(rows, POLICY, [], experiment_id=V2)
+        self.assertEqual(result["counts_by_split"], {"train": 6, "calibration": 4})
+        self.assertEqual(result["family_counts_by_split"], {"train": 2, "calibration": 1})
+        self.assertEqual(result["counts_by_category"], {"benign": 4, "disallowed": 4, "utility": 2})
+
+    def test_utility_requires_v2_and_cannot_replace_calibration_pairs(self):
+        with self.assertRaises(ValueError):
+            self.api.validate_correction_rows(utility_family(), POLICY, [])
+        with self.assertRaises(ValueError):
+            self.api.validate_correction_rows(utility_family(split="calibration"), POLICY, [], experiment_id=V2)
+        with self.assertRaises(ValueError):
+            self.api.validate_correction_rows(family(), POLICY, [], experiment_id="arbitrary_experiment")
+
+    def test_v2_rejects_missing_mixed_duplicate_or_mismatched_utility_pair(self):
+        missing = utility_family()[:1]
+        mixed = utility_family(); mixed[1]["category"] = "benign"
+        duplicate = utility_family(); duplicate[1]["language"] = "en"
+        rules = utility_family(); rules[1]["policy_rule_ids"] = ["refunds"]
+        extra = utility_family() + family("utility_a")
+        for rows in (missing, mixed, duplicate, rules, extra, family()[:2]):
+            with self.subTest(rows=rows), self.assertRaises(ValueError):
+                self.api.validate_correction_rows(rows, POLICY, [], experiment_id=V2)
+
     def test_complete_bilingual_families_have_explicit_split_counts(self):
         rows = family() + family("cal_a", "calibration")
         result = self.api.validate_correction_rows(rows, POLICY, [])
@@ -190,11 +233,15 @@ class PrepareExampleTests(ContractTest):
 
 
 class PreflightCliTests(ContractTest):
-    def _inputs(self, directory):
+    def _inputs(self, directory, *, version=1):
         rows = [row for i in range(8) for row in family(f"train_{i}")]
         rows += [row for i in range(4) for row in family(f"cal_{i}", "calibration")]
         config = json.loads((Path(__file__).resolve().parents[1] / "configs/correction-lora.json").read_text())
         config["policy_sha256"] = hashlib.sha256(json.dumps(POLICY).encode()).hexdigest()
+        if version == 2:
+            rows += [row for i in range(8, 16) for row in family(f"train_{i}")]
+            rows += [row for i in range(8) for row in utility_family(f"utility_{i}")]
+            config = v2_config(config)
         runtime = {k: config[k] for k in ("model", "model_revision", "dtype", "seed", "batch_size")}
         runtime["local_device"] = "mps"
         values = {"data": "\n".join(json.dumps(r) for r in rows) + "\n", "evaluation": "",
@@ -235,6 +282,34 @@ class PreflightCliTests(ContractTest):
                     self.assertEqual(row["labels"][:n], [-100] * n)
                     self.assertEqual(row["labels"][n:], row["input_ids"][n:])
                     self.assertEqual(row["labels"][-1], 2)
+
+    def test_v2_cli_selects_versioned_default_data_and_writes_80_16_archive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); paths = self._inputs(root, version=2); output = root / "prepared"
+            canonical = root / "data/corrections-v2/examples.jsonl"
+            data_bytes = paths["data"].read_bytes(); paths["data"].unlink()
+            canonical.parent.mkdir(parents=True); canonical.write_bytes(data_bytes)
+            del paths["data"]
+            with patch.object(self.api, "ROOT", root), patch.object(self.api, "load_cached_tokenizer",
+                    return_value=(FakeTokenizer(), "fixture template", {"actual_snapshot_commit": "fixture"})):
+                self.assertEqual(self.api.main(self._args(paths, output)), 0)
+            manifest = json.loads((output / "manifest.json").read_text())
+            self.assertEqual(manifest["validation"]["counts_by_split"], {"train": 80, "calibration": 16})
+            self.assertEqual(manifest["validation"]["family_counts_by_split"], {"train": 24, "calibration": 4})
+            self.assertEqual(manifest["validation"]["counts_by_category"], {"benign": 40, "disallowed": 40, "utility": 16})
+            self.assertEqual(manifest["inputs"]["data"]["path"], str(canonical.resolve()))
+            self.assertEqual(manifest["optimizer_steps"], 0)
+
+    def test_v2_rejects_schedule_or_unknown_experiment_before_tokenization(self):
+        for field, value in (("epochs", 1), ("epochs", True), ("train_steps", 159),
+                             ("learning_rate", 0.0001), ("experiment_id", "../rogue")):
+            with self.subTest(field=field, value=value), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary); paths = self._inputs(root, version=2); output = root / "prepared"
+                config = json.loads(paths["config"].read_text()); config[field] = value
+                paths["config"].write_text(json.dumps(config))
+                with patch.object(self.api, "load_cached_tokenizer", side_effect=AssertionError("Tokenizer must not load")):
+                    self.assertEqual(self.api.main(self._args(paths, output)), 1)
+                self.assertFalse(output.exists())
 
     def test_wrong_counts_and_changed_model_config_fail_before_tokenizer_load(self):
         for defect in ("count", "model", "revision", "cap", "steps", "policy", "supervision", "policy_bytes", "policy_hash"):

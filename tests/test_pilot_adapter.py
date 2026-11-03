@@ -56,6 +56,39 @@ class AdapterValidationTests(unittest.TestCase):
         self.assertEqual(identity["adapter_files"], self.report["adapter_files"])
         self.assertEqual(identity["policy_sha256"], self.config["policy_sha256"])
 
+    def use_v2(self):
+        self.config.update(experiment_id="harborcart_complete_answer_lora_v2",
+                           train_steps=160, epochs=2, learning_rate=0.00005,
+                           expected_rows={"train": 80, "calibration": 16},
+                           expected_families={"train": 24, "calibration": 4})
+        self.report["optimizer_steps"] = 160
+        self.report["training_config_sha256"] = sha(blob(self.config))
+
+    def test_valid_v2_snapshot_preserves_actual_completed_steps(self):
+        self.use_v2()
+        self.assertEqual(self.validate()["optimizer_steps"], 160)
+
+    def test_v2_rejects_partial_or_undeclared_training_schedule(self):
+        self.use_v2()
+        self.report["optimizer_steps"] = 159
+        with self.assertRaises(ValueError): self.validate()
+        self.report["optimizer_steps"] = 160
+        for key, value in [("train_steps", 32), ("epochs", 1), ("learning_rate", 0.0001),
+                           ("expected_rows", {"train": 79, "calibration": 16}),
+                           ("expected_families", {"train": 23, "calibration": 4}),
+                           ("experiment_id", "arbitrary_unfrozen_run")]:
+            with self.subTest(key=key):
+                saved = self.config[key]; self.config[key] = value
+                self.report["training_config_sha256"] = sha(blob(self.config))
+                with self.assertRaises(ValueError): self.validate()
+                self.config[key] = saved
+        self.report["training_config_sha256"] = sha(blob(self.config))
+
+    def test_unknown_experiment_does_not_reuse_v1_schedule(self):
+        self.config["experiment_id"] = "arbitrary_unfrozen_run"
+        self.report["training_config_sha256"] = sha(blob(self.config))
+        with self.assertRaises(ValueError): self.validate()
+
     def test_rejects_failed_partial_unverified_or_wrong_model_training(self):
         for key, value in [("status", "running"), ("optimizer_steps", 31),
                            ("saved_adapter_reload_exact", False), ("all_base_parameters_frozen", False),
