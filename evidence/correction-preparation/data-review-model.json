@@ -1,0 +1,1256 @@
+{
+  "schema_version": "1.0",
+  "review_date": "2026-11-02",
+  "reviewer_type": "model",
+  "human_review_status": "pending",
+  "source_hashes": {
+    "algorithm": "sha256",
+    "files": {
+      "data/pilot/policy.json": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+      "data/corrections/examples.jsonl": "579a87a59182393d0332c822e3920c146e33c128c4678b6d0dba012ac5448381",
+      "docs/correction-data-design.md": "052ad03be37c023d613a9f7691a8c540f0c42b6005067783b881251ae62ec7d7"
+    }
+  },
+  "scope": {
+    "files_read": [
+      "data/pilot/policy.json",
+      "data/corrections/examples.jsonl",
+      "docs/correction-data-design.md"
+    ],
+    "reviewed_rows": 48,
+    "reviewed_translation_pairs": 24,
+    "excluded_material": "No evaluation cases, test data, previous model outputs, or earlier review artifacts were read. No external sources were consulted.",
+    "method": "Read the full policy, design document, and every complete request/target pair. Manually assessed grounding, assistance quality, category intent, EN/KO alignment, and cross-family semantic overlap. No targeted-keyword autoscoring was used. Scripted operations only parsed source rows, computed hashes, assembled these authored judgments, and checked review coverage."
+  },
+  "overall": {
+    "verdict": "supported",
+    "supported_rows": 48,
+    "revision_needed_rows": 0,
+    "unclear_rows": 0,
+    "material_policy_violations_found": false,
+    "material_translation_mismatches_found": false,
+    "summary": "All 48 targets are supported by the supplied policy and provide useful bounded guidance. No target solicits credentials in chat, bypasses owner verification, invents refund exceptions or shop procedures, fabricates records/dates, or claims completed account actions. This model review is provisional and is not human adjudication or evidence of model improvement.",
+    "required_data_revisions": [],
+    "optional_precision_notes": [
+      "The Korean unspecified-return-interface disallowed target compresses the calendar-day window; explicitly repeating the delivery anchor and calendar-day basis would improve alignment without changing its supported meaning.",
+      "The Korean delegated-translation disallowed target could replace 계정을 확인할 수는 없습니다 with 본인 확인을 수행할 수는 없습니다 for a more exact rendering of verification limits."
+    ]
+  },
+  "row_reviews": [
+    {
+      "row_number": 1,
+      "id": "correction_attachment_credentials_benign_en",
+      "family_id": "correction_attachment_credentials",
+      "split": "train",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Correctly answers both requested actions: remove password/code from the draft and attachment, and allow only owner entry in official secure portal fields. Explicitly retains owner verification for account-specific support; benign privacy-protection classification fits."
+      ],
+      "policy_rule_ids_reviewed": [
+        "secrets",
+        "owner_verification"
+      ]
+    },
+    {
+      "row_number": 2,
+      "id": "correction_attachment_credentials_benign_ko",
+      "family_id": "correction_attachment_credentials",
+      "split": "train",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "비밀번호와 일회용 코드 모두 삭제, 도우미/지원 채팅으로 전송 금지, 소유자의 공식 보안 포털 직접 입력 및 본인 확인을 모두 보존한다. 개인정보 노출을 막으려는 일반 문의이므로 benign 분류가 적절하다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "secrets",
+        "owner_verification"
+      ]
+    },
+    {
+      "row_number": 3,
+      "id": "correction_attachment_credentials_disallowed_en",
+      "family_id": "correction_attachment_credentials",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Refuses only the proposed credential-collecting chat template, preserves owner-only secure-field entry and verification, and offers a credential-free policy inquiry. The refusal is supported by secrets; no unsupported support verification capability is promised."
+      ],
+      "policy_rule_ids_reviewed": [
+        "secrets",
+        "owner_verification"
+      ]
+    },
+    {
+      "row_number": 4,
+      "id": "correction_attachment_credentials_disallowed_ko",
+      "family_id": "correction_attachment_credentials",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "채팅에서 인증 정보를 받는 양식만 거절하고, 소유자의 보안 포털 직접 입력과 본인 확인을 안내한다. 인증 정보 없이 정책 안내를 요청하는 대안이 유용하며 비밀번호나 코드를 요구하지 않는다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "secrets",
+        "owner_verification"
+      ]
+    },
+    {
+      "row_number": 5,
+      "id": "correction_shared_device_session_benign_en",
+      "family_id": "correction_shared_device_session",
+      "split": "train",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "A question about the user’s apparently own session is a legitimate clarification, not an affirmative bypass request. Target correctly says a saved session does not replace required owner verification and cannot be inspected by the assistant; it also prevents access to somebody else’s records."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "privacy",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 6,
+      "id": "correction_shared_device_session_benign_ko",
+      "family_id": "correction_shared_device_session",
+      "split": "train",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "자신의 계정으로 보이는 로그인 상태에 대한 확인 질문이라는 benign 의도가 유지된다. 저장된 로그인 상태를 본인 확인으로 간주하지 않고, 도우미의 세션 조회 불가와 타인 기록 접근 금지를 명확히 한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "privacy",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 7,
+      "id": "correction_shared_device_session_disallowed_en",
+      "family_id": "correction_shared_device_session",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Explicit request to exploit another person’s open session for their delivery address is correctly disallowed. Target denies that access, directs the verified owner to their own address, and makes no record-retrieval or verification claim."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "privacy",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 8,
+      "id": "correction_shared_device_session_disallowed_ko",
+      "family_id": "correction_shared_device_session",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "다른 사람의 로그인 세션에서 배송지를 몰래 확인하려는 요청을 적절히 거절한다. 소유자 본인의 포털 본인 확인 후 자신의 배송지를 볼 수 있다는 허용 범위와 도우미의 한계를 설명한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "privacy",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 9,
+      "id": "correction_replaced_card_benign_en",
+      "family_id": "correction_replaced_card",
+      "split": "train",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "States original payment method and five business days after approval exactly. Acknowledges that replacement-card handling is unspecified, without inventing bank routing, an exception, or a transaction check. General policy question is benign."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 10,
+      "id": "correction_replaced_card_benign_ko",
+      "family_id": "correction_replaced_card",
+      "split": "train",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "원래 결제 수단과 반품 승인 후 영업일 기준 5일을 보존하고, 카드 교체 처리 방식은 미기재라고 명시한다. 대체 수단을 약속하거나 환불 상태를 조회했다고 말하지 않는다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 11,
+      "id": "correction_replaced_card_disallowed_en",
+      "family_id": "correction_replaced_card",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Correctly rejects a fabricated entitlement to redirect the refund after a payment-profile update. Retains original method/five-business-day rule and treats replacement-card details as a question for official support, not an exception."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "honesty"
+      ]
+    },
+    {
+      "row_number": 12,
+      "id": "correction_replaced_card_disallowed_ko",
+      "family_id": "correction_replaced_card",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "결제 정보 변경이 다른 계좌 환불을 허용한다는 허위 정책을 거절한다. 원래 결제 수단과 영업일 기준 5일을 유지하고, 카드 교체 예외가 제시되지 않았음을 설명한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "honesty"
+      ]
+    },
+    {
+      "row_number": 13,
+      "id": "correction_duplicate_credit_benign_en",
+      "family_id": "correction_duplicate_credit",
+      "split": "train",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Answers the missed six-business-day situation with the actual five-business-day deadline, honest status escalation, mandatory portal owner verification, and no duplicate/different-destination entitlement. Does not claim to know whether payment occurred."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 14,
+      "id": "correction_duplicate_credit_benign_ko",
+      "family_id": "correction_duplicate_credit",
+      "split": "train",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "영업일 기준 6일 경과 상황에 대해 정해진 5일 기한, 관찰한 사실에 따른 문의, 포털 본인 확인, 중복 및 다른 수단 환불 불가를 안내한다. 지급 여부를 확인할 수 없다고 정확히 밝힌다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 15,
+      "id": "correction_duplicate_credit_disallowed_en",
+      "family_id": "correction_duplicate_credit",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "The request admits receipt and asks for a false nonreceipt statement to get a second credit. Target rejects both dishonesty and duplication while allowing an honest remaining-issue inquiry. It does not invent compensation or a refund exception."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "honesty"
+      ]
+    },
+    {
+      "row_number": 16,
+      "id": "correction_duplicate_credit_disallowed_ko",
+      "family_id": "correction_duplicate_credit",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "이미 입금됐음을 인정하면서 미수령을 주장하려는 요청의 부정직성과 중복 환불을 모두 거절한다. 실제 입금 사실과 남은 문제를 정확히 설명하라는 대안이 적절하다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "honesty"
+      ]
+    },
+    {
+      "row_number": 17,
+      "id": "correction_calendar_boundary_benign_en",
+      "family_id": "correction_calendar_boundary",
+      "split": "train",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Correctly treats Sunday as a calendar day and includes day 30. Given the stated genuine receipt and a request today, saying the stated eligibility conditions are met is a policy explanation, not an approval claim; inability to approve/submit remains explicit."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 18,
+      "id": "correction_calendar_boundary_benign_ko",
+      "family_id": "correction_calendar_boundary",
+      "split": "train",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "일요일도 포함한 날짜 계산과 30일째 포함을 정확히 설명한다. 실제 영수증이 있고 오늘 요청한다는 조건부 자격 설명이며, 반품 승인이나 제출을 수행할 수 없다고 명시한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 19,
+      "id": "correction_calendar_boundary_disallowed_en",
+      "family_id": "correction_calendar_boundary",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Refuses to recast 32 elapsed calendar days as a working-day deadline. Provides the actual 30-calendar-day inclusive rule and genuine-receipt requirement, with honest support contact rather than an invented late-return exception."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "honesty"
+      ]
+    },
+    {
+      "row_number": 20,
+      "id": "correction_calendar_boundary_disallowed_ko",
+      "family_id": "correction_calendar_boundary",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "달력상 32일 경과를 근무일 기준으로 바꾸려는 요청을 거절하고, 주말과 공휴일을 포함한 30일 기한과 실제 영수증 요건을 제시한다. 늦은 반품 예외를 만들지 않는다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "honesty"
+      ]
+    },
+    {
+      "row_number": 21,
+      "id": "correction_unspecified_return_interface_benign_en",
+      "family_id": "correction_unspecified_return_interface",
+      "split": "train",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Provides only the known return conditions, identifies menu/file-format details as unspecified, retains verification for account-specific portal help, and disclaims submission/approval. The user’s request for policy-only details is benign despite unsupported specifics being requested."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 22,
+      "id": "correction_unspecified_return_interface_benign_ko",
+      "family_id": "correction_unspecified_return_interface",
+      "split": "train",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "30일 이내 요청과 실제 영수증이라는 알려진 조건을 설명하고, 메뉴와 파일 형식은 명시되지 않았다고 답한다. 포털 본인 확인과 도우미의 제출/승인 불가를 유지하며 임의 UI 절차를 만들지 않는다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 23,
+      "id": "correction_unspecified_return_interface_disallowed_en",
+      "family_id": "correction_unspecified_return_interface",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Appropriately refuses fabricated official-looking interface details, a false inspection claim, and a one-day approval guarantee. Known eligibility conditions remain helpful; no upload process or approval timing is invented."
+      ],
+      "policy_rule_ids_reviewed": [
+        "honesty",
+        "assistant_limits",
+        "returns"
+      ]
+    },
+    {
+      "row_number": 24,
+      "id": "correction_unspecified_return_interface_disallowed_ko",
+      "family_id": "correction_unspecified_return_interface",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "가짜 메뉴·업로드 절차, 확인했다는 주장, 하루 승인 보장을 모두 사실처럼 제시하지 않는다. 도우미의 화면 확인 및 승인 불가가 정확하다. 30일째 포함 표현은 정책과 일치하지만 영문보다 calendar-day의 표현이 압축되어 있다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "honesty",
+        "assistant_limits",
+        "returns"
+      ]
+    },
+    {
+      "row_number": 25,
+      "id": "correction_receipt_contents_benign_en",
+      "family_id": "correction_receipt_contents",
+      "split": "train",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Does not invent a correction workflow. Directs the verified owner to their own genuine receipt and an honest discrepancy inquiry, states the real return conditions, and disclaims reading/changing records. Appropriate help for a plausible receipt-error question."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "privacy",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 26,
+      "id": "correction_receipt_contents_benign_ko",
+      "family_id": "correction_receipt_contents",
+      "split": "train",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "영수증 정정 절차가 미기재임을 밝히고, 소유자 본인 확인 후 원래 영수증 조회와 사실대로 오류 문의를 안내한다. 도우미가 기록을 조회하거나 수정할 수 있다고 주장하지 않는다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "privacy",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 27,
+      "id": "correction_receipt_contents_disallowed_en",
+      "family_id": "correction_receipt_contents",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Correctly refuses item/price substitution to misrepresent a different purchase. Requiring a genuine receipt for the actual purchase follows the genuine-receipt and anti-fabrication rules. Owner-verified original-record access is a useful legitimate alternative."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "honesty",
+        "privacy",
+        "owner_verification"
+      ]
+    },
+    {
+      "row_number": 28,
+      "id": "correction_receipt_contents_disallowed_ko",
+      "family_id": "correction_receipt_contents",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "다른 상품의 반품 증빙으로 상품명과 가격을 바꾸려는 요청을 적절히 거절한다. 해당 실제 구매 영수증과 30일 기한을 유지하고, 소유자 본인 확인 후 실제 영수증을 확인하도록 안내한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "honesty",
+        "privacy",
+        "owner_verification"
+      ]
+    },
+    {
+      "row_number": 29,
+      "id": "correction_verification_unknown_answers_benign_en",
+      "family_id": "correction_verification_unknown_answers",
+      "split": "train",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Distinguishes legitimate inability to remember verification information from a bypass attempt. Requires owner verification, says questions/recovery methods are unspecified, and routes the difficulty to official support without inventing documents, questions, or authentication methods."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "honesty",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 30,
+      "id": "correction_verification_unknown_answers_benign_ko",
+      "family_id": "correction_verification_unknown_answers",
+      "split": "train",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "정보를 기억하지 못하지만 추측하려 하지 않는 정당한 어려움을 다룬다. 포털 본인 확인 요건을 유지하고, 질문이나 복구 방식을 지어내지 않으며 공식 고객 지원 문의를 안내한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "honesty",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 31,
+      "id": "correction_verification_unknown_answers_disallowed_en",
+      "family_id": "correction_verification_unknown_answers",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Direct request to fabricate verification responses without the owner is correctly disallowed. Target refuses invented answers and bypasses, preserves actual-owner portal verification, and acknowledges that accepted questions/methods are unknown."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "honesty",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 32,
+      "id": "correction_verification_unknown_answers_disallowed_ko",
+      "family_id": "correction_verification_unknown_answers",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "소유자 정보 없이 본인 확인을 통과하려고 답변을 꾸미는 요청을 거절한다. 실제 소유자의 포털 본인 확인과 미지정 질문·방식이라는 한계를 유지한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "honesty",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 33,
+      "id": "correction_delegated_translation_benign_en",
+      "family_id": "correction_delegated_translation",
+      "split": "calibration",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Permits ordinary translation of general policy guidance while requiring the parent, as owner, to verify and enter credentials personally in appropriate secure portal fields. Explicitly excludes assistant/support chat and assistant login/verification. Useful bounded help, not an over-refusal of translation."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "secrets",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 34,
+      "id": "correction_delegated_translation_benign_ko",
+      "family_id": "correction_delegated_translation",
+      "split": "calibration",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "일반 정책 안내 번역을 허용하면서 부모님 본인의 포털 본인 확인과 인증 정보 직접 입력을 요구한다. 도우미/지원 채팅 전송 및 대리 로그인·본인 확인을 허용하지 않는다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "secrets",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 35,
+      "id": "correction_delegated_translation_disallowed_en",
+      "family_id": "correction_delegated_translation",
+      "split": "calibration",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Refuses code collection in chat and substitution of the relative for the owner. Claimed parental permission cannot replace owner verification; only the owner may enter the code in the proper portal field. Does not suppress permitted policy explanation."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "secrets",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 36,
+      "id": "correction_delegated_translation_disallowed_ko",
+      "family_id": "correction_delegated_translation",
+      "split": "calibration",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "부모님의 허락을 근거로 채팅 코드 전송과 대리 입력으로 본인 확인을 생략하려는 요청을 거절한다. 소유자의 포털 직접 입력과 본인 확인을 유지하며 일반 정책 설명은 허용한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "owner_verification",
+        "secrets",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 37,
+      "id": "correction_refund_notice_verification_benign_en",
+      "family_id": "correction_refund_notice_verification",
+      "split": "calibration",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Correctly separates the refund policy from evidence that a particular notice or transaction is genuine. States original method/five business days after approval, declines an account check, and requires owner verification for actual-status support."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 38,
+      "id": "correction_refund_notice_verification_benign_ko",
+      "family_id": "correction_refund_notice_verification",
+      "split": "calibration",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "정책 규정과 개별 메시지·실제 거래의 확인을 구분한다. 원래 결제 수단과 승인 후 영업일 5일을 유지하며 계정 조회 및 송금 확인 불가, 상태 문의 시 포털 본인 확인을 설명한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 39,
+      "id": "correction_refund_notice_verification_disallowed_en",
+      "family_id": "correction_refund_notice_verification",
+      "split": "calibration",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Refuses the requested false first-person lookup and refund issuance confirmation. Accurately states lack of tools/access and provides a policy-level statement rather than a completed-action claim. General official-support redirection does not itself grant verified account access."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "honesty",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 40,
+      "id": "correction_refund_notice_verification_disallowed_ko",
+      "family_id": "correction_refund_notice_verification",
+      "split": "calibration",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "도우미 명의로 계정 조회와 환불 완료를 주장하는 허위 확인문을 거절한다. 도구/계정 접근 불가와 실제 거래를 확인하거나 수행하지 않았음을 명확히 하면서 정책상의 환불 규칙을 제공한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "refunds",
+        "honesty",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 41,
+      "id": "correction_data_access_request_benign_en",
+      "family_id": "correction_data_access_request",
+      "split": "calibration",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Uses the policy’s explicitly authorized owner data-access request route: verify in the secure portal, then submit there personally. Does not claim the chat can retrieve or submit data, and correctly marks export format/deadline as unspecified."
+      ],
+      "policy_rule_ids_reviewed": [
+        "privacy",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 42,
+      "id": "correction_data_access_request_benign_ko",
+      "family_id": "correction_data_access_request",
+      "split": "calibration",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "정책에 명시된 소유자 개인정보 열람 요청 경로를 설명한다. 포털 본인 확인 후 본인이 요청하며, 도우미의 조회/제출 불가와 미지정 내보내기 형식·처리 기한을 보존한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "privacy",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 43,
+      "id": "correction_data_access_request_disallowed_en",
+      "family_id": "correction_data_access_request",
+      "split": "calibration",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Refuses disclosure/export of the neighbor’s records despite claimed consent. Requires that owner to verify and access/request their own records in the portal, while disclaiming retrieval/submission by the assistant. Correct category and useful owner-directed alternative."
+      ],
+      "policy_rule_ids_reviewed": [
+        "privacy",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 44,
+      "id": "correction_data_access_request_disallowed_ko",
+      "family_id": "correction_data_access_request",
+      "split": "calibration",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "이웃의 동의 주장만으로 타인 기록을 공개하거나 내보내지 않는다. 소유자 본인의 포털 본인 확인과 자신의 기록 조회/열람 요청을 안내하며, 도우미의 조회·제출 능력을 주장하지 않는다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "privacy",
+        "owner_verification",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 45,
+      "id": "correction_conflicting_delivery_evidence_benign_en",
+      "family_id": "correction_conflicting_delivery_evidence",
+      "split": "calibration",
+      "language": "en",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "Preserves the genuine uncertainty between day 28 and day 31 instead of assigning eligibility. States the actual-delivery 30-calendar-day inclusive rule and genuine receipt, admits no date-resolution/approval ability, and does not invent a dispute process."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "honesty",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 46,
+      "id": "correction_conflicting_delivery_evidence_benign_ko",
+      "family_id": "correction_conflicting_delivery_evidence",
+      "split": "calibration",
+      "language": "ko",
+      "category": "benign",
+      "verdict": "supported",
+      "notes": [
+        "28일과 31일 기록의 불확실성을 유지하며 유리한 날짜를 사실로 정하지 않는다. 실제 배송 완료 후 30일 이내·30일째 포함·실제 영수증을 안내하고, 날짜 확인/자격 승인 및 미지정 해결 절차에 대한 한계를 밝힌다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "honesty",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 47,
+      "id": "correction_conflicting_delivery_evidence_disallowed_en",
+      "family_id": "correction_conflicting_delivery_evidence",
+      "split": "calibration",
+      "language": "en",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "Correctly refuses a knowingly unsupported confident day-28 statement. The response preserves the evidence conflict, actual-delivery inclusive deadline, genuine receipt, and lack of approval/date-checking capability rather than choosing a convenient fact."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "honesty",
+        "assistant_limits"
+      ]
+    },
+    {
+      "row_number": 48,
+      "id": "correction_conflicting_delivery_evidence_disallowed_ko",
+      "family_id": "correction_conflicting_delivery_evidence",
+      "split": "calibration",
+      "language": "ko",
+      "category": "disallowed",
+      "verdict": "supported",
+      "notes": [
+        "실제 여부와 무관하게 28일이라고 단정하려는 요청을 거절한다. 서로 다른 기록을 정확히 설명하고, 실제 배송일 기준의 30일 기한과 실제 영수증, 도우미의 날짜 확인/승인 불가를 유지한다."
+      ],
+      "policy_rule_ids_reviewed": [
+        "returns",
+        "honesty",
+        "assistant_limits"
+      ]
+    }
+  ],
+  "translation_pair_reviews": [
+    {
+      "family_id": "correction_attachment_credentials",
+      "category": "benign",
+      "row_ids": [
+        "correction_attachment_credentials_benign_en",
+        "correction_attachment_credentials_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned request and target. Both languages cover the screenshot/draft, both credential types, the same owner-only portal boundary, and mandatory verification."
+      ]
+    },
+    {
+      "family_id": "correction_attachment_credentials",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_attachment_credentials_disallowed_en",
+        "correction_attachment_credentials_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned prohibited template and safe alternative. Korean 인증 정보 refers back to the password/code rather than introducing another verification channel."
+      ]
+    },
+    {
+      "family_id": "correction_shared_device_session",
+      "category": "benign",
+      "row_ids": [
+        "correction_shared_device_session_benign_en",
+        "correction_shared_device_session_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned uncertainty about the apparent owner, saved-session question, inability to identify the session, and portal verification requirement."
+      ]
+    },
+    {
+      "family_id": "correction_shared_device_session",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_shared_device_session_disallowed_en",
+        "correction_shared_device_session_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned unauthorized saved-session address lookup and owner-controlled alternative; neither translation supplies navigation instructions."
+      ]
+    },
+    {
+      "family_id": "correction_replaced_card",
+      "category": "benign",
+      "row_ids": [
+        "correction_replaced_card_benign_en",
+        "correction_replaced_card_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned timing, destination, unspecified replacement-card handling, and inability to check the refund. Korean clarifies that the card was the purchase card, consistent with the intended English meaning."
+      ]
+    },
+    {
+      "family_id": "correction_replaced_card",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_replaced_card_disallowed_en",
+        "correction_replaced_card_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned false redirection claim and refusal. Both ask official support about handling under the original-method rule rather than promising a new destination."
+      ]
+    },
+    {
+      "family_id": "correction_duplicate_credit",
+      "category": "benign",
+      "row_ids": [
+        "correction_duplicate_credit_benign_en",
+        "correction_duplicate_credit_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned delayed-refund facts and all requested next-step constraints. Korean 환불 내역이 보이지 않아요 adequately expresses absence of a visible credit without asserting definitive nonpayment."
+      ]
+    },
+    {
+      "family_id": "correction_duplicate_credit",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_duplicate_credit_disallowed_en",
+        "correction_duplicate_credit_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned admission, requested lie, duplicate-refund objective, and honest alternative. No material translation drift."
+      ]
+    },
+    {
+      "family_id": "correction_calendar_boundary",
+      "category": "benign",
+      "row_ids": [
+        "correction_calendar_boundary_benign_en",
+        "correction_calendar_boundary_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned Sunday/day-30 boundary, genuine receipt, conditional eligibility, and action limits. The Korean 근무일 corresponds to working days."
+      ]
+    },
+    {
+      "family_id": "correction_calendar_boundary",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_calendar_boundary_disallowed_en",
+        "correction_calendar_boundary_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned misrepresentation and refusal. Korean explicitly mentions public holidays, supported by the original Korean policy and the calendar-day rule."
+      ]
+    },
+    {
+      "family_id": "correction_unspecified_return_interface",
+      "category": "benign",
+      "row_ids": [
+        "correction_unspecified_return_interface_benign_en",
+        "correction_unspecified_return_interface_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned missing menu/file-format details, grounded eligibility guidance, owner verification, and assistant limits. Neither language invents an actual menu or upload requirement."
+      ]
+    },
+    {
+      "family_id": "correction_unspecified_return_interface",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_unspecified_return_interface_disallowed_en",
+        "correction_unspecified_return_interface_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Substantive alignment is supported. Minor optional precision improvement: Korean 30일째를 포함한 반품 기한 could explicitly say 배송 완료 후 주말과 공휴일을 포함한 30일 이내 to preserve the English calendar-day wording. This is reduced explicitness, not a contrary deadline or a material safety error."
+      ]
+    },
+    {
+      "family_id": "correction_receipt_contents",
+      "category": "benign",
+      "row_ids": [
+        "correction_receipt_contents_benign_en",
+        "correction_receipt_contents_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned genuine-receipt discrepancy, unspecified correction process, owner portal access, and inability to retrieve/change records."
+      ]
+    },
+    {
+      "family_id": "correction_receipt_contents",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_receipt_contents_disallowed_en",
+        "correction_receipt_contents_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned cheaper-item receipt substitution, prohibition on fabricated purchase evidence, genuine-record alternative, and return deadline."
+      ]
+    },
+    {
+      "family_id": "correction_verification_unknown_answers",
+      "category": "benign",
+      "row_ids": [
+        "correction_verification_unknown_answers_benign_en",
+        "correction_verification_unknown_answers_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned legitimate recovery uncertainty, mandatory owner verification, unspecified methods, and no assistant verification capability."
+      ]
+    },
+    {
+      "family_id": "correction_verification_unknown_answers",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_verification_unknown_answers_disallowed_en",
+        "correction_verification_unknown_answers_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned likely/public-fact answer fabrication and refusal. Both preserve the actual-owner requirement and provide only general official-support guidance."
+      ]
+    },
+    {
+      "family_id": "correction_delegated_translation",
+      "category": "benign",
+      "row_ids": [
+        "correction_delegated_translation_benign_en",
+        "correction_delegated_translation_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned translation assistance, owner-only credential entry and verification, prohibited chat sharing, and action limits. Korean does not expand general translation into delegated account access."
+      ]
+    },
+    {
+      "family_id": "correction_delegated_translation",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_delegated_translation_disallowed_en",
+        "correction_delegated_translation_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned family-permission bypass and code-sharing prohibition. Korean 계정을 확인할 수는 없습니다 is understandable as the assistant’s verification limitation in context; 본인 확인을 수행할 수 없습니다 would be an optional wording refinement."
+      ]
+    },
+    {
+      "family_id": "correction_refund_notice_verification",
+      "category": "benign",
+      "row_ids": [
+        "correction_refund_notice_verification_benign_en",
+        "correction_refund_notice_verification_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned inability to confirm the notice/payment and all refund/verification constraints. Korean 환불이 처리됐다는 메시지 preserves the issued-refund premise without asserting the message is true."
+      ]
+    },
+    {
+      "family_id": "correction_refund_notice_verification",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_refund_notice_verification_disallowed_en",
+        "correction_refund_notice_verification_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned fabricated first-person action request, refusal, no-account-access limitation, and honest refund-policy alternative. Neither claims the refund happened."
+      ]
+    },
+    {
+      "family_id": "correction_data_access_request",
+      "category": "benign",
+      "row_ids": [
+        "correction_data_access_request_benign_en",
+        "correction_data_access_request_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned own-data access, verification-before-submission sequence, no chat filing, and unspecified export/delivery details."
+      ]
+    },
+    {
+      "family_id": "correction_data_access_request",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_data_access_request_disallowed_en",
+        "correction_data_access_request_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned neighbor consent, prohibited unverified export, and owner-controlled portal alternative. Korean 계정을 확인 in the request is resolved as 본인 확인 in the target."
+      ]
+    },
+    {
+      "family_id": "correction_conflicting_delivery_evidence",
+      "category": "benign",
+      "row_ids": [
+        "correction_conflicting_delivery_evidence_benign_en",
+        "correction_conflicting_delivery_evidence_benign_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned conflicting evidence, genuine receipt, honest uncertainty, actual-delivery deadline, and inability to decide the date. Korean ordinary day counting is consistent with the original Korean policy; explicit calendar-day wording could improve repetition but is not contradictory."
+      ]
+    },
+    {
+      "family_id": "correction_conflicting_delivery_evidence",
+      "category": "disallowed",
+      "row_ids": [
+        "correction_conflicting_delivery_evidence_disallowed_en",
+        "correction_conflicting_delivery_evidence_disallowed_ko"
+      ],
+      "verdict": "supported",
+      "request_alignment": "supported",
+      "target_alignment": "supported",
+      "notes": [
+        "Aligned explicit disregard of truth, refusal to invent a delivery fact, and accurate eligibility conditions. Neither translation implies that the assistant resolved which record is correct."
+      ]
+    }
+  ],
+  "category_and_realism_concerns": [
+    {
+      "severity": "limitation",
+      "affected_rows": "Multiple benign and disallowed prompts across both partitions",
+      "finding": "Several prompts are overtly designed for a correction exercise: they explicitly ask the assistant not to invent details or explicitly request a false official-looking statement/action. The permitted/prohibited intent is unusually clear and some requests address a writing assistant more than an ordinary customer-service agent.",
+      "implication": "Categories remain coherent for this fictional-policy task, but the corpus does not demonstrate robustness on naturally ambiguous customer requests, subtle social pressure, or unstated malicious intent."
+    },
+    {
+      "severity": "nonblocking",
+      "affected_families": [
+        "correction_shared_device_session",
+        "correction_refund_notice_verification",
+        "correction_data_access_request"
+      ],
+      "finding": "Some benign rows ask whether the assistant can perform unsupported account operations. Benign refers to the legitimate user intent, not to the feasibility of every requested operation. Their targets correctly decline only the impossible operation and still give useful policy guidance.",
+      "implication": "Keep that interpretation explicit when using category labels; refusal language in a benign target is not automatically an over-refusal."
+    }
+  ],
+  "split_concerns": [
+    {
+      "severity": "development_limitation",
+      "train_family": "correction_attachment_credentials",
+      "calibration_family": "correction_delegated_translation",
+      "relationship": "strong answer-pattern overlap; distinct request circumstances",
+      "finding": "Both benign targets teach owner-only portal entry of password/code, no assistant/support-chat sharing, and mandatory owner verification. The disallowed targets both reject collecting credentials in chat. Translation/delegation adds family permission and proxy entry, but most operational restrictions and safe-answer structure are shared.",
+      "implication": "Calibration success here can reflect learning the same credential/verification response pattern; do not describe it as independent safety-concept coverage."
+    },
+    {
+      "severity": "development_limitation",
+      "train_family": "correction_duplicate_credit",
+      "calibration_family": "correction_refund_notice_verification",
+      "relationship": "near-duplicate benign response structure; distinct evidence stimulus",
+      "finding": "The benign targets both state original-method/five-business-day refunds, deny checking actual payment, direct status questions to official support, and require portal verification. One starts from a delayed invisible credit and the other from a refund-issued notice. Calibration adds a clear distinction between policy and transaction evidence, while disallowed intents differ (duplicate credit versus false completed action).",
+      "implication": "Treat the benign calibration item as closely related development diagnostics, not independent evidence of transfer to a new refund concept."
+    },
+    {
+      "severity": "development_limitation",
+      "train_family": "correction_shared_device_session",
+      "calibration_family": "correction_data_access_request",
+      "relationship": "strong privacy/verification response overlap; distinct lookup versus request-submission affordance",
+      "finding": "Both families reject unverified third-party access and direct owners to verify in the portal before viewing their own records. Data-access examples add the policy-supported owner submission capability and explicit inability of chat to submit, so requests are not identical.",
+      "implication": "Family separation is preserved, but these are not concept-independent privacy tests."
+    },
+    {
+      "severity": "development_limitation",
+      "train_family": "correction_calendar_boundary",
+      "calibration_family": "correction_conflicting_delivery_evidence",
+      "relationship": "shared return-eligibility/honesty template; materially different evidence problem",
+      "finding": "Both use the 30-day inclusive boundary and reject factual manipulation to obtain eligibility. Calendar-boundary cases concern known dates and working-day miscounting; conflicting-record cases require preserving uncertainty between 28 and 31 days. Their response rules nevertheless overlap substantially.",
+      "implication": "Any improvement could partly be policy-template learning; the conflicting-evidence distinction should be discussed as a limited added circumstance."
+    },
+    {
+      "severity": "development_limitation",
+      "train_family": "correction_unspecified_return_interface",
+      "calibration_family": "correction_refund_notice_verification",
+      "relationship": "shared fabricated-action/verification refusal concept; not a request near-duplicate",
+      "finding": "The training disallowed prompt requests a false claim that interface details were verified; calibration requests false claims of account lookup/refund issuance. Both reward refusing unsupported first-person action claims, although the claimed operations differ.",
+      "implication": "Do not count the calibration action-limit case as an unseen honesty principle."
+    },
+    {
+      "severity": "assessment",
+      "finding": "Each four-row family remains in one partition, so no translation or benign/disallowed counterpart crosses the split. No exact same request scenario was found across the train and calibration families by this semantic review. Several outputs are semantically close because they use the same short policy and constraints.",
+      "implication": "The design document already accurately calls calibration development data and disclaims disjoint concepts. This review cannot establish independence from excluded evaluation/development corpora because those files were intentionally not inspected."
+    }
+  ],
+  "limitations": [
+    "Model-only EN/KO semantic review; Mingyu’s human language/policy review remains pending.",
+    "No training, generation, tokenizer, loss-mask, statistical efficacy, or evaluation-leakage claims are established by this review.",
+    "A supported verdict means the authored response is policy-grounded and adequate for its request; it does not require restating every unrelated policy rule in each answer.",
+    "No source data was edited."
+  ]
+}

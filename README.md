@@ -131,6 +131,19 @@ HF_HUB_OFFLINE=1 .venv/bin/python scripts/run_pilot_baseline.py \
 
 For a new run, first verify and record the protocol/configuration/rubric hashes as described in the protocol. Re-review all 80 shuffled outputs with variant names withheld; do not copy earlier annotations into a new pack. Use the same `summarize` command shown above on the new pack and its own annotations. Explicit reference/candidate roles determine comparison direction independently of label spelling or ordering.
 
+## Targeted correction preparation
+
+[Preparation results](docs/correction-preparation-results.md) now include 48 original correction examples: 32 training and 16 calibration rows, with bilingual scenario families kept together. All passed a provisional model review and an actual cached-tokenizer audit. Full conversations span 457–699 tokens; the 1,024-token training cap preserves every example. Human review remains pending, and train/calibration share policy concepts.
+
+The [adjudication note](docs/adjudication-development.md) preserves ten model-reviewed disputes and Mingyu's single field-scoped human decision without rewriting historical scores. [correction-lora.json](configs/correction-lora.json) proposes a fixed 32-step plain LoRA pilot; full-context memory testing and training remain unrun.
+
+```sh
+HF_HUB_OFFLINE=1 .venv/bin/python scripts/prepare_corrections.py \
+  --output results/correction-preflight-next
+```
+
+This cache-only command produces separate train/calibration token files, full assistant-response/EOS loss masks, and a hash-bound manifest. It rejects altered policy bytes, split leakage, exact evaluation-request overlap, oversized examples, and incomplete targets. It does not load model weights or train. The 20 test cases remain unrun.
+
 ## SafeTune and AuditKIT integration
 
 The runner reuses one SafeTune-loaded checkpoint through AuditKIT's public `CallableModel` API, avoiding a second full model in memory. It scores six benign English/Korean/Mandarin prompts using exact match and token F1, saves every prompt/output/score, records immutable model/tool revisions, and forces a fresh run with a unique cache identity. Generation limits are set on the SafeTune backend as well as AuditKIT.

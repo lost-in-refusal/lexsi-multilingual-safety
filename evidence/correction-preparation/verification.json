@@ -1,0 +1,23 @@
+{
+  "verified_utc": "2026-11-03T02:26:44.277054+00:00",
+  "tests": {
+    "command": ".venv/bin/python -m unittest discover -s tests -q",
+    "exit_code": 0,
+    "passed": 105,
+    "new_preflight_tests": 19,
+    "log_sha256": "736c687601c69db771afc2657acbb3088338f9ea5d695ae3c62f67392c33dfa9"
+  },
+  "preflight_manifest_sha256": "6149f2361a6dda06b4e9d843f77abcd6e4da32ee92b1fd0650631ed9822e098c",
+  "model_data_review_sha256": "8c37d7b247e86f21e3b75aef241396bc74117e93f9bc60a2257d757164b47985",
+  "human_decision_sha256": "81e6d44c7c5dd9e38213ed0d8ce91beae6b3b7bf1d9d4d3af7eede899b51a850",
+  "checks": [
+    "Archived preflight files and current inputs match recorded hashes",
+    "All48model row reviews and24translation reviews present",
+    "One actual human field decision correctly bound to reference output and review IDs",
+    "Original evaluation data,prior outputs,annotations,prompts and summaries unchanged",
+    "Independent implementation review found no material issue"
+  ],
+  "training_performed": false,
+  "gpu_memory_preflight_performed": false,
+  "test_generated_or_scored": false
+}

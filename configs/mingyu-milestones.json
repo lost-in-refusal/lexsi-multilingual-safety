@@ -29,11 +29,11 @@
     {
       "due": "2026-11-07",
       "deliverable": "Plain fine-tuning config and baseline run",
-      "status": "independent_development_prompt_ablation_complete_fine_tuning_not_run",
+      "status": "plain_lora_configuration_and_corpus_prepared_training_not_run",
       "needs": [
-        "Human review of original English-Korean policy/scenarios and v2 output judgments",
-        "Adjudicate repeat-review disagreement and credential/refund/access failures",
-        "Separate training/calibration families from intervention-selection/test families"
+        "Human review of authored English-Korean correction targets and remaining disputed dimensions",
+        "Longest-example forward/backward memory check at realistic policy context",
+        "Implement and run the fixed32-step adapter-only pilot, then compare held-out-from-training development behavior"
       ],
       "evidence": [
         "docs/pilot-baseline-review.md",
@@ -42,11 +42,16 @@
         "evidence/grounding-comparison/summary-model.json",
         "docs/conciseness-ablation-results.md",
         "evidence/conciseness-ablation/summary-model.json",
-        "evidence/conciseness-ablation/review-consistency.json"
+        "evidence/conciseness-ablation/review-consistency.json",
+        "docs/adjudication-development.md",
+        "evidence/adjudication-development/human-decisions.json",
+        "docs/correction-preparation-results.md",
+        "configs/correction-lora.json",
+        "evidence/correction-preparation/preflight/manifest.json"
       ],
       "scope": "120 generated development responses across baseline and two prompt controls; latest comparison freshly reviews80 outputs under v2;20test cases unrun;model judgments provisional",
       "remaining": [
-        "Plain fine-tuning configuration and substantive training experiment are not complete"
+        "Realistic-context memory validation and substantive32-step training experiment are not complete"
       ]
     },
     {
@@ -82,10 +87,10 @@
     }
   ],
   "next_work_package": [
-    "Adjudicate conflicting reference labels and credential/refund/access failures with Mingyu",
-    "Author targeted correction examples and a separate training/calibration design before LoRA or steering",
-    "Compare corrections on required facts, policy contradictions, unsupported details and over-refusal together",
-    "Freeze reviewed labels and selected intervention before the candidate test run"
+    "Review remaining correction target/translation judgments without treating model review as human approval",
+    "Run longest-training-example forward/backward memory check with no optimizer step, then reset state",
+    "Implement and execute the frozen32-step plainLoRA training pass; keep calibration out of optimizer batches",
+    "Compare base and adapted model under unchanged policy on40development cases; keep20test cases sealed until final intervention/scoring freeze"
   ],
   "research_limits": [
     "Safety drift is a hypothesis to test, not a required conclusion",
