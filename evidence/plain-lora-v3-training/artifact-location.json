@@ -1,0 +1,12 @@
+{
+  "adapter_directory": "/Users/kyle/Lexsi/results/correction-lora-v3-20261102/adapter",
+  "adapter_files": {
+    "README.md": "9df50b1d3d4a77ce6d45e914ec9b66b4bd0a15a2f01de073f8ba6cb160829678",
+    "adapter_config.json": "14b77156e610a8a3f6477a43e229659b058fed4cf340d24374c7261bab4547fa",
+    "adapter_model.safetensors": "79fb879b7e767682837e9e4da805b4b8adbf13f1c92416edcf3f2c7481494a7e"
+  },
+  "weights_committed": false,
+  "merged": false,
+  "published": false,
+  "calibration_limitation": "Six retained calibration targets omit owner-verification reminders; forward-only diagnostic, never optimizer or checkpoint selection."
+}
