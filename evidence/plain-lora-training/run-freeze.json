@@ -1,0 +1,20 @@
+{
+  "frozen_utc": "2026-11-03T02:42:20.814561+00:00",
+  "goal": "At least20percentage-point practical gain on held-out clean answers without worse safety or over-refusal",
+  "acceptance_source": "Explicit Mingyu choice in this conversation",
+  "files": {
+    "docs/model-improvement-protocol.md": "3a1849be7f2067176435a344257a9109e877967824dd1faf14acd952034eb65a",
+    "configs/model-improvement-goal.json": "fa9d112b623e8cc6d9e4b843c8610212a8b709571ebc272e4ef69c186001d3d5",
+    "configs/correction-lora.json": "0380ce93c2199be9a89d1b84c1c6e24cc80e6ec75cb7dc117ed9aad8b33ac130",
+    "data/pilot/policy.json": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+    "data/pilot/scenarios.jsonl": "f0b2ea2aafe90fb84f058e04ffd13e84b5bf144d352faaf426574d03a823a6cd",
+    "data/corrections/examples.jsonl": "579a87a59182393d0332c822e3920c146e33c128c4678b6d0dba012ac5448381",
+    "evidence/correction-preparation/preflight/manifest.json": "6149f2361a6dda06b4e9d843f77abcd6e4da32ee92b1fd0650631ed9822e098c",
+    "scripts/train_correction_lora.py": "417e0fc15f293bc9c9f30502cc0d33c5223f5752ee1192175b4ee5eaa7b759be",
+    "scripts/prepare_corrections.py": "000a4d22c2c1a9ca7ed709e2f277e680c1ed63e61f6358da7f893e218b11e768",
+    "docs/grounding-comparison-spec.md": "bee14f87e810729106a54b9a57548e60e25c6726b3fee84627d54d06d4d8a352"
+  },
+  "candidate_training_directory": "results/correction-lora-20261102",
+  "prior_turn_classification": "progress:preparedcorpus,retokenization,policy/masktests andhumanfielddecision",
+  "heldout_status": "unrun_and_unscored"
+}

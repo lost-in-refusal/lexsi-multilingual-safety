@@ -177,6 +177,102 @@ class GroundingComparisonTests(unittest.TestCase):
         self.write_responses(self.baseline, responses)
         self.mutate_report(self.baseline, ("responses_sha256",), digest(self.baseline / "responses.jsonl"))
 
+    def make_adapted_candidate(self):
+        from tests.test_pilot_adapter import fixture, blob
+        from scripts.run_pilot_baseline import validate_adapter_snapshot
+        runtime, config, adapter, training, _ = fixture()
+        report = self.read(self.candidate / "report.json")
+        config["policy_sha256"] = report["policy_sha256"]
+        training["training_config_sha256"] = hashlib.sha256(blob(config)).hexdigest()
+        for path in (self.baseline, self.candidate):
+            existing = self.read(path / "report.json")
+            existing["runtime"].update(runtime)
+            write_json(path / "report.json", existing)
+        report = self.read(self.candidate / "report.json")
+        for key in ("intervention", "intervention_sha256"):
+            report.pop(key, None)
+        (self.candidate / "intervention.json").unlink()
+        write_json(self.candidate / "effective-prompts.json", self.policy["texts"])
+        identity = validate_adapter_snapshot(blob(training), blob(config), blob(adapter), report["runtime"], report["policy_sha256"])
+        for name, data in (("adapter-training-report.json", training), ("adapter-training-config.json", config),
+                           ("adapter-config.json", adapter), ("adapter-provenance.json", identity)):
+            write_json(self.candidate / name, data)
+        report.update(variant="adapted", adapter_provenance=identity,
+                      adapter_provenance_sha256=digest(self.candidate / "adapter-provenance.json"),
+                      effective_prompts_sha256=digest(self.candidate / "effective-prompts.json"),
+                      adapter_loaded_for_inference=True, adapter_merged=False)
+        responses = [json.loads(line) for line in (self.candidate / "responses.jsonl").read_text().splitlines()]
+        for response in responses:
+            response["effective_prompts_sha256"] = report["effective_prompts_sha256"]
+            response["adapter_provenance_sha256"] = report["adapter_provenance_sha256"]
+        self.write_responses(self.candidate, responses)
+        report["responses_sha256"] = digest(self.candidate / "responses.jsonl")
+        write_json(self.candidate / "report.json", report)
+        audit = self.read(self.candidate / "auditkit-result.json")
+        audit["config"]["extra"]["adapter_provenance_sha256"] = report["adapter_provenance_sha256"]
+        write_json(self.candidate / "auditkit-result.json", audit)
+
+    def create_adapter_comparison(self, output=None):
+        return self.api.create_review_pack(self.baseline, self.candidate, self.rubric, output or self.pack,
+                                          candidate_mode="adapted", candidate_label="plain_lora")
+
+    def test_adapter_comparison_roundtrip_binds_weight_and_training_identity(self):
+        self.make_adapted_candidate()
+        manifest = self.create_adapter_comparison()
+        self.assertEqual(manifest["schema_version"], 3)
+        self.assertEqual(manifest["comparison"]["candidate"], {"label": "plain_lora", "mode": "adapted"})
+        bound = manifest["review_context"]["runs"]["plain_lora"]
+        self.assertEqual(bound["adapter_provenance_sha256"], digest(self.candidate / "adapter-provenance.json"))
+        self.assertEqual(bound["training_report_sha256"], digest(self.candidate / "adapter-training-report.json"))
+        summary = self.summarize([self.label("baseline"), self.label("plain_lora")])
+        self.assertEqual(summary["provenance"]["comparison"], manifest["comparison"])
+        self.assertIn("required_points", summary["paired"]["overall"])
+
+    def test_adapter_comparison_rejects_missing_identity_mixed_prompt_or_unloaded_adapter(self):
+        self.make_adapted_candidate()
+        originals = {p.name: p.read_bytes() for p in self.candidate.iterdir()}
+        for field, value in [("adapter_provenance_sha256", "0" * 64), ("adapter_loaded_for_inference", False),
+                             ("adapter_merged", True), ("intervention", self.intervention)]:
+            with self.subTest(field=field):
+                for name, data in originals.items(): (self.candidate / name).write_bytes(data)
+                self.mutate_report(self.candidate, (field,), value)
+                with self.assertRaises(ValueError): self.create_adapter_comparison()
+        for name, data in originals.items(): (self.candidate / name).write_bytes(data)
+        effective = deepcopy(self.policy["texts"]); effective["en"] += " Be concise."
+        write_json(self.candidate / "effective-prompts.json", effective)
+        self.mutate_report(self.candidate, ("effective_prompts_sha256",), digest(self.candidate / "effective-prompts.json"))
+        with self.assertRaisesRegex(ValueError, "unmodified base policy"):
+            self.create_adapter_comparison()
+
+    def test_adapter_hash_changes_create_new_review_ids_and_reject_stale_labels(self):
+        self.make_adapted_candidate()
+        first = self.create_adapter_comparison()
+        label = self.label("plain_lora")
+        training = self.read(self.candidate / "adapter-training-report.json")
+        training["adapter_files"]["adapter_model.safetensors"] = "c" * 64
+        write_json(self.candidate / "adapter-training-report.json", training)
+        from scripts.run_pilot_baseline import validate_adapter_snapshot
+        report = self.read(self.candidate / "report.json")
+        identity = validate_adapter_snapshot((self.candidate / "adapter-training-report.json").read_bytes(),
+                                            (self.candidate / "adapter-training-config.json").read_bytes(),
+                                            (self.candidate / "adapter-config.json").read_bytes(),
+                                            report["runtime"], report["policy_sha256"])
+        write_json(self.candidate / "adapter-provenance.json", identity)
+        report.update(adapter_provenance=identity, adapter_provenance_sha256=digest(self.candidate / "adapter-provenance.json"))
+        responses = [json.loads(line) for line in (self.candidate / "responses.jsonl").read_text().splitlines()]
+        for response in responses: response["adapter_provenance_sha256"] = report["adapter_provenance_sha256"]
+        self.write_responses(self.candidate, responses); report["responses_sha256"] = digest(self.candidate / "responses.jsonl")
+        write_json(self.candidate / "report.json", report)
+        audit = self.read(self.candidate / "auditkit-result.json")
+        audit["config"]["extra"]["adapter_provenance_sha256"] = report["adapter_provenance_sha256"]
+        write_json(self.candidate / "auditkit-result.json", audit)
+        second_pack = self.root / "second-pack"
+        second = self.create_adapter_comparison(second_pack)
+        self.assertNotEqual(first["review_context_sha256"], second["review_context_sha256"])
+        annotations = self.root / "stale.json"; write_json(annotations, [label])
+        with self.assertRaisesRegex(ValueError, "Unknown review ID"):
+            self.api.summarize_review(second_pack, [annotations], self.root / "never-summary.json")
+
     def test_modern_baseline_custom_labels_roundtrip_includes_effective_policy_snapshot(self):
         self.make_modern_baseline()
         manifest = self.create_ablation(self.baseline, reference_mode="baseline", reference_label="policy_reference")

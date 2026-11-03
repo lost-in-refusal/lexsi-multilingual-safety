@@ -16,7 +16,10 @@ import time
 import traceback
 import uuid
 
-from pilot_validation import summarize_annotations, validate_rows
+try:
+    from .pilot_validation import summarize_annotations, validate_rows
+except ImportError:
+    from pilot_validation import summarize_annotations, validate_rows
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -61,21 +64,96 @@ def build_effective_prompts(policy, intervention=None):
     return {lang: base[lang] + "\n\n" + appendix[lang] for lang in ("en", "ko")}
 
 
+def validate_adapter_snapshot(report_bytes, config_bytes, adapter_config_bytes, runtime, policy_sha256):
+    """Validate archived training metadata without reopening mutable weight paths."""
+    def require(condition, message):
+        if not condition:
+            raise ValueError(message)
+
+    digest = lambda content: hashlib.sha256(content).hexdigest()
+    report, config, adapter_config = map(json.loads, (report_bytes, config_bytes, adapter_config_bytes))
+    require(all(isinstance(x, dict) for x in (report, config, adapter_config)), "Adapter snapshots must be objects")
+    require(report.get("status") == "passed_training", "Adapter requires passed_training")
+    require(report.get("training_config") == config and report.get("training_config_sha256") == digest(config_bytes),
+            "Training configuration snapshot/hash mismatch")
+    for field in ("model", "model_revision"):
+        require(report.get(field) == config.get(field) == runtime.get(field), f"Adapter base {field} mismatch")
+    require(config.get("policy_sha256") == policy_sha256, "Adapter training policy mismatch")
+    require(config.get("system_prompt") == "original_policy_only", "Adapter must train under the original policy only")
+    require(config.get("dtype") == runtime.get("dtype") == "bfloat16"
+            and config.get("device") == runtime.get("local_device") == "mps"
+            and report.get("base_dtype") == "torch.bfloat16" and report.get("model_device") == "mps:0",
+            "Adapter training dtype/device mismatch")
+    require(type(report.get("optimizer_steps")) is int and report["optimizer_steps"] == 32
+            and type(config.get("train_steps")) is int and config["train_steps"] == 32,
+            "Expected all 32 frozen training steps")
+    for flag in ("saved_adapter_reload_exact", "all_base_parameters_frozen", "frozen_parameter_samples_unchanged"):
+        require(report.get(flag) is True, f"Adapter training check is missing: {flag}")
+    require(report.get("adapter_directory") == "adapter", "Expected relative adapter directory 'adapter'")
+    files = report.get("adapter_files")
+    require(isinstance(files, dict) and {"adapter_config.json", "adapter_model.safetensors"} <= set(files)
+            and set(files) <= {"adapter_config.json", "adapter_model.safetensors", "README.md"},
+            "Expected adapter-only configuration and safetensors files")
+    require(all(isinstance(value, str) and len(value) == 64
+                and set(value) <= set("0123456789abcdef") for value in files.values()), "Invalid adapter file digest")
+    require(files["adapter_config.json"] == digest(adapter_config_bytes), "Adapter configuration hash mismatch")
+    targets = {"q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"}
+    require(config.get("lora_r") == 4 and config.get("lora_alpha") == 8 and config.get("lora_dropout") == 0.0,
+            "Unexpected frozen LoRA configuration")
+    require(isinstance(config.get("target_modules"), list) and set(config["target_modules"]) == targets,
+            "Unexpected frozen LoRA target modules")
+    for field, expected in (("base_model_name_or_path", runtime["model"]), ("revision", runtime["model_revision"]),
+                            ("peft_type", "LORA"), ("task_type", "CAUSAL_LM"), ("r", 4),
+                            ("lora_alpha", 8), ("lora_dropout", 0.0), ("bias", "none")):
+        require(adapter_config.get(field) == expected, f"Saved PEFT configuration mismatch: {field}")
+    require(isinstance(adapter_config.get("target_modules"), list)
+            and set(adapter_config["target_modules"]) == targets, "Saved PEFT target modules mismatch")
+    require(adapter_config.get("inference_mode") is True, "Saved PEFT configuration must be inference-ready")
+    for field in ("modules_to_save", "rank_pattern", "alpha_pattern", "use_dora", "use_rslora", "lora_bias",
+                  "trainable_token_indices", "target_parameters", "layer_replication", "fan_in_fan_out",
+                  "exclude_modules", "layers_to_transform", "layers_pattern", "use_qalora", "use_bdlora",
+                  "alora_invocation_tokens"):
+        require(not adapter_config.get(field), f"Unapproved saved PEFT feature: {field}")
+    return {"schema_version": 1, "model": runtime["model"], "model_revision": runtime["model_revision"],
+            "policy_sha256": policy_sha256, "training_report_sha256": digest(report_bytes),
+            "training_config_sha256": digest(config_bytes), "adapter_config_sha256": digest(adapter_config_bytes),
+            "adapter_files": files, "optimizer_steps": 32, "saved_adapter_reload_exact": True}
+
+
+def load_adapter_training_run(directory, runtime, policy_sha256):
+    """Verify the exact weight files immediately before inference; no model load."""
+    directory = Path(directory)
+    snapshots = {"adapter-training-report.json": (directory / "report.json").read_bytes(),
+                 "adapter-training-config.json": (directory / "training-config.json").read_bytes(),
+                 "adapter-config.json": (directory / "adapter/adapter_config.json").read_bytes()}
+    identity = validate_adapter_snapshot(*snapshots.values(), runtime, policy_sha256)
+    adapter_path = directory / "adapter"
+    actual = {str(p.relative_to(adapter_path)) for p in adapter_path.rglob("*") if p.is_file()}
+    if actual != set(identity["adapter_files"]):
+        raise ValueError("Adapter directory files differ from training manifest")
+    for name, expected in identity["adapter_files"].items():
+        if sha256(adapter_path / name) != expected:
+            raise ValueError(f"Adapter file hash mismatch: {name}")
+    return {"adapter_path": adapter_path, "identity": identity, "snapshots": snapshots}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--curate-only", action="store_true", help="Validate and curate without loading Aya")
-    parser.add_argument("--intervention", type=Path, help="Bilingual system-prompt appendix JSON; weights stay unchanged")
-    parser.add_argument("--rubric", type=Path, help="Rubric to snapshot before generation; required with --intervention")
+    treatments = parser.add_mutually_exclusive_group()
+    treatments.add_argument("--intervention", type=Path, help="Bilingual system-prompt appendix JSON; weights stay unchanged")
+    treatments.add_argument("--adapter-training-run", type=Path, help="Completed hash-verified LoRA training run; original policy only")
+    parser.add_argument("--rubric", type=Path, help="Rubric to snapshot before generation; required with either intervention")
     args = parser.parse_args()
-    if args.intervention and not args.rubric:
-        parser.error("--intervention requires --rubric")
+    if (args.intervention or args.adapter_training_run) and not args.rubric:
+        parser.error("--intervention and --adapter-training-run require --rubric")
     args.output.mkdir(parents=True, exist_ok=False)
     runtime = json.loads((ROOT / "configs/runtime.json").read_text())
     config = json.loads((ROOT / "configs/pilot.json").read_text())
     pins = json.loads((ROOT / "configs/tools.lock.json").read_text())
     report = dict(status="running", started_utc=datetime.now(timezone.utc).isoformat(),
-                  runtime=runtime, config=config, variant="grounded" if args.intervention else "baseline",
+                  runtime=runtime, config=config, variant="adapted" if args.adapter_training_run else "grounded" if args.intervention else "baseline",
                   callback_calls=0, generated_samples=0,
                   test_generated_samples=0, semantic_review="pending",
                   scope="Draft fictional support-policy development pilot; no general safety claim.")
@@ -126,6 +204,16 @@ def main():
             (args.output / "rubric.md").write_bytes(args.rubric.read_bytes())
         report["dataset_sha256"] = sha256(dataset_path)
         report["policy_sha256"] = sha256(policy_path)
+        adapter_run = None
+        if args.adapter_training_run:
+            adapter_run = load_adapter_training_run(args.adapter_training_run, runtime, report["policy_sha256"])
+            for name, content in adapter_run["snapshots"].items():
+                (args.output / name).write_bytes(content)
+            write_json(args.output / "adapter-provenance.json", adapter_run["identity"])
+            report["adapter_provenance"] = adapter_run["identity"]
+            report["adapter_provenance_sha256"] = sha256(args.output / "adapter-provenance.json")
+            report["adapter_packages"] = {name: importlib.metadata.version(name) for name in ("peft", "safetensors")}
+            config["experiment"] = "harborcart-bilingual-adapter-" + report["adapter_provenance_sha256"][:12]
         report["dataset"] = validate_rows(rows)
         assert report["dataset"]["counts_by_split"] == {"development": 40, "test": 20}
         curated, manifest = curate_rows(rows, "data/pilot/scenarios.jsonl")
@@ -139,7 +227,7 @@ def main():
         assert len({row["request"] for row in selected}) == len(selected), "Ambiguous request-to-ID mapping"
         report["selected_ids"] = [row["id"] for row in selected]
         report["selected_dataset"] = validate_rows(selected)
-        if intervention is None:
+        if intervention is None and adapter_run is None:
             write_json(args.output / "semantic-summary.json", summarize_annotations(selected, []))
             write_json(args.output / "annotation-template.json", [dict(
                 sample_id=row["id"], outcome=None, task_score=None, language_adherence=None, reviewer=None,
@@ -177,6 +265,16 @@ def main():
         tok = load_tok(snapshot)
         started = time.perf_counter()
         model = load_model(snapshot, dtype=runtime["dtype"], device=device)
+        if adapter_run is not None:
+            from peft import PeftModel
+            # Recheck bytes after base loading; do not trust a stale path/hash.
+            current_adapter = load_adapter_training_run(args.adapter_training_run, runtime, report["policy_sha256"])
+            assert current_adapter["identity"] == adapter_run["identity"], "Adapter changed while loading base model"
+            model = PeftModel.from_pretrained(model, str(current_adapter["adapter_path"]), is_trainable=False)
+            assert all(not p.requires_grad for p in model.parameters()), "Inference adapter unexpectedly trainable"
+            assert not any(getattr(module, "merged", False) for module in model.modules()), "Adapter was unexpectedly merged"
+            report["adapter_loaded_for_inference"] = True
+            report["adapter_merged"] = False
         model.eval()
         torch.mps.synchronize()
         report["model_load_seconds"] = round(time.perf_counter() - started, 3)
@@ -242,6 +340,8 @@ def main():
                         policy_sha256=report["policy_sha256"], **observation,
                         effective_prompts_sha256=report["effective_prompts_sha256"],
                         case_seconds=round(time.perf_counter() - started_case, 3))
+                    if adapter_run is not None:
+                        record["adapter_provenance_sha256"] = report["adapter_provenance_sha256"]
                     checkpoints.write(json.dumps(record, ensure_ascii=False) + "\n")
                     checkpoints.flush()
                     os.fsync(checkpoints.fileno())
@@ -269,7 +369,8 @@ def main():
                         "model_revision": runtime["model_revision"], "tools": report["tools"],
                         "variant": report["variant"], "effective_prompts_sha256": report["effective_prompts_sha256"],
                         "intervention_sha256": report.get("intervention_sha256"),
-                        "rubric_sha256": report.get("rubric_sha256")}))
+                        "rubric_sha256": report.get("rubric_sha256"),
+                        **({"adapter_provenance_sha256": report["adapter_provenance_sha256"]} if adapter_run is not None else {})}))
         model.generate = original_generate
         report["evaluation_seconds"] = round(time.perf_counter() - started, 3)
         result.metadata.update({"scope": report["scope"], "semantic_review": "pending",

@@ -1,0 +1,51 @@
+{
+  "experiment_id": "harborcart_targeted_plain_lora_v1",
+  "status": "proposed_not_trained",
+  "model": "CohereLabs/aya-expanse-8b",
+  "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+  "system_prompt": "original_policy_only",
+  "dtype": "bfloat16",
+  "device": "mps",
+  "seed": 42,
+  "expected_rows": {
+    "train": 32,
+    "calibration": 16
+  },
+  "expected_families": {
+    "train": 8,
+    "calibration": 4
+  },
+  "train_steps": 32,
+  "epochs": 1,
+  "batch_size": 1,
+  "gradient_accumulation_steps": 1,
+  "learning_rate": 0.0001,
+  "weight_decay": 0.0,
+  "optimizer": "AdamW",
+  "foreach": false,
+  "max_grad_norm": 1.0,
+  "lora_r": 4,
+  "lora_alpha": 8,
+  "lora_dropout": 0.0,
+  "target_modules": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+  ],
+  "gradient_checkpointing": true,
+  "use_reentrant": false,
+  "use_cache_during_training": false,
+  "max_sequence_tokens": 1024,
+  "max_generation_new_tokens": 512,
+  "mps_memory_fraction": 0.8,
+  "loss": "assistant_response_and_eos_only",
+  "calibration": "forward_only_token_weighted_loss_before_and_after_no_optimizer_or_checkpoint_selection",
+  "save": "adapter_only_no_merge_no_publication",
+  "human_review_status": "pending",
+  "memory_status": "longest_example_forward_backward_preflight_not_run",
+  "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08"
+}

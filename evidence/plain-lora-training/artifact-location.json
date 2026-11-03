@@ -1,0 +1,11 @@
+{
+  "training_run_directory": "/Users/kyle/Lexsi/results/correction-lora-20261102",
+  "adapter_directory": "/Users/kyle/Lexsi/results/correction-lora-20261102/adapter",
+  "adapter_files": {
+    "README.md": "9df50b1d3d4a77ce6d45e914ec9b66b4bd0a15a2f01de073f8ba6cb160829678",
+    "adapter_config.json": "cd37632e9fb31b15c40e19b1d9c637637afa8b7c5341c5e70d6aac74318d8095",
+    "adapter_model.safetensors": "58dfe75a572df7c44504b2b3ce264c478c4f9b85ff3d30af2f1f1d2fb152a640"
+  },
+  "adapter_weights_bytes": 42002136,
+  "scope": "Model weights remain local in the ignored results directory; metadata and reproducible inputs are versioned; no merge or publication."
+}

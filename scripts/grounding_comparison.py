@@ -16,8 +16,10 @@ import random
 
 try:
     from .pilot_validation import validate_rows
+    from .run_pilot_baseline import validate_adapter_snapshot
 except ImportError:
     from pilot_validation import validate_rows
+    from run_pilot_baseline import validate_adapter_snapshot
 
 VARIANTS = ("baseline", "grounded")
 LANGUAGES = ("en", "ko")
@@ -70,15 +72,19 @@ def _unique_map(records, key, context):
     return result
 
 
-def _comparison(reference_mode, reference_label, candidate_label):
+def _comparison(reference_mode, reference_label, candidate_label, candidate_mode="grounded"):
     _require(reference_mode in ("baseline", "grounded"), "Reference mode must be baseline or grounded")
+    _require(candidate_mode in ("grounded", "adapted"), "Candidate mode must be grounded or adapted")
+    if candidate_mode == "adapted":
+        _require(reference_mode == "baseline", "Adapter comparison requires the original-policy baseline")
+        _require(candidate_label not in ("baseline", "grounded"), "Adapted candidate requires an explicit adapter label")
     _text(reference_label, "reference label")
     _text(candidate_label, "candidate label")
     _require(reference_label != candidate_label, "Reference and candidate labels must differ")
     _require(candidate_label != "baseline" and (reference_mode == "baseline" or reference_label != "baseline"),
              "A grounded run cannot be labeled baseline")
     return {"reference": {"label": reference_label, "mode": reference_mode},
-            "candidate": {"label": candidate_label, "mode": "grounded"}}
+            "candidate": {"label": candidate_label, "mode": candidate_mode}}
 
 
 def _load_run(directory, variant, rubric_sha):
@@ -154,6 +160,27 @@ def _load_run(directory, variant, rubric_sha):
         blobs["rubric.md"] = (directory / "rubric.md").read_bytes()
         _require(_sha(blobs["rubric.md"]) == report.get("rubric_sha256") == rubric_sha,
                  "Grounded run frozen rubric differs from the supplied review rubric")
+    elif variant == "adapted":
+        _require(report.get("variant") == "adapted" and not report.get("intervention"),
+                 "Adapted run must contain only an adapter treatment")
+        _require(report.get("adapter_loaded_for_inference") is True and report.get("adapter_merged") is False,
+                 "Adapted run must verify an unmerged inference adapter was loaded")
+        effective = read("effective-prompts.json")
+        _require(_sha(blobs["effective-prompts.json"]) == report.get("effective_prompts_sha256"),
+                 "Effective-prompts hash mismatch")
+        _require(effective == {language: texts[language] for language in LANGUAGES},
+                 "Adapted effective prompts must be exactly the unmodified base policy")
+        for name in ("adapter-training-report.json", "adapter-training-config.json", "adapter-config.json"):
+            blobs[name] = (directory / name).read_bytes()
+        identity = validate_adapter_snapshot(blobs["adapter-training-report.json"], blobs["adapter-training-config.json"],
+                                             blobs["adapter-config.json"], runtime, report["policy_sha256"])
+        provenance = read("adapter-provenance.json")
+        _require(provenance == identity == report.get("adapter_provenance"), "Adapter provenance differs from snapshots/report")
+        _require(_sha(blobs["adapter-provenance.json"]) == report.get("adapter_provenance_sha256"),
+                 "Adapter provenance hash mismatch")
+        blobs["rubric.md"] = (directory / "rubric.md").read_bytes()
+        _require(_sha(blobs["rubric.md"]) == report.get("rubric_sha256") == rubric_sha,
+                 "Adapted run frozen rubric differs from the supplied review rubric")
     else:
         _require(report.get("variant") in (None, "baseline") and not report.get("intervention"),
                  "Baseline must be an unmodified-policy run")
@@ -166,7 +193,7 @@ def _load_run(directory, variant, rubric_sha):
 
     blobs["responses.jsonl"] = (directory / "responses.jsonl").read_bytes()
     response_hash = _sha(blobs["responses.jsonl"])
-    if variant == "grounded" or "responses_sha256" in report:
+    if variant in ("grounded", "adapted") or "responses_sha256" in report:
         _require(response_hash == report.get("responses_sha256"), "Responses file hash mismatch")
     responses = _unique_map([json.loads(line) for line in blobs["responses.jsonl"].splitlines() if line.strip()],
                             "sample_id", "response")
@@ -178,6 +205,9 @@ def _load_run(directory, variant, rubric_sha):
         _require(response.get("policy_sha256") == report["policy_sha256"], f"Response {sample_id}: policy mismatch")
         for field in ("cap_reached", "ended_with_eos"):
             _require(type(response.get(field)) is bool, f"Response {sample_id}: {field} must be boolean")
+        if variant == "adapted":
+            _require(response.get("adapter_provenance_sha256") == report["adapter_provenance_sha256"],
+                     f"Response {sample_id}: adapter identity mismatch")
         if "effective-prompts.json" in blobs:
             _require(response.get("effective_prompts_sha256") == report["effective_prompts_sha256"],
                      f"Response {sample_id}: effective prompt mismatch")
@@ -193,6 +223,9 @@ def _load_run(directory, variant, rubric_sha):
              "Frozen AuditKIT settings require concurrency=1 and max_retries=0")
     extra = _object(audit_config.get("extra"), "AuditKIT config.extra")
     _require(extra.get("run_nonce") == report["run_nonce"], "AuditKIT run nonce mismatch")
+    if variant == "adapted":
+        _require(extra.get("adapter_provenance_sha256") == report["adapter_provenance_sha256"],
+                 "AuditKIT adapter identity mismatch")
     for audit_field, expected in (("seed", runtime["seed"]), ("temperature", config["temperature"]),
                                   ("batch_size", config["batch_size"]), ("max_tokens", config["max_new_tokens"])):
         _require(audit_config.get(audit_field) == expected, f"AuditKIT {audit_field} mismatch")
@@ -207,7 +240,7 @@ def _load_run(directory, variant, rubric_sha):
 
 
 def create_review_pack(baseline_dir, candidate_dir, rubric_path, output_dir, *,
-                       reference_mode="baseline", reference_label="baseline", candidate_label="grounded"):
+                       reference_mode="baseline", reference_label="baseline", candidate_label="grounded", candidate_mode="grounded"):
     """Validate two matched runs and create a new 80-item blinded review pack.
 
     Give reviewers only review-items.json, rubric.md and policy.json. mapping.json
@@ -223,11 +256,11 @@ def create_review_pack(baseline_dir, candidate_dir, rubric_path, output_dir, *,
         raise FileExistsError(f"Refusing to overwrite {output_dir}")
     rubric_bytes = rubric_path.read_bytes()
     _require(bool(rubric_bytes.strip()), "Review rubric cannot be empty")
-    comparison = _comparison(reference_mode, reference_label, candidate_label)
+    comparison = _comparison(reference_mode, reference_label, candidate_label, candidate_mode)
     labels = (reference_label, candidate_label)
-    legacy = reference_mode == "baseline" and labels == VARIANTS
+    legacy = reference_mode == "baseline" and labels == VARIANTS and candidate_mode == "grounded"
     runs = {reference_label: _load_run(baseline_dir, reference_mode, _sha(rubric_bytes)),
-            candidate_label: _load_run(candidate_dir, "grounded", _sha(rubric_bytes))}
+            candidate_label: _load_run(candidate_dir, candidate_mode, _sha(rubric_bytes))}
     left, right = (runs[v]["report"] for v in labels)
     for field in ("dataset_sha256", "curated_sha256", "policy_sha256", "dtype", "model_device", "tools", "packages"):
         _require(left[field] == right[field], f"Run mismatch: {field}")
@@ -258,6 +291,15 @@ def create_review_pack(baseline_dir, candidate_dir, rubric_path, output_dir, *,
             "curated_sha256": left["curated_sha256"], "policy_sha256": left["policy_sha256"],
             "rubric_sha256": _sha(rubric_bytes), "ordered_selected_ids": left["selected_ids"],
         }
+    if candidate_mode == "adapted":
+        review_context["version"] = 3
+        for label in labels:
+            files = runs[label]["files"]
+            review_context["runs"][label].update(
+                adapter_provenance_sha256=files.get("adapter-provenance.json"),
+                training_report_sha256=files.get("adapter-training-report.json"),
+                training_config_sha256=files.get("adapter-training-config.json"),
+                adapter_config_sha256=files.get("adapter-config.json"))
     context_hash = _sha(_json_bytes(review_context))
     pairs = [(variant, row) for variant in labels for row in runs[variant]["rows"]]
     rng = random.Random(SHUFFLE_SEED)
@@ -297,7 +339,9 @@ def create_review_pack(baseline_dir, candidate_dir, rubric_path, output_dir, *,
         "script_sha256": _sha(Path(__file__).read_bytes()),
     }
     if not legacy:
-        manifest.update(schema_version=2, comparison=comparison)
+        manifest.update(schema_version=3 if candidate_mode == "adapted" else 2, comparison=comparison)
+    if candidate_mode == "adapted":
+        manifest["adapter_validation_script_sha256"] = _sha(Path(__file__).with_name("run_pilot_baseline.py").read_bytes())
     output_dir.mkdir(parents=True, exist_ok=False)
     for name, content in files.items():
         with (output_dir / name).open("xb") as handle:
@@ -314,7 +358,7 @@ def _load_pack(pack_dir):
     _require(_sha(_json_bytes(manifest.get("review_context"))) == manifest.get("review_context_sha256"),
              "Review-context hash mismatch")
     schema = manifest.get("schema_version")
-    _require(schema in (1, 2), "Unsupported review-pack schema")
+    _require(schema in (1, 2, 3), "Unsupported review-pack schema")
     if schema == 1:
         _require("comparison" not in manifest and manifest["review_context"].get("version") == 1,
                  "Legacy pack must use the original comparison context")
@@ -323,21 +367,28 @@ def _load_pack(pack_dir):
         comparison = _object(manifest.get("comparison"), "pack comparison")
         reference = _object(comparison.get("reference"), "comparison reference")
         candidate = _object(comparison.get("candidate"), "comparison candidate")
-        expected = _comparison(reference.get("mode"), reference.get("label"), candidate.get("label"))
+        expected = _comparison(reference.get("mode"), reference.get("label"), candidate.get("label"), candidate.get("mode"))
+        _require((schema == 3) == (candidate.get("mode") == "adapted"), "Adapter comparisons require schema 3")
         _require(comparison == expected, "Invalid comparison roles or modes")
         context = _object(manifest["review_context"], "review context")
-        _require(context.get("version") == 2 and context.get("comparison") == comparison,
+        _require(context.get("version") == schema and context.get("comparison") == comparison,
                  "Comparison roles differ from bound review context")
         labels = (reference["label"], candidate["label"])
         _require(set(manifest.get("runs", {})) == set(labels) == set(context.get("runs", {})),
                  "Run labels differ from comparison roles")
         for label in labels:
             files = manifest["runs"][label]["files"]
-            _require(context["runs"][label] == {
+            bound = {
                 "responses_sha256": files.get("responses.jsonl"),
                 "intervention_sha256": files.get("intervention.json"),
                 "effective_prompts_sha256": files.get("effective-prompts.json"),
-            }, "Run evidence differs from bound review context")
+            }
+            if schema == 3:
+                bound.update(adapter_provenance_sha256=files.get("adapter-provenance.json"),
+                             training_report_sha256=files.get("adapter-training-report.json"),
+                             training_config_sha256=files.get("adapter-training-config.json"),
+                             adapter_config_sha256=files.get("adapter-config.json"))
+            _require(context["runs"][label] == bound, "Run evidence differs from bound review context")
     blobs = {}
     for name in ("review-items.json", "mapping.json", "rubric.md", "policy.json"):
         blobs[name] = (pack_dir / name).read_bytes()
@@ -620,7 +671,7 @@ def summarize_review(pack_dir, annotation_paths, output_path):
         }
     sample_ids = manifest["selected_ids"]
     reference = by_variant[reference_label]
-    protocol_metrics = manifest["schema_version"] == 2
+    protocol_metrics = manifest["schema_version"] in (2, 3)
     paired = {
         "overall": _paired_summary(sample_ids, by_variant, annotations, labels, protocol_metrics),
         "by_language": {language: _paired_summary([sid for sid in sample_ids if reference[sid]["language"] == language], by_variant, annotations, labels, protocol_metrics) for language in LANGUAGES},
@@ -648,7 +699,7 @@ def summarize_review(pack_dir, annotation_paths, output_path):
         },
         "variants": variants, "paired": paired, "differences": differences,
     }
-    if manifest["schema_version"] == 2:
+    if manifest["schema_version"] in (2, 3):
         summary["provenance"]["comparison"] = manifest["comparison"]
         summary["provenance"]["pair_exclusion_rule"] = (
             "Compare only two annotated, decisive values for each dimension; absent annotations and unclear "
@@ -671,6 +722,7 @@ def main(argv=None):
     pack.add_argument("--reference-mode", choices=("baseline", "grounded"), default="baseline")
     pack.add_argument("--reference-label", default="baseline")
     pack.add_argument("--candidate-label", default="grounded")
+    pack.add_argument("--candidate-mode", choices=("grounded", "adapted"), default="grounded")
     pack.add_argument("--rubric", type=Path, required=True)
     pack.add_argument("--output", type=Path, required=True)
     summarize = commands.add_parser("summarize", help="Summarize explicit review annotations")
@@ -682,7 +734,7 @@ def main(argv=None):
         if args.command == "pack":
             create_review_pack(args.baseline, args.candidate, args.rubric, args.output,
                                reference_mode=args.reference_mode, reference_label=args.reference_label,
-                               candidate_label=args.candidate_label)
+                               candidate_label=args.candidate_label, candidate_mode=args.candidate_mode)
         else:
             summarize_review(args.pack, args.annotations, args.output)
     except (ValueError, OSError) as exc:
