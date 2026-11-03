@@ -18,7 +18,7 @@ The original-policy development run produced 40 nonempty EOS-complete answers, z
 
 Training source was frozen at `e80218b8beecaa0bdd10fc9860de77126b244729`, and generation source at `cf1810b9ee6cac7a797c1ebcfb055f39082f87af`. Metadata and immutable snapshots are in `evidence/plain-lora-v3-training/`, `evidence/correction-preparation-v3/`, and `evidence/pilot-lora-v3-development/`. Adapter weights remain local and unmerged at the path in `artifact-location.json`.
 
-The selection procedure and all thresholds remain fixed. Only candidates that pass every gate are eligible; among passing candidates, prefer more confirmed-clean answers and then fewer confirmed contradictions. The three earlier v2 human wording questions remain pending and do not change any v3 labels. No held-out case has been generated or scored.
+The selection procedure and all thresholds remain fixed. Only candidates that pass every gate are eligible; among passing candidates, prefer more confirmed-clean answers and then fewer confirmed contradictions. Mingyu answered the three earlier v2 wording questions on November 3. Those field-scoped decisions do not change any v3 labels; v2 still fails its English contradiction check. No held-out case has been generated or scored.
 
 ## Development result
 

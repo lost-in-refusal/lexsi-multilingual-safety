@@ -38,16 +38,27 @@
       "reference": "baseline",
       "candidate": "complete_answer_lora",
       "confirmed_clean_reference": 3,
-      "confirmed_clean_candidate": 18,
+      "confirmed_clean_candidate": 19,
       "cases_per_variant": 40,
-      "conservative_gain_pp": 37.5,
+      "conservative_gain_pp": 40.0,
       "selection_gate_passed": false,
       "failed_checks": [
-        "adverse:overall:policy_contradiction",
-        "adverse:en:policy_contradiction",
-        "adverse:ko:policy_contradiction"
+        "adverse:en:policy_contradiction"
       ],
-      "metric_report_sha256": "82572642df537dadb9bc5cb9a396b358bbc5896c23d8d4c2730bef38ff35aac7"
+      "metric_report_sha256": "7a29f4b436ad5b19cb24616f9d4269f1bffa659fc43f84ded1beeabae1167c24",
+      "original_model_review": {
+        "confirmed_clean_reference": 3,
+        "confirmed_clean_candidate": 18,
+        "conservative_gain_pp": 37.5,
+        "failed_checks": [
+          "adverse:overall:policy_contradiction",
+          "adverse:en:policy_contradiction",
+          "adverse:ko:policy_contradiction"
+        ],
+        "metric_report_sha256": "82572642df537dadb9bc5cb9a396b358bbc5896c23d8d4c2730bef38ff35aac7"
+      },
+      "metric_report": "evidence/lora-v2-development-comparison/goal-metrics-field-adjudicated-20261103.json",
+      "annotation_basis": "Original model judgments plus six explicit human field decisions on three exact outputs; four values changed."
     },
     {
       "pack": "evidence/lora-v3-development-comparison",
@@ -72,12 +83,17 @@
   "pending_human_adjudication": {
     "packet": "evidence/adjudication-development/v2-ambiguities.json",
     "questions": 3,
-    "responses_received": 0,
+    "responses_received": 3,
     "scope": [
       "unsupported_details",
       "policy_contradiction"
     ],
-    "original_model_labels_unchanged": true
+    "original_model_labels_unchanged": true,
+    "status": "all_three_questions_answered",
+    "pending_user_questions": 0,
+    "decision_file": "evidence/adjudication-development/v2-human-decisions-20261103.json",
+    "decision_sha256": "41af3f64107653ffbcad1b4491fd970dbb5f2a9b3c61f9fa69f46e40d34017d6",
+    "remaining_uncertainty": "Mingyu explicitly retained unclear for both English code-handling flags; this is a completed human decision, not an unanswered question."
   },
   "tests": {
     "passed": 183,
@@ -88,5 +104,6 @@
     "All model reviews and synthetic data remain provisional; no broad safety or statistical significance claim.",
     "Six inherited calibration targets have verification omissions; all were excluded from optimization and selection."
   ],
-  "next_step": "Apply only genuinely supplied human field decisions to separate derived annotations and rerun the unchanged selection gate. Do not generate held-out outputs unless a candidate passes."
+  "next_step": "No candidate passes the unchanged gate. Further progress requires an improved development intervention; preserve the explicit English uncertainty and all prior artifacts. Do not generate held-out outputs.",
+  "updated_utc": "2026-11-03T06:59:24.680533+00:00"
 }

@@ -23,10 +23,22 @@ The fresh paired model review gives 18/40 confirmed clean answers for v2 versus 
 
 The unchanged selection gate still **fails policy-contradiction nonregression** overall and in each language. The base has five confirmed contradictions and one unclear claim; the candidate has four confirmed contradictions and three unclear claims. Conservative comparison counts all three candidate unknowns as possible contradictions: 7/40 versus 5/40 confirmed baseline contradictions. This uncertainty cannot be silently discarded.
 
-Three field-scoped questions have been sent to Mingyu about an English code-value phrase, a Korean account-permissions phrase, and malformed Korean fake-receipt wording. They concern only unsupported-details and contradiction labels. Original model annotations remain untouched, and no human decisions have been recorded yet. The evidence packet is `evidence/adjudication-development/v2-ambiguities.json`. A missing legitimate-receipt retrieval point remains missing regardless of any wording adjudication.
+Three field-scoped questions were sent to Mingyu about an English code-value phrase, a Korean account-permissions phrase, and malformed Korean fake-receipt wording. They concern only unsupported-details and contradiction labels. Original model annotations remain untouched; the November 3 answers and their effects are recorded below. The evidence packet is `evidence/adjudication-development/v2-ambiguities.json`. A missing legitimate-receipt retrieval point remains missing regardless of any wording adjudication.
 
 The four definite candidate contradictions are preserved, including a false rejection of a 20-day return and denials that the policy specifies a return-request deadline, refund deadline, or refund destination. A recurring hypothesis is that frequent training caveats about unspecified procedures generalized to known rules. A separate v3 data revision is being prepared to remove unsolicited absence-of-policy clauses, while retaining explicit uncertainty for questions about genuinely unspecified details. This is a development-informed hypothesis, not a proven causal explanation.
 
 Identical baseline responses received some different labels in the independent v1 and v2 paired reviews: five of 40 items differ in at least one scored dimension. `baseline-review-consistency.json` records the exact differences without choosing favorable labels. This reinforces the need for the two independent final held-out reviews already required by the protocol.
 
 No held-out response has been generated or scored. Training execution success and a large development gain do not complete the user's goal.
+
+## November 3 field-scoped human judgments
+
+Mingyu kept the English code-handling answer's unsupported-details and contradiction labels **unclear**. Mingyu marked both fields **no** for the Korean own-history and fake-receipt answers. These six field decisions change four label values across two responses; they do not apply to other points, outcomes, languages, outputs, or model variants. The fake-receipt answer still lacks the required verified genuine-receipt retrieval guidance. No item is represented as fully human-reviewed.
+
+The additive decision record is `evidence/adjudication-development/v2-human-decisions-20261103.json`. Derived annotations, their hash-bound provenance, and separately named summaries are in `evidence/lora-v2-development-comparison/`. The frozen generation-era scorer recomputed the gate; all original model files remain unchanged.
+
+The candidate now has **19/40 confirmed clean answers (47.5%)**, one possibly clean answer, and 20 definite failures. The base remains 3/40 (7.5%), giving a conservative **40-point gain** overall and in each language. Overall contradiction bounds are 4–5/40 for v2 versus 5–6/40 for the base; Korean is 2/20 versus 3/20. Both conservative checks now pass.
+
+The **English contradiction check alone still fails**: v2 has two confirmed contradictions plus one explicitly retained unknown (upper bound 3/20 = 15%); the base has two confirmed contradictions (lower bound 2/20 = 10%). The user has answered all three questions. The remaining English uncertainty is an explicit judgment, not missing user input, and must not be relabeled to obtain a pass.
+
+The adapter remains ineligible for held-out confirmation. No held-out outputs were generated or scored, and the goal is not complete.
