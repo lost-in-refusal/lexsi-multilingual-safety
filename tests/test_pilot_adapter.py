@@ -68,6 +68,14 @@ class AdapterValidationTests(unittest.TestCase):
         self.use_v2()
         self.assertEqual(self.validate()["optimizer_steps"], 160)
 
+    def test_v3_uses_the_same_frozen_schedule_and_rejects_partial_training(self):
+        self.use_v2()
+        self.config["experiment_id"] = "harborcart_known_facts_lora_v3"
+        self.report["training_config_sha256"] = sha(blob(self.config))
+        self.assertEqual(self.validate()["optimizer_steps"], 160)
+        self.report["optimizer_steps"] = 80
+        with self.assertRaises(ValueError): self.validate()
+
     def test_v2_rejects_partial_or_undeclared_training_schedule(self):
         self.use_v2()
         self.report["optimizer_steps"] = 159

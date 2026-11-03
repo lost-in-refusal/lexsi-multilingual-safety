@@ -1,0 +1,10 @@
+{
+  "model": "CohereLabs/aya-expanse-8b",
+  "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+  "local_device": "mps",
+  "dtype": "bfloat16",
+  "seed": 42,
+  "batch_size": 1,
+  "smoke_max_new_tokens": 32,
+  "decision": "Mingyu selected Aya Expanse 8B for current local team smoke tests on November 2, 2026. Tiny Aya remains an untested fallback."
+}

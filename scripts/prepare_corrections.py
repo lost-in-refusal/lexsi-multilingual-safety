@@ -3,6 +3,8 @@
 
 Only mechanical overlap is checked here. Policy fidelity, translation quality,
 and semantic independence require separate review; no evaluation is performed.
+Archives bind this source hash: after source changes, preserve old archives and
+use their original source revision or create a new preflight directory.
 """
 from __future__ import annotations
 
@@ -22,12 +24,17 @@ SPLITS = ("train", "calibration")
 CATEGORIES = ("benign", "disallowed")
 V1 = "harborcart_targeted_plain_lora_v1"
 V2 = "harborcart_complete_answer_lora_v2"
+V3 = "harborcart_known_facts_lora_v3"
 EXPERIMENTS = {
     V1: {"data": "data/corrections/examples.jsonl", "config": "configs/correction-lora.json",
          "expected_rows": {"train": 32, "calibration": 16},
          "expected_families": {"train": 8, "calibration": 4},
          "epochs": 1, "train_steps": 32, "learning_rate": 0.0001},
     V2: {"data": "data/corrections-v2/examples.jsonl", "config": "configs/correction-lora-v2.json",
+         "expected_rows": {"train": 80, "calibration": 16},
+         "expected_families": {"train": 24, "calibration": 4},
+         "epochs": 2, "train_steps": 160, "learning_rate": 0.00005},
+    V3: {"data": "data/corrections-v3/examples.jsonl", "config": "configs/correction-lora-v3.json",
          "expected_rows": {"train": 80, "calibration": 16},
          "expected_families": {"train": 24, "calibration": 4},
          "epochs": 2, "train_steps": 160, "learning_rate": 0.00005},
@@ -81,7 +88,7 @@ def validate_correction_rows(rows, policy, evaluation_rows, *, experiment_id=V1)
     No labels, outputs, or semantic outcomes from either split are used.
     """
     experiment_spec(experiment_id)
-    categories = CATEGORIES + (("utility",) if experiment_id == V2 else ())
+    categories = CATEGORIES + (("utility",) if experiment_id in (V2, V3) else ())
     _policy_texts(policy)
     rules = policy.get("rules")
     _require(isinstance(rules, list) and bool(rules), "Policy rules must be a nonempty list")
@@ -135,8 +142,8 @@ def validate_correction_rows(rows, policy, evaluation_rows, *, experiment_id=V1)
     for family_id, family in families.items():
         utility = any(category == "utility" for category, _ in family["variants"])
         if utility:
-            _require(experiment_id == V2 and family["split"] == "train",
-                     f"Family {family_id}: utility pairs are allowed only in v2 training")
+            _require(experiment_id in (V2, V3) and family["split"] == "train",
+                     f"Family {family_id}: utility pairs are allowed only in v2/v3 training")
         required = {("utility", language) for language in LANGUAGES} if utility else expected_variants
         _require(set(family["variants"]) == required, f"Family {family_id} lacks complete bilingual category pairs")
         for category in (("utility",) if utility else CATEGORIES):

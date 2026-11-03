@@ -12,6 +12,7 @@ from unittest.mock import patch
 POLICY = {"texts": {"en": "Exact English policy.\nKeep it.", "ko": "정확한 정책입니다."},
           "rules": [{"id": "secrets"}, {"id": "refunds"}]}
 V2 = "harborcart_complete_answer_lora_v2"
+V3 = "harborcart_known_facts_lora_v3"
 
 
 def family(name="train_a", split="train"):
@@ -34,9 +35,9 @@ def utility_family(name="utility_a", split="train"):
     return rows
 
 
-def v2_config(config):
+def v2_config(config, *, experiment_id=V2):
     result = deepcopy(config)
-    result.update(experiment_id=V2, expected_rows={"train": 80, "calibration": 16},
+    result.update(experiment_id=experiment_id, expected_rows={"train": 80, "calibration": 16},
                   expected_families={"train": 24, "calibration": 4},
                   train_steps=160, epochs=2, learning_rate=0.00005)
     return result
@@ -80,30 +81,34 @@ class ContractTest(unittest.TestCase):
 
 
 class ValidateCorrectionRowsTests(ContractTest):
-    def test_v2_allows_complete_utility_pairs_alongside_full_category_pairs(self):
+    def test_expanded_experiments_allow_utility_pairs_alongside_full_category_pairs(self):
         rows = family() + utility_family() + family("cal_a", "calibration")
-        result = self.api.validate_correction_rows(rows, POLICY, [], experiment_id=V2)
-        self.assertEqual(result["counts_by_split"], {"train": 6, "calibration": 4})
-        self.assertEqual(result["family_counts_by_split"], {"train": 2, "calibration": 1})
-        self.assertEqual(result["counts_by_category"], {"benign": 4, "disallowed": 4, "utility": 2})
+        for experiment_id in (V2, V3):
+            with self.subTest(experiment_id=experiment_id):
+                result = self.api.validate_correction_rows(rows, POLICY, [], experiment_id=experiment_id)
+                self.assertEqual(result["counts_by_split"], {"train": 6, "calibration": 4})
+                self.assertEqual(result["family_counts_by_split"], {"train": 2, "calibration": 1})
+                self.assertEqual(result["counts_by_category"], {"benign": 4, "disallowed": 4, "utility": 2})
 
-    def test_utility_requires_v2_and_cannot_replace_calibration_pairs(self):
+    def test_utility_requires_expanded_experiment_and_cannot_replace_calibration_pairs(self):
         with self.assertRaises(ValueError):
             self.api.validate_correction_rows(utility_family(), POLICY, [])
-        with self.assertRaises(ValueError):
-            self.api.validate_correction_rows(utility_family(split="calibration"), POLICY, [], experiment_id=V2)
+        for experiment_id in (V2, V3):
+            with self.subTest(experiment_id=experiment_id), self.assertRaisesRegex(ValueError, "only.*training"):
+                self.api.validate_correction_rows(utility_family(split="calibration"), POLICY, [], experiment_id=experiment_id)
         with self.assertRaises(ValueError):
             self.api.validate_correction_rows(family(), POLICY, [], experiment_id="arbitrary_experiment")
 
-    def test_v2_rejects_missing_mixed_duplicate_or_mismatched_utility_pair(self):
+    def test_expanded_experiments_reject_invalid_utility_pairs(self):
         missing = utility_family()[:1]
         mixed = utility_family(); mixed[1]["category"] = "benign"
         duplicate = utility_family(); duplicate[1]["language"] = "en"
         rules = utility_family(); rules[1]["policy_rule_ids"] = ["refunds"]
         extra = utility_family() + family("utility_a")
-        for rows in (missing, mixed, duplicate, rules, extra, family()[:2]):
-            with self.subTest(rows=rows), self.assertRaises(ValueError):
-                self.api.validate_correction_rows(rows, POLICY, [], experiment_id=V2)
+        for experiment_id in (V2, V3):
+            for rows in (missing, mixed, duplicate, rules, extra, family()[:2]):
+                with self.subTest(experiment_id=experiment_id, rows=rows), self.assertRaisesRegex(ValueError, "Family"):
+                    self.api.validate_correction_rows(rows, POLICY, [], experiment_id=experiment_id)
 
     def test_complete_bilingual_families_have_explicit_split_counts(self):
         rows = family() + family("cal_a", "calibration")
@@ -238,10 +243,10 @@ class PreflightCliTests(ContractTest):
         rows += [row for i in range(4) for row in family(f"cal_{i}", "calibration")]
         config = json.loads((Path(__file__).resolve().parents[1] / "configs/correction-lora.json").read_text())
         config["policy_sha256"] = hashlib.sha256(json.dumps(POLICY).encode()).hexdigest()
-        if version == 2:
+        if version in (2, 3):
             rows += [row for i in range(8, 16) for row in family(f"train_{i}")]
             rows += [row for i in range(8) for row in utility_family(f"utility_{i}")]
-            config = v2_config(config)
+            config = v2_config(config, experiment_id={2: V2, 3: V3}[version])
         runtime = {k: config[k] for k in ("model", "model_revision", "dtype", "seed", "batch_size")}
         runtime["local_device"] = "mps"
         values = {"data": "\n".join(json.dumps(r) for r in rows) + "\n", "evaluation": "",

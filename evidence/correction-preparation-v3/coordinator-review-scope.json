@@ -1,0 +1,26 @@
+{
+  "status": "training_partition_accepted_with_calibration_limitations",
+  "decision_by": "root_coordinator",
+  "human_approval": false,
+  "review_status_preserved": "changes_required",
+  "review_sha256": "ad5e3bfd3b2280b1f410b130068da381552312301358d1531beac5ab2e40f447",
+  "corpus_sha256": "c9d57310196dd923fe79ad6a7690a776ecd8b517bbbaf0c5b3295b994ab639ce",
+  "training_rows_cleared": 80,
+  "calibration_blocking_row_ids": [
+    "correction_conflicting_delivery_evidence_benign_en",
+    "correction_conflicting_delivery_evidence_benign_ko",
+    "correction_conflicting_delivery_evidence_disallowed_en",
+    "correction_conflicting_delivery_evidence_disallowed_ko",
+    "correction_refund_notice_verification_disallowed_en",
+    "correction_refund_notice_verification_disallowed_ko"
+  ],
+  "ruling": "Proceed only with the80 independently cleared optimizer targets. Keep the16 historical calibration targets byte-identical as a forward-only diagnostic control, with the six verification-condition omissions and four minor conditional-timing omissions explicitly retained. The reviewer full-corpus changes_required result is not overwritten.",
+  "reason": "Calibration never enters optimizer updates, checkpoint selection, candidate selection, or behavior metrics. Its imperfect labels can affect the diagnostic loss, so loss is not evidence of correctness and must be reported with this limitation. Actual behavior selection uses the unchanged frozen development gates.",
+  "constraints": [
+    "Only split=train may enter optimizer order",
+    "No checkpoint selection from calibration loss",
+    "Do not describe all96 rows as semantically clear or human-approved",
+    "Preserve reviewer severity and original calibration bytes",
+    "All acceptance thresholds and held-out isolation remain unchanged"
+  ]
+}

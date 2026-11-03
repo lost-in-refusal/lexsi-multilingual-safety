@@ -1,0 +1,34 @@
+{
+  "reviewer": "heldout_audit",
+  "reviewer_type": "model",
+  "recorded_by": "root",
+  "status": "passed_delta_audit",
+  "material_defects": [],
+  "input_hashes": {
+    "scripts/prepare_corrections.py": "c3ccc3e1f4d08c4666f95807f4154b310ae9a4151f5589f3c30157b2fe15c3c7",
+    "scripts/train_correction_lora.py": "60de6a8ede48fd88fc60b478c56ebc09b60609f4e08477a3657481c4263fc062",
+    "scripts/run_pilot_baseline.py": "420873e31ca9094dfc17c14768ce7934482f940d8b6d817152835839649677f3",
+    "configs/correction-lora-v3.json": "7032f4860b1438480e3b8ecc567b89f7d06566db3508dda302b8f17d9b76326c",
+    "tests/test_prepare_corrections.py": "ba9344694e78d70e0d2e7d0a81b6e7e50e6445514de52cab8dcbf406f86e2f12",
+    "tests/test_train_correction_lora.py": "2ff5bcd2c41bee90b296c0f2673313df066d48d2bbfce55b444e5c08cf407de4",
+    "tests/test_pilot_adapter.py": "8c7651774292b37073fb4587e8229bf9881fec64900dd466797d2de424e94f4f"
+  },
+  "findings": [
+    "V3 uses explicit canonical data/config paths and same v2 schedule and counts",
+    "V1/V2 registered definitions unchanged",
+    "Utility allowance restricted to V2/V3 complete bilingual training pairs",
+    "Adapter validation accepts only declared fixed schedules, rejects partial v3 training",
+    "Provenance/hash validation unchanged"
+  ],
+  "tests_reported_by_implementer": {
+    "focused_passed": 50,
+    "full_suite_passed": 183
+  },
+  "semantic_data_review": false,
+  "human_review_status": "not_human_review",
+  "tests_observed_by_root": {
+    "command": ".venv/bin/python -m unittest discover -s tests",
+    "passed": 183,
+    "failed": 0
+  }
+}

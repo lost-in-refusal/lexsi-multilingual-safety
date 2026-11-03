@@ -11,7 +11,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tests.test_prepare_corrections import FakeTokenizer, POLICY, family, utility_family, v2_config
+from tests.test_prepare_corrections import FakeTokenizer, POLICY, V2, V3, family, utility_family, v2_config
 
 ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / 'evidence/correction-preparation/preflight'
@@ -33,17 +33,18 @@ class TrainingContractTests(unittest.TestCase):
         manifest['script_sha256'] = hashlib.sha256((ROOT / 'scripts/prepare_corrections.py').read_bytes()).hexdigest()
         mpath.write_text(json.dumps(manifest))
 
-    def v2_archive(self):
-        root = Path(self.temp.name) / 'v2-root'; root.mkdir()
-        config = v2_config(json.loads((ROOT / 'configs/correction-lora.json').read_text()))
+    def versioned_archive(self, version=2):
+        root = Path(self.temp.name) / f'v{version}-root'; root.mkdir()
+        config = v2_config(json.loads((ROOT / 'configs/correction-lora.json').read_text()),
+                           experiment_id={2: V2, 3: V3}[version])
         policy_bytes = json.dumps(POLICY).encode()
         config['policy_sha256'] = hashlib.sha256(policy_bytes).hexdigest()
         rows = [r for i in range(16) for r in family(f'train_{i}')]
         rows += [r for i in range(8) for r in utility_family(f'utility_{i}')]
         rows += [r for i in range(4) for r in family(f'cal_{i}', 'calibration')]
         contents = {
-            'data/corrections-v2/examples.jsonl': ''.join(json.dumps(r) + '\n' for r in rows).encode(),
-            'configs/correction-lora-v2.json': json.dumps(config).encode(),
+            f'data/corrections-v{version}/examples.jsonl': ''.join(json.dumps(r) + '\n' for r in rows).encode(),
+            f'configs/correction-lora-v{version}.json': json.dumps(config).encode(),
             'data/pilot/policy.json': policy_bytes,
             'data/pilot/scenarios.jsonl': b'',
             'configs/runtime.json': (ROOT / 'configs/runtime.json').read_bytes(),
@@ -59,7 +60,7 @@ class TrainingContractTests(unittest.TestCase):
                     'chat_template_sha256': hashlib.sha256(template.encode()).hexdigest()}
         with patch.object(prepare, 'ROOT', root), patch.object(prepare, 'load_cached_tokenizer',
                 return_value=(FakeTokenizer(), template, metadata)):
-            self.assertEqual(prepare.main(['--config', str(root / 'configs/correction-lora-v2.json'),
+            self.assertEqual(prepare.main(['--config', str(root / f'configs/correction-lora-v{version}.json'),
                                           '--output', str(output)]), 0)
         return root, output
 
@@ -86,25 +87,29 @@ class TrainingContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'implementation hash'):
             self.api.load_prepared(self.prepared)
 
-    def test_v2_archive_loads_only_its_canonical_versioned_inputs(self):
-        root, archive = self.v2_archive()
-        data = self.api.load_prepared(archive, root=root)
-        self.assertEqual(len(data['train']), 80)
-        self.assertEqual(len(data['calibration']), 16)
-        self.assertEqual(data['config']['epochs'], 2)
-        self.assertEqual(data['config']['train_steps'], 160)
-        self.assertEqual(sum(r['category'] == 'utility' for r in data['train']), 16)
+    def test_versioned_archive_loads_only_its_canonical_inputs(self):
+        for version in (2, 3):
+            with self.subTest(version=version):
+                root, archive = self.versioned_archive(version)
+                data = self.api.load_prepared(archive, root=root)
+                self.assertEqual(len(data['train']), 80)
+                self.assertEqual(len(data['calibration']), 16)
+                self.assertEqual(data['config']['epochs'], 2)
+                self.assertEqual(data['config']['train_steps'], 160)
+                self.assertEqual(sum(r['category'] == 'utility' for r in data['train']), 16)
 
-    def test_v2_rogue_manifest_path_is_rejected_even_with_identical_bytes(self):
-        root, archive = self.v2_archive()
-        rogue = root / 'rogue.jsonl'; shutil.copyfile(root / 'data/corrections-v2/examples.jsonl', rogue)
-        path = archive / 'manifest.json'; manifest = json.loads(path.read_text())
-        manifest['inputs']['data']['path'] = str(rogue); path.write_text(json.dumps(manifest))
-        with self.assertRaisesRegex(ValueError, 'canonical.*path'):
-            self.api.load_prepared(archive, root=root)
+    def test_versioned_rogue_manifest_path_is_rejected_even_with_identical_bytes(self):
+        for version in (2, 3):
+            with self.subTest(version=version):
+                root, archive = self.versioned_archive(version)
+                rogue = root / 'rogue.jsonl'; shutil.copyfile(root / f'data/corrections-v{version}/examples.jsonl', rogue)
+                path = archive / 'manifest.json'; manifest = json.loads(path.read_text())
+                manifest['inputs']['data']['path'] = str(rogue); path.write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, 'canonical.*path'):
+                    self.api.load_prepared(archive, root=root)
 
     def test_v2_manifest_cannot_redirect_to_stale_copy_when_canonical_data_changes(self):
-        root, archive = self.v2_archive()
+        root, archive = self.versioned_archive()
         path = root / 'data/corrections-v2/examples.jsonl'; path.write_bytes(path.read_bytes() + b'\n')
         with self.assertRaisesRegex(ValueError, 'canonical input hash'):
             self.api.load_prepared(archive, root=root)
@@ -167,16 +172,18 @@ class TrainingContractTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     self.api.validate_training_config(invalid)
 
-    def test_v2_requires_exact_epoch_schedule_and_learning_rate(self):
-        config = v2_config(json.loads((self.prepared / 'config.json').read_text()))
-        self.api.validate_training_config(config)
-        for field, value in [('epochs', 1), ('epochs', True), ('train_steps', 80), ('train_steps', 159),
-                             ('learning_rate', 0.0001), ('experiment_id', '../unknown'),
-                             ('expected_rows', {'train': 32, 'calibration': 16})]:
-            with self.subTest(field=field, value=value):
-                invalid = deepcopy(config); invalid[field] = value
-                with self.assertRaises(ValueError):
-                    self.api.validate_training_config(invalid)
+    def test_expanded_experiments_require_exact_schedule_and_learning_rate(self):
+        for experiment_id in (V2, V3):
+            with self.subTest(experiment_id=experiment_id):
+                config = v2_config(json.loads((self.prepared / 'config.json').read_text()), experiment_id=experiment_id)
+                self.api.validate_training_config(config)
+                for field, value in [('epochs', 1), ('epochs', True), ('train_steps', 80), ('train_steps', 159),
+                                     ('learning_rate', 0.0001), ('experiment_id', '../unknown'),
+                                     ('expected_rows', {'train': 32, 'calibration': 16})]:
+                    with self.subTest(field=field, value=value):
+                        invalid = deepcopy(config); invalid[field] = value
+                        with self.assertRaises(ValueError):
+                            self.api.validate_training_config(invalid)
 
     def test_two_epochs_reshuffle_all_training_ids_exactly_once_per_epoch(self):
         rows = [{'id': str(i), 'split': 'train'} for i in range(80)]
@@ -237,7 +244,7 @@ class TrainingContractTests(unittest.TestCase):
         self.assertEqual((output / 'training-config.json').read_bytes(), (self.prepared / 'config.json').read_bytes())
 
     def test_v2_prepare_only_cli_reports_two_complete_epochs_without_runtime(self):
-        root, archive = self.v2_archive(); output = root / 'result'
+        root, archive = self.versioned_archive(); output = root / 'result'
         with patch.object(self.api, 'ROOT', root), patch.object(self.api, 'verify_retokenized',
                 return_value=(object(), {'scope': 'mock tokenizer'})), patch.dict('sys.modules', {'torch': None, 'safetune': None}):
             code = self.api.main(['--prepared', str(archive), '--output', str(output), '--prepare-only'])

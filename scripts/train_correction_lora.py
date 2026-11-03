@@ -4,7 +4,7 @@
 The complete policy stays in every input. Only the declared training rows enter
 optimizer updates. Calibration loss is diagnostic, not evidence of repair.
 
-Preparation source hashes are strict: historical v1 archives need their original
+Preparation source hashes are strict: historical archives need their original
 source revision, or new preparation in a separate directory with current source.
 """
 from __future__ import annotations

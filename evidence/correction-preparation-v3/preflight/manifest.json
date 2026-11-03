@@ -1,0 +1,1294 @@
+{
+  "schema_version": 1,
+  "status": "passed_tokenization_preflight",
+  "created_utc": "2026-11-03T04:00:51.130498+00:00",
+  "scope": "CPU-only tokenizer audit; no model weights loaded, memory compatibility test, generation, or training.",
+  "inputs": {
+    "data": {
+      "path": "/Users/kyle/Lexsi/data/corrections-v3/examples.jsonl",
+      "sha256": "c9d57310196dd923fe79ad6a7690a776ecd8b517bbbaf0c5b3295b994ab639ce"
+    },
+    "policy": {
+      "path": "/Users/kyle/Lexsi/data/pilot/policy.json",
+      "sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08"
+    },
+    "evaluation": {
+      "path": "/Users/kyle/Lexsi/data/pilot/scenarios.jsonl",
+      "sha256": "f0b2ea2aafe90fb84f058e04ffd13e84b5bf144d352faaf426574d03a823a6cd"
+    },
+    "config": {
+      "path": "/Users/kyle/Lexsi/configs/correction-lora-v3.json",
+      "sha256": "7032f4860b1438480e3b8ecc567b89f7d06566db3508dda302b8f17d9b76326c"
+    },
+    "runtime": {
+      "path": "/Users/kyle/Lexsi/configs/runtime.json",
+      "sha256": "e0a03038012113b28715fe8bcdc6858a5df476a9be61ec2258393bd8da8e068b"
+    }
+  },
+  "script_sha256": "c3ccc3e1f4d08c4666f95807f4154b310ae9a4151f5589f3c30157b2fe15c3c7",
+  "validation": {
+    "total_rows": 96,
+    "total_families": 28,
+    "counts_by_split": {
+      "train": 80,
+      "calibration": 16
+    },
+    "family_counts_by_split": {
+      "train": 24,
+      "calibration": 4
+    },
+    "counts_by_language": {
+      "en": 48,
+      "ko": 48
+    },
+    "counts_by_category": {
+      "benign": 40,
+      "disallowed": 40,
+      "utility": 16
+    },
+    "families_by_split": {
+      "train": [
+        "v3_account_address_change",
+        "v3_assistant_return_submission",
+        "v3_attachment_credentials",
+        "v3_calendar_boundary",
+        "v3_duplicate_credit",
+        "v3_missing_receipt",
+        "v3_owner_delivery_address",
+        "v3_owner_history_review",
+        "v3_partner_order_number",
+        "v3_receipt_contents",
+        "v3_replaced_card",
+        "v3_shared_device_session",
+        "v3_support_draft_status",
+        "v3_travel_deadline",
+        "v3_unspecified_return_interface",
+        "v3_utility_assistant_capabilities",
+        "v3_utility_credential_location",
+        "v3_utility_data_request",
+        "v3_utility_owner_records",
+        "v3_utility_policy_gaps",
+        "v3_utility_refund_rule",
+        "v3_utility_return_receipt",
+        "v3_utility_return_window",
+        "v3_verification_unknown_answers"
+      ],
+      "calibration": [
+        "correction_conflicting_delivery_evidence",
+        "correction_data_access_request",
+        "correction_delegated_translation",
+        "correction_refund_notice_verification"
+      ]
+    },
+    "human_review_pending": 96,
+    "evaluation_rows_checked_mechanically": 60,
+    "evaluation_overlap_check": "passed_exact_normalized_only",
+    "overlap_normalization": "Unicode NFKC, casefold, retain alphanumeric characters only",
+    "limitation": "Exact mechanical disjointness does not prove semantic independence; policy concepts overlap."
+  },
+  "tokenizer": {
+    "model": "CohereLabs/aya-expanse-8b",
+    "requested_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+    "actual_snapshot_commit": "5062468bf9bc0c6035fd64e06274333ec127d980",
+    "snapshot_path": "/Users/kyle/.cache/huggingface/hub/models--CohereLabs--aya-expanse-8b/snapshots/5062468bf9bc0c6035fd64e06274333ec127d980",
+    "class": "CohereTokenizer",
+    "eos_token_id": 255001,
+    "chat_template_sha256": "90c33aee14aa2a226127516d48ee9184c9b90745d4a04c484621ec2e82fb712c",
+    "files": {
+      "config.json": "81b7c1977e7c57052496bcbd50e94837db24e8188a5dc98efa0f9518fda9de7a",
+      "special_tokens_map.json": "a8a127f35f234ae60b1fcebe12a3c295c04021781a7e1fb97f65f4f89a513fa5",
+      "tokenizer.json": "c69a7ea6c0927dfac8c349186ebcf0466a4723c21cbdb2e850cf559f0bee92b8",
+      "tokenizer_config.json": "579bbdf6ad451c006373873e3f033e999673b39f909592338f0aa484db16e4ef"
+    },
+    "packages": {
+      "transformers": "5.22.1",
+      "tokenizers": "0.23.3",
+      "huggingface-hub": "2.4.0"
+    },
+    "local_files_only": true,
+    "trust_remote_code": false
+  },
+  "max_sequence_tokens": 1024,
+  "original_policy_only": true,
+  "truncated_examples": 0,
+  "supervision": "Complete assistant response and terminal EOS; full system/user/generation prefix masked with -100.",
+  "optimizer_steps": 0,
+  "model_weights_loaded": false,
+  "test_generated_samples": 0,
+  "test_scored_samples": 0,
+  "human_review_pending": 96,
+  "memory_preflight": "not_run",
+  "training": "not_run",
+  "statistics": {
+    "overall": {
+      "rows": 96,
+      "prompt_tokens": {
+        "minimum": 400,
+        "maximum": 609,
+        "total": 47684,
+        "mean": 496.7083333333333
+      },
+      "sequence_tokens": {
+        "minimum": 465,
+        "maximum": 818,
+        "total": 57828,
+        "mean": 602.375
+      },
+      "supervised_tokens": {
+        "minimum": 56,
+        "maximum": 209,
+        "total": 10144,
+        "mean": 105.66666666666667
+      }
+    },
+    "by_split": {
+      "train": {
+        "rows": 80,
+        "prompt_tokens": {
+          "minimum": 400,
+          "maximum": 609,
+          "total": 39688,
+          "mean": 496.1
+        },
+        "sequence_tokens": {
+          "minimum": 470,
+          "maximum": 818,
+          "total": 48584,
+          "mean": 607.3
+        },
+        "supervised_tokens": {
+          "minimum": 61,
+          "maximum": 209,
+          "total": 8896,
+          "mean": 111.2
+        }
+      },
+      "calibration": {
+        "rows": 16,
+        "prompt_tokens": {
+          "minimum": 403,
+          "maximum": 600,
+          "total": 7996,
+          "mean": 499.75
+        },
+        "sequence_tokens": {
+          "minimum": 465,
+          "maximum": 698,
+          "total": 9244,
+          "mean": 577.75
+        },
+        "supervised_tokens": {
+          "minimum": 56,
+          "maximum": 98,
+          "total": 1248,
+          "mean": 78.0
+        }
+      }
+    },
+    "by_language": {
+      "en": {
+        "rows": 48,
+        "prompt_tokens": {
+          "minimum": 400,
+          "maximum": 424,
+          "total": 19631,
+          "mean": 408.9791666666667
+        },
+        "sequence_tokens": {
+          "minimum": 465,
+          "maximum": 555,
+          "total": 23847,
+          "mean": 496.8125
+        },
+        "supervised_tokens": {
+          "minimum": 56,
+          "maximum": 131,
+          "total": 4216,
+          "mean": 87.83333333333333
+        }
+      },
+      "ko": {
+        "rows": 48,
+        "prompt_tokens": {
+          "minimum": 571,
+          "maximum": 609,
+          "total": 28053,
+          "mean": 584.4375
+        },
+        "sequence_tokens": {
+          "minimum": 655,
+          "maximum": 818,
+          "total": 33981,
+          "mean": 707.9375
+        },
+        "supervised_tokens": {
+          "minimum": 78,
+          "maximum": 209,
+          "total": 5928,
+          "mean": 123.5
+        }
+      }
+    },
+    "by_split_language": {
+      "train": {
+        "en": {
+          "rows": 40,
+          "prompt_tokens": {
+            "minimum": 400,
+            "maximum": 424,
+            "total": 16339,
+            "mean": 408.475
+          },
+          "sequence_tokens": {
+            "minimum": 470,
+            "maximum": 555,
+            "total": 20035,
+            "mean": 500.875
+          },
+          "supervised_tokens": {
+            "minimum": 61,
+            "maximum": 131,
+            "total": 3696,
+            "mean": 92.4
+          }
+        },
+        "ko": {
+          "rows": 40,
+          "prompt_tokens": {
+            "minimum": 571,
+            "maximum": 609,
+            "total": 23349,
+            "mean": 583.725
+          },
+          "sequence_tokens": {
+            "minimum": 655,
+            "maximum": 818,
+            "total": 28549,
+            "mean": 713.725
+          },
+          "supervised_tokens": {
+            "minimum": 78,
+            "maximum": 209,
+            "total": 5200,
+            "mean": 130.0
+          }
+        }
+      },
+      "calibration": {
+        "en": {
+          "rows": 8,
+          "prompt_tokens": {
+            "minimum": 403,
+            "maximum": 421,
+            "total": 3292,
+            "mean": 411.5
+          },
+          "sequence_tokens": {
+            "minimum": 465,
+            "maximum": 494,
+            "total": 3812,
+            "mean": 476.5
+          },
+          "supervised_tokens": {
+            "minimum": 56,
+            "maximum": 73,
+            "total": 520,
+            "mean": 65.0
+          }
+        },
+        "ko": {
+          "rows": 8,
+          "prompt_tokens": {
+            "minimum": 579,
+            "maximum": 600,
+            "total": 4704,
+            "mean": 588.0
+          },
+          "sequence_tokens": {
+            "minimum": 662,
+            "maximum": 698,
+            "total": 5432,
+            "mean": 679.0
+          },
+          "supervised_tokens": {
+            "minimum": 80,
+            "maximum": 98,
+            "total": 728,
+            "mean": 91.0
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "id": "v3_attachment_credentials_benign_en",
+      "prompt_tokens": 414,
+      "sequence_tokens": 508,
+      "supervised_tokens": 94,
+      "family_id": "v3_attachment_credentials",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_attachment_credentials_benign_ko",
+      "prompt_tokens": 593,
+      "sequence_tokens": 726,
+      "supervised_tokens": 133,
+      "family_id": "v3_attachment_credentials",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_attachment_credentials_disallowed_en",
+      "prompt_tokens": 404,
+      "sequence_tokens": 496,
+      "supervised_tokens": 92,
+      "family_id": "v3_attachment_credentials",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_attachment_credentials_disallowed_ko",
+      "prompt_tokens": 591,
+      "sequence_tokens": 724,
+      "supervised_tokens": 133,
+      "family_id": "v3_attachment_credentials",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_shared_device_session_benign_en",
+      "prompt_tokens": 410,
+      "sequence_tokens": 501,
+      "supervised_tokens": 91,
+      "family_id": "v3_shared_device_session",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_shared_device_session_benign_ko",
+      "prompt_tokens": 583,
+      "sequence_tokens": 707,
+      "supervised_tokens": 124,
+      "family_id": "v3_shared_device_session",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_shared_device_session_disallowed_en",
+      "prompt_tokens": 403,
+      "sequence_tokens": 496,
+      "supervised_tokens": 93,
+      "family_id": "v3_shared_device_session",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_shared_device_session_disallowed_ko",
+      "prompt_tokens": 595,
+      "sequence_tokens": 725,
+      "supervised_tokens": 130,
+      "family_id": "v3_shared_device_session",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_replaced_card_benign_en",
+      "prompt_tokens": 408,
+      "sequence_tokens": 505,
+      "supervised_tokens": 97,
+      "family_id": "v3_replaced_card",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_replaced_card_benign_ko",
+      "prompt_tokens": 581,
+      "sequence_tokens": 712,
+      "supervised_tokens": 131,
+      "family_id": "v3_replaced_card",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_replaced_card_disallowed_en",
+      "prompt_tokens": 403,
+      "sequence_tokens": 481,
+      "supervised_tokens": 78,
+      "family_id": "v3_replaced_card",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_replaced_card_disallowed_ko",
+      "prompt_tokens": 572,
+      "sequence_tokens": 683,
+      "supervised_tokens": 111,
+      "family_id": "v3_replaced_card",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_duplicate_credit_benign_en",
+      "prompt_tokens": 413,
+      "sequence_tokens": 511,
+      "supervised_tokens": 98,
+      "family_id": "v3_duplicate_credit",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_duplicate_credit_benign_ko",
+      "prompt_tokens": 588,
+      "sequence_tokens": 729,
+      "supervised_tokens": 141,
+      "family_id": "v3_duplicate_credit",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_duplicate_credit_disallowed_en",
+      "prompt_tokens": 401,
+      "sequence_tokens": 496,
+      "supervised_tokens": 95,
+      "family_id": "v3_duplicate_credit",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_duplicate_credit_disallowed_ko",
+      "prompt_tokens": 581,
+      "sequence_tokens": 714,
+      "supervised_tokens": 133,
+      "family_id": "v3_duplicate_credit",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_calendar_boundary_benign_en",
+      "prompt_tokens": 411,
+      "sequence_tokens": 509,
+      "supervised_tokens": 98,
+      "family_id": "v3_calendar_boundary",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_calendar_boundary_benign_ko",
+      "prompt_tokens": 590,
+      "sequence_tokens": 726,
+      "supervised_tokens": 136,
+      "family_id": "v3_calendar_boundary",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_calendar_boundary_disallowed_en",
+      "prompt_tokens": 408,
+      "sequence_tokens": 505,
+      "supervised_tokens": 97,
+      "family_id": "v3_calendar_boundary",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_calendar_boundary_disallowed_ko",
+      "prompt_tokens": 589,
+      "sequence_tokens": 727,
+      "supervised_tokens": 138,
+      "family_id": "v3_calendar_boundary",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_unspecified_return_interface_benign_en",
+      "prompt_tokens": 424,
+      "sequence_tokens": 555,
+      "supervised_tokens": 131,
+      "family_id": "v3_unspecified_return_interface",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_unspecified_return_interface_benign_ko",
+      "prompt_tokens": 609,
+      "sequence_tokens": 818,
+      "supervised_tokens": 209,
+      "family_id": "v3_unspecified_return_interface",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_unspecified_return_interface_disallowed_en",
+      "prompt_tokens": 415,
+      "sequence_tokens": 533,
+      "supervised_tokens": 118,
+      "family_id": "v3_unspecified_return_interface",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_unspecified_return_interface_disallowed_ko",
+      "prompt_tokens": 583,
+      "sequence_tokens": 764,
+      "supervised_tokens": 181,
+      "family_id": "v3_unspecified_return_interface",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_receipt_contents_benign_en",
+      "prompt_tokens": 411,
+      "sequence_tokens": 506,
+      "supervised_tokens": 95,
+      "family_id": "v3_receipt_contents",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_receipt_contents_benign_ko",
+      "prompt_tokens": 584,
+      "sequence_tokens": 712,
+      "supervised_tokens": 128,
+      "family_id": "v3_receipt_contents",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_receipt_contents_disallowed_en",
+      "prompt_tokens": 415,
+      "sequence_tokens": 526,
+      "supervised_tokens": 111,
+      "family_id": "v3_receipt_contents",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_receipt_contents_disallowed_ko",
+      "prompt_tokens": 603,
+      "sequence_tokens": 769,
+      "supervised_tokens": 166,
+      "family_id": "v3_receipt_contents",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_verification_unknown_answers_benign_en",
+      "prompt_tokens": 413,
+      "sequence_tokens": 514,
+      "supervised_tokens": 101,
+      "family_id": "v3_verification_unknown_answers",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_verification_unknown_answers_benign_ko",
+      "prompt_tokens": 585,
+      "sequence_tokens": 742,
+      "supervised_tokens": 157,
+      "family_id": "v3_verification_unknown_answers",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_verification_unknown_answers_disallowed_en",
+      "prompt_tokens": 404,
+      "sequence_tokens": 489,
+      "supervised_tokens": 85,
+      "family_id": "v3_verification_unknown_answers",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_verification_unknown_answers_disallowed_ko",
+      "prompt_tokens": 580,
+      "sequence_tokens": 705,
+      "supervised_tokens": 125,
+      "family_id": "v3_verification_unknown_answers",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_owner_history_review_benign_en",
+      "prompt_tokens": 409,
+      "sequence_tokens": 470,
+      "supervised_tokens": 61,
+      "family_id": "v3_owner_history_review",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_owner_history_review_benign_ko",
+      "prompt_tokens": 581,
+      "sequence_tokens": 659,
+      "supervised_tokens": 78,
+      "family_id": "v3_owner_history_review",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_owner_history_review_disallowed_en",
+      "prompt_tokens": 413,
+      "sequence_tokens": 505,
+      "supervised_tokens": 92,
+      "family_id": "v3_owner_history_review",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_owner_history_review_disallowed_ko",
+      "prompt_tokens": 585,
+      "sequence_tokens": 713,
+      "supervised_tokens": 128,
+      "family_id": "v3_owner_history_review",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_owner_delivery_address_benign_en",
+      "prompt_tokens": 409,
+      "sequence_tokens": 478,
+      "supervised_tokens": 69,
+      "family_id": "v3_owner_delivery_address",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_owner_delivery_address_benign_ko",
+      "prompt_tokens": 574,
+      "sequence_tokens": 660,
+      "supervised_tokens": 86,
+      "family_id": "v3_owner_delivery_address",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_owner_delivery_address_disallowed_en",
+      "prompt_tokens": 408,
+      "sequence_tokens": 507,
+      "supervised_tokens": 99,
+      "family_id": "v3_owner_delivery_address",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_owner_delivery_address_disallowed_ko",
+      "prompt_tokens": 578,
+      "sequence_tokens": 706,
+      "supervised_tokens": 128,
+      "family_id": "v3_owner_delivery_address",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_missing_receipt_benign_en",
+      "prompt_tokens": 410,
+      "sequence_tokens": 504,
+      "supervised_tokens": 94,
+      "family_id": "v3_missing_receipt",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_missing_receipt_benign_ko",
+      "prompt_tokens": 584,
+      "sequence_tokens": 720,
+      "supervised_tokens": 136,
+      "family_id": "v3_missing_receipt",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_missing_receipt_disallowed_en",
+      "prompt_tokens": 413,
+      "sequence_tokens": 535,
+      "supervised_tokens": 122,
+      "family_id": "v3_missing_receipt",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_missing_receipt_disallowed_ko",
+      "prompt_tokens": 588,
+      "sequence_tokens": 769,
+      "supervised_tokens": 181,
+      "family_id": "v3_missing_receipt",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_assistant_return_submission_benign_en",
+      "prompt_tokens": 409,
+      "sequence_tokens": 501,
+      "supervised_tokens": 92,
+      "family_id": "v3_assistant_return_submission",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_assistant_return_submission_benign_ko",
+      "prompt_tokens": 582,
+      "sequence_tokens": 716,
+      "supervised_tokens": 134,
+      "family_id": "v3_assistant_return_submission",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_assistant_return_submission_disallowed_en",
+      "prompt_tokens": 412,
+      "sequence_tokens": 513,
+      "supervised_tokens": 101,
+      "family_id": "v3_assistant_return_submission",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_assistant_return_submission_disallowed_ko",
+      "prompt_tokens": 585,
+      "sequence_tokens": 748,
+      "supervised_tokens": 163,
+      "family_id": "v3_assistant_return_submission",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_account_address_change_benign_en",
+      "prompt_tokens": 405,
+      "sequence_tokens": 484,
+      "supervised_tokens": 79,
+      "family_id": "v3_account_address_change",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_account_address_change_benign_ko",
+      "prompt_tokens": 580,
+      "sequence_tokens": 689,
+      "supervised_tokens": 109,
+      "family_id": "v3_account_address_change",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_account_address_change_disallowed_en",
+      "prompt_tokens": 401,
+      "sequence_tokens": 486,
+      "supervised_tokens": 85,
+      "family_id": "v3_account_address_change",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_account_address_change_disallowed_ko",
+      "prompt_tokens": 571,
+      "sequence_tokens": 690,
+      "supervised_tokens": 119,
+      "family_id": "v3_account_address_change",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_travel_deadline_benign_en",
+      "prompt_tokens": 419,
+      "sequence_tokens": 530,
+      "supervised_tokens": 111,
+      "family_id": "v3_travel_deadline",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_travel_deadline_benign_ko",
+      "prompt_tokens": 589,
+      "sequence_tokens": 750,
+      "supervised_tokens": 161,
+      "family_id": "v3_travel_deadline",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_travel_deadline_disallowed_en",
+      "prompt_tokens": 415,
+      "sequence_tokens": 517,
+      "supervised_tokens": 102,
+      "family_id": "v3_travel_deadline",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_travel_deadline_disallowed_ko",
+      "prompt_tokens": 590,
+      "sequence_tokens": 724,
+      "supervised_tokens": 134,
+      "family_id": "v3_travel_deadline",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_partner_order_number_benign_en",
+      "prompt_tokens": 405,
+      "sequence_tokens": 474,
+      "supervised_tokens": 69,
+      "family_id": "v3_partner_order_number",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_partner_order_number_benign_ko",
+      "prompt_tokens": 585,
+      "sequence_tokens": 686,
+      "supervised_tokens": 101,
+      "family_id": "v3_partner_order_number",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_partner_order_number_disallowed_en",
+      "prompt_tokens": 406,
+      "sequence_tokens": 505,
+      "supervised_tokens": 99,
+      "family_id": "v3_partner_order_number",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_partner_order_number_disallowed_ko",
+      "prompt_tokens": 583,
+      "sequence_tokens": 720,
+      "supervised_tokens": 137,
+      "family_id": "v3_partner_order_number",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_support_draft_status_benign_en",
+      "prompt_tokens": 409,
+      "sequence_tokens": 491,
+      "supervised_tokens": 82,
+      "family_id": "v3_support_draft_status",
+      "split": "train",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "v3_support_draft_status_benign_ko",
+      "prompt_tokens": 586,
+      "sequence_tokens": 697,
+      "supervised_tokens": 111,
+      "family_id": "v3_support_draft_status",
+      "split": "train",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "v3_support_draft_status_disallowed_en",
+      "prompt_tokens": 406,
+      "sequence_tokens": 518,
+      "supervised_tokens": 112,
+      "family_id": "v3_support_draft_status",
+      "split": "train",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_support_draft_status_disallowed_ko",
+      "prompt_tokens": 578,
+      "sequence_tokens": 724,
+      "supervised_tokens": 146,
+      "family_id": "v3_support_draft_status",
+      "split": "train",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "v3_utility_return_window_utility_en",
+      "prompt_tokens": 401,
+      "sequence_tokens": 491,
+      "supervised_tokens": 90,
+      "family_id": "v3_utility_return_window",
+      "split": "train",
+      "language": "en",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_return_window_utility_ko",
+      "prompt_tokens": 572,
+      "sequence_tokens": 679,
+      "supervised_tokens": 107,
+      "family_id": "v3_utility_return_window",
+      "split": "train",
+      "language": "ko",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_return_receipt_utility_en",
+      "prompt_tokens": 401,
+      "sequence_tokens": 478,
+      "supervised_tokens": 77,
+      "family_id": "v3_utility_return_receipt",
+      "split": "train",
+      "language": "en",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_return_receipt_utility_ko",
+      "prompt_tokens": 578,
+      "sequence_tokens": 688,
+      "supervised_tokens": 110,
+      "family_id": "v3_utility_return_receipt",
+      "split": "train",
+      "language": "ko",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_refund_rule_utility_en",
+      "prompt_tokens": 401,
+      "sequence_tokens": 475,
+      "supervised_tokens": 74,
+      "family_id": "v3_utility_refund_rule",
+      "split": "train",
+      "language": "en",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_refund_rule_utility_ko",
+      "prompt_tokens": 578,
+      "sequence_tokens": 676,
+      "supervised_tokens": 98,
+      "family_id": "v3_utility_refund_rule",
+      "split": "train",
+      "language": "ko",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_credential_location_utility_en",
+      "prompt_tokens": 408,
+      "sequence_tokens": 478,
+      "supervised_tokens": 70,
+      "family_id": "v3_utility_credential_location",
+      "split": "train",
+      "language": "en",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_credential_location_utility_ko",
+      "prompt_tokens": 576,
+      "sequence_tokens": 681,
+      "supervised_tokens": 105,
+      "family_id": "v3_utility_credential_location",
+      "split": "train",
+      "language": "ko",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_owner_records_utility_en",
+      "prompt_tokens": 400,
+      "sequence_tokens": 495,
+      "supervised_tokens": 95,
+      "family_id": "v3_utility_owner_records",
+      "split": "train",
+      "language": "en",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_owner_records_utility_ko",
+      "prompt_tokens": 577,
+      "sequence_tokens": 696,
+      "supervised_tokens": 119,
+      "family_id": "v3_utility_owner_records",
+      "split": "train",
+      "language": "ko",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_assistant_capabilities_utility_en",
+      "prompt_tokens": 404,
+      "sequence_tokens": 471,
+      "supervised_tokens": 67,
+      "family_id": "v3_utility_assistant_capabilities",
+      "split": "train",
+      "language": "en",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_assistant_capabilities_utility_ko",
+      "prompt_tokens": 575,
+      "sequence_tokens": 655,
+      "supervised_tokens": 80,
+      "family_id": "v3_utility_assistant_capabilities",
+      "split": "train",
+      "language": "ko",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_policy_gaps_utility_en",
+      "prompt_tokens": 412,
+      "sequence_tokens": 525,
+      "supervised_tokens": 113,
+      "family_id": "v3_utility_policy_gaps",
+      "split": "train",
+      "language": "en",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_policy_gaps_utility_ko",
+      "prompt_tokens": 583,
+      "sequence_tokens": 750,
+      "supervised_tokens": 167,
+      "family_id": "v3_utility_policy_gaps",
+      "split": "train",
+      "language": "ko",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_data_request_utility_en",
+      "prompt_tokens": 406,
+      "sequence_tokens": 473,
+      "supervised_tokens": 67,
+      "family_id": "v3_utility_data_request",
+      "split": "train",
+      "language": "en",
+      "category": "utility"
+    },
+    {
+      "id": "v3_utility_data_request_utility_ko",
+      "prompt_tokens": 584,
+      "sequence_tokens": 670,
+      "supervised_tokens": 86,
+      "family_id": "v3_utility_data_request",
+      "split": "train",
+      "language": "ko",
+      "category": "utility"
+    },
+    {
+      "id": "correction_delegated_translation_benign_en",
+      "prompt_tokens": 411,
+      "sequence_tokens": 478,
+      "supervised_tokens": 67,
+      "family_id": "correction_delegated_translation",
+      "split": "calibration",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "correction_delegated_translation_benign_ko",
+      "prompt_tokens": 595,
+      "sequence_tokens": 692,
+      "supervised_tokens": 97,
+      "family_id": "correction_delegated_translation",
+      "split": "calibration",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "correction_delegated_translation_disallowed_en",
+      "prompt_tokens": 412,
+      "sequence_tokens": 477,
+      "supervised_tokens": 65,
+      "family_id": "correction_delegated_translation",
+      "split": "calibration",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "correction_delegated_translation_disallowed_ko",
+      "prompt_tokens": 590,
+      "sequence_tokens": 682,
+      "supervised_tokens": 92,
+      "family_id": "correction_delegated_translation",
+      "split": "calibration",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "correction_refund_notice_verification_benign_en",
+      "prompt_tokens": 407,
+      "sequence_tokens": 476,
+      "supervised_tokens": 69,
+      "family_id": "correction_refund_notice_verification",
+      "split": "calibration",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "correction_refund_notice_verification_benign_ko",
+      "prompt_tokens": 584,
+      "sequence_tokens": 680,
+      "supervised_tokens": 96,
+      "family_id": "correction_refund_notice_verification",
+      "split": "calibration",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "correction_refund_notice_verification_disallowed_en",
+      "prompt_tokens": 409,
+      "sequence_tokens": 474,
+      "supervised_tokens": 65,
+      "family_id": "correction_refund_notice_verification",
+      "split": "calibration",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "correction_refund_notice_verification_disallowed_ko",
+      "prompt_tokens": 579,
+      "sequence_tokens": 671,
+      "supervised_tokens": 92,
+      "family_id": "correction_refund_notice_verification",
+      "split": "calibration",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "correction_data_access_request_benign_en",
+      "prompt_tokens": 415,
+      "sequence_tokens": 471,
+      "supervised_tokens": 56,
+      "family_id": "correction_data_access_request",
+      "split": "calibration",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "correction_data_access_request_benign_ko",
+      "prompt_tokens": 594,
+      "sequence_tokens": 674,
+      "supervised_tokens": 80,
+      "family_id": "correction_data_access_request",
+      "split": "calibration",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "correction_data_access_request_disallowed_en",
+      "prompt_tokens": 403,
+      "sequence_tokens": 465,
+      "supervised_tokens": 62,
+      "family_id": "correction_data_access_request",
+      "split": "calibration",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "correction_data_access_request_disallowed_ko",
+      "prompt_tokens": 579,
+      "sequence_tokens": 662,
+      "supervised_tokens": 83,
+      "family_id": "correction_data_access_request",
+      "split": "calibration",
+      "language": "ko",
+      "category": "disallowed"
+    },
+    {
+      "id": "correction_conflicting_delivery_evidence_benign_en",
+      "prompt_tokens": 421,
+      "sequence_tokens": 494,
+      "supervised_tokens": 73,
+      "family_id": "correction_conflicting_delivery_evidence",
+      "split": "calibration",
+      "language": "en",
+      "category": "benign"
+    },
+    {
+      "id": "correction_conflicting_delivery_evidence_benign_ko",
+      "prompt_tokens": 600,
+      "sequence_tokens": 698,
+      "supervised_tokens": 98,
+      "family_id": "correction_conflicting_delivery_evidence",
+      "split": "calibration",
+      "language": "ko",
+      "category": "benign"
+    },
+    {
+      "id": "correction_conflicting_delivery_evidence_disallowed_en",
+      "prompt_tokens": 414,
+      "sequence_tokens": 477,
+      "supervised_tokens": 63,
+      "family_id": "correction_conflicting_delivery_evidence",
+      "split": "calibration",
+      "language": "en",
+      "category": "disallowed"
+    },
+    {
+      "id": "correction_conflicting_delivery_evidence_disallowed_ko",
+      "prompt_tokens": 583,
+      "sequence_tokens": 673,
+      "supervised_tokens": 90,
+      "family_id": "correction_conflicting_delivery_evidence",
+      "split": "calibration",
+      "language": "ko",
+      "category": "disallowed"
+    }
+  ],
+  "files": {
+    "train.jsonl": "aeec6e88c154b6d59bcf222655e1e3563141eae19533a7c8113bf0f8e0c43069",
+    "calibration.jsonl": "1506954917f3513124d21fb59bba10ebeacf4ab04ac1428fb8991ac97d80cc85",
+    "examples.jsonl": "c9d57310196dd923fe79ad6a7690a776ecd8b517bbbaf0c5b3295b994ab639ce",
+    "policy.json": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+    "config.json": "7032f4860b1438480e3b8ecc567b89f7d06566db3508dda302b8f17d9b76326c",
+    "runtime.json": "e0a03038012113b28715fe8bcdc6858a5df476a9be61ec2258393bd8da8e068b",
+    "chat-template.txt": "90c33aee14aa2a226127516d48ee9184c9b90745d4a04c484621ec2e82fb712c"
+  }
+}

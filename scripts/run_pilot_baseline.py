@@ -86,16 +86,17 @@ def validate_adapter_snapshot(report_bytes, config_bytes, adapter_config_bytes, 
             and report.get("base_dtype") == "torch.bfloat16" and report.get("model_device") == "mps:0",
             "Adapter training dtype/device mismatch")
     experiment = config.get("experiment_id", "harborcart_targeted_plain_lora_v1")
-    require(experiment in {"harborcart_targeted_plain_lora_v1", "harborcart_complete_answer_lora_v2"},
+    require(experiment in {"harborcart_targeted_plain_lora_v1", "harborcart_complete_answer_lora_v2",
+                           "harborcart_known_facts_lora_v3"},
             "Unknown adapter experiment; declare and review its schedule first")
     expected_steps = 32
-    if experiment == "harborcart_complete_answer_lora_v2":
+    if experiment in {"harborcart_complete_answer_lora_v2", "harborcart_known_facts_lora_v3"}:
         expected_steps = 160
         for field, expected in (("epochs", 2), ("learning_rate", 0.00005),
                                 ("expected_rows", {"train": 80, "calibration": 16}),
                                 ("expected_families", {"train": 24, "calibration": 4})):
             require(type(config.get(field)) is type(expected) and config[field] == expected,
-                    f"Unexpected frozen v2 training setting: {field}")
+                    f"Unexpected frozen versioned training setting: {field}")
     require(type(report.get("optimizer_steps")) is int and report["optimizer_steps"] == expected_steps
             and type(config.get("train_steps")) is int and config["train_steps"] == expected_steps,
             f"Expected all {expected_steps} frozen training steps")
