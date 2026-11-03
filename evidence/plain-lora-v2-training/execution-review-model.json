@@ -1,0 +1,28 @@
+{
+  "reviewer": "heldout_audit",
+  "reviewer_type": "model",
+  "recorded_by": "root",
+  "status": "passed_execution_audit",
+  "material_defects": [],
+  "input_hashes": {
+    "evidence/plain-lora-v2-training/report.json": "c79271d9555d926e33219c4c9306090b0023a42391c13b8ae3c797304eb0cb22",
+    "evidence/plain-lora-v2-training/steps.jsonl": "0b920a6c8cd6ce432e335c8e2cbb8ff158244a6c190a5712d742fcde37a1d0be",
+    "evidence/correction-preparation-v2/preflight/manifest.json": "b1d4df209b6d9f148f094c5279017dba1606a4d9c81ef91525f045824025344d",
+    "evidence/pilot-lora-v2-development/report.json": "32f8aec4cc0494389710cb0120d4de4d11ba0e39613cd4d9701a17ffe8b0e079",
+    "evidence/lora-v2-development-comparison/manifest.json": "fe081f1075a968c50dc466ab4b35f1d75810bf2a8b00f2327f79916481a3e830"
+  },
+  "verified": [
+    "160 contiguous updates and two deterministic complete epochs over 80 train IDs",
+    "All 16 calibration IDs excluded from optimizer steps",
+    "742-token longest training preflight had zero updates and unchanged adapter",
+    "Base frozen and sampled values unchanged; exact save/reload tensors and calibration replay",
+    "Actual local adapter hashes match archived training and generation identity; unmerged inference",
+    "Training, data, preparation, source snapshots, and frozen Git revision hashes match",
+    "Development: 40 generated responses, 0 test, 40 EOS, 0 caps",
+    "Schema3 pack: 40 pairs,12 families; archived runner audits full chat input tokens"
+  ],
+  "semantic_content_read": false,
+  "heldout_requests_read": false,
+  "gpu_loaded": false,
+  "model_quality_conclusion": null
+}

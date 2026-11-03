@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "model": "CohereLabs/aya-expanse-8b",
+  "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+  "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+  "training_report_sha256": "c79271d9555d926e33219c4c9306090b0023a42391c13b8ae3c797304eb0cb22",
+  "training_config_sha256": "1d8563937bf18932e6b0810c260e943cd6c85609f8424c12f67e5b32f6f7c3e1",
+  "adapter_config_sha256": "4a325038a6c8998e391e178a61d7ca4e5c4162f2f18dc9d8dd778c86cb7eeb83",
+  "adapter_files": {
+    "README.md": "9df50b1d3d4a77ce6d45e914ec9b66b4bd0a15a2f01de073f8ba6cb160829678",
+    "adapter_config.json": "4a325038a6c8998e391e178a61d7ca4e5c4162f2f18dc9d8dd778c86cb7eeb83",
+    "adapter_model.safetensors": "c1fdf36de74daad87989b815384b08218b961d1908597506142cff1c6eaffb0b"
+  },
+  "optimizer_steps": 160,
+  "saved_adapter_reload_exact": true
+}
