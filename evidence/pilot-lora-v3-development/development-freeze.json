@@ -1,0 +1,35 @@
+{
+  "phase": "before_v3_development_generation",
+  "frozen_utc": "2026-11-03T04:14:31.626081+00:00",
+  "source_commit": "cf1810b9ee6cac7a797c1ebcfb055f39082f87af",
+  "training_report_sha256": "389c16e4c0c6eac46ec9e98ea028cf2d057cc3c8a1e27461da4b7921e2a4f8c1",
+  "adapter_training_run": "/Users/kyle/Lexsi/results/correction-lora-v3-20261102",
+  "adapter_identity": {
+    "schema_version": 1,
+    "model": "CohereLabs/aya-expanse-8b",
+    "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+    "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+    "training_report_sha256": "389c16e4c0c6eac46ec9e98ea028cf2d057cc3c8a1e27461da4b7921e2a4f8c1",
+    "training_config_sha256": "7032f4860b1438480e3b8ecc567b89f7d06566db3508dda302b8f17d9b76326c",
+    "adapter_config_sha256": "14b77156e610a8a3f6477a43e229659b058fed4cf340d24374c7261bab4547fa",
+    "adapter_files": {
+      "README.md": "9df50b1d3d4a77ce6d45e914ec9b66b4bd0a15a2f01de073f8ba6cb160829678",
+      "adapter_config.json": "14b77156e610a8a3f6477a43e229659b058fed4cf340d24374c7261bab4547fa",
+      "adapter_model.safetensors": "79fb879b7e767682837e9e4da805b4b8adbf13f1c92416edcf3f2c7481494a7e"
+    },
+    "optimizer_steps": 160,
+    "saved_adapter_reload_exact": true
+  },
+  "files": {
+    "scripts/run_pilot_baseline.py": "420873e31ca9094dfc17c14768ce7934482f940d8b6d817152835839649677f3",
+    "scripts/grounding_comparison.py": "ea5f25f902584a0c31f806ae4ec0cb769464d405ff97678d39c6c8782bd0c5ef",
+    "scripts/model_improvement_metrics.py": "e4d467fc3c983e062070113a083fa0178fb23c9a94176b5eee16d44a32b645a5",
+    "scripts/pilot_validation.py": "3c15257090ccb660bba0ad76a56286b8e3bb7f9d6789c40569699543e9781fc2",
+    "configs/model-improvement-goal.json": "fa9d112b623e8cc6d9e4b843c8610212a8b709571ebc272e4ef69c186001d3d5",
+    "docs/model-improvement-protocol.md": "3a1849be7f2067176435a344257a9109e877967824dd1faf14acd952034eb65a"
+  },
+  "model": "CohereLabs/aya-expanse-8b",
+  "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+  "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
+  "scope": "40 development cases only; no held-out generation unless frozen gate passes"
+}

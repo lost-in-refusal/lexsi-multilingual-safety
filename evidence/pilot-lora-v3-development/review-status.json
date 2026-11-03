@@ -1,0 +1,7 @@
+{
+  "status": "pending",
+  "rubric_version": 2,
+  "human_review_pending": 40,
+  "workflow": "Use scripts/grounding_comparison.py pack with the preserved baseline, then review both variants under rubric.md.",
+  "note": "No v1 template or v1 semantic summary is produced for this comparison."
+}

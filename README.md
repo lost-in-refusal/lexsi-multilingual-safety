@@ -2,7 +2,17 @@
 
 GitHub: [xtnayk](https://github.com/xtnayk) · Hugging Face: [xtnayk](https://huggingface.co/xtnayk)
 
-Current model: **Aya Expanse 8B**, selected by Mingyu on November 2, 2026 for local work. The original team brief used Tiny Aya; the model choice here supersedes that setup default. Current work builds a small English–Korean support-policy baseline. No safety improvement has been established.
+Current model: **Aya Expanse 8B**, selected by Mingyu on November 2, 2026 for local work. The original team brief used Tiny Aya; the model choice here supersedes that setup default. Current work measures local English–Korean support-policy correction adapters. Held-out improvement has not yet been established.
+
+## Current experiment status
+
+Mingyu selected a practical target of at least **20 percentage points more fully correct, grounded held-out answers without worse safety or over-refusal**. The [frozen acceptance protocol](docs/model-improvement-protocol.md) defines conservative uncertainty bounds, bilingual checks, and the final independent reviews.
+
+- [First adapter](docs/plain-lora-development.md): trained 32 steps; failed development selection with a 17.5-point clean-answer gain and fewer required facts.
+- [Complete-answer adapter v2](docs/complete-answer-lora-v2.md): trained 160 steps; 18/40 confirmed clean answers versus 3/40 base in its fresh paired review. Its 37.5-point development gain does not resolve three ambiguous contradiction judgments; the conservative gate remains failed pending field-scoped human input.
+- [Known-fact adapter v3](docs/known-facts-lora-v3.md): trained 160 steps with revised data; 21/40 clean answers versus 3/40 base (+45 points), with 18 paired improvements and zero clean-answer regressions. The safety gate still fails because of a wrong deadline and unresolved judgments, including possible over-refusal. Six inherited calibration answers have documented verification omissions; those rows never train the model or select a checkpoint.
+
+All adapters are local and unmerged. The 20 held-out cases remain ungenerated and unscored. Development gains, lower loss, and software checks do not complete the goal. All model reviews remain provisional.
 
 ## Start here
 
@@ -35,8 +45,8 @@ Dates and assignments come from the updated team brief; model selection follows 
 |---|---|---|
 | Nov 3 | GitHub repo and working environment | Pinned local setup; saved Colab Qwen reference |
 | Nov 4 | SafeTune + AuditKIT smoke test | Actual Aya 8B generation connected to AuditKIT; benign fixtures only |
-| Nov 7 | Plain fine-tuning config and baseline | Requires the agreed task, training data and held-out evaluation sets |
-| Nov 10 | Plain and hardened runs; adapters on HF | Ordinary two-step LoRA works; SafeGrad and repair are untested |
+| Nov 7 | Plain fine-tuning config and baseline | Fictional-policy baseline, versioned correction data, and plain LoRA runs completed; held-out confirmation remains |
+| Nov 10 | Plain and hardened runs; adapters on HF | Three local plain LoRA adapters trained; SafeGrad, confirmed repair, and HF publication remain separate |
 | Nov 12 | Probe/CircuitKIT analysis and one figure | Source compatibility reviewed; actual CircuitKIT checkpoint execution untested |
 | Nov 14 | Reproducibility notebook | Initial local wrapper prepared; final experiment reproduction remains |
 
@@ -58,7 +68,7 @@ HF_HUB_OFFLINE=1 .venv/bin/python scripts/run_pilot_baseline.py \
   --output results/pilot-development-next-run
 ```
 
-Add `--curate-only` to validate and curate without loading the model. Each output directory must be new. The runner intentionally has no test-split option.
+Add `--curate-only` to validate and curate without loading the model. Each output directory must be new. Development is the default. The test path requires a hash-bound confirmation freeze backed by a passing development gate; it cannot be used as an ordinary development run.
 
 CuratorKIT normalizes and deduplicates requests with per-row provenance, preserving raw drafts. SafeTune generates responses from one cached Aya 8B checkpoint, with batch size 1, greedy decoding and a 512-token limit. An initial 128-token development calibration was stopped after responses were truncated; those partial results stay separate. AuditKIT records the full run's outputs. The runner verifies that the complete bilingual system policy reaches the model, records actual generated token IDs and EOS/cap status, and flushes each response before moving on. A fresh cache identity and callback counts distinguish live generation from replay.
 
@@ -73,7 +83,7 @@ To score a review, copy the annotation template, fill only cases actually review
   --output results/pilot-development-next-run/semantic-summary-reviewed.json
 ```
 
-Before correction experiments, review the Korean wording and labels, inspect the baseline errors, and choose one intervention supported by those errors. Tune it on development cases; freeze data, rubric and settings before running the held-out partition. Fine-tuning and CircuitKIT remain later work.
+Correction experiments use development errors to choose interventions, with versioned synthetic targets and independent policy/translation review. Freeze the selected adapter, data, rubric and settings before the held-out partition. CircuitKIT remains separate future work.
 
 ## Grounding prompt control
 
@@ -135,7 +145,7 @@ For a new run, first verify and record the protocol/configuration/rubric hashes 
 
 [Preparation results](docs/correction-preparation-results.md) now include 48 original correction examples: 32 training and 16 calibration rows, with bilingual scenario families kept together. All passed a provisional model review and an actual cached-tokenizer audit. Full conversations span 457–699 tokens; the 1,024-token training cap preserves every example. Human review remains pending, and train/calibration share policy concepts.
 
-The [adjudication note](docs/adjudication-development.md) preserves ten model-reviewed disputes and Mingyu's single field-scoped human decision without rewriting historical scores. [correction-lora.json](configs/correction-lora.json) proposes a fixed 32-step plain LoRA pilot; full-context memory testing and training remain unrun.
+The [adjudication note](docs/adjudication-development.md) preserves ten model-reviewed disputes and Mingyu's single field-scoped human decision without rewriting historical scores. [correction-lora.json](configs/correction-lora.json) is the frozen input configuration for the completed 32-step first adapter. Later [v2](configs/correction-lora-v2.json) and [v3](configs/correction-lora-v3.json) experiments use 80 training rows and 160 steps. The [v3 design](docs/correction-data-v3-design.md) records the exact revisions and inherited calibration limitations. Historical configurations retain their original proposal fields; run reports record actual execution.
 
 ```sh
 HF_HUB_OFFLINE=1 .venv/bin/python scripts/prepare_corrections.py \
