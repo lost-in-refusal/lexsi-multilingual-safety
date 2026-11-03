@@ -75,6 +75,39 @@ To score a review, copy the annotation template, fill only cases actually review
 
 Before correction experiments, review the Korean wording and labels, inspect the baseline errors, and choose one intervention supported by those errors. Tune it on development cases; freeze data, rubric and settings before running the held-out partition. Fine-tuning and CircuitKIT remain later work.
 
+## Grounding prompt control
+
+**Comparison completed:** [read the results and regressions](docs/grounding-comparison-results.md). Across decisively reviewed matched cases, unsupported details improved in seven and regressed in one; full required-fact coverage improved in three and regressed in five. Keep the baseline as the reference while these provisional judgments are reviewed. The 20 candidate test cases remain unrun.
+
+The [comparison specification](docs/grounding-comparison-spec.md) freezes a bilingual instruction appendix and rubric v2. The appendix asks for policy-supported claims and directs unspecified details to official support. It preserves the original policy, model weights, requests and decoding settings. This is a prompt control; no fine-tuning or activation steering is involved.
+
+Rubric v2 separates required facts, unsupported details, explicit policy contradictions, requested prohibited assistance, over-refusal and language adherence. Both the saved baseline and the new answers are reviewed under this same rubric. The earlier v1 scores remain unchanged. Variant names are withheld from the shuffled review items; this is provisional model review, not validated human assessment.
+
+To reproduce a new candidate and review pack:
+
+```sh
+HF_HUB_OFFLINE=1 .venv/bin/python scripts/run_pilot_baseline.py \
+  --intervention configs/grounding-intervention.json \
+  --rubric docs/grounding-comparison-spec.md \
+  --output results/grounded-next-run
+.venv/bin/python scripts/grounding_comparison.py pack \
+  --baseline evidence/pilot-development \
+  --candidate results/grounded-next-run \
+  --rubric docs/grounding-comparison-spec.md \
+  --output results/grounded-next-review
+```
+
+Give reviewers only the pack's `review-items.json`, `rubric.md`, and `policy.json`. Keep `mapping.json` and `manifest.json` with the coordinator until review is finished. Review IDs bind annotations to the exact response set, policy, data and rubric, so labels cannot silently move to a different run. Fill all v2 fields defined by the rubric, then summarize explicit annotations:
+
+```sh
+.venv/bin/python scripts/grounding_comparison.py summarize \
+  --pack results/grounded-next-review \
+  --annotations results/grounded-next-review/annotations-reviewed.json \
+  --output results/grounded-next-review/summary-reviewed.json
+```
+
+All output paths must be new. Partial reviews report coverage and null rates where nothing is decided. Paired comparisons use the same sample with decisive reviews in both variants; marginal percentage-point differences are labeled separately. For human review, preserve model annotations, save only genuinely reviewed items with a human reviewer identity, and generate a separate human-only summary. Do not combine an annotation with its replacement: duplicate review IDs are rejected.
+
 ## SafeTune and AuditKIT integration
 
 The runner reuses one SafeTune-loaded checkpoint through AuditKIT's public `CallableModel` API, avoiding a second full model in memory. It scores six benign English/Korean/Mandarin prompts using exact match and token F1, saves every prompt/output/score, records immutable model/tool revisions, and forces a fresh run with a unique cache identity. Generation limits are set on the SafeTune backend as well as AuditKIT.

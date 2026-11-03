@@ -39,17 +39,44 @@ def make_nonempty_scorer():
     return ak.scorer(direction=ak.Direction.MAXIMIZE)(nonempty_output)
 
 
+def build_effective_prompts(policy, intervention=None):
+    """Preserve the base policy verbatim; optionally append one bilingual control."""
+    def texts(value):
+        result = value.get("texts") if isinstance(value, dict) else None
+        if not isinstance(result, dict) or set(result) != {"en", "ko"}:
+            raise ValueError("Prompt texts must contain exactly en and ko")
+        if any(not isinstance(text, str) or not text.strip() for text in result.values()):
+            raise ValueError("Prompt texts must be nonempty strings")
+        return result
+
+    base = texts(policy)
+    if intervention is None:
+        return dict(base)
+    if not isinstance(intervention, dict) or intervention.get("type") != "system_prompt_appendix":
+        raise ValueError("Only system_prompt_appendix interventions are supported")
+    for key in ("intervention_id", "version"):
+        if not isinstance(intervention.get(key), str) or not intervention[key].strip():
+            raise ValueError(f"Intervention {key} must be a nonempty string")
+    appendix = texts(intervention)
+    return {lang: base[lang] + "\n\n" + appendix[lang] for lang in ("en", "ko")}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--curate-only", action="store_true", help="Validate and curate without loading Aya")
+    parser.add_argument("--intervention", type=Path, help="Bilingual system-prompt appendix JSON; weights stay unchanged")
+    parser.add_argument("--rubric", type=Path, help="Rubric to snapshot before generation; required with --intervention")
     args = parser.parse_args()
+    if args.intervention and not args.rubric:
+        parser.error("--intervention requires --rubric")
     args.output.mkdir(parents=True, exist_ok=False)
     runtime = json.loads((ROOT / "configs/runtime.json").read_text())
     config = json.loads((ROOT / "configs/pilot.json").read_text())
     pins = json.loads((ROOT / "configs/tools.lock.json").read_text())
     report = dict(status="running", started_utc=datetime.now(timezone.utc).isoformat(),
-                  runtime=runtime, config=config, callback_calls=0, generated_samples=0,
+                  runtime=runtime, config=config, variant="grounded" if args.intervention else "baseline",
+                  callback_calls=0, generated_samples=0,
                   test_generated_samples=0, semantic_review="pending",
                   scope="Draft fictional support-policy development pilot; no general safety claim.")
 
@@ -85,6 +112,18 @@ def main():
         policy_path = ROOT / "data/pilot/policy.json"
         rows = [json.loads(line) for line in dataset_path.read_text().splitlines() if line.strip()]
         policy = json.loads(policy_path.read_text())
+        intervention = json.loads(args.intervention.read_text()) if args.intervention else None
+        effective_prompts = build_effective_prompts(policy, intervention)
+        write_json(args.output / "effective-prompts.json", effective_prompts)
+        report["effective_prompts_sha256"] = sha256(args.output / "effective-prompts.json")
+        if intervention is not None:
+            report["intervention"] = intervention
+            report["intervention_sha256"] = sha256(args.intervention)
+            (args.output / "intervention.json").write_bytes(args.intervention.read_bytes())
+            config["experiment"] = "harborcart-bilingual-" + intervention["intervention_id"]
+        if args.rubric:
+            report["rubric_sha256"] = sha256(args.rubric)
+            (args.output / "rubric.md").write_bytes(args.rubric.read_bytes())
         report["dataset_sha256"] = sha256(dataset_path)
         report["policy_sha256"] = sha256(policy_path)
         report["dataset"] = validate_rows(rows)
@@ -100,12 +139,19 @@ def main():
         assert len({row["request"] for row in selected}) == len(selected), "Ambiguous request-to-ID mapping"
         report["selected_ids"] = [row["id"] for row in selected]
         report["selected_dataset"] = validate_rows(selected)
-        write_json(args.output / "semantic-summary.json", summarize_annotations(selected, []))
-        write_json(args.output / "annotation-template.json", [dict(
-            sample_id=row["id"], outcome=None, task_score=None, language_adherence=None, reviewer=None,
-            reviewer_type=None, notes="", category=row["category"], language=row["language"],
-            required_points=row["required_points"], forbidden_features=row["forbidden_features"]
-        ) for row in selected])
+        if intervention is None:
+            write_json(args.output / "semantic-summary.json", summarize_annotations(selected, []))
+            write_json(args.output / "annotation-template.json", [dict(
+                sample_id=row["id"], outcome=None, task_score=None, language_adherence=None, reviewer=None,
+                reviewer_type=None, notes="", category=row["category"], language=row["language"],
+                required_points=row["required_points"], forbidden_features=row["forbidden_features"]
+            ) for row in selected])
+        else:
+            write_json(args.output / "review-status.json", {
+                "status": "pending", "rubric_version": 2, "human_review_pending": len(selected),
+                "workflow": "Use scripts/grounding_comparison.py pack with the preserved baseline, then review both variants under rubric.md.",
+                "note": "No v1 template or v1 semantic summary is produced for this comparison.",
+            })
         if args.curate_only:
             report["status"] = "curated_only"
             stage("complete")
@@ -139,14 +185,14 @@ def main():
         assert report["dtype"] == "torch." + runtime["dtype"]
         gen_config = GenerationConfig(max_new_tokens=config["max_new_tokens"], batch_size=1,
                                       temperature=config["temperature"], seed=runtime["seed"])
-        backends = {lang: TransformersBackend(model, tok, config=gen_config, system_prompt=policy["texts"][lang])
+        backends = {lang: TransformersBackend(model, tok, config=gen_config, system_prompt=effective_prompts[lang])
                     for lang in ("en", "ko")}
         # Precompute the intended complete chat inputs. The observer rejects any
         # silent raw-prompt fallback or tokenizer truncation inside the backend.
         expected_ids = {}
         for row in selected:
             text = tok.apply_chat_template([
-                {"role": "system", "content": policy["texts"][row["language"]]},
+                {"role": "system", "content": effective_prompts[row["language"]]},
                 {"role": "user", "content": row["request"]},
             ], tokenize=False, add_generation_prompt=True)
             expected_ids[row["id"]] = tok(text, add_special_tokens=False)["input_ids"]
@@ -194,6 +240,7 @@ def main():
                     record = dict(sample_id=row["id"], family_id=row["family_id"], split=row["split"],
                         language=row["language"], category=row["category"], request=prompt, output=output,
                         policy_sha256=report["policy_sha256"], **observation,
+                        effective_prompts_sha256=report["effective_prompts_sha256"],
                         case_seconds=round(time.perf_counter() - started_case, 3))
                     checkpoints.write(json.dumps(record, ensure_ascii=False) + "\n")
                     checkpoints.flush()
@@ -212,14 +259,17 @@ def main():
                 key: row[key] for key in ("family_id", "split", "language", "category")}) for row in selected]
             report["run_nonce"] = uuid.uuid4().hex
             result = ak.evaluate(samples,
-                model=CallableModel(generate, name=f"safetune:{runtime['model']}@{runtime['model_revision']}:pilot-baseline"),
+                model=CallableModel(generate, name=f"safetune:{runtime['model']}@{runtime['model_revision']}:{report['variant']}"),
                 scorers=[make_nonempty_scorer()],
                 config=ak.RunConfig(seed=runtime["seed"], temperature=config["temperature"],
                     max_tokens=config["max_new_tokens"], batch_size=1, concurrency=1,
                     max_retries=0, track_performance=False, extra={
                         "run_nonce": report["run_nonce"], "dataset_sha256": report["dataset_sha256"],
                         "curated_sha256": report["curated_sha256"], "policy_sha256": report["policy_sha256"],
-                        "model_revision": runtime["model_revision"], "tools": report["tools"]}))
+                        "model_revision": runtime["model_revision"], "tools": report["tools"],
+                        "variant": report["variant"], "effective_prompts_sha256": report["effective_prompts_sha256"],
+                        "intervention_sha256": report.get("intervention_sha256"),
+                        "rubric_sha256": report.get("rubric_sha256")}))
         model.generate = original_generate
         report["evaluation_seconds"] = round(time.perf_counter() - started, 3)
         result.metadata.update({"scope": report["scope"], "semantic_review": "pending",
@@ -231,6 +281,7 @@ def main():
         assert {p.sample_id for p in result.predictions} == completed_ids
         recorded_outputs = {r["sample_id"]: r["output"] for r in responses}
         assert all(p.raw_output == recorded_outputs[p.sample_id] for p in result.predictions)
+        report["responses_sha256"] = sha256(args.output / "responses.jsonl")
         report["diagnostics"] = dict(nonempty_output=result.headline,
             cap_hits=sum(r["cap_reached"] for r in responses),
             eos_count=sum(r["ended_with_eos"] for r in responses),
