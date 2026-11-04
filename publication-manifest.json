@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "scope": "Exact allowlisted scientific files; originals unchanged; no Git history included.",
+  "content_scan": "JSON, JSONL, and documentation scanned; Python exempt from generic markers; caller deny terms checked in every file.",
+  "caller_supplied_deny_terms_checked": true,
+  "confirmation_texts_exported": false,
+  "withheld_confirmation_files": [
+    "data/corpus/confirmation.jsonl"
+  ],
+  "unlisted_files_and_binary_weights_exported": false,
+  "exporter_sha256": "c34d9c01c46c947268df498f99862a77706f5984efe0235232e8e85775c4f88e",
+  "files": {
+    ".gitignore": {
+      "sha256": "89fc391dafc70360e1f0316296bee547170718b9eb432933dac059b23a49509e",
+      "bytes": 150,
+      "source_relative_path": ".gitignore"
+    },
+    "README.md": {
+      "sha256": "af2f7fa9c0b0c77e33eb6c5fb846cba1079892da9d95885cd1a9c6eaa72cb108",
+      "bytes": 11097,
+      "source_relative_path": "experiments/multilingual_repair/README.md"
+    },
+    "data/corpus/alignment.jsonl": {
+      "sha256": "7b481f766a9988ded9195df00bb1d39c0fa0a8f2e37c3693aedaa020a6f6a799",
+      "bytes": 68196,
+      "source_relative_path": "results/multilingual-prepared-eager-20261103/alignment.jsonl"
+    },
+    "data/corpus/calibration.jsonl": {
+      "sha256": "9f1e7224427f09f983094dd0960cf7f58d625a90a1bde654445e8663a7099108",
+      "bytes": 49506,
+      "source_relative_path": "results/multilingual-prepared-eager-20261103/calibration.jsonl"
+    },
+    "data/corpus/config.json": {
+      "sha256": "d4730c933aed2301ddb59ce0c08df461fcd6529485d83ffd22bd73ee35967f7f",
+      "bytes": 1331,
+      "source_relative_path": "results/multilingual-prepared-eager-20261103/config.json"
+    },
+    "data/corpus/development.jsonl": {
+      "sha256": "59234479cd85f8e44dd64aa704b8b719fbf18dffa47af4024033a3312466c97e",
+      "bytes": 139163,
+      "source_relative_path": "results/multilingual-prepared-eager-20261103/development.jsonl"
+    },
+    "data/corpus/manifest.json": {
+      "sha256": "c0fc197c4035efa22ed2b50db9e1ae2f42b075268f181b320fb376963600f2ba",
+      "bytes": 3992,
+      "source_relative_path": "results/multilingual-prepared-eager-20261103/manifest.json"
+    },
+    "data/corpus/train.jsonl": {
+      "sha256": "22ec4439165376520c56361bb8269d1de1ff0534d0a0d84fb45afc102c6ffe9a",
+      "bytes": 2489956,
+      "source_relative_path": "results/multilingual-prepared-eager-20261103/train.jsonl"
+    },
+    "experiments/multilingual_repair/DATA_ATTRIBUTION.md": {
+      "sha256": "1f189aa21e9780cefcd13868205df3d6edbed01d0d1562026a8d261f2aa43754",
+      "bytes": 1932,
+      "source_relative_path": "experiments/multilingual_repair/DATA_ATTRIBUTION.md"
+    },
+    "experiments/multilingual_repair/README.md": {
+      "sha256": "af2f7fa9c0b0c77e33eb6c5fb846cba1079892da9d95885cd1a9c6eaa72cb108",
+      "bytes": 11097,
+      "source_relative_path": "experiments/multilingual_repair/README.md"
+    },
+    "experiments/multilingual_repair/config.json": {
+      "sha256": "d4730c933aed2301ddb59ce0c08df461fcd6529485d83ffd22bd73ee35967f7f",
+      "bytes": 1331,
+      "source_relative_path": "experiments/multilingual_repair/config.json"
+    },
+    "experiments/multilingual_repair/diagnose_attention.py": {
+      "sha256": "17d74292302554e6daea3da2fd16ad05fba4e9e970a0bbd17afec904327aacf6",
+      "bytes": 11541,
+      "source_relative_path": "experiments/multilingual_repair/diagnose_attention.py"
+    },
+    "experiments/multilingual_repair/evaluate.py": {
+      "sha256": "d60962e11014fba380a180a5f8771d1d523b95c4235fc7e3693eed5278aebb51",
+      "bytes": 31233,
+      "source_relative_path": "experiments/multilingual_repair/evaluate.py"
+    },
+    "experiments/multilingual_repair/evaluation_protocol.md": {
+      "sha256": "3f3ce9589fe45edc6fb7318801a7e52bf04ffe4dda8ecb52e3452cb58ecbaefa",
+      "bytes": 4659,
+      "source_relative_path": "experiments/multilingual_repair/evaluation_protocol.md"
+    },
+    "experiments/multilingual_repair/export_publication.py": {
+      "sha256": "c34d9c01c46c947268df498f99862a77706f5984efe0235232e8e85775c4f88e",
+      "bytes": 20178,
+      "source_relative_path": "experiments/multilingual_repair/export_publication.py"
+    },
+    "experiments/multilingual_repair/licenses/Apache-2.0.txt": {
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "source_relative_path": "experiments/multilingual_repair/licenses/Apache-2.0.txt"
+    },
+    "experiments/multilingual_repair/licenses/Aya-dataset-card.md": {
+      "sha256": "3ac54f63eec84100c155571945da01c7c18cd8ec97ea94639e2b94a6860e8573",
+      "bytes": 13659,
+      "source_relative_path": "experiments/multilingual_repair/licenses/Aya-dataset-card.md"
+    },
+    "experiments/multilingual_repair/licenses/MultiJail-MIT.txt": {
+      "sha256": "1b995a4eb759b42d44d31bdf8cfa364c5eb404b3c0bda8c58ca4bd43788835e4",
+      "bytes": 1102,
+      "source_relative_path": "experiments/multilingual_repair/licenses/MultiJail-MIT.txt"
+    },
+    "experiments/multilingual_repair/prepare.py": {
+      "sha256": "ff3a642f74f44a18a38c4c3fd42d8355c00a5364d380443747ecce3d3c2108a6",
+      "bytes": 13143,
+      "source_relative_path": "experiments/multilingual_repair/prepare.py"
+    },
+    "experiments/multilingual_repair/requirements.txt": {
+      "sha256": "4c2a1b73b57b465dda79c0051da91da981c606ec7c8f3a2103dc93a3dc39bf98",
+      "bytes": 244,
+      "source_relative_path": "experiments/multilingual_repair/requirements.txt"
+    },
+    "experiments/multilingual_repair/review.py": {
+      "sha256": "e879e725220776878e4990b5386a7c6f57b4bacfcff415bd55dda783d67a1a11",
+      "bytes": 33333,
+      "source_relative_path": "experiments/multilingual_repair/review.py"
+    },
+    "experiments/multilingual_repair/train.py": {
+      "sha256": "0dd9082a407ee2cff58f36da586183964df4c1c36d815b49aade55c0a4b5f4b6",
+      "bytes": 42716,
+      "source_relative_path": "experiments/multilingual_repair/train.py"
+    },
+    "runs/attention-diagnostic/report.json": {
+      "sha256": "72e89940a8b71a9efabf5ab1286b2298fd7e558213394120fea04e2ff89abd94",
+      "bytes": 3095,
+      "source_relative_path": "results/multilingual-attention-observation-20261103/report.json"
+    },
+    "runs/input-audit/annotations.json": {
+      "sha256": "6e9f58c26912455907557586c4576cfd8ff118e23c1f8e0e52c49e8e0b6f6f9f",
+      "bytes": 86397,
+      "source_relative_path": "results/multilingual-development-prompt-audit-20261103/annotations.json"
+    },
+    "runs/input-audit/inputs.jsonl": {
+      "sha256": "a0a16544362fd22eceddfecf45190354148117b73e2c94aa84d136895c935e49",
+      "bytes": 34569,
+      "source_relative_path": "results/multilingual-development-prompt-audit-20261103/inputs.jsonl"
+    },
+    "runs/input-audit/report.json": {
+      "sha256": "0ff5d88edb1e2fad1a8c09ef7877afd1083da158eb0a011aae55ca350237f1f9",
+      "bytes": 2150,
+      "source_relative_path": "results/multilingual-development-prompt-audit-20261103/report.json"
+    },
+    "runs/plain-training/prepared-manifest.json": {
+      "sha256": "c0fc197c4035efa22ed2b50db9e1ae2f42b075268f181b320fb376963600f2ba",
+      "bytes": 3992,
+      "source_relative_path": "results/multilingual-plain-eager-20261103/prepared-manifest.json"
+    },
+    "runs/plain-training/report.json": {
+      "sha256": "9943fe5f89169b03c1dd73aa139e322fb050f4be0805819b7dc914118678ded4",
+      "bytes": 699074,
+      "source_relative_path": "results/multilingual-plain-eager-20261103/report.json"
+    },
+    "runs/plain-training/steps.jsonl": {
+      "sha256": "e5da41eb5f28c13bb903e7fec8a629ee1ebe9aeadeaf77ea196b2a26c1a4f485",
+      "bytes": 365968,
+      "source_relative_path": "results/multilingual-plain-eager-20261103/steps.jsonl"
+    },
+    "runs/plain-training/training-config.json": {
+      "sha256": "d4730c933aed2301ddb59ce0c08df461fcd6529485d83ffd22bd73ee35967f7f",
+      "bytes": 1331,
+      "source_relative_path": "results/multilingual-plain-eager-20261103/training-config.json"
+    },
+    "runs/plain-training/training-source.py": {
+      "sha256": "0dd9082a407ee2cff58f36da586183964df4c1c36d815b49aade55c0a4b5f4b6",
+      "bytes": 42716,
+      "source_relative_path": "results/multilingual-plain-eager-20261103/training-source.py"
+    },
+    "tests/test_multilingual_cohere_reference.py": {
+      "sha256": "8ef7abf90b0d212c4647525a07fdf2cf56a6bc733b399941210485dbb7c540ac",
+      "bytes": 5868,
+      "source_relative_path": "tests/test_multilingual_cohere_reference.py"
+    },
+    "tests/test_multilingual_diagnose_attention.py": {
+      "sha256": "a0d0f157f7f95f57fa0c0cb83978be9f458441e2741565dcf3204672516d88dd",
+      "bytes": 4065,
+      "source_relative_path": "tests/test_multilingual_diagnose_attention.py"
+    },
+    "tests/test_multilingual_evaluate.py": {
+      "sha256": "a00347f70d742e8f3cf50b30bf357193b7a1131b2256259c682d729a7f396640",
+      "bytes": 14575,
+      "source_relative_path": "tests/test_multilingual_evaluate.py"
+    },
+    "tests/test_multilingual_prepare.py": {
+      "sha256": "e5da668a18e3d92f37dfb25913b3e9d41166f6f8c8fb954964fd805eed5c9e04",
+      "bytes": 3053,
+      "source_relative_path": "tests/test_multilingual_prepare.py"
+    },
+    "tests/test_multilingual_publication.py": {
+      "sha256": "9bd7254819e1d8daa6f82194b1ad30dd8b41b6623c8a7237aee2cc20603bff93",
+      "bytes": 18742,
+      "source_relative_path": "tests/test_multilingual_publication.py"
+    },
+    "tests/test_multilingual_review.py": {
+      "sha256": "4204b341011d53eb6674856dbbeed75145dc20fb07b8395f253301b60a8430d6",
+      "bytes": 18573,
+      "source_relative_path": "tests/test_multilingual_review.py"
+    },
+    "tests/test_multilingual_train.py": {
+      "sha256": "eec46d742f8daf6023d2a0b7640fb6de412ddfe08d051df8ac21c4fcc181d9af",
+      "bytes": 17842,
+      "source_relative_path": "tests/test_multilingual_train.py"
+    }
+  }
+}

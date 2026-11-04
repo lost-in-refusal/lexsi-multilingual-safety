@@ -1,0 +1,86 @@
+{
+  "status": "completed_numerical_diagnostic",
+  "optimizer_steps": 0,
+  "scope": "Single alignment-sequence numerical experiment on the pinned base model, not a task-quality or safety evaluation.",
+  "model": "CohereLabs/aya-expanse-8b",
+  "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+  "device": "mps",
+  "base_dtype": "bfloat16",
+  "adapter_dtype": "float32",
+  "lora_r": 4,
+  "lora_alpha": 8,
+  "lora_dropout": 0.0,
+  "original_observation_sha256": "ee63b092c4a7a77f70c3d1fa1ad99d80ff490473428acfda65893cd576039c70",
+  "executed_diagnostic_source_sha256": "52ff54fb0dc58d288acc267a1f047daaa6c4eaba500c52083fc0bcf17cc02c7e",
+  "observation": {
+    "sample_id": "multijail-221-ko",
+    "sequence_tokens": 74,
+    "initial_lora_B_zero": true,
+    "attention_implementation": "sdpa",
+    "dropouts": [],
+    "backends": {
+      "sdpa": {
+        "comparisons": {
+          "disabled_nograd": {
+            "equal": true,
+            "max_abs": 0.0,
+            "mean_abs": 0.0,
+            "kl_batchmean": 3.5104267226415686e-07
+          },
+          "active_nograd": {
+            "equal": true,
+            "max_abs": 0.0,
+            "mean_abs": 0.0,
+            "kl_batchmean": 3.5104267226415686e-07
+          },
+          "active_grad": {
+            "equal": false,
+            "max_abs": 0.5625,
+            "mean_abs": 0.020624130964279175,
+            "kl_batchmean": 0.06448967009782791
+          },
+          "disabled_nograd_repeat": {
+            "equal": true,
+            "max_abs": 0.0,
+            "mean_abs": 0.0,
+            "kl_batchmean": 3.5104267226415686e-07
+          }
+        },
+        "active_grad_vs_nograd_equal": false
+      },
+      "eager": {
+        "comparisons": {
+          "disabled_nograd": {
+            "equal": true,
+            "max_abs": 0.0,
+            "mean_abs": 0.0,
+            "kl_batchmean": 5.014474027120741e-07
+          },
+          "active_nograd": {
+            "equal": true,
+            "max_abs": 0.0,
+            "mean_abs": 0.0,
+            "kl_batchmean": 5.014474027120741e-07
+          },
+          "active_grad": {
+            "equal": true,
+            "max_abs": 0.0,
+            "mean_abs": 0.0,
+            "kl_batchmean": 5.014474027120741e-07
+          },
+          "disabled_nograd_repeat": {
+            "equal": true,
+            "max_abs": 0.0,
+            "mean_abs": 0.0,
+            "kl_batchmean": 5.014474027120741e-07
+          }
+        },
+        "active_grad_vs_nograd_equal": true
+      }
+    },
+    "max_driver_gib": 15.05731201171875
+  },
+  "measurement_qualification": "The historical max_driver_gib field is a final allocated-driver-memory sample after cleanup, not a peak.",
+  "reproduction_command": "python -m experiments.multilingual_repair.diagnose_attention --prepared artifacts/prepared --output artifacts/attention-diagnostic",
+  "reproduction_note": "The portable command adds integrity checks and renames the memory field; this observation was produced by an earlier diagnostic script with the recorded source hash. No optimizer update or semantic review was performed."
+}

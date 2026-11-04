@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "status": "passed_tokenization_preflight",
+  "sources": {
+    "aya_dataset": {
+      "repo": "CohereLabs/aya_dataset",
+      "revision": "f9ea04583f02a8f86404ff6c58bf75fe637df8a2",
+      "filename": "data/train-00000-of-00001.parquet",
+      "license": "Apache-2.0",
+      "source_sha256": "51baa85043b569ba117f41516b32d1b0e4e2647fb203a08933f98a556fb1fb06"
+    },
+    "multijail": {
+      "repo": "DAMO-NLP-SG/MultiJail",
+      "revision": "93d65c778925d55973b9ff30c7bccc8545494eb6",
+      "filename": "MultiJail.csv",
+      "license": "MIT",
+      "source_sha256": "953132d40b8bf562f20bd9db0a9edf6a3564dc7362bd15a8bb649c8afd128ef4"
+    }
+  },
+  "files": {
+    "alignment.jsonl": "7b481f766a9988ded9195df00bb1d39c0fa0a8f2e37c3693aedaa020a6f6a799",
+    "calibration.jsonl": "9f1e7224427f09f983094dd0960cf7f58d625a90a1bde654445e8663a7099108",
+    "config.json": "d4730c933aed2301ddb59ce0c08df461fcd6529485d83ffd22bd73ee35967f7f",
+    "confirmation.jsonl": "b29de6a6bf39649b30a5f227060249f752b6bfb55585392d32b53b908b3e7b17",
+    "development.jsonl": "59234479cd85f8e44dd64aa704b8b719fbf18dffa47af4024033a3312466c97e",
+    "train.jsonl": "22ec4439165376520c56361bb8269d1de1ff0534d0a0d84fb45afc102c6ffe9a"
+  },
+  "preparation_script_sha256": "ff3a642f74f44a18a38c4c3fd42d8355c00a5364d380443747ecce3d3c2108a6",
+  "tokenizer": {
+    "model": "CohereLabs/aya-expanse-8b",
+    "actual_snapshot_commit": "5062468bf9bc0c6035fd64e06274333ec127d980",
+    "eos_token_id": 255001,
+    "chat_template_sha256": "90c33aee14aa2a226127516d48ee9184c9b90745d4a04c484621ec2e82fb712c"
+  },
+  "counts": {
+    "train": {
+      "en:task": 450,
+      "ko:task": 100,
+      "zh:task": 450
+    },
+    "calibration": {
+      "en:task": 6,
+      "ko:task": 6,
+      "zh:task": 6
+    },
+    "development": {
+      "en:task": 12,
+      "ko:task": 12,
+      "zh:task": 12,
+      "en:disallowed": 12,
+      "ko:disallowed": 12,
+      "zh:disallowed": 12
+    },
+    "confirmation": {
+      "en:task": 100,
+      "ko:task": 100,
+      "zh:task": 100,
+      "en:disallowed": 100,
+      "ko:disallowed": 100,
+      "zh:disallowed": 100
+    },
+    "alignment": {
+      "en:disallowed": 24,
+      "ko:disallowed": 24,
+      "zh:disallowed": 24
+    }
+  },
+  "max_sequence_tokens": {
+    "train": 439,
+    "calibration": 264,
+    "development": 305,
+    "confirmation": 434,
+    "alignment": 74
+  },
+  "curation": {
+    "tool": "CuratorKIT",
+    "version": "0.1.21",
+    "cleaning_transforms": {
+      "strip_html": false,
+      "normalise_unicode": true,
+      "fix_encoding_artifacts": false,
+      "collapse_whitespace": false,
+      "remove_control_chars": true
+    },
+    "input_rows": 7255,
+    "deduplicated_rows": 6402,
+    "changed_requests": 0,
+    "filter_counts": {
+      "zh:source": 4909,
+      "en:source": 3944,
+      "en:length_filter": 902,
+      "ko:source": 361,
+      "ko:length_filter": 85,
+      "zh:length_filter": 884,
+      "zh:lexical_risk": 11,
+      "en:lexical_risk": 70,
+      "ko:lexical_risk": 4,
+      "en:empty": 3
+    },
+    "risk_filter": "\\b(kill|murder|suicide|bomb|weapon|hack|hacking|phish|porn|rape|fraud|cocaine|methamphetamine|terrorist|nazi|sex|sexual)\\b|살인|자살|폭탄|마약|성폭행|해킹|杀人|自杀|炸弹|毒品|强奸|色情|诈骗"
+  },
+  "truncated_examples": 0,
+  "optimizer_steps": 0,
+  "model_generations": 0,
+  "limitations": [
+    "Task splits are newly held out from this fine-tuning, not from original base pretraining.",
+    "Task data is lexically screened, not fully reviewed as harmless or correct.",
+    "Korean training count is lower because the public source has fewer eligible Korean rows.",
+    "Task exact duplicates are removed globally; semantic/translated paraphrase independence is not certified.",
+    "MultiJail labels come from its source; no semantic outcome labels are inferred from refusal words.",
+    "Prompt-only alignment KL differs from alignment prompt/response protocols; this is a scoped adaptation."
+  ]
+}

@@ -1,0 +1,16 @@
+.DS_Store
+.gstack/
+vendor/
+.venv/
+.venv-*/
+.cache/
+__pycache__/
+.ipynb_checkpoints/
+.env
+.env.*
+!.env.example
+results/
+*.zip
+*.safetensors
+*.bin
+*.pt
