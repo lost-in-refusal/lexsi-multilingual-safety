@@ -61,6 +61,34 @@ class CandidateTests(unittest.TestCase):
         self.assertEqual(stats['rejected_incomplete_families'], 1)
         self.assertEqual(stats['rejected_content_families'], 6)
 
+    def test_explicit_null_empty_and_whitespace_inputs_mean_no_supplied_context(self):
+        for inputs in ((None, '', ' \t\n'), ('', None, ' '), (' ', '', None)):
+            with self.subTest(inputs=inputs):
+                family = bactrian_family('mixed-empty-input')
+                for lang, value in zip(LANGS, inputs):
+                    family[lang]['input'] = value
+                rows, stats = prepare.select_candidates(columns(family), 1)
+                self.assertEqual([row['lang'] for row in rows], ['en', 'ko', 'zh'])
+                self.assertEqual({row['family_id'] for row in rows}, {'bactrian:mixed-empty-input'})
+                self.assertEqual(stats['rejected_content_families'], 0)
+
+    def test_missing_wrong_type_and_nonempty_input_reject_whole_family(self):
+        good = bactrian_family('valid-empty-input')
+        broken = []
+        for lang in LANGS:
+            for label, value in (('missing', None), ('number', 0), ('boolean', False),
+                                 ('list', []), ('dict', {}), ('supplied', ' context ')):
+                family = bactrian_family(f'{lang}-{label}')
+                if label == 'missing':
+                    del family[lang]['input']
+                else:
+                    family[lang]['input'] = value
+                broken.append(family)
+        rows, stats = prepare.select_candidates(columns(good, *broken), 1)
+        self.assertEqual(len(rows), 3)
+        self.assertEqual({row['family_id'] for row in rows}, {'bactrian:valid-empty-input'})
+        self.assertEqual(stats['rejected_content_families'], 18)
+
     def test_cleaner_changes_have_original_instruction_and_verbatim_response(self):
         family = bactrian_family('normalization')
         family['en']['instruction'] = '  Describe cafe\u0301 colors\x00  '

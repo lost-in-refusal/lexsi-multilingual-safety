@@ -142,7 +142,9 @@ def select_candidates(data: dict, count: int = 1000) -> tuple[list[dict], dict]:
             stats['rejected_incomplete_families'] += 1
             continue
         rows = [values[0] for values in raw]
-        if any(not isinstance(row.get('input'), str) or row['input'].strip()
+        if any('input' not in row
+               or (row['input'] is not None and
+                   (not isinstance(row['input'], str) or row['input'].strip()))
                or not _valid_text(row.get('instruction')) or not _valid_text(row.get('output'))
                for row in rows):
             stats['rejected_content_families'] += 1
