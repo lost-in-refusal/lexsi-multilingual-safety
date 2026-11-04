@@ -198,12 +198,15 @@ def _verify_prior(output,context):
         require(value.get('status')==expected_status,'Prior qualification conclusion mismatch')
 
 
-def _readiness_binding(folder,profile,sources):
+def _readiness_binding(folder,profile,sources,*,expected_prior=None):
     from .task_grading_check import verify
     assets=_assets('task',task_profile=profile)
     result=verify(folder,expected_profile=task_profile_settings(profile),assets=assets,
         parse_task=lambda evidence:parse_task_evaluation(evidence,task_profile=profile))
     require(_same(result['config']['sources'],sources),'Readiness/pack task runtime source hashes mismatch')
+    if expected_prior is not None:
+        require(_same(result['config']['prior_qualification'],expected_prior),
+            'Readiness/pack prior qualification evidence mismatch')
     report=result['report'];config=result['config']
     return dict(status='controlled_checks_passed' if report['status']=='controlled_task_checks_passed_exploratory_use' else
         'failed' if report['records']==36 else 'unknown',manifest_sha256=_hash_file(folder/'manifest.json'),
@@ -263,7 +266,9 @@ def _verify_task_context(pack,config):
             _same({k:v for k,v in binding.items() if k!='descriptor_sha256'},_read(folder/'not-run.json')) and
             _same(_read(folder/'not-run.json'),_unknown_readiness(profile,config['sources'])),
             'Invalid unknown readiness descriptor')
-    else:require(_same(binding,_readiness_binding(folder,profile,config['sources'])),'Readiness binding mismatch')
+    else:
+        verified=_readiness_binding(folder,profile,config['sources'],expected_prior=config['prior_qualification'])
+        require(_same(binding,verified),'Readiness binding mismatch')
 
 
 def _require_task_ready(pack,kind):

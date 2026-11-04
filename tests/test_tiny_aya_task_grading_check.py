@@ -270,6 +270,46 @@ class NewPackTests(legacy.PackTests):
             self.assertEqual(judge.load_scores(self.root/'task',self.pack)['report'],report)
             self.assertEqual(loaded['config']['prior_qualification']['files']['root.json'],judge._hash_file(prior['root']))
 
+    def _assert_rehashed_prior_substitution_rejected(self,*,original_known):
+        assets=controlled_assets();prior={}
+        for name,status in [('root','not_qualified_for_autonomous_quality_approval'),('semantic','provisional_automated_semantic_assessment_not_human_validation')]:
+            prior[name]=self.root/(name+'.json')
+            judge._write(prior[name],dict(status=status,context='original'))
+        readiness=self.root/'readiness'
+        controlled_artifact(readiness,assets,prior=prior if original_known else None)
+        with patch.object(judge,'_assets',return_value=assets):
+            frozen=judge.freeze_pack(self.arms['base'],self.arms['plain'],self.arms['safegrad'],self.pack,
+                bundle=self.bundle,prepared=self.prepared,screened=self.screened,
+                plain_training=self.root/'plain-train',safegrad_training=self.root/'safegrad-train',
+                task_profile='qwen3-14b-task-v1',task_readiness=readiness)
+            self.assertEqual(frozen['task_eligible'],original_known)
+            config=judge._read(self.pack/'run-config.json')
+            replacement=copy.deepcopy(config['prior_qualification'])
+            replacement['status']='prior_failed_source_qualification_bound'
+            replacement['files']={}
+            for name in ('root','semantic'):
+                value=judge._read(prior[name]);value['context']='replacement'
+                copied=self.pack/'prior-assessments'/(name+'.json')
+                judge._write(copied,value)
+                replacement['files'][name+'.json']=judge._hash_file(copied)
+            nested_prior=judge._read(self.pack/'task-readiness'/'run-config.json')['prior_qualification']
+            self.assertNotEqual(replacement,nested_prior)
+            config['prior_qualification']=replacement
+            judge._write(self.pack/'run-config.json',config)
+            report=judge._pack_report(config,self.pack)
+            self.assertTrue(report['task_eligible'])
+            judge._write(self.pack/'report.json',report)
+            judge._manifest(self.pack,'complete',bindings=dict(config_sha256=report['config_sha256'],
+                rows_sha256=config['rows_sha256'],audit_sha256=config['audit_sha256']))
+            with self.assertRaisesRegex(ValueError,'Readiness/pack prior qualification evidence mismatch'):
+                judge.load_pack(self.pack)
+
+    def test_reader_rejects_rehashed_different_known_prior_hashes(self):
+        self._assert_rehashed_prior_substitution_rejected(original_known=True)
+
+    def test_reader_rejects_rehashed_unknown_run_to_known_pack_prior_substitution(self):
+        self._assert_rehashed_prior_substitution_rejected(original_known=False)
+
     def test_collision_and_failed_artifacts_archive_without_disabling_safety(self):
         from experiments.tiny_aya import task_grading_check as check
         assets=controlled_assets();readiness=self.root/'readiness'
