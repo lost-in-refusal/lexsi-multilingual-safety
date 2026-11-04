@@ -25,6 +25,16 @@ class TinyTokenizer:
         return prefix + [100 + ord(c) for c in messages[1]['content']] + [14, 2]
 
 
+class GuardTokenizer:
+    eos_token_id = 2
+    def __len__(self): return 1000
+    def encode(self, raw): return [10 + ord(c) for c in raw]
+    def decode(self, tokens, skip_special_tokens=True):
+        return ''.join(chr(i - 10) for i in tokens if i not in (2, 3))
+    def apply_chat_template(self, messages, **kwargs):
+        return self.encode('|'.join(m['role'] + ':' + m['content'] for m in messages))
+
+
 def row(i=0, lang='en'):
     return dict(id=f'bactrian:{i}:{lang}', family_id=f'bactrian:{i}', lang=lang,
                 instruction=f'Explain colors {i}', response=f'Colors are visible {lang}',
@@ -34,6 +44,8 @@ def row(i=0, lang='en'):
 class Runtime:
     def __init__(self):
         self.bindings = {'synthetic_cpu_runtime': True}
+        self.guard_tokenizer = GuardTokenizer()
+        self.eos_token_ids = [2, 3]
         self.fail = None
         self.calls = []
     def preflight(self, item):
@@ -43,7 +55,10 @@ class Runtime:
         raw = RESPONSE if mode == 'response' else SAFE
         if self.fail == (item['id'], mode):
             raw = 'Safety: Unsafe\nCategories: Violent' + ('\nRefusal: No' if mode == 'response' else '')
-        return dict(raw=raw, input_tokens=100, generated_tokens=12, eos=True, stop_reason='eos')
+        return self.completion(item, mode, raw)
+    def completion(self, item, mode, raw):
+        return guard._completion_evidence(self.guard_tokenizer, self.eos_token_ids,
+            guard._guard_input(self.guard_tokenizer, item, mode), self.guard_tokenizer.encode(raw) + [2])
     def metrics(self):
         return {'device': 'synthetic-cpu'}
 
@@ -137,6 +152,7 @@ class TokenTests(unittest.TestCase):
             self.skipTest('Pinned guard tokenizer is not cached; downloads forbidden')
         runtime = object.__new__(guard._Runtime)
         runtime.guard_tokenizer = tokenizer
+        runtime.eos_token_ids = [151645, 151643]
         item = row(); item['instruction'] = 'word ' * 6000
         result = runtime.moderate(item, 'prompt')
         self.assertEqual((result['stop_reason'], result['generated_tokens']), ('input_cap', 0))
@@ -150,6 +166,47 @@ class TokenTests(unittest.TestCase):
         self.assertIn("ONLY THE LAST **ASSISTANT's response**", response)
         self.assertIn('USER: benign request', response)
         self.assertIn('ASSISTANT: candidate response', response)
+
+
+
+class CompletionEvidenceTests(unittest.TestCase):
+    def test_both_pinned_qwen_eos_ids_are_complete_and_cap_still_unscorable(self):
+        from transformers import AutoTokenizer
+        tokenizer = AutoTokenizer.from_pretrained('Qwen/Qwen3Guard-Gen-4B',
+            revision='6ec42827da0c1ff11e7a49dc269d2e810d27e108', local_files_only=True, trust_remote_code=False)
+        for eos in (151645, 151643):
+            ids = tokenizer.encode(SAFE, add_special_tokens=False) + [eos]
+            result = guard._completion_evidence(tokenizer, [151645, 151643], [100], ids)
+            self.assertEqual((result['raw'], result['eos'], result['stop_reason']), (SAFE, True, 'eos'))
+            self.assertTrue(guard.parse_completion(result['raw'], 'prompt', **{k: result[k] for k in
+                            ('eos', 'generated_tokens', 'input_tokens', 'stop_reason')})['strict_pass'])
+        capped = guard._completion_evidence(tokenizer, [151645, 151643], [100], [100] * 128)
+        self.assertEqual((capped['eos'], capped['stop_reason']), (False, 'max_tokens'))
+        eos_cap = guard._completion_evidence(tokenizer, [151645, 151643], [100], [100] * 127 + [151643])
+        self.assertEqual(guard.parse_completion(SAFE, 'prompt', **{k: eos_cap[k] for k in
+                         ('eos', 'generated_tokens', 'input_tokens', 'stop_reason')})['status'], 'unscorable')
+
+    def test_effective_generation_config_explicitly_freezes_pinned_eos_and_limits(self):
+        from transformers import AutoTokenizer
+        snapshot, files = guard._snapshot('Qwen/Qwen3Guard-Gen-4B',
+            '6ec42827da0c1ff11e7a49dc269d2e810d27e108', False)
+        self.assertIn('generation_config.json', files)
+        tokenizer = AutoTokenizer.from_pretrained(snapshot, local_files_only=True, trust_remote_code=False)
+        config, ids = guard._guard_generation_config(snapshot, tokenizer)
+        frozen = config.to_dict()
+        self.assertEqual(ids, [151643, 151645])
+        self.assertEqual(frozen['eos_token_id'], [151643, 151645])
+        self.assertEqual((frozen['do_sample'], frozen['max_new_tokens'], frozen['pad_token_id']), (False, 128, 151645))
+
+    def test_completion_evidence_validates_input_cap_and_token_vocabulary(self):
+        tokenizer = GuardTokenizer()
+        capped = guard._completion_evidence(tokenizer, [2, 3], [100] * 4097, [])
+        self.assertEqual((capped['raw'], capped['generated_tokens'], capped['eos'], capped['stop_reason']),
+                         ('', 0, False, 'input_cap'))
+        for ids in ([-1], [1000], [True], [1.5], [2, 100], [100] * 129, []):
+            with self.subTest(ids=ids[:3]), self.assertRaises(ValueError):
+                guard._completion_evidence(tokenizer, [2, 3], [100], ids)
+        with self.assertRaises(ValueError): guard._completion_evidence(tokenizer, [2, 3], [100] * 4097, [2])
 
 
 
@@ -258,12 +315,49 @@ class ScreeningTests(unittest.TestCase):
         original = self.runtime.moderate
         def refuses(item, mode):
             result = original(item, mode)
-            if mode == 'response': result['raw'] = SAFE + '\nRefusal: Yes'
+            if mode == 'response': result = self.runtime.completion(item, mode, SAFE + '\nRefusal: Yes')
             return result
         self.runtime.moderate = refuses
         report = guard.screen_candidates(self.prepared, self.output, 2)
         self.assertEqual(report['passing_families'], 1)
         self.assertEqual(report['rejection_reasons'], {'refusal': 1})
+
+    def test_resume_rejects_missing_and_contradictory_completion_evidence(self):
+        guard.screen_candidates(self.prepared, self.output, 1)
+        journal = self.output / 'judgments.jsonl'
+        original = json.loads(journal.read_text())
+        mutations = (
+            ('missing_ids', lambda c: c.pop('generated_token_ids')),
+            ('negative_id', lambda c: c.update(generated_token_ids=[-1])),
+            ('out_of_vocab', lambda c: c.update(generated_token_ids=[1000])),
+            ('count', lambda c: c.update(generated_tokens=127)),
+            ('eos', lambda c: c.update(eos=False)),
+            ('stop_reason', lambda c: c.update(stop_reason='max_tokens')),
+            ('raw', lambda c: c.update(raw=SAFE + ' ')),
+            ('input_count', lambda c: c.update(input_tokens=4096)),
+            ('input_context', lambda c: c['input_token_ids'].__setitem__(0, 999)),
+            ('missing_input', lambda c: c.pop('input_token_ids')),
+        )
+        for index in range(6):
+            for name, mutate in mutations:
+                record = copy.deepcopy(original); mutate(record['checks'][index])
+                journal.write_text(json.dumps(record) + '\n')
+                with self.subTest(check=index, name=name), self.assertRaises(ValueError):
+                    guard.screen_candidates(self.prepared, self.output, 2)
+        journal.write_text(json.dumps(original) + '\n')
+        self.assertEqual(guard.screen_candidates(self.prepared, self.output, 2)['passing_families'], 2)
+
+    def test_input_cap_journal_requires_exact_context_and_no_output(self):
+        self.runtime.guard_tokenizer.apply_chat_template = lambda messages, **kwargs: [100] * 4097
+        self.runtime.moderate = lambda item, mode: guard._completion_evidence(
+            self.runtime.guard_tokenizer, self.runtime.eos_token_ids, [100] * 4097, [])
+        guard.screen_candidates(self.prepared, self.output, 1)
+        journal = self.output / 'judgments.jsonl'; original = json.loads(journal.read_text())
+        for change in ({'generated_token_ids': [2]}, {'raw': 'Safety: Safe'}, {'input_tokens': 4098}, {'eos': True}):
+            record = copy.deepcopy(original); record['checks'][0].update(change)
+            journal.write_text(json.dumps(record) + '\n')
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                guard.screen_candidates(self.prepared, self.output, 2)
 
     def test_input_rehash_even_when_verifier_boundary_is_injected(self):
         with (self.prepared / 'candidates.jsonl').open('ab') as handle: handle.write(b'\n')

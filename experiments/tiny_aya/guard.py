@@ -122,9 +122,11 @@ def tokenize_row(tokenizer, row):
 
 
 def _snapshot(repo, revision, weights):
-    from huggingface_hub import snapshot_download
-    # local_files_only forbids downloading, including tokenizer-only preflight.
-    path = Path(snapshot_download(repo_id=repo, revision=revision, local_files_only=True))
+    from huggingface_hub import hf_hub_download
+    # Resolve one required cached file instead of demanding unused repository
+    # files (such as .gitattributes); every consumed file is checked/hashed below.
+    path = Path(hf_hub_download(repo_id=repo, filename='config.json', revision=revision,
+                                local_files_only=True)).parent
     files = {p.name: p for p in path.iterdir() if p.is_file() and
              (p.suffix in ('.json', '.jinja', '.txt', '.model') or p.suffix == '.safetensors')}
     if weights:
@@ -146,6 +148,60 @@ def _finite_logits(scores):
     return scores
 
 
+def _guard_input(tokenizer, row, mode):
+    if mode not in ('prompt', 'response'):
+        raise ValueError('Invalid moderation mode')
+    messages = [dict(role='user', content=row['instruction'])]
+    if mode == 'response': messages.append(dict(role='assistant', content=row['response']))
+    return list(tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True,
+                                              return_dict=False, truncation=False))
+
+
+def _completion_evidence(tokenizer, eos_token_ids, input_ids, generated_ids):
+    """Derive audit metadata solely from exact template IDs and generation IDs."""
+    vocabulary_size = len(tokenizer)
+    if (not isinstance(generated_ids, list) or not isinstance(input_ids, list) or not input_ids
+            or any(type(i) is not int or not 0 <= i < vocabulary_size for i in input_ids + generated_ids)):
+        raise ValueError('Invalid generated/input token IDs or vocabulary bounds')
+    count = len(input_ids)
+    if count > 4096:
+        if generated_ids: raise ValueError('Overlong guard input must have no generated tokens')
+        raw, eos, stop = '', False, 'input_cap'
+    else:
+        if not 1 <= len(generated_ids) <= 128:
+            raise ValueError('Invalid generated token count')
+        if any(i in eos_token_ids for i in generated_ids[:-1]):
+            raise ValueError('Generated tokens continue after a configured EOS')
+        raw = tokenizer.decode(generated_ids, skip_special_tokens=True)
+        eos = generated_ids[-1] in eos_token_ids
+        stop = 'eos' if eos else 'max_tokens' if len(generated_ids) == 128 else 'incomplete'
+    return dict(raw=raw, input_token_ids=input_ids, input_tokens=count,
+                generated_token_ids=generated_ids, generated_tokens=len(generated_ids),
+                eos=eos, stop_reason=stop)
+
+
+def _validate_completion(runtime, row, mode, result):
+    expected = _completion_evidence(runtime.guard_tokenizer, runtime.eos_token_ids,
+        _guard_input(runtime.guard_tokenizer, row, mode), result.get('generated_token_ids'))
+    if any(type(result.get(key)) is not type(value) or result.get(key) != value
+           for key, value in expected.items()):
+        raise ValueError('Completion token evidence, context or decoded metadata mismatch')
+
+
+def _guard_generation_config(path, tokenizer):
+    from transformers import GenerationConfig
+    config = GenerationConfig.from_pretrained(path, local_files_only=True)
+    ids = config.eos_token_id if isinstance(config.eos_token_id, list) else [config.eos_token_id]
+    if not ids or any(type(i) is not int or not 0 <= i < len(tokenizer) for i in ids):
+        raise ValueError('Invalid configured Qwen EOS token IDs')
+    eos_ids = sorted(set(ids))
+    config.eos_token_id = eos_ids
+    config.do_sample = False
+    config.max_new_tokens = 128
+    config.pad_token_id = tokenizer.eos_token_id
+    return config, eos_ids
+
+
 class _Runtime:
     """CPU tokenizers and file hashing first; actual MPS model only on moderation."""
     def __init__(self):
@@ -156,7 +212,9 @@ class _Runtime:
             self.guard_path, local_files_only=True, trust_remote_code=False)
         self.tiny_tokenizer = AutoTokenizer.from_pretrained(
             tiny_path, local_files_only=True, trust_remote_code=False)
+        self.generation_config, self.eos_token_ids = _guard_generation_config(self.guard_path, self.guard_tokenizer)
         self.bindings = dict(guard_files=guard_files, tiny_tokenizer_files=tiny_files,
+            guard_generation_config=self.generation_config.to_dict(), guard_eos_token_ids=self.eos_token_ids,
             guard_template_sha256=_digest(self.guard_tokenizer.chat_template),
             tiny_template_sha256=_digest(self.tiny_tokenizer.chat_template),
             versions={name: importlib.metadata.version(name) for name in
@@ -170,13 +228,11 @@ class _Runtime:
     def moderate(self, row, mode):
         import torch
         from transformers import AutoModelForCausalLM, LogitsProcessor, LogitsProcessorList
-        messages = [dict(role='user', content=row['instruction'])]
-        if mode == 'response': messages.append(dict(role='assistant', content=row['response']))
-        ids = self.guard_tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True,
-                                                       return_tensors='pt', return_dict=False, truncation=False)
-        count = ids.shape[-1]
-        if count > 4096:
-            return dict(raw='', eos=False, input_tokens=count, generated_tokens=0, stop_reason='input_cap')
+        input_ids = _guard_input(self.guard_tokenizer, row, mode)
+        if len(input_ids) > 4096:
+            return _completion_evidence(self.guard_tokenizer, self.eos_token_ids, input_ids, [])
+        ids = torch.tensor([input_ids], dtype=torch.long)
+        count = len(input_ids)
         if self.model is None:
             if not torch.backends.mps.is_available(): raise RuntimeError('MPS is required for local guard screening')
             torch.mps.set_per_process_memory_fraction(0.8)
@@ -187,13 +243,9 @@ class _Runtime:
                 return _finite_logits(scores)
         with torch.inference_mode():
             output = self.model.generate(input_ids=ids.to('mps'), attention_mask=torch.ones_like(ids).to('mps'),
-                do_sample=False, max_new_tokens=128, logits_processor=LogitsProcessorList([FiniteLogits()]),
-                pad_token_id=self.guard_tokenizer.eos_token_id)
+                generation_config=self.generation_config, logits_processor=LogitsProcessorList([FiniteLogits()]))
         new = output[0, count:].tolist()
-        eos = bool(new and new[-1] == self.guard_tokenizer.eos_token_id)
-        return dict(raw=self.guard_tokenizer.decode(new, skip_special_tokens=True),
-                    generated_token_ids=new, eos=eos, input_tokens=count,
-                    generated_tokens=len(new), stop_reason='eos' if eos else 'max_tokens')
+        return _completion_evidence(self.guard_tokenizer, self.eos_token_ids, input_ids, new)
 
     def metrics(self):
         import torch
@@ -275,6 +327,7 @@ def _record(family, runtime, config_hash):
     if reason is None:
         for check, row in zip(checks, (r for r in family for _ in range(2))):
             result = runtime.moderate(row, check['mode'])
+            _validate_completion(runtime, row, check['mode'], result)
             labels = parse_completion(result['raw'], check['mode'], **{k: result[k] for k in
                                       ('eos', 'generated_tokens', 'input_tokens', 'stop_reason')})
             check.update(result, status=labels['status'], labels=labels)
@@ -296,13 +349,14 @@ def _validate_record(record, family, runtime, config_hash):
     if not isinstance(checks, list) or len(checks) != 6:
         raise ValueError('Invalid moderation journal structure')
     stopped = bool(reason)
-    for actual, wanted in zip(checks, expected):
+    for actual, wanted, row in zip(checks, expected, (r for r in family for _ in range(2))):
         if any(actual.get(key) != wanted[key] for key in ('id', 'mode')):
             raise ValueError('Moderation context/order mismatch')
         if stopped:
             if actual != wanted: raise ValueError('Unexpected checks after family rejection')
         else:
             if actual.get('status') == 'pending': raise ValueError('Unexpected pending check')
+            _validate_completion(runtime, row, actual['mode'], actual)
             parsed = parse_completion(actual['raw'], actual['mode'], **{k: actual[k] for k in
                                        ('eos', 'generated_tokens', 'input_tokens', 'stop_reason')})
             if actual.get('labels') != parsed or actual.get('status') != parsed['status']:
