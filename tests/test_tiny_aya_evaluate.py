@@ -100,6 +100,27 @@ class EvaluationTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.generate(batch_size=1)
         self.assertEqual(self.loader.call_count,2)
 
+    def test_changed_executing_source_blocks_resume_but_archive_remains_readable(self):
+        self.freeze();self.generate(max_batches=1)
+        before={p.relative_to(self.output):p.read_bytes() for p in self.output.rglob('*') if p.is_file()}
+        paths=evaluate._source_paths()
+        changed=self.root/'changed-runtime.py'
+        changed.write_bytes(paths['runtime.py'].read_bytes()+b'\n# Changed executing implementation.\n')
+        cases=[{**paths,'runtime.py':changed},{name:path for name,path in paths.items() if name!='runtime.py'}]
+        for current in cases:
+            with self.subTest(inventory=sorted(current)),patch.object(evaluate,'_source_paths',return_value=current):
+                with self.assertRaisesRegex(ValueError,'Current implementation source'):
+                    self.generate(max_batches=2)
+                self.assertEqual(self.loader.call_count,1)
+                self.assertEqual({p.relative_to(self.output):p.read_bytes() for p in self.output.rglob('*') if p.is_file()},before)
+                loaded=self.load()
+                self.assertEqual(loaded['report']['status'],'incomplete')
+                self.assertEqual(len(loaded['rows']),1)
+        # Restoring the original implementation resumes the same immutable run.
+        self.generate(max_batches=2)
+        self.assertEqual(len(self.load()['rows']),2)
+        self.assertEqual(self.loader.call_count,2)
+
     def test_rehashed_float_token_ids_do_not_pass_integer_equality(self):
         self.freeze()
         rows=train._rows(self.bundle/'items.jsonl');rows[0]['input_ids']=[float(i) for i in rows[0]['input_ids']]

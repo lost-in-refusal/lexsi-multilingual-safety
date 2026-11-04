@@ -113,7 +113,11 @@ class RuntimeTests(unittest.TestCase):
             runtime.generate_batch(model,Tokenizer(),[[5,4]],generation_config=frozen,device='cpu')
         self.assertEqual(model.generation_config.suppress_tokens,[7])
         model.generation_config=copy.deepcopy(frozen)
-        rows=runtime.generate_batch(model,Tokenizer(),[[5,4],[5,4,8]],generation_config=frozen,device='cpu')
+        with self.assertLogs('transformers.generation.utils',level='WARNING') as logged:
+            rows=runtime.generate_batch(model,Tokenizer(),[[5,4],[5,4,8]],generation_config=frozen,device='cpu')
+        self.assertEqual(len(logged.records),1)
+        self.assertIn('Both `max_new_tokens` (=4) and `max_length`(=20)',logged.records[0].getMessage())
+        self.assertIn('`max_new_tokens` will take precedence',logged.records[0].getMessage())
         self.assertEqual(len(rows),2)
         self.assertEqual(model.generation_config.to_dict(),frozen.to_dict())
 

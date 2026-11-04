@@ -103,6 +103,12 @@ def _verify_sources(directory, sources):
     require(all(_hash_file(directory/'sources'/n)==h for n,h in sources.items()),'Source snapshot hash mismatch')
 
 
+def _verify_executing_sources(sources):
+    """Only writers require their current implementation to match the archive."""
+    current={name:_hash_file(path) for name,path in _source_paths().items()}
+    require(_same(current,sources),'Current implementation source inventory/hashes differ from frozen run')
+
+
 def _file_entry(path):
     return dict(sha256=_hash_file(path),rows=len(_rows(path)) if path.suffix=='.jsonl' else 1)
 
@@ -357,11 +363,14 @@ def generate(bundle:Path,output:Path,*,arm:str,prepared:Path,screened:Path,
             _write(output/'run-config.json',config)
             with (output/'batches.jsonl').open('x') as handle:handle.flush();os.fsync(handle.fileno())
         ledger,rows=_ledger(output,config,frozen)
-        _save_state(output,config,rows)
         pending=list(enumerate(config['batches']))[len(ledger):]
         # max_batches is an absolute prefix boundary, not additional batches.
         if max_batches is not None:pending=[(i,b) for i,b in pending if i<max_batches]
         if not pending:return _save_state(output,config,rows)
+        # Never append new outputs under a prior implementation's provenance.
+        # Keep this writer-only check separate from archived evidence consumers.
+        _verify_executing_sources(config['sources'])
+        _save_state(output,config,rows)
         model=None
         try:
             device=_device();generation=GenerationConfig.from_dict(config['generation'])
