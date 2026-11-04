@@ -29,40 +29,34 @@
     {
       "due": "2026-11-07",
       "deliverable": "Plain fine-tuning config and baseline run",
-      "status": "plain_lora_configuration_and_corpus_prepared_training_not_run",
+      "status": "three_plain_lora_training_and_development_runs_completed_heldout_pending",
       "needs": [
-        "Human review of authored English-Korean correction targets and remaining disputed dimensions",
-        "Longest-example forward/backward memory check at realistic policy context",
-        "Implement and run the fixed32-step adapter-only pilot, then compare held-out-from-training development behavior"
+        "Further development intervention that passes every unchanged acceptance check",
+        "Human review of synthetic bilingual data and provisional semantic judgments"
       ],
       "evidence": [
         "docs/pilot-baseline-review.md",
-        "evidence/pilot-development/report.json",
         "docs/grounding-comparison-results.md",
-        "evidence/grounding-comparison/summary-model.json",
         "docs/conciseness-ablation-results.md",
-        "evidence/conciseness-ablation/summary-model.json",
-        "evidence/conciseness-ablation/review-consistency.json",
-        "docs/adjudication-development.md",
-        "evidence/adjudication-development/human-decisions.json",
-        "docs/correction-preparation-results.md",
-        "configs/correction-lora.json",
-        "evidence/correction-preparation/preflight/manifest.json"
+        "docs/plain-lora-development.md",
+        "docs/complete-answer-lora-v2.md",
+        "docs/known-facts-lora-v3.md",
+        "evidence/model-improvement-status.json",
+        "docs/model-improvement-protocol.md"
       ],
-      "scope": "120 generated development responses across baseline and two prompt controls; latest comparison freshly reviews80 outputs under v2;20test cases unrun;model judgments provisional",
+      "scope": "Original baseline, two prompt controls, and three plain LoRA adapters evaluated on 40 development cases; 20 held-out cases remain ungenerated and unscored. No adapter has passed every selection check.",
       "remaining": [
-        "Realistic-context memory validation and substantive32-step training experiment are not complete"
+        "Pass development selection, freeze the selected candidate, then conduct held-out confirmation with two independent reviews."
       ]
     },
     {
       "due": "2026-11-10",
       "deliverable": "Plain and hardened fine-tunes; adapters on HF",
-      "status": "not_run",
+      "status": "three_plain_adapters_completed_hardening_and_publication_pending",
       "prerequisites": [
-        "Realistic-context memory test",
-        "Frozen data/config comparison",
-        "SafeGrad fit and surgery correctness test",
-        "Team HF artifact destination"
+        "Separate SafeGrad memory-fit and surgery correctness test",
+        "Frozen plain-versus-hardened comparison with reviewed data and scoring",
+        "Team HF artifact destination and publication preparation"
       ]
     },
     {
@@ -87,14 +81,16 @@
     }
   ],
   "next_work_package": [
-    "Review remaining correction target/translation judgments without treating model review as human approval",
-    "Run longest-training-example forward/backward memory check with no optimizer step, then reset state",
-    "Implement and execute the frozen32-step plainLoRA training pass; keep calibration out of optimizer batches",
-    "Compare base and adapted model under unchanged policy on40development cases; keep20test cases sealed until final intervention/scoring freeze"
+    "Use development findings to prepare another versioned correction intervention while retaining prior outputs and judgments",
+    "Pass the unchanged development acceptance checks before selecting a candidate",
+    "Freeze the selected adapter, data, policy, decoding, and scoring; then evaluate the 20 held-out cases with two independent reviews",
+    "Prepare separate SafeGrad and CircuitKIT compatibility experiments and coordinate team artifact publication"
   ],
   "research_limits": [
     "Safety drift is a hypothesis to test, not a required conclusion",
     "The nonlinear-feature hypothesis requires held-out predictive and causal evidence",
     "Never treat an English refusal phrase detector as a multilingual safety judge"
-  ]
+  ],
+  "progress_updated": "2026-11-03",
+  "progress_evidence": "evidence/model-improvement-status.json"
 }

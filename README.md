@@ -1,6 +1,8 @@
 # Lexsi multilingual safety
 
-GitHub: [xtnayk](https://github.com/xtnayk) · Hugging Face: [xtnayk](https://huggingface.co/xtnayk)
+Team repository: [lost-in-refusal/lexsi-multilingual-safety](https://github.com/lost-in-refusal/lexsi-multilingual-safety)
+
+Mingyu’s accounts: GitHub [xtnayk](https://github.com/xtnayk) · Hugging Face [xtnayk](https://huggingface.co/xtnayk)
 
 Current model: **Aya Expanse 8B**, selected by Mingyu on November 2, 2026 for local work. The original team brief used Tiny Aya; the model choice here supersedes that setup default. Current work measures local English–Korean support-policy correction adapters. Held-out improvement has not yet been established.
 
@@ -170,9 +172,9 @@ The next compatibility test should load HF and CircuitKIT sequentially in bfloat
 
 Verified hardware: Apple M5 Pro, 20 GPU cores, 48 GiB unified memory, macOS 26.5.1. The local environment uses Python 3.12 in `.venv`. The runner supports Apple Metal through `--device mps`, as well as CUDA for Colab. Each model check runs in a separate process.
 
-Verified on November 2, 2026: dependency consistency, SafeTune imports, bfloat16 forward/backward on MPS, and one LoRA optimizer step on miniature random `cohere` and `cohere2` models. Evidence is in `results/local-environment.json` and `results/mps-architecture-check.json`; rerun the architecture check with `.venv/bin/python scripts/check_mps.py`. PyTorch reports a recommended MPS budget of 37.44 GiB on this machine. These synthetic checks do not validate actual Aya weights or full SafeGrad training. Local Hugging Face sign-in and Aya Expanse 8B access are verified as `xtnayk`. Actual Aya Expanse 8B inference passed through the pinned SafeTune loader and generation backend on November 2, 2026. The verified report is in [results/local-aya-8b-20261102-verified/report.json](results/local-aya-8b-20261102-verified/report.json): model revision `5062468bf9bc0c6035fd64e06274333ec127d980`, 32 decoder layers, bfloat16, and actual parameter device `mps:0`.
+Verified on November 2, 2026: dependency consistency, SafeTune imports, bfloat16 forward/backward on MPS, and one LoRA optimizer step on miniature random `cohere` and `cohere2` models. Evidence is in `results/local-environment.json` and `results/mps-architecture-check.json`; rerun the architecture check with `.venv/bin/python scripts/check_mps.py`. PyTorch reports a recommended MPS budget of 37.44 GiB on this machine. These synthetic checks do not validate actual Aya weights or full SafeGrad training. Local Hugging Face sign-in and Aya Expanse 8B access are verified as `xtnayk`. Actual Aya Expanse 8B inference passed through the pinned SafeTune loader and generation backend on November 2, 2026. The [tracked setup summary](evidence/setup-summary.json) records the inference pass; the detailed report remains local-only at `results/local-aya-8b-20261102-verified/report.json`: model revision `5062468bf9bc0c6035fd64e06274333ec127d980`, 32 decoder layers, bfloat16, and actual parameter device `mps:0`.
 
-On a new environment, authenticate locally as `xtnayk` using the interactive Hugging Face CLI. Type the token into the CLI yourself; do not put it in chat, a command argument, or a project file. A token saved in Colab Secrets does not authenticate this Mac.
+On a new environment, authenticate with your own Hugging Face account using the interactive CLI. Type the token into the CLI yourself; do not put it in chat, a command argument, or a project file. A token saved in Colab Secrets does not authenticate this Mac.
 
 ```sh
 cd lexsi-multilingual-safety
@@ -196,7 +198,7 @@ Aya Expanse 8B is the selected local baseline. Tiny Aya remains an untested fall
 
 ## Local LoRA training check
 
-On November 2, 2026, a two-step ordinary LoRA check passed on the actual Aya Expanse 8B checkpoint. It used SafeTune's model loader and LoRA wrapper with a bounded PyTorch AdamW loop. This does not validate SafeTune's high-level training runner, SafeGrad, or repair. Evidence: [report](results/aya-8b-lora-smoke-20261102/report.json), [benign examples](results/aya-8b-lora-smoke-20261102/benign_examples.json), and the exact [experiment script](results/aya-8b-lora-smoke-20261102/run_script.py).
+On November 2, 2026, a two-step ordinary LoRA check passed on the actual Aya Expanse 8B checkpoint. It used SafeTune's model loader and LoRA wrapper with a bounded PyTorch AdamW loop. This does not validate SafeTune's high-level training runner, SafeGrad, or repair. The [tracked setup summary](evidence/setup-summary.json) records the pass. The detailed `report.json`, `benign_examples.json`, and `run_script.py` remain local-only under `results/aya-8b-lora-smoke-20261102/`.
 
 - Two authored benign examples, 37 and 27 tokens including chat formatting; batch size 1. Only assistant-answer tokens contributed to the loss.
 - Rank-4 LoRA, alpha 8, learning rate 0.0001, bfloat16 base and float32 adapters, gradient checkpointing. It trained 10,485,760 adapter parameters, approximately 0.13% of the wrapped model.
@@ -226,7 +228,7 @@ To recreate the Colab setup:
 2. Choose **Upload notebook** and select `notebooks/01_safetune_setup.ipynb` from this folder.
 3. Choose **Runtime → Change runtime type → T4 GPU** (or another available GPU). Use Python 3.12+.
 4. Run sections 1–5 to install SafeTune and try its official small-model quickstart.
-5. Sign in to Hugging Face as `xtnayk` and accept the conditions on [Tiny Aya Global](https://huggingface.co/CohereLabs/tiny-aya-global).
+5. Sign in to your own Hugging Face account and accept the conditions on [Tiny Aya Global](https://huggingface.co/CohereLabs/tiny-aya-global).
 6. Create a read token in [Hugging Face token settings](https://huggingface.co/settings/tokens). Put it in Colab's **Secrets** panel as `HF_TOKEN` and enable notebook access. Keep the token out of chat and code cells.
 7. Run sections 6–7 for model access and Tiny Aya compatibility. Section 8 is an optional longer upstream quickstart trial.
 8. Download the results archive in section 9 before disconnecting, including after a failure.
@@ -242,7 +244,7 @@ The notebook is self-contained: upload just the `.ipynb` file. There is no need 
 
 SafeTune source is pinned to `26f59e6d1bdcacafe5f2be3b8d982fb214369659`. Each model run records its resolved model revision, package versions, runtime details, and actual pass/fail status. Each notebook attempt has a separate results directory. The Aya smoke check uses one model, batch size 1, and at most 32 new tokens; memory fit must be measured on the selected runtime.
 
-The Colab reference confirms that the small-model setup runs. Separate local reports verify Aya Expanse 8B inference and a two-step ordinary LoRA check on MPS. Full fine-tuning experiments, safety hardening, and repair remain unvalidated, and Tiny Aya's actual checkpoint has not been run. Local verification evidence is recorded under `results/`.
+The Colab reference confirms that the small-model setup runs. Separate local reports verify Aya Expanse 8B inference and a two-step ordinary LoRA check on MPS. Three subsequent plain LoRA experiments are documented in [Current experiment status](#current-experiment-status), with tracked evidence under `evidence/`. SafeGrad hardening, confirmed safety repair, and Tiny Aya’s actual checkpoint remain unvalidated. Detailed setup logs remain local under `results/`.
 
 ## What the checks mean
 
@@ -264,7 +266,7 @@ For later training, SafeTune's README warns that Tiny Aya's chat preamble is lon
 
 - **No GPU:** select a GPU runtime, then reconnect. If free GPUs are unavailable, retry later or discuss the brief's Kaggle fallback.
 - **Import error:** inspect `imports.log`; verify Python 3.12+ and rerun installation in a fresh runtime.
-- **401/403:** confirm you accepted the model conditions as `xtnayk`; check token access and the Colab Secrets notebook-access switch.
+- **401/403:** confirm you accepted the model conditions with the account used for your token; check token access and the Colab Secrets notebook-access switch.
 - **Xet/CAS download error:** retry in a fresh process with `HF_HUB_DISABLE_XET=1 HF_HUB_DOWNLOAD_TIMEOUT=60` before the Python command to use Hugging Face's standard HTTP downloader. This fallback successfully downloaded Aya Expanse 8B on this Mac after a Xet response-decoding error. Completed cached files are reused; preserve the failed attempt's logs and choose a new output directory.
 - **Out of memory:** restart the runtime, rerun the setup, and try only the single-model smoke check. The larger optional sweep is not necessary to establish basic loading.
 - **Crash or disconnect:** preserve the current attempt's logs. A missing or `running` report is incomplete, not a pass.
