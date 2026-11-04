@@ -26,7 +26,8 @@ PREPARED_FILES = ('config.json', 'manifest.json', 'train.jsonl', 'calibration.js
                   'development.jsonl', 'alignment.jsonl')
 RUN_FILES = ('report.json', 'steps.jsonl', 'responses.jsonl', 'auditkit-result.json',
              'training-config.json', 'prepared-config.json', 'prepared-manifest.json',
-             'training-source.py', 'evaluation-source.py', 'summary.json', 'annotations.json', 'inputs.jsonl')
+             'training-source.py', 'evaluation-source.py', 'summary.json', 'annotations.json', 'inputs.jsonl',
+             'eligibility.json', 'manifest.json')
 REVIEW_PACK_FILES = ('review-en.jsonl', 'review-ko.jsonl', 'review-zh.jsonl', 'evaluation_protocol.md')
 REVIEW_SCORE_FILES = frozenset(('review-key.json', 'combined-reviews.jsonl',
                                 'disagreements.jsonl', 'evaluation_protocol.md'))
@@ -220,6 +221,7 @@ def export_publication(project_root, output, *, prepared=None, runs=None, review
                         f'{base}: confirmation run cannot be exported')
                 pairs = [('responses_sha256', 'responses.jsonl'), ('steps_sha256', 'steps.jsonl'),
                          ('annotations_sha256', 'annotations.json'), ('inputs_sha256', 'inputs.jsonl'),
+                         ('eligibility_sha256', 'eligibility.json'),
                          ('training_script_sha256', 'training-source.py')]
                 pairs += [('config_sha256', name) for name in ('training-config.json', 'prepared-config.json')
                           if f'{base}/{name}' in selected]
@@ -231,6 +233,15 @@ def export_publication(project_root, output, *, prepared=None, runs=None, review
                         require(target in selected, f'{target}: declared run artifact missing')
                         require(report[field] == digest(selected[target][0]),
                                 f'{target}: declared run hash mismatch')
+                if f'{base}/manifest.json' in selected:
+                    run_manifest = json.loads(selected[f'{base}/manifest.json'][0])
+                    declared = run_manifest.get('files')
+                    require(isinstance(declared, dict) and bool(declared), f'{base}: invalid run manifest')
+                    for name, expected in declared.items():
+                        target = f'{base}/{name}'
+                        require(name in RUN_FILES and name != 'manifest.json' and target in selected,
+                                f'{base}: unapproved or missing run-manifest artifact')
+                        require(expected == digest(selected[target][0]), f'{target}: run-manifest hash mismatch')
 
     packs_by_hash = {}
     for alias, directory in sorted((review_packs or {}).items()):

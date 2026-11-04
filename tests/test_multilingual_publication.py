@@ -168,6 +168,26 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'declared run artifact missing'):
             self.export(runs={'plain': run})
 
+    def test_secondary_eligibility_and_manifest_are_verified(self):
+        eligibility = b'{"records": []}\n'
+        run = self.run_directory({'status': 'provisional_diagnostic',
+                                  'eligibility_sha256': hashlib.sha256(eligibility).hexdigest()})
+        (run / 'eligibility.json').write_bytes(eligibility)
+        manifest = {'files': {'eligibility.json': '0' * 64}}
+        (run / 'manifest.json').write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError, 'run-manifest hash mismatch'):
+            self.export(runs={'secondary': run})
+        manifest['files']['eligibility.json'] = hashlib.sha256(eligibility).hexdigest()
+        (run / 'manifest.json').write_text(json.dumps(manifest))
+        result = self.export(runs={'secondary': run})
+        self.assertIn('runs/secondary/eligibility.json', result['files'])
+
+    def test_run_manifest_cannot_add_unapproved_artifacts(self):
+        run = self.run_directory()
+        (run / 'manifest.json').write_text(json.dumps({'files': {'confirmation.jsonl': '0' * 64}}))
+        with self.assertRaisesRegex(ValueError, 'unapproved or missing run-manifest artifact'):
+            self.export(runs={'secondary': run})
+
     def test_input_audit_artifacts_are_bound_to_the_report(self):
         annotation = b'{"records": []}\n'
         inputs = b'{"id": "example", "request": "Explain addition."}\n'

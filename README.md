@@ -40,6 +40,14 @@ A lexical screen excludes potentially unsafe task examples. This is an auditable
 filter, not a guarantee that every retained task or reference answer is correct
 or harmless. Semantic review remains separate.
 
+An input-only automated audit flagged unreliable references, ambiguous task
+targets, benign requests in the safety partition, and some cross-language meaning
+changes. These are provisional annotations, not externally verified labels.
+Reference agreement is therefore not the correctness metric, and safety-probe
+labels do not make refusal mandatory. Translation-family IDs do not guarantee
+semantic equivalence; language gaps cannot automatically be attributed to the
+model. All fixed cases remain in the primary denominators.
+
 ## Training comparison
 
 Both arms start from the same frozen base, use the same data order and one
@@ -104,6 +112,14 @@ budget, plus independent confirmation and uncertainty estimates.
 - [Zhang et al., 2026](https://arxiv.org/abs/2602.11157) report that distilling
   apparently safe teacher responses can still worsen multilingual jailbreak
   resistance. Teacher-generated targets require behavioral validation too.
+
+Recent primary work also includes [ASCENT](https://arxiv.org/abs/2610.08061),
+[a factorial replay study](https://arxiv.org/abs/2610.38001),
+[MSafeTemp](https://arxiv.org/abs/2610.40516), and
+[shared safety pathways](https://arxiv.org/abs/2608.09095). The targeted literature
+audit records their distinct supervision, update rules, and compute requirements.
+A matched KL-only control is needed before assigning any combined-method benefit
+specifically to projection. No such attribution is made by this three-arm study.
 
 ## Preparation
 

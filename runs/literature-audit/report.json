@@ -1,0 +1,206 @@
+{
+  "report_type": "targeted_primary_literature_comparison_audit",
+  "audit_date_local": "2026-11-03",
+  "scope": "Selected recent primary methods relevant to multilingual safety-preserving fine-tuning. This is a targeted audit, not an exhaustive literature review or a best-method ranking.",
+  "evidence_policy": {
+    "browsing": "All web inspection used the gstack browse browser in an isolated session.",
+    "source_status": "Paper abstracts, relevant full-text passages, and paper-linked official repository documentation were inspected. Repository code was not executed or independently reproduced.",
+    "publication_caution": "The four selected papers are recent 2026 arXiv reports. Reported improvements are author findings within their protocols, not established results for the current experiment.",
+    "experiment_boundary": "No training code, configuration, datasets, model outputs, or held-out evaluation material was changed or inspected for this audit."
+  },
+  "current_experiment_context": {
+    "provenance": "Experiment specification supplied for this audit; not independently re-inspected.",
+    "model": "Aya Expanse 8B",
+    "precision_backend": "bfloat16 on MPS",
+    "training": "1,000 public Aya examples across English, Korean, and Chinese; rank-4 adaptation; one epoch.",
+    "comparison": "Plain fine-tuning versus a prompt-only SafeGrad variant combining reference KL, global gradient projection, and rho=1.",
+    "interpretation": "A narrow controlled comparison on one backbone, data mixture, adaptation budget, and implementation variant. It cannot establish state of the art or reproduce the original SafeGrad paper by name alone."
+  },
+  "methods": [
+    {
+      "name": "ASCENT",
+      "title": "ASCENT: First-Order Optimal Fine-Tuning with Recalibration for Safety--Utility Co-Enhancement",
+      "first_submitted": "2026-10-06",
+      "inspected_version": "v1",
+      "sources": [
+        {
+          "type": "primary_paper_metadata",
+          "url": "https://arxiv.org/abs/2610.08061"
+        },
+        {
+          "type": "primary_paper_full_text",
+          "url": "https://arxiv.org/html/2610.08061v1"
+        },
+        {
+          "type": "paper_linked_official_code",
+          "url": "https://github.com/ZJU-LLM-Safety/ASCENT"
+        }
+      ],
+      "brief_paraphrase": "Estimates a safety gradient from harmful prompts and a differentiable safety judge, forms a low-rank calibration update from its leading singular components, suppresses safety-conflicting task-update components, and periodically recalibrates. The paper evaluates several model families and task benchmarks with matched rank-32 LoRA settings.",
+      "method_vs_current": "Both modify task updates using safety-related information, but ASCENT uses an external judge, explicit safety-improving calibration, matrix-space structure, and periodic refresh. The current prompt-only reference KL and global projection do not provide that supervision or an equivalent update rule.",
+      "matched_comparison_needed": "Use the same backbone, task examples, tokenization, update budget, evaluation prompts, and safety-supervision budget. Separate calibration-only, task-constraint-only, and recalibration contributions. Compare effective full-weight updates and parameter budgets because ASCENT's corrected merged update need not retain the LoRA rank.",
+      "applicability_to_8b_mac": {
+        "assessment": "Scientifically relevant but not an immediate drop-in baseline.",
+        "observed_repository_requirement": "The official README specifies two CUDA GPUs, one each for the target model and Llama Guard, with local checkpoints.",
+        "inference": "A Mac implementation would need engineering and resource validation for the judge and calibration gradients. An Aya port and bfloat16/MPS operation were not verified. No run is recommended while the current experiment is frozen."
+      },
+      "known_claim_limits": [
+        "The first-order optimality result applies to a local approximation under specified rank and norm constraints, not a guarantee of global behavioral safety.",
+        "The inspected evaluation does not demonstrate the current Aya English/Korean/Chinese setting.",
+        "Numbers in its paper are not comparable to the current run without a matched protocol."
+      ],
+      "next_scientifically_useful_control": "First isolate the current method's reference KL from projection. A later ASCENT comparison should match safety supervision and include calibration-only and fixed-versus-refreshed controls."
+    },
+    {
+      "name": "Factorial replay: ER, DER, and DER++",
+      "title": "Preserving Safety During Sequential Fine-Tuning: A Factorial and Geometric Analysis of Replay",
+      "first_submitted": "2026-10-27",
+      "inspected_version": "v1",
+      "sources": [
+        {
+          "type": "primary_paper_metadata",
+          "url": "https://arxiv.org/abs/2610.38001"
+        },
+        {
+          "type": "primary_paper_full_text",
+          "url": "https://arxiv.org/html/2610.38001v1"
+        },
+        {
+          "type": "paper_linked_official_code",
+          "url": "https://github.com/gruellan/preserving_safety_sequential_finetuning"
+        }
+      ],
+      "brief_paraphrase": "Separates supervised replay exposure from frozen-base logit distillation during sequential LoRA adaptation. The fixed replay buffer includes harmful-prompt refusals and benign-compliance responses. Supervised exposure produces stronger refusal but greater over-refusal; distillation more closely retains the base model's behavior. The study includes a procedural Matched Plain control.",
+      "method_vs_current": "Its distillation term uses cached base logits on replay response positions with mean-squared error. That differs from prompt-only KL on the current training inputs. Its supervised replay adds supplied response targets, which the current reference-preservation objective does not. The study also shows that retention of a refusal direction need not track behavioral safety.",
+      "matched_comparison_needed": "Hold buffer content, mixed-batch scheduling, token and optimizer-update budgets, and adapter settings fixed while enabling exposure, distillation, both, or neither. Evaluate harmful compliance, benign over-refusal, and task capability together. A response-token KL adaptation should be labeled as an adaptation, not a reproduction of DER.",
+      "applicability_to_8b_mac": {
+        "assessment": "The control structure is readily transferable conceptually; the released implementation is not verified on Mac.",
+        "observed_repository_requirement": "The README requires an NVIDIA GPU, describes use of an A100 80GB, and caches teacher logits before training.",
+        "inference": "Caching teacher outputs could avoid simultaneous teacher/student model residency, but storage scales with response length and vocabulary. A bounded future adaptation may be practical after memory and storage measurement."
+      },
+      "known_claim_limits": [
+        "The principal setting is sequential adaptation of Mistral and Llama using rank-16 adapters and larger task datasets, not one-epoch rank-4 Aya adaptation.",
+        "Preserving base logits can preserve the base model's harmful compliance as well as its safe behavior.",
+        "Lower harmful-compliance rates can be accompanied by substantial benign over-refusal."
+      ],
+      "next_scientifically_useful_control": "Add a matched KL-only arm before attributing any benefit to gradient projection. In a later separate experiment, compare prompt-token versus response-token anchoring and report benign over-refusal."
+    },
+    {
+      "name": "MSafeTemp",
+      "title": "How I Aligned Your Model: Scaling Up Multilingual Safety Training with Templates",
+      "first_submitted": "2026-10-29",
+      "inspected_version": "v1",
+      "sources": [
+        {
+          "type": "primary_paper_metadata",
+          "url": "https://arxiv.org/abs/2610.40516"
+        },
+        {
+          "type": "primary_paper_full_text",
+          "url": "https://arxiv.org/html/2610.40516v1"
+        },
+        {
+          "type": "paper_linked_official_code",
+          "url": "https://github.com/swiss-ai/msafetemp"
+        },
+        {
+          "type": "paper_linked_dataset_reference_not_downloaded",
+          "url": "https://huggingface.co/datasets/swiss-ai/MSafeTemp"
+        }
+      ],
+      "brief_paraphrase": "Builds multilingual safety data from reusable templates, culturally localized fills, and matched benign requests across 60 languages. Its model-training recipe mixes safety and general instruction examples for SFT, then applies on-policy DPO. The paper reports that translated and culturally localized tests reveal different failures.",
+      "method_vs_current": "This is chiefly a data and alignment recipe, not a gradient-preservation method. It supplies multilingual refusal and benign-compliance targets and a preference stage, whereas the current task uses public Aya instruction data and reference preservation.",
+      "matched_comparison_needed": "To test the data contribution, compare translation-only with culturally localized data under equal source-seed counts, language balance, training tokens, and optimizer budgets. Split by original seed before creating variants to prevent descendants crossing train and evaluation. Separate SFT and DPO effects.",
+      "applicability_to_8b_mac": {
+        "assessment": "A small data-reuse or evaluation-control study may fit a future local experiment; reproducing the full pipeline is a substantially larger project.",
+        "observed_repository_requirement": "The repository supports TRL training and OpenAI-compatible model endpoints. Its default generator and judges are large models; training examples include distributed cluster workflows.",
+        "inference": "Using a carefully bounded released subset avoids regenerating the full corpus. Full SFT plus on-policy sampling and DPO would exceed the present experiment's training budget and would require independent backend validation."
+      },
+      "known_claim_limits": [
+        "The paper relies heavily on automated generation and judging, with limited human coverage.",
+        "Its stated limitations include fixed single-turn templates, inherited harm labels, SFT over-refusal, and some general-capability degradation.",
+        "The current three-language result cannot establish coverage of culturally localized requests or low-resource languages generally."
+      ],
+      "next_scientifically_useful_control": "For a separately preregistered evaluation, distinguish direct translations from localized variants and include paired benign requests. Keep all variants of one seed in the same split and do not repurpose the current held-out set."
+    },
+    {
+      "name": "Shared safety pathways",
+      "title": "Who Bridges Safety? Identifying and Targeting Cross-Lingual Shared Safety Pathways",
+      "first_submitted": "2026-08-10",
+      "last_revised": "2026-09-30",
+      "inspected_version": "v2",
+      "sources": [
+        {
+          "type": "primary_paper_metadata",
+          "url": "https://arxiv.org/abs/2608.09095"
+        },
+        {
+          "type": "primary_paper_full_text",
+          "url": "https://arxiv.org/html/2608.09095v2"
+        },
+        {
+          "type": "paper_linked_official_code",
+          "url": "https://github.com/msy0513/shared-safety-pathways"
+        }
+      ],
+      "brief_paraphrase": "Identifies language-specific safety neurons and their cross-layer relationships, then updates only parameters belonging to an English safety pathway using multilingual safety supervision. The paper tests size-matched random pathways and leave-one-language-out transfer. The official repository includes English, Chinese, and Korean among its supported languages.",
+      "method_vs_current": "It restricts where parameters can change using activation attribution and interventions, and adds multilingual safety targets. The current global gradient projection does not identify layer-specific or language-specific pathways. Both pursue restricted updates, but their supervision, parameterization, and mechanisms differ.",
+      "matched_comparison_needed": "Match the multilingual safety corpus, effective batch size, sequence length, optimizer budget, and updated-parameter count. Compare targeted pathways with size-matched random masks and ordinary LoRA. Include held-out-language transfer and per-language safety, over-refusal, and utility.",
+      "applicability_to_8b_mac": {
+        "assessment": "A relevant longer-term research comparator, with substantial implementation and calibration cost.",
+        "observed_repository_requirement": "The README supports Gemma-2-9B and Llama-3.1-8B, specifies a single 80GB GPU, and identifies per-neuron intervention as the most expensive stage.",
+        "inference": "An Aya port requires validating architecture-specific FFN hooks and masking. Updating under 1% of parameters does not imply low total activation, attribution, or optimizer memory. Mac feasibility has not been demonstrated."
+      },
+      "known_claim_limits": [
+        "The method's reported parameter efficiency excludes the practical cost of pathway identification.",
+        "English/Korean/Chinese overlap in language coverage does not make results on different backbones directly comparable.",
+        "Its safety supervision and leave-one-language-out protocol address transfer questions absent from the current two-arm experiment."
+      ],
+      "next_scientifically_useful_control": "Before implementing pathways, use per-language metrics and a future English-only versus multilingual anchoring comparison to determine whether one language's safety signal hides regressions in another."
+    }
+  ],
+  "next_control_priority": [
+    {
+      "priority": 1,
+      "control": "Matched reference-KL-only arm",
+      "reason": "It separates reference anchoring from the incremental contribution of global projection.",
+      "keep_matched": "Backbone checkpoint, data order, examples, formatting, rank, optimizer, learning rate, schedule, batch size, update count, precision, and evaluation protocol.",
+      "timing": "A subsequent experiment after the frozen comparison completes; do not modify the current run."
+    },
+    {
+      "priority": 2,
+      "control": "Task-adaptation strength control",
+      "reason": "A smaller learning rate or update norm may preserve safety by suppressing all learning. Compare safety at matched utility or adaptation strength before claiming a favorable trade-off.",
+      "keep_matched": "Use the same task data and prespecified evaluation. Count all training steps and safety-computation overhead."
+    },
+    {
+      "priority": 3,
+      "control": "Supervision-location and language controls",
+      "reason": "Prompt-only distribution preservation need not preserve generated response behavior, and aggregate projection need not protect every language.",
+      "design": "In separate preregistered runs, compare prompt-only versus response-token anchoring and English-only versus multilingual anchors using disjoint calibration data."
+    },
+    {
+      "priority": 4,
+      "control": "Behavioral evaluation and repeatability",
+      "reason": "Safety retention requires joint evidence on harmful compliance, benign over-refusal, and task utility; single-run differences can reflect sampling or optimization noise.",
+      "design": "Use the frozen evaluation as planned, then assess multiple seeds and paired uncertainty, report language-specific and worst-language results, and validate the judge on a blinded multilingual sample. Keep development/calibration separate from final evaluation."
+    }
+  ],
+  "claim_boundary": {
+    "supported_if_evaluation_succeeds": "A measured safety/utility difference between two specified fine-tuning configurations on one model and three languages under the frozen protocol.",
+    "not_supported_by_this_audit": [
+      "A state-of-the-art claim.",
+      "An exhaustive claim to have compared the best available methods.",
+      "General multilingual safety, low-resource transfer, cultural coverage, or resistance to adaptive attacks.",
+      "A causal claim that projection caused improvement without a KL-only control.",
+      "A guarantee that prompt-only reference KL preserves response safety.",
+      "A hardware-efficiency or practical-superiority claim without counting calibration, reference passes, and evaluation costs.",
+      "A claim that any selected official implementation runs unchanged on Aya Expanse 8B with MPS."
+    ]
+  },
+  "operational_notes": {
+    "search_limitation": "A general web-search query encountered a bot challenge. Discovery proceeded through arXiv's browser search and paper-linked repositories. This narrows search coverage and is another reason not to describe the audit as exhaustive.",
+    "execution_status": "Literature inspection only. No new model run, model download, external message, dependency installation, or dataset access was performed.",
+    "durable_learning_review": "No new durable project-specific learning was identified beyond the already supplied browser-isolation precaution."
+  }
+}
