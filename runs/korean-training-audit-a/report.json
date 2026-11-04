@@ -1,0 +1,121 @@
+{
+  "audit_type": "provisional_automated_training_data_audit",
+  "audit_date": "2026-11-04",
+  "source": "results/multilingual-prepared-eager-20261103/train.jsonl",
+  "source_train_sha256": "22ec4439165376520c56361bb8269d1de1ff0534d0a0d84fb45afc102c6ffe9a",
+  "selection": {
+    "language": "ko",
+    "records": 100,
+    "unique_ids": 100
+  },
+  "annotations_file": "annotations.json",
+  "annotations_sha256": "afbf7a44ace401d3d3cff2765f57c1f16fbe90ecd8743f53074fb9355d647c17",
+  "counts": {
+    "quality": {
+      "usable": 42,
+      "unclear": 28,
+      "incorrect": 19,
+      "ambiguous": 11
+    },
+    "safety": {
+      "benign": 98,
+      "unsafe": 2
+    },
+    "usable_and_benign": 42
+  },
+  "rubric": {
+    "quality": {
+      "usable": "An accurate, helpful target that satisfies the request; minor non-material wording flaws may remain.",
+      "incorrect": "A serious factual, unsupported-content, language, format, or instruction-following error is identifiable.",
+      "ambiguous": "Missing context or unresolved interpretations prevent a unique or well-scoped target judgment.",
+      "unclear": "Verification was insufficient for a confident judgment."
+    },
+    "safety": {
+      "benign": "No harmful assistance or materially hazardous recommendation identified in the request/reference pair.",
+      "unsafe": "Materially hazardous advice or information identified, including misleading emergency assessment.",
+      "unclear": "Available evidence is insufficient to resolve safety."
+    }
+  },
+  "method": [
+    "Read all selected request/reference pairs and their exact source IDs.",
+    "Used supplied context for passage-grounded extraction and general knowledge for straightforward language and factual tasks.",
+    "Conducted limited external reference checks through gstack browse in an isolated browser state.",
+    "Made no corrected targets, dataset edits, filtering operations, or training runs."
+  ],
+  "principal_observations": [
+    {
+      "issue": "Unanswered requests, contradictory explanations, corrupt names, and mistranslated technical terminology",
+      "example_ids": [
+        "aya-train-045484",
+        "aya-train-012055",
+        "aya-train-075972",
+        "aya-train-052424",
+        "aya-train-055900"
+      ]
+    },
+    {
+      "issue": "Hazardous medical or animal-care information",
+      "example_ids": [
+        "aya-train-183343",
+        "aya-train-038893"
+      ]
+    },
+    {
+      "issue": "Unverified health-benefit and health-risk claims",
+      "example_ids": [
+        "aya-train-154168",
+        "aya-train-182487",
+        "aya-train-088078"
+      ]
+    },
+    {
+      "issue": "Unidentified subjects and ambiguous passage continuations",
+      "example_ids": [
+        "aya-train-140029",
+        "aya-train-095781"
+      ]
+    },
+    {
+      "issue": "Repeated or closely related prompts with differing targets",
+      "example_ids": [
+        "aya-train-117690",
+        "aya-train-016884",
+        "aya-train-112382",
+        "aya-train-045484",
+        "aya-train-182487",
+        "aya-train-022120",
+        "aya-train-039423"
+      ]
+    }
+  ],
+  "references_checked": [
+    {
+      "url": "https://www.who.int/news-room/questions-and-answers/item/radiation-electromagnetic-fields",
+      "title": "WHO: Radiation: Electromagnetic fields",
+      "relevance": "General mechanisms, uncertainty, reported symptoms, and childhood leukemia association; used for limited checks of electromagnetic-field items."
+    },
+    {
+      "url": "https://www.merckvetmanual.com/exotic-and-laboratory-animals/reptiles/clinical-procedures-for-reptiles",
+      "title": "Merck Veterinary Manual: Clinical Procedures for Reptiles",
+      "relevance": "Distinguishes oral rehydration for mild cases or alert reptiles from routes favored in moderate to severe dehydration."
+    },
+    {
+      "url": "https://www.merckvetmanual.com/exotic-and-laboratory-animals/reptiles/environmental-diseases-and-traumatic-injuries-of-reptiles",
+      "title": "Merck Veterinary Manual: Environmental Diseases and Traumatic Injuries of Reptiles",
+      "relevance": "Retained shedding can have several causes and is not diagnostically specific."
+    },
+    {
+      "url": "https://www.msdmanuals.com/professional/neurologic-disorders/coma-and-impaired-consciousness/overview-of-coma-and-impaired-consciousness",
+      "title": "MSD Manual: Overview of Coma and Impaired Consciousness",
+      "relevance": "Pupillary responses can remain present in toxic-metabolic coma."
+    }
+  ],
+  "limitations": [
+    "These are provisional automated judgments from one reviewer, not independent human or native-speaker validation.",
+    "Only the 100 Korean training records were in scope. No development, calibration, confirmation, model-output, review-pack, score, or existing evaluation-annotation material was inspected.",
+    "External verification was limited, not exhaustive. Several requested pages were unavailable and a search attempt was blocked; unresolved claims were retained as unclear.",
+    "The source lacks dates or identifying context for some current-policy, career, health, and historical questions; apparent plausibility was not treated as verification of detailed niche claims.",
+    "Safety labels concern the supplied pair and do not establish clinical correctness for every benign item.",
+    "Counts describe this fixed training subset only. No model improvement, held-out performance, or benefit from filtering has been measured or claimed."
+  ]
+}

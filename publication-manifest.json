@@ -16,8 +16,8 @@
       "source_relative_path": ".gitignore"
     },
     "README.md": {
-      "sha256": "2d2df8fb63a020839d6567e745a5459a623be571c5bcc4f6256082cc9763dbda",
-      "bytes": 16286,
+      "sha256": "02e745cb04b976fe9b19ca0199925fa00a7749c83a6f1b58aba56169671860f2",
+      "bytes": 16982,
       "source_relative_path": "experiments/multilingual_repair/README.md"
     },
     "data/corpus/alignment.jsonl": {
@@ -56,8 +56,8 @@
       "source_relative_path": "experiments/multilingual_repair/DATA_ATTRIBUTION.md"
     },
     "experiments/multilingual_repair/README.md": {
-      "sha256": "2d2df8fb63a020839d6567e745a5459a623be571c5bcc4f6256082cc9763dbda",
-      "bytes": 16286,
+      "sha256": "02e745cb04b976fe9b19ca0199925fa00a7749c83a6f1b58aba56169671860f2",
+      "bytes": 16982,
       "source_relative_path": "experiments/multilingual_repair/README.md"
     },
     "experiments/multilingual_repair/audit_semantic_reviews.py": {
@@ -289,6 +289,36 @@
       "sha256": "0ff5d88edb1e2fad1a8c09ef7877afd1083da158eb0a011aae55ca350237f1f9",
       "bytes": 2150,
       "source_relative_path": "results/multilingual-development-prompt-audit-20261103/report.json"
+    },
+    "runs/korean-training-audit-a/annotations.json": {
+      "sha256": "afbf7a44ace401d3d3cff2765f57c1f16fbe90ecd8743f53074fb9355d647c17",
+      "bytes": 23540,
+      "source_relative_path": "results/multilingual-korean-training-audit-20261104/annotations.json"
+    },
+    "runs/korean-training-audit-a/report.json": {
+      "sha256": "077307fe5642bed83dc9925503ca5004e548ef5b4d767d4bddd68d73bcb13bb7",
+      "bytes": 5501,
+      "source_relative_path": "results/multilingual-korean-training-audit-20261104/report.json"
+    },
+    "runs/korean-training-audit-b/annotations.json": {
+      "sha256": "1a503e72c07f7739c65784ecb50689a8256e712971b9afb470037ab5332b1789",
+      "bytes": 25147,
+      "source_relative_path": "results/multilingual-korean-training-audit-b-20261104/annotations.json"
+    },
+    "runs/korean-training-audit-b/report.json": {
+      "sha256": "7eeb863a55a2ca073b0036efdc804a7f0e9ea282b63fb734ace4041b516691a2",
+      "bytes": 6908,
+      "source_relative_path": "results/multilingual-korean-training-audit-b-20261104/report.json"
+    },
+    "runs/korean-training-audit-consensus/annotations.json": {
+      "sha256": "65bece85b0932a8074ffc06c15b4ec3ce20df9206db6db0e0fd50df87c9f8316",
+      "bytes": 32633,
+      "source_relative_path": "results/multilingual-korean-training-audit-consensus-20261104/annotations.json"
+    },
+    "runs/korean-training-audit-consensus/report.json": {
+      "sha256": "5a2dd8b50092734098e2f7a37fa0a49faad542f49cb746bf4c9acdbe2365725d",
+      "bytes": 2658,
+      "source_relative_path": "results/multilingual-korean-training-audit-consensus-20261104/report.json"
     },
     "runs/literature-audit/report.json": {
       "sha256": "576cb6a6e494acbf63a98d729195c28150743c2932d405307c3eecd2553c79b2",

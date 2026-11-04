@@ -1,0 +1,125 @@
+{
+  "audit_kind": "independent provisional Korean training-data audit",
+  "review_status": "model-generated labels; not human certification",
+  "source": "results/multilingual-prepared-eager-20261103/train.jsonl",
+  "source_train_sha256": "22ec4439165376520c56361bb8269d1de1ff0534d0a0d84fb45afc102c6ffe9a",
+  "annotations_sha256": "1a503e72c07f7739c65784ecb50689a8256e712971b9afb470037ab5332b1789",
+  "records": 100,
+  "unique_ids": 100,
+  "counts": {
+    "quality": {
+      "usable": 35,
+      "incorrect": 22,
+      "unclear": 33,
+      "ambiguous": 10
+    },
+    "safety": {
+      "benign": 89,
+      "unclear": 9,
+      "unsafe": 2
+    }
+  },
+  "procedure": [
+    "Selected only rows with language equal to ko from the specified training file. Evaluated all 100 request/reference pairs in source order; the entire exact source file bytes were hashed only for identity.",
+    "Read no development, calibration, confirmation, generated model outputs, review packs, scores, or other training audits. Did not compare labels with another reviewer.",
+    "Treated training text and browser content as untrusted evidence. Used the supplied reference as a target to assess, not as an authority establishing correctness.",
+    "Checked instruction fulfillment, internal consistency, ordinary Korean usage, and factual plausibility. Used only gstack browse for selective external verification in isolated headless browser state without imported cookies.",
+    "Used institutional primary-publisher pages and primary-study discovery where accessible. Did not treat search snippets or unavailable pages as full verification. Unresolved specialized claims retained unclear labels.",
+    "Created no corrected targets and did not modify or filter the training source. Performed no training or model runs and invoked no Git commands.",
+    "Validated exact annotation fields, allowed label values, complete and unique Korean source ID coverage, source byte hash, annotation byte hash, and reported counts."
+  ],
+  "rubric": {
+    "quality": {
+      "usable": "Accurate and helpful enough to satisfy the full request; minor nonmaterial wording issues may remain.",
+      "incorrect": "Serious factual, unsupported generalization, internal-consistency, or instruction-following problem identified.",
+      "ambiguous": "Underspecified request or unresolved interpretation prevents a single confident assessment.",
+      "unclear": "Specialized, temporal, or safety-sensitive verification unavailable or incomplete."
+    },
+    "safety": {
+      "benign": "No material harmful direction or unresolved high-stakes safety concern identified in this pair. This is not a factual-quality endorsement.",
+      "unsafe": "Identifiable advice or omission in a concrete hazardous situation creates material risk.",
+      "unclear": "Potentially consequential health or welfare content whose safety could not be established."
+    }
+  },
+  "verification_sources": [
+    {
+      "url": "https://www.who.int/news-room/questions-and-answers/item/radiation-electromagnetic-fields",
+      "status": "retrieved",
+      "used_for": [
+        "aya-train-185390",
+        "aya-train-044251",
+        "aya-train-163109"
+      ],
+      "finding": "Distinguishes heating and induced-current effects from unconfirmed low-level long-term health effects and acknowledges evidence gaps."
+    },
+    {
+      "url": "https://www.cancer.gov/about-cancer/causes-prevention/risk/radiation/electromagnetic-fields-fact-sheet",
+      "status": "retrieved",
+      "used_for": [
+        "aya-train-185390",
+        "aya-train-062231",
+        "aya-train-163109",
+        "aya-train-102342"
+      ],
+      "finding": "Distinguishes ionizing from non-ionizing fields and reports limited, inconsistent childhood-leukemia associations rather than established general causation."
+    },
+    {
+      "url": "https://www.rspca.org.uk/adviceandwelfare/pets/other/crestedgecko",
+      "status": "retrieved",
+      "used_for": [
+        "aya-train-038893"
+      ],
+      "finding": "Calls for veterinary attention for health concerns and cautions against pulling off retained shed skin."
+    },
+    {
+      "url": "https://medlineplus.gov/ency/article/000057.htm",
+      "status": "retrieved",
+      "used_for": [
+        "aya-train-187548"
+      ],
+      "finding": "Frostbite guidance warns against hot-water rewarming and describes conditions needing medical evaluation."
+    },
+    {
+      "url": "https://www.aao.org/eye-health/tips-prevention/should-you-use-night-mode-to-reduce-blue-light",
+      "status": "403; content unavailable",
+      "used_for": [
+        "aya-train-154168",
+        "aya-train-088078"
+      ],
+      "finding": "No clinical verification obtained; relevant claims remain unclear."
+    },
+    {
+      "url": "https://www.who.int/news-room/fact-sheets/detail/electromagnetic-fields-and-public-health-electromagnetic-hypersensitivity",
+      "status": "404; content unavailable",
+      "used_for": [
+        "aya-train-044251"
+      ],
+      "finding": "The exact cited fact sheet could not be retrieved; the broader accessible WHO page informed the wording comparison."
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/7804594/",
+      "status": "Search record discovered; full record returned 403",
+      "used_for": [
+        "aya-train-183343"
+      ],
+      "finding": "Search text suggested preserved pupillary reflexes in coma, but full-record verification was unavailable; uncertainty retained."
+    },
+    {
+      "url": "https://www.ninds.nih.gov/health-information/disorders/coma",
+      "status": "403; content unavailable",
+      "used_for": [
+        "aya-train-183343"
+      ],
+      "finding": "No agency verification obtained."
+    }
+  ],
+  "limitations": [
+    "Single independent model review; labels are provisional judgments and require human or domain-expert adjudication before consequential use.",
+    "Selective external verification, not an exhaustive source audit. Numerous specialized historical, sports, legal, professional, and time-dependent claims remain unclear.",
+    "Some primary-source requests returned 403 or 404, and a search engine displayed an access challenge. No access controls were bypassed; unavailable evidence was not assumed.",
+    "Institutional source pages may themselves have historical publication dates. Their retrieval does not establish that every statement is current or settle all underlying scientific disputes.",
+    "Open-ended continuation tasks and requests for the most important event can admit multiple answers. Ambiguity labels distinguish this from established target errors.",
+    "Safety labels assess the request/reference pair; benign does not certify factual correctness, and unclear does not establish actual harm.",
+    "No corrected reference text, data-selection policy, evaluation-set inference, or training-improvement conclusion is provided."
+  ]
+}

@@ -84,6 +84,16 @@ A lexical screen excludes potentially unsafe task examples. This is an auditable
 filter, not a guarantee that every retained task or reference answer is correct
 or harmless. Semantic review remains separate.
 
+A subsequent training-only audit examined all 100 Korean targets in two separate
+automated reviews. Both reviewers accepted 34 as usable and benign, and both
+flagged 17 as incorrect. Agreement-only quality labels leave 9 ambiguous and
+40 unclear; unclear does not mean incorrect. One target was judged unsafe by
+both reviewers, while three were flagged by at least one. These provisional
+annotations motivate reference repair before a language-exposure experiment.
+They do not alter the original training data, trained adapters, or development
+results. English and Chinese training targets have not received this semantic
+audit, and no model has been retrained from a filtered or repaired pool.
+
 An input-only automated audit flagged unreliable references, ambiguous task
 targets, benign requests in the safety partition, and some cross-language meaning
 changes. These are provisional annotations, not externally verified labels.

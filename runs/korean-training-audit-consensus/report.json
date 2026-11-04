@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "status": "completed_provisional_training_only_audit",
+  "source_train_sha256": "22ec4439165376520c56361bb8269d1de1ff0534d0a0d84fb45afc102c6ffe9a",
+  "annotations_sha256": "65bece85b0932a8074ffc06c15b4ec3ce20df9206db6db0e0fd50df87c9f8316",
+  "source_audit_hashes": {
+    "audit_1": {
+      "report_sha256": "077307fe5642bed83dc9925503ca5004e548ef5b4d767d4bddd68d73bcb13bb7",
+      "annotations_sha256": "afbf7a44ace401d3d3cff2765f57c1f16fbe90ecd8743f53074fb9355d647c17"
+    },
+    "audit_2": {
+      "report_sha256": "7eeb863a55a2ca073b0036efdc804a7f0e9ea282b63fb734ace4041b516691a2",
+      "annotations_sha256": "1a503e72c07f7739c65784ecb50689a8256e712971b9afb470037ab5332b1789"
+    }
+  },
+  "rows": 100,
+  "individual_counts": {
+    "audit_1": {
+      "quality": {
+        "usable": 42,
+        "unclear": 28,
+        "incorrect": 19,
+        "ambiguous": 11
+      },
+      "safety": {
+        "benign": 98,
+        "unsafe": 2
+      }
+    },
+    "audit_2": {
+      "quality": {
+        "usable": 35,
+        "incorrect": 22,
+        "unclear": 33,
+        "ambiguous": 10
+      },
+      "safety": {
+        "benign": 89,
+        "unclear": 9,
+        "unsafe": 2
+      }
+    }
+  },
+  "counts": {
+    "consensus_quality": {
+      "usable": 34,
+      "unclear": 40,
+      "incorrect": 17,
+      "ambiguous": 9
+    },
+    "consensus_safety": {
+      "benign": 89,
+      "unclear": 10,
+      "unsafe": 1
+    },
+    "both_usable_and_benign": 34,
+    "both_flagged_incorrect": 17,
+    "either_flagged_unsafe": 3,
+    "quality_disagreements": 13,
+    "safety_disagreements": 10
+  },
+  "combination_rule": "Agreement retains each field; disagreement becomes unclear. Both-usable-and-benign requires both reviewers to supply both exact labels. Original individual labels retained.",
+  "source_training_data_modified": false,
+  "filter_applied": false,
+  "new_training_run_started": false,
+  "human_validation_claimed": false,
+  "limitations": [
+    "Two separately produced automated reviews can share model errors; consensus is not factual certification.",
+    "Unclear or ambiguous examples are not automatically incorrect.",
+    "English and Chinese training targets were not semantically reviewed in this audit.",
+    "No development, calibration, or confirmation text was supplied to the training-data reviewers.",
+    "Target-quality observations do not prove a filtering, reference-repair, or resampling method improves a model."
+  ],
+  "next_experimental_priority": "Repair and independently verify problematic training references before testing balanced language exposure; do not use development answers as training targets."
+}

@@ -1,0 +1,602 @@
+[
+  {
+    "id": "aya-train-196923",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Grammatically completes the passage and gives the conventional 793–1066 Viking-age span; no material error identified."
+  },
+  {
+    "id": "aya-train-185390",
+    "quality": "incorrect",
+    "safety": "unclear",
+    "notes": "The broad electromagnetic-radiation answer omits ionizing injury and describes nonthermal effects as occurring while also claiming no supporting research; WHO and NCI distinguish frequency, exposure, and evidence."
+  },
+  {
+    "id": "aya-train-050274",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The continuation adds specific Fourth Crusade chronology, motives, and the direction of Zara’s rebellion; these historical details were not independently verified."
+  },
+  {
+    "id": "aya-train-076945",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Treats an undefined stage between Narrow AI and General AI as established fact and makes superintelligence the general goal of AI research without qualification."
+  },
+  {
+    "id": "aya-train-119764",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Provides a relevant, practical list of common dormitory supplies in Korean."
+  },
+  {
+    "id": "aya-train-186512",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "The supplied passage already ends as a complete sentence and no missing segment is identified; a request for more context is defensible."
+  },
+  {
+    "id": "aya-train-031792",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly gives reduced wet-rail traction as a possible reason, limited to routes with exposed sections rather than asserting it always causes delays."
+  },
+  {
+    "id": "aya-train-117973",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Selects the February 1848 revolution, an explicit central event in the supplied passage."
+  },
+  {
+    "id": "aya-train-117690",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Alternative comedy-career routes are plausible, but the unqualified assertion that public recruitment was abolished is time-dependent and unverified."
+  },
+  {
+    "id": "aya-train-055783",
+    "quality": "incorrect",
+    "safety": "unclear",
+    "notes": "Does not establish why toothpaste is alkaline; the opening preservative claim is disconnected from the acid explanation and generalizes toothpaste chemistry and bacterial activity."
+  },
+  {
+    "id": "aya-train-044251",
+    "quality": "incorrect",
+    "safety": "unclear",
+    "notes": "Overstates the WHO evidence as proving symptoms are not caused by EMF and mainly psychological; the retrieved WHO discussion describes insufficient evidence and unresolved mechanisms."
+  },
+  {
+    "id": "aya-train-130369",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "The short continuation correctly associates Beckham with the 2000 and 2004 European Championships and completes the grammar."
+  },
+  {
+    "id": "aya-train-059734",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Adds exact 2018 playing-time and league-position claims about an unnamed goalkeeper; those specialized claims were not independently verified."
+  },
+  {
+    "id": "aya-train-053504",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Correct origin explanation is mixed with categorical claims about an uninterrupted flame, selection of runners, and a relay lasting only days, making the overall target unreliable."
+  },
+  {
+    "id": "aya-train-012055",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Denies the underground multi-year life stage, confuses nymph development, and fails to answer what cicadas eat or how they breathe underground."
+  },
+  {
+    "id": "aya-train-005111",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The precise connection between Deokhye’s title, post-annexation royal status, and rules for imperial daughters was not independently verified."
+  },
+  {
+    "id": "aya-train-136471",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Gives jurisdiction-specific tax reasoning and an 800-dollar threshold without a date; current applicability and exceptions were not verified."
+  },
+  {
+    "id": "aya-train-061544",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "The question asks about an application document that the passage does not identify; the target appropriately requests clarification instead of inventing one."
+  },
+  {
+    "id": "aya-train-016884",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The alleged current prevalence and continuing availability of broadcaster recruitment exams are time-sensitive; the detailed selection sequence is also unverified."
+  },
+  {
+    "id": "aya-train-191085",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Gives a sound concise explanation that reflected moonlight can be distinguishable against the bright daytime sky."
+  },
+  {
+    "id": "aya-train-154168",
+    "quality": "unclear",
+    "safety": "unclear",
+    "notes": "The claimed macular-degeneration prevention and inevitable eye damage from dilation require clinical support; the attempted ophthalmology source returned 403."
+  },
+  {
+    "id": "aya-train-011694",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly explains the head/seat and next-rank meanings behind 수석 and 차석."
+  },
+  {
+    "id": "aya-train-083944",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Offers a basic performance comparison and appropriately notes that actual components and game requirements determine performance; detail is limited but no serious error identified."
+  },
+  {
+    "id": "aya-train-172203",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Supplies the ordinary attention-getting device or marketing-trick meaning of gimmick; the final paraphrase is narrower but recognizably related."
+  },
+  {
+    "id": "aya-train-074847",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly names Canberra as Australia’s capital."
+  },
+  {
+    "id": "aya-train-112382",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Comedy-career suggestions are plausible, but the blanket claim that public recruitment was abolished is undated and unverified."
+  },
+  {
+    "id": "aya-train-093746",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Conflates the child-bride arrangement with a couple returning to the bride’s household and asserts an unsupported derivation of 민 from 미리."
+  },
+  {
+    "id": "aya-train-106809",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The AGI classification is definitional and version-dependent; the claim that capabilities are confined to predefined training-data scope is oversimplified and unverified."
+  },
+  {
+    "id": "aya-train-137360",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly distinguishes superintendent from deputy superintendent and answers the requested yes/no comparison."
+  },
+  {
+    "id": "aya-train-128251",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Confuses fluorescence with persistent afterglow by describing energy storage and continued light emission in darkness as the defining behavior of fluorescence."
+  },
+  {
+    "id": "aya-train-068906",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Restricts off-the-ball to attacking players and omits the requested Korean rendering; the example only partially satisfies the request."
+  },
+  {
+    "id": "aya-train-045484",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Does not answer whether the particular cream alone is adequate and substitutes generic lifestyle advice without addressing the reported dryness or product suitability."
+  },
+  {
+    "id": "aya-train-095038",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The continuation makes a specific causal historical claim about the Rhodes defeat and Dodecanese campaign; it was not independently verified."
+  },
+  {
+    "id": "aya-train-063218",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Specific dates, allegation, legal disposition, and political effect of the New Delhi affair were not independently verified."
+  },
+  {
+    "id": "aya-train-047114",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Offers tentative behavioral possibilities, acknowledges individual variation, and recommends a professional for persistent hiding instead of claiming a definite diagnosis."
+  },
+  {
+    "id": "aya-train-182487",
+    "quality": "unclear",
+    "safety": "unclear",
+    "notes": "Claims exceptional skin-regeneration and acne-scar treatment benefits for snail cream without specifying the product or evidence; efficacy and safety were not verified."
+  },
+  {
+    "id": "aya-train-022120",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Suggests plausible study and audition routes, but the claim that a theatre/film major is the most common path lacks verification."
+  },
+  {
+    "id": "aya-train-183343",
+    "quality": "unclear",
+    "safety": "unclear",
+    "notes": "The blanket assertion that unconscious people lack a pupillary light reflex is clinically suspect; primary-study search results suggested preserved reflexes, but full-record retrieval and the agency page returned 403."
+  },
+  {
+    "id": "aya-train-075972",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Calls Lauryn Williams the eventual women’s 100 m winner and contains an unresolved <unk> token plus garbled event prose; the target is unsuitable as an accurate continuation."
+  },
+  {
+    "id": "aya-train-197600",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Adds exact church construction dates, capacity, status, and fundraising details without a clear locality; these claims were not verified."
+  },
+  {
+    "id": "aya-train-149872",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly extracts the reorganization of the Dhaka branch into Bangladesh Bank from the supplied text."
+  },
+  {
+    "id": "aya-train-080390",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Uses the proverb naturally to describe favoritism toward people from the same school."
+  },
+  {
+    "id": "aya-train-187548",
+    "quality": "incorrect",
+    "safety": "unsafe",
+    "notes": "Gives an incoherent blood-mixing explanation and rules out actual freezing from the text alone while leaving hot-water rewarming uncorrected; retrieved frostbite guidance warns against hot water."
+  },
+  {
+    "id": "aya-train-062231",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Communicates reported childhood-leukemia associations as possible rather than certain; retrieved NCI guidance supports the limited-evidence classification for power-frequency magnetic fields."
+  },
+  {
+    "id": "aya-train-007675",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly extracts Crawley, West Sussex, as the club’s location from the passage."
+  },
+  {
+    "id": "aya-train-117591",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Speculative dog/cat tail-signal explanation is qualified, but the generalized canine resting posture and causal account were not verified."
+  },
+  {
+    "id": "aya-train-088078",
+    "quality": "unclear",
+    "safety": "unclear",
+    "notes": "Asserts increased myopia from prolonged dark mode without evidence; the attempted ophthalmology verification was blocked with 403."
+  },
+  {
+    "id": "aya-train-058130",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly identifies Yi I on the 5,000-won note and gives broadly accurate biographical context."
+  },
+  {
+    "id": "aya-train-143908",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly distinguishes 이에요 after consonants from contracted 예요 after vowels and supplies appropriate examples."
+  },
+  {
+    "id": "aya-train-052694",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Specific claims about military victories and the Moscow title require historical verification; an unqualified victory description for Eylau is especially questionable."
+  },
+  {
+    "id": "aya-train-052481",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly expands SaaS and explains provider-managed software access and reduced infrastructure ownership; browser-only wording is a simplification."
+  },
+  {
+    "id": "aya-train-085269",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly identifies Boston’s North End as Paul Revere’s birthplace."
+  },
+  {
+    "id": "aya-train-029186",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Makes an unsupported universal claim that nobody debuts as an entertainment MC and substitutes established celebrities’ career patterns for a usable entry route."
+  },
+  {
+    "id": "aya-train-152531",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "The buyer’s tasks and budget are absent; the target recognizes the need for fit but supplies little guidance beyond the different operating systems."
+  },
+  {
+    "id": "aya-train-059170",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Accurately explains that a laundry bag separates and supports garments to reduce friction and handling damage."
+  },
+  {
+    "id": "aya-train-038893",
+    "quality": "incorrect",
+    "safety": "unsafe",
+    "notes": "Confidently attributes severe illness to dehydration and urges forced water and shed removal without veterinary escalation; RSPCA guidance calls for urgent assessment of health concerns and warns against pulling shed skin."
+  },
+  {
+    "id": "aya-train-110071",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly explains that a song’s narrative voice need not match the singer’s gender, allowing a female singer to use 僕."
+  },
+  {
+    "id": "aya-train-069640",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "The remembered title, person, and medium do not identify a unique work; requesting more context avoids unsupported identification."
+  },
+  {
+    "id": "aya-train-041782",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The target supplies an additional battle participation claim for an unnamed Japanese battleship; the identification and history were not independently verified."
+  },
+  {
+    "id": "aya-train-046938",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The broad curated-food-court description is plausible, but franchise requirements, named locations, and claims of commercial success were not verified."
+  },
+  {
+    "id": "aya-train-057330",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Gives a useful general distinction between activity-centered training retreats and travel-centered educational trips without a serious factual problem."
+  },
+  {
+    "id": "aya-train-076515",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "The selected Potsdam Declaration is mentioned, but the passage chiefly describes island control and Soviet occupation; no importance criterion resolves the competing events."
+  },
+  {
+    "id": "aya-train-185046",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "Cloud color and estimated height do not uniquely identify dust or yellow-sand conditions; the target is too confident without location, time, weather, or an image."
+  },
+  {
+    "id": "aya-train-006917",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Claims the broad video-game definition excludes modern high-definition and most handheld systems, contradicting the ordinary category and its own framing."
+  },
+  {
+    "id": "aya-train-095265",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The supplied historical sentence is substantially garbled and the continuation adds exact Sino-French War dates; the full factual coherence was not verified."
+  },
+  {
+    "id": "aya-train-102896",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "A brief conventional conversational reply to a casual greeting, with no substantive factual or safety issue."
+  },
+  {
+    "id": "aya-train-087447",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Completes the grammar, but the claimed convention that contemporary history generally begins in either 1945 or 1989 depends on historiographical context not supplied or verified."
+  },
+  {
+    "id": "aya-train-140029",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "The prompt names only a revolution; the continuation silently assumes a particular deposed monarch and adds a biography without an antecedent."
+  },
+  {
+    "id": "aya-train-094957",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Provides a specific national medical-training sequence and residency duration without naming jurisdiction or date; the current professional requirements were not verified."
+  },
+  {
+    "id": "aya-train-057184",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly extracts trade and agriculture as the emirate’s other income sources from the supplied passage."
+  },
+  {
+    "id": "aya-train-052424",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "The central pathogen-versus-healthy-tissue explanation is relevant, but the added classification includes the nonstandard mistranslated term 융성 면역 and makes the full target unreliable."
+  },
+  {
+    "id": "aya-train-017586",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Specific Tokyo emblem-selection and withdrawal dates and attribution require historical verification that was not completed."
+  },
+  {
+    "id": "aya-train-023545",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Presents fare, duration, and lack of intermediate stops as categorical distinctions; these do not reliably define the two bus services and leave the highway question inadequately explained."
+  },
+  {
+    "id": "aya-train-116485",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Faithfully identifies both explicit first-time Champions League achievements described in the supplied text."
+  },
+  {
+    "id": "aya-train-055130",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Reverses the sun’s seasonal movement at the autumn equinox and does not answer the imminent vacation question; the fixed September 22 framing is also overconfident."
+  },
+  {
+    "id": "aya-train-000976",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Reduces becoming any singer to an appearance-and-dance-based agency trainee path and implies that entry into a debut group guarantees debut."
+  },
+  {
+    "id": "aya-train-163109",
+    "quality": "unclear",
+    "safety": "unclear",
+    "notes": "The prompt and continuation generalize children’s susceptibility and carcinogenicity across electromagnetic radiation; retrieved sources distinguish field types, exposure levels, and limited evidence, leaving this broad assertion unresolved."
+  },
+  {
+    "id": "aya-train-037747",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Explains the relevant life-safety reason that hot smoke accumulates overhead, supporting staying low; the vapor-specific-gravity terminology is imprecise."
+  },
+  {
+    "id": "aya-train-037512",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly distinguishes fleeing disaster from fleeing war or civil turmoil, with suitable examples."
+  },
+  {
+    "id": "aya-train-102652",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Country counts and the asserted connection between yellow/red boxes and service speed are undated and unverified; the answer only partly explains the color choice."
+  },
+  {
+    "id": "aya-train-060783",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly selects the mobile phone as the device using the radio portion of the electromagnetic spectrum for communication."
+  },
+  {
+    "id": "aya-train-020144",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The suggestion to seek a school offering oil/acrylic instruction is sensible, but the broad claim that ordinary art schools rarely teach it lacks verification."
+  },
+  {
+    "id": "aya-train-055900",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Names a Taito-developed and Taito-sold game as Nintendo’s first game; the target itself identifies the conflicting company attribution."
+  },
+  {
+    "id": "aya-train-093869",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly rejects 이였다 for the intended copular past form and distinguishes the standard consonant/vowel examples."
+  },
+  {
+    "id": "aya-train-095781",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "No game title or identifying source is supplied, so the Stalingrad mission cannot be uniquely inferred from the generic demo description."
+  },
+  {
+    "id": "aya-train-102342",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "The general base-station evidence is consistent with retrieved NCI guidance, but the undated claim that mobile phones have been widespread for only about 20 years is stale and the exact WHO attribution was not verified."
+  },
+  {
+    "id": "aya-train-081989",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "The question may concern the Korean word’s etymology or the underlying Christian term; the answer silently switches to a Greek origin without resolving that distinction."
+  },
+  {
+    "id": "aya-train-160648",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Confuses prey with lower predators, defines plankton almost exclusively as animal young, and overgeneralizes anchovy predators as nearly all fish."
+  },
+  {
+    "id": "aya-train-152998",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Accurately describes common marine-pollution and ingestion/entanglement risks of discarded disposable cups at a general level."
+  },
+  {
+    "id": "aya-train-038109",
+    "quality": "ambiguous",
+    "safety": "benign",
+    "notes": "Returning to Athens is stated, but European Championship qualification and coaching titles are stronger competing events; the unspecified importance criterion leaves the selection unresolved."
+  },
+  {
+    "id": "aya-train-041252",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly gives the approximate budget figure asked for, consistent with the passage’s statement that the amount exceeded 540 million dollars."
+  },
+  {
+    "id": "aya-train-093839",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Adds particular claims about Charles IV’s injuries and escape at Crécy; these details were not independently verified."
+  },
+  {
+    "id": "aya-train-077432",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Specific composition dates, reception, suppression, and asserted personal psychological consequences for Franck were not independently verified."
+  },
+  {
+    "id": "aya-train-000626",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Provides a natural example of the requested flirtation idiom; the generic illustrative sentence does not target an identifiable person."
+  },
+  {
+    "id": "aya-train-039423",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Several acting routes are plausible, but the implied low-budget-to-high-budget hierarchy and claims about most actors’ beginnings are broad and unverified."
+  },
+  {
+    "id": "aya-train-061798",
+    "quality": "unclear",
+    "safety": "benign",
+    "notes": "Adds exclusions from an unnamed Egyptian king list; the exact identification, counts, and excluded dynasties were not verified."
+  },
+  {
+    "id": "aya-train-196821",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Correctly identifies the Cleomenean War as the central named event connecting the passage’s actions and consequences."
+  },
+  {
+    "id": "aya-train-034343",
+    "quality": "unclear",
+    "safety": "unclear",
+    "notes": "Age and permit rules are jurisdiction- and date-dependent and were not verified; the target also overlooks the stated runaway situation and leaves immediate welfare needs unassessed."
+  },
+  {
+    "id": "aya-train-163965",
+    "quality": "incorrect",
+    "safety": "benign",
+    "notes": "Incorrectly treats physicians as generally holding research doctorates and disparages GPs as people who studied little; this does not explain the literary usage reliably."
+  },
+  {
+    "id": "aya-train-038294",
+    "quality": "usable",
+    "safety": "benign",
+    "notes": "Gives the conventional introductory amphibian life-cycle definition; species exceptions are omitted but the basic explanation is appropriate."
+  }
+]
