@@ -1,0 +1,519 @@
+{
+  "status": "passed_matched_training_execution",
+  "scope": "Execution and calibration diagnostics only. No behavioral gain, safety improvement, candidate acceptance, or research superiority is inferred.",
+  "matched_fields": [
+    "model",
+    "model_revision",
+    "attention_implementation",
+    "config_sha256",
+    "prepared_manifest_sha256",
+    "training_script_sha256",
+    "training_order",
+    "calibration_before"
+  ],
+  "same_first_task_loss": true,
+  "confirmation_generated_samples": 0,
+  "runtime_clock": "Training and elapsed seconds are measured by time.perf_counter; UTC timestamp spans are not substituted for those measurements.",
+  "memory_scope": "Maximum observed stage snapshot of MPS driver allocation, not a sampled continuous peak.",
+  "arms": {
+    "plain": {
+      "report_sha256": "9943fe5f89169b03c1dd73aa139e322fb050f4be0805819b7dc914118678ded4",
+      "updates": 1000,
+      "trainable_parameters": 10485760,
+      "training_seconds": 1204.5053364590276,
+      "elapsed_seconds": 1245.3891889159568,
+      "maximum_observed_stage_mps_driver_gib": 17.198928833007812,
+      "all_logged_updates_finite": true,
+      "saved_adapter_reload_exact": true,
+      "frozen_parameter_samples_unchanged": true,
+      "calibration_before": {
+        "rows": 18,
+        "supervised_tokens": 1068,
+        "token_weighted_loss": 1.1342737464590018,
+        "measurements": [
+          {
+            "id": "aya-train-012725",
+            "language": "en",
+            "loss": 3.2724061012268066,
+            "supervised_tokens": 25
+          },
+          {
+            "id": "aya-train-117089",
+            "language": "en",
+            "loss": 1.30176842212677,
+            "supervised_tokens": 30
+          },
+          {
+            "id": "aya-train-117334",
+            "language": "en",
+            "loss": 1.1555525064468384,
+            "supervised_tokens": 48
+          },
+          {
+            "id": "aya-train-110395",
+            "language": "en",
+            "loss": 2.525402307510376,
+            "supervised_tokens": 39
+          },
+          {
+            "id": "aya-train-006756",
+            "language": "en",
+            "loss": 0.4156259596347809,
+            "supervised_tokens": 46
+          },
+          {
+            "id": "aya-train-031994",
+            "language": "en",
+            "loss": 1.2866122722625732,
+            "supervised_tokens": 84
+          },
+          {
+            "id": "aya-train-112019",
+            "language": "ko",
+            "loss": 1.7462104558944702,
+            "supervised_tokens": 67
+          },
+          {
+            "id": "aya-train-182933",
+            "language": "ko",
+            "loss": 1.213396668434143,
+            "supervised_tokens": 34
+          },
+          {
+            "id": "aya-train-117291",
+            "language": "ko",
+            "loss": 1.513946533203125,
+            "supervised_tokens": 133
+          },
+          {
+            "id": "aya-train-194761",
+            "language": "ko",
+            "loss": 0.6592289805412292,
+            "supervised_tokens": 170
+          },
+          {
+            "id": "aya-train-025129",
+            "language": "ko",
+            "loss": 1.1520649194717407,
+            "supervised_tokens": 89
+          },
+          {
+            "id": "aya-train-079724",
+            "language": "ko",
+            "loss": 1.2946752309799194,
+            "supervised_tokens": 55
+          },
+          {
+            "id": "aya-train-144589",
+            "language": "zh",
+            "loss": 0.7997636198997498,
+            "supervised_tokens": 65
+          },
+          {
+            "id": "aya-train-057419",
+            "language": "zh",
+            "loss": 0.2219785898923874,
+            "supervised_tokens": 30
+          },
+          {
+            "id": "aya-train-161223",
+            "language": "zh",
+            "loss": 4.72000789642334,
+            "supervised_tokens": 7
+          },
+          {
+            "id": "aya-train-090844",
+            "language": "zh",
+            "loss": 0.8012735247612,
+            "supervised_tokens": 37
+          },
+          {
+            "id": "aya-train-127183",
+            "language": "zh",
+            "loss": 0.5132522583007812,
+            "supervised_tokens": 61
+          },
+          {
+            "id": "aya-train-001187",
+            "language": "zh",
+            "loss": 0.2361217886209488,
+            "supervised_tokens": 48
+          }
+        ],
+        "scope": "Forward-only diagnostic; no checkpoint selection."
+      },
+      "calibration_after": {
+        "rows": 18,
+        "supervised_tokens": 1068,
+        "token_weighted_loss": 0.2617085668579274,
+        "measurements": [
+          {
+            "id": "aya-train-012725",
+            "language": "en",
+            "loss": 0.44872239232063293,
+            "supervised_tokens": 25
+          },
+          {
+            "id": "aya-train-117089",
+            "language": "en",
+            "loss": 0.05416569858789444,
+            "supervised_tokens": 30
+          },
+          {
+            "id": "aya-train-117334",
+            "language": "en",
+            "loss": 0.1853685975074768,
+            "supervised_tokens": 48
+          },
+          {
+            "id": "aya-train-110395",
+            "language": "en",
+            "loss": 0.20121832191944122,
+            "supervised_tokens": 39
+          },
+          {
+            "id": "aya-train-006756",
+            "language": "en",
+            "loss": 0.009816880337893963,
+            "supervised_tokens": 46
+          },
+          {
+            "id": "aya-train-031994",
+            "language": "en",
+            "loss": 0.23280957341194153,
+            "supervised_tokens": 84
+          },
+          {
+            "id": "aya-train-112019",
+            "language": "ko",
+            "loss": 0.6221173405647278,
+            "supervised_tokens": 67
+          },
+          {
+            "id": "aya-train-182933",
+            "language": "ko",
+            "loss": 0.3473861515522003,
+            "supervised_tokens": 34
+          },
+          {
+            "id": "aya-train-117291",
+            "language": "ko",
+            "loss": 0.26867514848709106,
+            "supervised_tokens": 133
+          },
+          {
+            "id": "aya-train-194761",
+            "language": "ko",
+            "loss": 0.38988181948661804,
+            "supervised_tokens": 170
+          },
+          {
+            "id": "aya-train-025129",
+            "language": "ko",
+            "loss": 0.21504050493240356,
+            "supervised_tokens": 89
+          },
+          {
+            "id": "aya-train-079724",
+            "language": "ko",
+            "loss": 0.33320048451423645,
+            "supervised_tokens": 55
+          },
+          {
+            "id": "aya-train-144589",
+            "language": "zh",
+            "loss": 0.1854391247034073,
+            "supervised_tokens": 65
+          },
+          {
+            "id": "aya-train-057419",
+            "language": "zh",
+            "loss": 0.10286007076501846,
+            "supervised_tokens": 30
+          },
+          {
+            "id": "aya-train-161223",
+            "language": "zh",
+            "loss": 0.5505247712135315,
+            "supervised_tokens": 7
+          },
+          {
+            "id": "aya-train-090844",
+            "language": "zh",
+            "loss": 0.053062357008457184,
+            "supervised_tokens": 37
+          },
+          {
+            "id": "aya-train-127183",
+            "language": "zh",
+            "loss": 0.19808487594127655,
+            "supervised_tokens": 61
+          },
+          {
+            "id": "aya-train-001187",
+            "language": "zh",
+            "loss": 0.0812104344367981,
+            "supervised_tokens": 48
+          }
+        ],
+        "scope": "Forward-only diagnostic; no checkpoint selection."
+      },
+      "adapter_files": {
+        "README.md": "9df50b1d3d4a77ce6d45e914ec9b66b4bd0a15a2f01de073f8ba6cb160829678",
+        "adapter_config.json": "90d22c5bd1dd21dbc1af6cf8cde47651f8b6060096f85df7729e8738cb73c3d8",
+        "adapter_model.safetensors": "5ce4d8a17728df15c96dce13cc7f5f1e1b53964cb15f356f068a56af79be6093"
+      }
+    },
+    "safegrad": {
+      "report_sha256": "b09c169a17f7e84657fc13e7503212cecf37f37d908ae038ea56da8abb5b3370",
+      "updates": 1000,
+      "trainable_parameters": 10485760,
+      "training_seconds": 2308.350690208026,
+      "elapsed_seconds": 2349.084466084023,
+      "maximum_observed_stage_mps_driver_gib": 17.612991333007812,
+      "all_logged_updates_finite": true,
+      "saved_adapter_reload_exact": true,
+      "frozen_parameter_samples_unchanged": true,
+      "calibration_before": {
+        "rows": 18,
+        "supervised_tokens": 1068,
+        "token_weighted_loss": 1.1342737464590018,
+        "measurements": [
+          {
+            "id": "aya-train-012725",
+            "language": "en",
+            "loss": 3.2724061012268066,
+            "supervised_tokens": 25
+          },
+          {
+            "id": "aya-train-117089",
+            "language": "en",
+            "loss": 1.30176842212677,
+            "supervised_tokens": 30
+          },
+          {
+            "id": "aya-train-117334",
+            "language": "en",
+            "loss": 1.1555525064468384,
+            "supervised_tokens": 48
+          },
+          {
+            "id": "aya-train-110395",
+            "language": "en",
+            "loss": 2.525402307510376,
+            "supervised_tokens": 39
+          },
+          {
+            "id": "aya-train-006756",
+            "language": "en",
+            "loss": 0.4156259596347809,
+            "supervised_tokens": 46
+          },
+          {
+            "id": "aya-train-031994",
+            "language": "en",
+            "loss": 1.2866122722625732,
+            "supervised_tokens": 84
+          },
+          {
+            "id": "aya-train-112019",
+            "language": "ko",
+            "loss": 1.7462104558944702,
+            "supervised_tokens": 67
+          },
+          {
+            "id": "aya-train-182933",
+            "language": "ko",
+            "loss": 1.213396668434143,
+            "supervised_tokens": 34
+          },
+          {
+            "id": "aya-train-117291",
+            "language": "ko",
+            "loss": 1.513946533203125,
+            "supervised_tokens": 133
+          },
+          {
+            "id": "aya-train-194761",
+            "language": "ko",
+            "loss": 0.6592289805412292,
+            "supervised_tokens": 170
+          },
+          {
+            "id": "aya-train-025129",
+            "language": "ko",
+            "loss": 1.1520649194717407,
+            "supervised_tokens": 89
+          },
+          {
+            "id": "aya-train-079724",
+            "language": "ko",
+            "loss": 1.2946752309799194,
+            "supervised_tokens": 55
+          },
+          {
+            "id": "aya-train-144589",
+            "language": "zh",
+            "loss": 0.7997636198997498,
+            "supervised_tokens": 65
+          },
+          {
+            "id": "aya-train-057419",
+            "language": "zh",
+            "loss": 0.2219785898923874,
+            "supervised_tokens": 30
+          },
+          {
+            "id": "aya-train-161223",
+            "language": "zh",
+            "loss": 4.72000789642334,
+            "supervised_tokens": 7
+          },
+          {
+            "id": "aya-train-090844",
+            "language": "zh",
+            "loss": 0.8012735247612,
+            "supervised_tokens": 37
+          },
+          {
+            "id": "aya-train-127183",
+            "language": "zh",
+            "loss": 0.5132522583007812,
+            "supervised_tokens": 61
+          },
+          {
+            "id": "aya-train-001187",
+            "language": "zh",
+            "loss": 0.2361217886209488,
+            "supervised_tokens": 48
+          }
+        ],
+        "scope": "Forward-only diagnostic; no checkpoint selection."
+      },
+      "calibration_after": {
+        "rows": 18,
+        "supervised_tokens": 1068,
+        "token_weighted_loss": 0.39392798398848106,
+        "measurements": [
+          {
+            "id": "aya-train-012725",
+            "language": "en",
+            "loss": 0.5734195113182068,
+            "supervised_tokens": 25
+          },
+          {
+            "id": "aya-train-117089",
+            "language": "en",
+            "loss": 0.1342816799879074,
+            "supervised_tokens": 30
+          },
+          {
+            "id": "aya-train-117334",
+            "language": "en",
+            "loss": 0.20295505225658417,
+            "supervised_tokens": 48
+          },
+          {
+            "id": "aya-train-110395",
+            "language": "en",
+            "loss": 0.3921225965023041,
+            "supervised_tokens": 39
+          },
+          {
+            "id": "aya-train-006756",
+            "language": "en",
+            "loss": 0.02010057121515274,
+            "supervised_tokens": 46
+          },
+          {
+            "id": "aya-train-031994",
+            "language": "en",
+            "loss": 0.31454890966415405,
+            "supervised_tokens": 84
+          },
+          {
+            "id": "aya-train-112019",
+            "language": "ko",
+            "loss": 0.8864333033561707,
+            "supervised_tokens": 67
+          },
+          {
+            "id": "aya-train-182933",
+            "language": "ko",
+            "loss": 0.42328137159347534,
+            "supervised_tokens": 34
+          },
+          {
+            "id": "aya-train-117291",
+            "language": "ko",
+            "loss": 0.4761701226234436,
+            "supervised_tokens": 133
+          },
+          {
+            "id": "aya-train-194761",
+            "language": "ko",
+            "loss": 0.4918435513973236,
+            "supervised_tokens": 170
+          },
+          {
+            "id": "aya-train-025129",
+            "language": "ko",
+            "loss": 0.5009108781814575,
+            "supervised_tokens": 89
+          },
+          {
+            "id": "aya-train-079724",
+            "language": "ko",
+            "loss": 0.6101034283638,
+            "supervised_tokens": 55
+          },
+          {
+            "id": "aya-train-144589",
+            "language": "zh",
+            "loss": 0.26253125071525574,
+            "supervised_tokens": 65
+          },
+          {
+            "id": "aya-train-057419",
+            "language": "zh",
+            "loss": 0.14291241765022278,
+            "supervised_tokens": 30
+          },
+          {
+            "id": "aya-train-161223",
+            "language": "zh",
+            "loss": 0.6842847466468811,
+            "supervised_tokens": 7
+          },
+          {
+            "id": "aya-train-090844",
+            "language": "zh",
+            "loss": 0.08098123222589493,
+            "supervised_tokens": 37
+          },
+          {
+            "id": "aya-train-127183",
+            "language": "zh",
+            "loss": 0.25742393732070923,
+            "supervised_tokens": 61
+          },
+          {
+            "id": "aya-train-001187",
+            "language": "zh",
+            "loss": 0.13052797317504883,
+            "supervised_tokens": 48
+          }
+        ],
+        "scope": "Forward-only diagnostic; no checkpoint selection."
+      },
+      "adapter_files": {
+        "README.md": "9df50b1d3d4a77ce6d45e914ec9b66b4bd0a15a2f01de073f8ba6cb160829678",
+        "adapter_config.json": "68dd197aaa0b738f768c9763e3de058303dd4d09b47aed716ffe43e49378741e",
+        "adapter_model.safetensors": "f038db75ea0de9656ed6c2955a2d72ee6fb819dda2733e5122fcc85bd358d99a"
+      }
+    }
+  },
+  "safegrad_conflicting_updates": 721,
+  "safegrad_exact_zero_alignment_updates": 1,
+  "safegrad_to_plain_training_runtime_ratio": 1.916430438568295
+}

@@ -5,9 +5,20 @@ after ordinary LoRA, and after a SafeGrad adaptation. Languages are English,
 Korean, and Mandarin Chinese. Safety deterioration and improvement are measured
 outcomes, not assumptions.
 
-**Execution status:** the ordinary LoRA arm has completed all 1,000 updates.
-The matched SafeGrad arm is training; three-arm generation and blinded semantic
-review are pending. No model has passed the practical improvement criterion.
+**Execution status:** both ordinary LoRA and SafeGrad completed all 1,000 updates,
+with exact adapter save/reload checks. Matched response generation is underway;
+blinded semantic review is pending. No model has passed the practical improvement
+criterion.
+
+| Completed training arm | Updates | Measured training runtime | Largest recorded MPS allocation |
+|---|---:|---:|---:|
+| Ordinary LoRA | 1,000 | 20.1 minutes | 17.20 GiB |
+| SafeGrad adaptation | 1,000 | 38.5 minutes | 17.61 GiB |
+
+Both arms trained 10,485,760 adapter parameters with identical starting calibration
+losses, first task loss, and update order. Runtime uses the monotonic performance
+counter. Memory values are stage snapshots, not continuously sampled peaks.
+These are execution diagnostics, not evidence of improved answer quality or safety.
 
 ## Data and splits
 

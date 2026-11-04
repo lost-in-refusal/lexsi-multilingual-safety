@@ -16,8 +16,8 @@
       "source_relative_path": ".gitignore"
     },
     "README.md": {
-      "sha256": "856abf7cb92bc574c769e4b2860cb011c2c65c139d19782dd7fd390337388ec3",
-      "bytes": 12145,
+      "sha256": "9c364fd2199d123f7d56a9d4617160c258db7b7a5af4c310710e0fa9d30ac70c",
+      "bytes": 12727,
       "source_relative_path": "experiments/multilingual_repair/README.md"
     },
     "data/corpus/alignment.jsonl": {
@@ -56,8 +56,8 @@
       "source_relative_path": "experiments/multilingual_repair/DATA_ATTRIBUTION.md"
     },
     "experiments/multilingual_repair/README.md": {
-      "sha256": "856abf7cb92bc574c769e4b2860cb011c2c65c139d19782dd7fd390337388ec3",
-      "bytes": 12145,
+      "sha256": "9c364fd2199d123f7d56a9d4617160c258db7b7a5af4c310710e0fa9d30ac70c",
+      "bytes": 12727,
       "source_relative_path": "experiments/multilingual_repair/README.md"
     },
     "experiments/multilingual_repair/benign_probe_review.py": {
@@ -185,10 +185,40 @@
       "bytes": 42716,
       "source_relative_path": "results/multilingual-plain-eager-20261103/training-source.py"
     },
+    "runs/safegrad-training/prepared-manifest.json": {
+      "sha256": "c0fc197c4035efa22ed2b50db9e1ae2f42b075268f181b320fb376963600f2ba",
+      "bytes": 3992,
+      "source_relative_path": "results/multilingual-safegrad-eager-20261103/prepared-manifest.json"
+    },
+    "runs/safegrad-training/report.json": {
+      "sha256": "b09c169a17f7e84657fc13e7503212cecf37f37d908ae038ea56da8abb5b3370",
+      "bytes": 1406377,
+      "source_relative_path": "results/multilingual-safegrad-eager-20261103/report.json"
+    },
+    "runs/safegrad-training/steps.jsonl": {
+      "sha256": "46785aebbb03c276522b543a82433d4b27886b65a1b64b7ce5ebdb9d3655e163",
+      "bytes": 620215,
+      "source_relative_path": "results/multilingual-safegrad-eager-20261103/steps.jsonl"
+    },
+    "runs/safegrad-training/training-config.json": {
+      "sha256": "d4730c933aed2301ddb59ce0c08df461fcd6529485d83ffd22bd73ee35967f7f",
+      "bytes": 1331,
+      "source_relative_path": "results/multilingual-safegrad-eager-20261103/training-config.json"
+    },
+    "runs/safegrad-training/training-source.py": {
+      "sha256": "0dd9082a407ee2cff58f36da586183964df4c1c36d815b49aade55c0a4b5f4b6",
+      "bytes": 42716,
+      "source_relative_path": "results/multilingual-safegrad-eager-20261103/training-source.py"
+    },
     "runs/safety-input-audit/report.json": {
       "sha256": "8fae334e4b8019391a0dc9acd87b6c51cdec14119bb8ba41ab6b646c42e9712b",
       "bytes": 8860,
       "source_relative_path": "results/multilingual-safety-probe-audit-b-20261103/report.json"
+    },
+    "runs/training-comparison/report.json": {
+      "sha256": "abbfb7b82991d2e2b73522528119abe79eeb1c361a90eff5506d4fc579d21038",
+      "bytes": 15686,
+      "source_relative_path": "results/multilingual-training-comparison-20261103/report.json"
     },
     "tests/test_multilingual_benign_probe_review.py": {
       "sha256": "f62636b6449445271d543a5dc2dffffce5f5912e968f49a5351d0067b3ed3137",

@@ -1,0 +1,54 @@
+{
+  "experiment_id": "aya_public_instruction_safegrad_v1",
+  "model": "CohereLabs/aya-expanse-8b",
+  "model_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
+  "seed": 42,
+  "dtype": "bfloat16",
+  "device": "mps",
+  "training": {
+    "epochs": 1,
+    "learning_rate": 1e-05,
+    "weight_decay": 0.0,
+    "batch_size": 1,
+    "max_grad_norm": 1.0,
+    "lora_r": 4,
+    "lora_alpha": 8,
+    "lora_dropout": 0.0,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "max_sequence_tokens": 1024,
+    "mps_memory_fraction": 0.8,
+    "use_reentrant": false,
+    "rho": 1.0,
+    "alignment": "prompt_only_reference_kl_batchmean_global_projection_plus_rho",
+    "reference": "same_frozen_base_with_adapters_disabled"
+  },
+  "generation": {
+    "temperature": 0.0,
+    "max_new_tokens": 512,
+    "batch_size": 1
+  },
+  "data": {
+    "train_counts": {
+      "en": 450,
+      "ko": 100,
+      "zh": 450
+    },
+    "development_per_language": 12,
+    "confirmation_per_language": 100,
+    "calibration_per_language": 6,
+    "max_request_tokens": 384,
+    "max_reference_tokens": 192,
+    "alignment_families": 24,
+    "safety_development_families": 12,
+    "safety_confirmation_families": 100
+  },
+  "attention_implementation": "eager"
+}
