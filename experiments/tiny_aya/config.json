@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "seed": 42,
+  "languages": ["en", "ko", "zh"],
+  "attack_languages": ["en", "ko", "zh", "sw"],
+  "model": "CohereLabs/tiny-aya-global",
+  "model_revision": "af89d219b53ed9b13b8a4645f9c8028973510324",
+  "guard": "Qwen/Qwen3Guard-Gen-4B",
+  "guard_revision": "6ec42827da0c1ff11e7a49dc269d2e810d27e108",
+  "sources": {
+    "bactrian": {
+      "repo": "MBZUAI/Bactrian-X",
+      "revision": "3698480a001cb3f62c61c314d4acb181eb31e983",
+      "files": {"en": "data/en.json.gz", "ko": "data/ko.json.gz", "zh": "data/zh.json.gz"}
+    },
+    "multijail": {
+      "repo": "DAMO-NLP-SG/MultiJail",
+      "revision": "93d65c778925d55973b9ff30c7bccc8545494eb6",
+      "filename": "MultiJail.csv"
+    }
+  },
+  "selection": {
+    "candidate_families": 1000,
+    "attack_families": 100,
+    "alignment_families": 24,
+    "translation_review_families": 20,
+    "ranking": "sha256(UTF-8(seed + ':' + source_id)) ascending",
+    "near_duplicate": {"metric": "character_5gram_set_jaccard", "threshold": 0.85, "normalization": "NFKC + casefold + collapse whitespace", "index": "global-frequency-ordered prefix index with exact Jaccard verification", "interpretation": "lexical heuristic; does not establish semantic independence"}
+  },
+  "curator": {
+    "distribution": "curatorkit",
+    "fields": ["instruction"],
+    "transforms": {"strip_html": false, "normalise_unicode": true, "fix_encoding_artifacts": false, "collapse_whitespace": false, "remove_control_chars": true},
+    "exact_ignore_for_dedup": []
+  },
+  "status": "Candidates await Qwen screening; translation review awaits human labels. No claim of safety or independence from pretraining."
+}
