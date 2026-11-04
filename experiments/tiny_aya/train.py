@@ -692,7 +692,8 @@ def load_training_run(directory:Path,prepared:Path,screened:Path)->dict:
     require(plan==expected and _hash_file(directory/'plan.json')==config.get('plan_sha256')==report.get('plan_sha256'),'Training plan mismatch')
     snapshot,files=_snapshot(MODEL,REVISION,True)
     require(config.get('checkpoint_files')==files,'Pinned checkpoint files changed')
-    expected_inventory=expected_adapter_inventory(_read(snapshot/'config.json'))
+    checkpoint_config=_read(snapshot/'config.json')
+    expected_inventory=expected_adapter_inventory(checkpoint_config)
     sources=config.get('sources',{})
     expected_sources={'train.py','numerical-helpers.py','guard.py','prepare.py','tiny-config.json','safetune-safegrad.py','safetune-model-utils.py'}
     require(set(sources)==expected_sources and set(p.name for p in (directory/'sources').iterdir())==expected_sources,'Source snapshot inventory mismatch')
@@ -731,8 +732,11 @@ def load_training_run(directory:Path,prepared:Path,screened:Path)->dict:
     require(reload.get('every_adapter_tensor_bitwise_equal') is True and reload.get('probe_logits_finite') is True
             and _hash_file(directory/'reload-probe.safetensors')==reload.get('probe_sha256'),'Missing/tampered reload evidence')
     probes=load_file(str(directory/'reload-probe.safetensors'),device='cpu')
+    expected_probe_shape=(1,1,checkpoint_config['vocab_size'])
     require(set(probes)=={'before','after'} and probes['before'].shape==probes['after'].shape
-            and probes['before'].dtype==probes['after'].dtype and all(torch.isfinite(v).all().item() for v in probes.values()),'Invalid reload logits')
+            and probes['before'].dtype==probes['after'].dtype
+            and all(v.shape==expected_probe_shape and v.dtype==torch.bfloat16
+                    and torch.isfinite(v).all().item() for v in probes.values()),'Invalid reload logits')
     require((probes['before'].float()-probes['after'].float()).abs().max().item()==reload.get('max_abs_logit_difference'),'Reload difference evidence mismatch')
     probe=bundle['train'][0]
     require(reload.get('probe_id')==probe['id'] and reload.get('probe_input_ids')==probe['input_ids'][:probe['prompt_tokens']],'Reload prompt mismatch')

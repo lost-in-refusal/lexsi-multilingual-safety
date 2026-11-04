@@ -264,6 +264,44 @@ class RunnerTests(TinyCohereFixture,unittest.TestCase):
                 train._write(output/'report.json',report)
                 valid=train.load_training_run(output,directory/'prepared',directory/'screened')
                 self.assertEqual(valid['report']['counts']['task_exposures'],5400)
+                # Hash-consistent malformed logits still fail semantic validation.
+                from safetensors.torch import save_file,load_file
+                probe_path=output/'reload-probe.safetensors';probe_bytes=probe_path.read_bytes()
+                actual=load_file(str(probe_path))
+                self.assertEqual(actual['before'].shape,(1,1,32))
+                self.assertEqual(actual['before'].dtype,torch.bfloat16)
+                for shape,dtype in (((1,),torch.float32),((1,),torch.bfloat16),
+                                    ((2,1,32),torch.bfloat16),((1,2,32),torch.bfloat16),
+                                    ((1,1,31),torch.bfloat16),((1,1,32),torch.float32)):
+                    with self.subTest(probe_shape=shape,probe_dtype=dtype):
+                        save_file({key:torch.zeros(shape,dtype=dtype) for key in ('before','after')},str(probe_path))
+                        altered=copy.deepcopy(report)
+                        altered['reload']['probe_sha256']=train._hash_file(probe_path)
+                        altered['reload']['max_abs_logit_difference']=0.
+                        train._write(output/'report.json',altered)
+                        with self.assertRaisesRegex(ValueError,'Invalid reload logits'):
+                            train.load_training_run(output,directory/'prepared',directory/'screened')
+                # Exercise the real pinned vocabulary width without allocating
+                # pretrained weights: this is still a synthetic consumer fixture.
+                snapshot_config=snapshot/'config.json';snapshot_bytes=snapshot_config.read_bytes()
+                pinned_width=train._read(snapshot_config);pinned_width['vocab_size']=262144
+                train._write(snapshot_config,pinned_width);checkpoint['config.json']=train._hash_file(snapshot_config)
+                wide_config=copy.deepcopy(config);wide_config['checkpoint_files']=copy.deepcopy(checkpoint)
+                train._write(output/'run-config.json',wide_config)
+                wide_report=copy.deepcopy(report);wide_report['config_sha256']=train._hash_file(output/'run-config.json')
+                for dtype,accept in ((torch.bfloat16,True),(torch.float32,False)):
+                    save_file({key:torch.zeros((1,1,262144),dtype=dtype) for key in ('before','after')},str(probe_path))
+                    wide_report['reload']['probe_sha256']=train._hash_file(probe_path)
+                    wide_report['reload']['max_abs_logit_difference']=0.;train._write(output/'report.json',wide_report)
+                    if accept:
+                        self.assertEqual(train.load_training_run(output,directory/'prepared',directory/'screened')['counts']['updates'],171)
+                    else:
+                        with self.assertRaisesRegex(ValueError,'Invalid reload logits'):
+                            train.load_training_run(output,directory/'prepared',directory/'screened')
+                snapshot_config.write_bytes(snapshot_bytes);checkpoint['config.json']=train._hash_file(snapshot_config)
+                train._write(output/'run-config.json',config)
+                probe_path.write_bytes(probe_bytes);train._write(output/'report.json',report)
+                self.assertEqual(train.load_training_run(output,directory/'prepared',directory/'screened')['counts']['updates'],171)
                 for name in ('plan.json','run-config.json','steps.jsonl','sources/train.py','adapter/adapter_model.safetensors','adapter/adapter_config.json'):
                     path=output/name;original=path.read_bytes();path.write_bytes(original+b'bad')
                     with self.subTest(name=name),self.assertRaises((ValueError,json.JSONDecodeError)):
