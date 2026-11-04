@@ -91,6 +91,12 @@ never supplied to the model. Greedy decoding uses at most 512 new tokens, with
 EOS, truncation, elapsed time, and actual output token IDs recorded. AuditKIT's
 nonempty-output score is only an execution diagnostic.
 
+After blinded review, `audit_semantic_reviews` uses AuditKIT with precomputed
+outputs to recompute the frozen lower and upper semantic indicators for all
+18 model/language/category groups. It checks exact agreement with the primary
+metrics and acceptance comparisons. It performs no generation or additional
+judging; the underlying labels remain provisional automated reviews.
+
 An initial 256-token execution probe reached its cap in four of nine outputs.
 Before semantic review, the cap was fixed at 512 for every main comparison arm.
 That interrupted length probe is excluded from the model comparison.
@@ -198,7 +204,9 @@ Regenerate the complete prepared bundle from the pinned public sources before
 training, because the publication copy deliberately lacks that reserved file.
 
 JSON, JSONL, and documentation are checked for disallowed metadata and local
-filesystem paths. A failed check rejects the export before its directory is
+filesystem paths. JSON path checks inspect decoded keys and string values;
+malformed JSON, nonfinite literals, and duplicate object keys are rejected.
+Documentation is scanned as written. A failed check rejects the export before its directory is
 created; the exporter never rewrites a scientific artifact to make it pass.
 Python source and tests are exempt from generic content-marker checks so they
 can define and test the rejection rules. Additional private terms can be supplied

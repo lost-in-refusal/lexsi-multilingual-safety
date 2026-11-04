@@ -187,6 +187,7 @@ class ReviewTests(unittest.TestCase):
 
     def test_review_key_released_only_after_valid_reviews_and_reproduces_scores(self):
         workspace = Path(__file__).resolve().parents[1]
+        (workspace / 'results').mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=workspace / 'results', prefix='synthetic-review-test-') as directory:
             directory = Path(directory)
             pack = directory / 'pack'

@@ -8,7 +8,7 @@
     "data/corpus/confirmation.jsonl"
   ],
   "unlisted_files_and_binary_weights_exported": false,
-  "exporter_sha256": "d8c573381f7955f406d4a073ca000a441731853b840d7e1ea0d84ef9bf7a441c",
+  "exporter_sha256": "02bb4465a96d6d84af270ae891b7b4f960c116bd93c22c7517dce9b89fe6358a",
   "files": {
     ".gitignore": {
       "sha256": "89fc391dafc70360e1f0316296bee547170718b9eb432933dac059b23a49509e",
@@ -16,8 +16,8 @@
       "source_relative_path": ".gitignore"
     },
     "README.md": {
-      "sha256": "9c364fd2199d123f7d56a9d4617160c258db7b7a5af4c310710e0fa9d30ac70c",
-      "bytes": 12727,
+      "sha256": "7d9891a8700e461f34217e49b8359789d09323bad85b6907f391e5feb70a36b9",
+      "bytes": 13275,
       "source_relative_path": "experiments/multilingual_repair/README.md"
     },
     "data/corpus/alignment.jsonl": {
@@ -56,9 +56,14 @@
       "source_relative_path": "experiments/multilingual_repair/DATA_ATTRIBUTION.md"
     },
     "experiments/multilingual_repair/README.md": {
-      "sha256": "9c364fd2199d123f7d56a9d4617160c258db7b7a5af4c310710e0fa9d30ac70c",
-      "bytes": 12727,
+      "sha256": "7d9891a8700e461f34217e49b8359789d09323bad85b6907f391e5feb70a36b9",
+      "bytes": 13275,
       "source_relative_path": "experiments/multilingual_repair/README.md"
+    },
+    "experiments/multilingual_repair/audit_semantic_reviews.py": {
+      "sha256": "8e9bd150af9b94fda37f44af23ee210e06140950130fd5ce852ced22fbc6771f",
+      "bytes": 15587,
+      "source_relative_path": "experiments/multilingual_repair/audit_semantic_reviews.py"
     },
     "experiments/multilingual_repair/benign_probe_review.py": {
       "sha256": "f81492dec1ddbb96882c82f9ca2dc74bba6e3fbcdabf1049f4e5c91dbe8e7355",
@@ -86,8 +91,8 @@
       "source_relative_path": "experiments/multilingual_repair/evaluation_protocol.md"
     },
     "experiments/multilingual_repair/export_publication.py": {
-      "sha256": "d8c573381f7955f406d4a073ca000a441731853b840d7e1ea0d84ef9bf7a441c",
-      "bytes": 21016,
+      "sha256": "02bb4465a96d6d84af270ae891b7b4f960c116bd93c22c7517dce9b89fe6358a",
+      "bytes": 21582,
       "source_relative_path": "experiments/multilingual_repair/export_publication.py"
     },
     "experiments/multilingual_repair/licenses/Apache-2.0.txt": {
@@ -130,6 +135,26 @@
       "bytes": 3095,
       "source_relative_path": "results/multilingual-attention-observation-20261103/report.json"
     },
+    "runs/base-development/auditkit-result.json": {
+      "sha256": "243b45b9dda7dfb15f9113eaabada73a3a339d9424ea37f28931fcf1409dc8d2",
+      "bytes": 313358,
+      "source_relative_path": "results/multilingual-base-eager-development-20261103/auditkit-result.json"
+    },
+    "runs/base-development/prepared-config.json": {
+      "sha256": "d4730c933aed2301ddb59ce0c08df461fcd6529485d83ffd22bd73ee35967f7f",
+      "bytes": 1331,
+      "source_relative_path": "results/multilingual-base-eager-development-20261103/prepared-config.json"
+    },
+    "runs/base-development/report.json": {
+      "sha256": "755b01979d7e9a5a49ebf7fd63e1f5add77fb8f34c70e1a09867f0c263bdf095",
+      "bytes": 5418,
+      "source_relative_path": "results/multilingual-base-eager-development-20261103/report.json"
+    },
+    "runs/base-development/responses.jsonl": {
+      "sha256": "53ced48f522d6f02b074ea031a695c8353b3d0389e3fae9ecb54da77d09117d2",
+      "bytes": 319826,
+      "source_relative_path": "results/multilingual-base-eager-development-20261103/responses.jsonl"
+    },
     "runs/grading-preregistration/eligibility.json": {
       "sha256": "411c972d9d1ec4604d519d8fb7c12c0b93670553739bb6454e974af77449e833",
       "bytes": 6441,
@@ -159,6 +184,26 @@
       "sha256": "576cb6a6e494acbf63a98d729195c28150743c2932d405307c3eecd2553c79b2",
       "bytes": 17261,
       "source_relative_path": "results/multilingual-literature-audit-20261103/report.json"
+    },
+    "runs/plain-development/auditkit-result.json": {
+      "sha256": "2239d74751728773a68e10f1efeab6e1f93eee0fef70a023a0355dea07939f93",
+      "bytes": 256665,
+      "source_relative_path": "results/multilingual-plain-eager-development-20261103/auditkit-result.json"
+    },
+    "runs/plain-development/prepared-config.json": {
+      "sha256": "d4730c933aed2301ddb59ce0c08df461fcd6529485d83ffd22bd73ee35967f7f",
+      "bytes": 1331,
+      "source_relative_path": "results/multilingual-plain-eager-development-20261103/prepared-config.json"
+    },
+    "runs/plain-development/report.json": {
+      "sha256": "baf4ebf0eed61025d7ce40ce9ccfdd4273332199681f41b125f1aec8659ec73b",
+      "bytes": 6437,
+      "source_relative_path": "results/multilingual-plain-eager-development-20261103/report.json"
+    },
+    "runs/plain-development/responses.jsonl": {
+      "sha256": "c1d98383d8a1013aee924b0a0e70f27847d937b8d71ea48f3d0849d856c4cd02",
+      "bytes": 277112,
+      "source_relative_path": "results/multilingual-plain-eager-development-20261103/responses.jsonl"
     },
     "runs/plain-training/prepared-manifest.json": {
       "sha256": "c0fc197c4035efa22ed2b50db9e1ae2f42b075268f181b320fb376963600f2ba",
@@ -221,8 +266,8 @@
       "source_relative_path": "results/multilingual-training-comparison-20261103/report.json"
     },
     "tests/test_multilingual_benign_probe_review.py": {
-      "sha256": "f62636b6449445271d543a5dc2dffffce5f5912e968f49a5351d0067b3ed3137",
-      "bytes": 14645,
+      "sha256": "872f0ed115236877c1b3920d45462ded17ab7fcc653af6b6bc9912243d8e014e",
+      "bytes": 14712,
       "source_relative_path": "tests/test_multilingual_benign_probe_review.py"
     },
     "tests/test_multilingual_cohere_reference.py": {
@@ -246,14 +291,19 @@
       "source_relative_path": "tests/test_multilingual_prepare.py"
     },
     "tests/test_multilingual_publication.py": {
-      "sha256": "bed7f50c90cb6bad5afd1d19eb86b4ee69fd519be7792d6cceb253c820049f4b",
-      "bytes": 19963,
+      "sha256": "915e1f5323e965d4c200f4b0eb336f5f9f113bce8d82c9109b0a15efa9178eb9",
+      "bytes": 23780,
       "source_relative_path": "tests/test_multilingual_publication.py"
     },
     "tests/test_multilingual_review.py": {
-      "sha256": "4204b341011d53eb6674856dbbeed75145dc20fb07b8395f253301b60a8430d6",
-      "bytes": 18573,
+      "sha256": "15545d08bb48496872762ad511edac90e1cf4ad881e5e165a71e81896f422a59",
+      "bytes": 18640,
       "source_relative_path": "tests/test_multilingual_review.py"
+    },
+    "tests/test_multilingual_semantic_audit.py": {
+      "sha256": "f27d5a71f121653e7416023eb95a4276b646b6994a4e6560508554c097acf16a",
+      "bytes": 15866,
+      "source_relative_path": "tests/test_multilingual_semantic_audit.py"
     },
     "tests/test_multilingual_train.py": {
       "sha256": "eec46d742f8daf6023d2a0b7640fb6de412ddfe08d051df8ac21c4fcc181d9af",

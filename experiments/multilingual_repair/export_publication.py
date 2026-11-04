@@ -77,10 +77,11 @@ def safe_path(root, path):
     return path
 
 
-def scan_string(value, label, deny_terms=()):
+def scan_string(value, label, deny_terms=(), *, check_paths=True):
     require(not SECRET_TOKEN.search(value), f'{label}: plausible credential token')
     require(not DENIED_MARKERS.search(value), f'{label}: private or dialogue marker')
-    require(not ABSOLUTE_PATH.search(value), f'{label}: absolute filesystem path')
+    if check_paths:
+        require(not ABSOLUTE_PATH.search(value), f'{label}: absolute filesystem path')
     require(not any(term.casefold() in value.casefold() for term in deny_terms),
             f'{label}: caller-supplied private term')
 
@@ -114,14 +115,26 @@ def scan_content(path, blob, label, deny_terms=()):
         require(not any(term.casefold() in text.casefold() for term in deny_terms),
                 f'{label}: caller-supplied private term')
         return
-    scan_string(text, label, deny_terms)
-    if path.suffix in ('.json', '.jsonl'):
+    is_json = path.suffix in ('.json', '.jsonl')
+    # JSON escapes are syntax; only decoded keys and values represent paths.
+    # Other raw privacy checks still apply before recursively scanning values.
+    scan_string(text, label, deny_terms, check_paths=not is_json)
+    if is_json:
         def invalid_constant(_):
             raise ValueError('Non-finite JSON number')
+
+        def unique_object(pairs):
+            result = {}
+            for key, value in pairs:
+                if key in result:
+                    raise ValueError('Duplicate JSON key')
+                result[key] = value
+            return result
+
         try:
-            values = [json.loads(line, parse_constant=invalid_constant)
+            values = [json.loads(line, parse_constant=invalid_constant, object_pairs_hook=unique_object)
                       for line in text.splitlines() if line.strip()] if path.suffix == '.jsonl' else [
-                          json.loads(text, parse_constant=invalid_constant)]
+                          json.loads(text, parse_constant=invalid_constant, object_pairs_hook=unique_object)]
         except ValueError:
             raise ValueError(f'{label}: invalid JSON') from None
         for value in values:

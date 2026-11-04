@@ -114,6 +114,64 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'absolute filesystem path'):
             self.export()
 
+    def test_json_colon_then_newline_is_exported_without_changing_bytes(self):
+        run = self.run_directory({'status': 'passed_execution', 'diagnostic': 'y:\nSynthetic value'})
+        original = (run / 'report.json').read_bytes()
+        self.export(runs={'example': run})
+        self.assertEqual((self.output / 'runs/example/report.json').read_bytes(), original)
+        self.assertEqual((run / 'report.json').read_bytes(), original)
+
+    def test_jsonl_colon_then_newline_is_exported_without_changing_bytes(self):
+        run = self.run_directory()
+        original = (json.dumps({'response': 'y:\nSynthetic value'}) + '\n').encode()
+        (run / 'responses.jsonl').write_bytes(original)
+        self.export(runs={'example': run})
+        self.assertEqual((self.output / 'runs/example/responses.jsonl').read_bytes(), original)
+        self.assertEqual((run / 'responses.jsonl').read_bytes(), original)
+
+    def test_encoded_true_paths_in_json_keys_and_values_are_rejected(self):
+        paths = ('/Users/example/data', '/scratch/model/checkpoint', r'C:\Users\example\data')
+        for suffix in ('.json', '.jsonl'):
+            for value in paths:
+                encoded = ''.join('\\u%04x' % ord(char) for char in value)
+                for field in ('key', 'value'):
+                    content = ('{"' + encoded + '": "example"}' if field == 'key'
+                               else '{"nested": [{"value": "' + encoded + '"}]}')
+                    with self.subTest(suffix=suffix, path=value, field=field):
+                        with self.assertRaisesRegex(ValueError, 'absolute filesystem path'):
+                            self.exporter.scan_content(Path('artifact' + suffix), content.encode(), 'artifact')
+
+    def test_encoded_json_privacy_markers_fields_and_tokens_are_rejected(self):
+        cases = (('call_example123', 'private or dialogue marker'),
+                 ('private-planning', 'private or dialogue marker'),
+                 ('ExamplePerson', 'caller-supplied private term'),
+                 ('hf_' + 'x' * 48, 'plausible credential token'))
+        for suffix in ('.json', '.jsonl'):
+            for value, reason in cases:
+                encoded = ''.join('\\u%04x' % ord(char) for char in value)
+                content = '{"nested": [{"value": "' + encoded + '"}]}'
+                with self.subTest(suffix=suffix, reason=reason):
+                    with self.assertRaisesRegex(ValueError, reason):
+                        self.exporter.scan_content(Path('artifact' + suffix), content.encode(), 'artifact', ('ExamplePerson',))
+            field = ''.join('\\u%04x' % ord(char) for char in 'answer_verbatim')
+            with self.subTest(suffix=suffix, reason='forbidden field'):
+                with self.assertRaisesRegex(ValueError, 'forbidden field'):
+                    self.exporter.scan_content(Path('artifact' + suffix), ('{"' + field + '": "example"}').encode(), 'artifact')
+
+    def test_duplicate_json_keys_cannot_hide_earlier_values(self):
+        content = b'{"value": "\\u002fUsers\\u002fexample\\u002fdata", "value": "example"}'
+        for suffix in ('.json', '.jsonl'):
+            with self.subTest(suffix=suffix):
+                with self.assertRaisesRegex(ValueError, 'invalid JSON'):
+                    self.exporter.scan_content(Path('artifact' + suffix), content, 'artifact')
+
+    def test_malformed_and_nonfinite_json_and_jsonl_are_rejected(self):
+        for suffix in ('.json', '.jsonl'):
+            for content in (b'{broken', b'{"value": NaN}', b'{"value": Infinity}', b'{"value": -Infinity}'):
+                with self.subTest(suffix=suffix, content=content):
+                    with self.assertRaisesRegex(ValueError, 'invalid JSON'):
+                        self.exporter.scan_content(Path('artifact' + suffix), content, 'artifact')
+
     def test_confirmation_record_disguised_as_development_rejected(self):
         prepared = self.prepare()
         (prepared / 'development.jsonl').write_text('{"split":"confirmation", "request":"reserved"}\n')

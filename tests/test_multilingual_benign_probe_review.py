@@ -211,6 +211,7 @@ class BenignProbeReviewTests(unittest.TestCase):
 
     def test_exact_eligibility_bytes_preserved_without_copying_primary_responses(self):
         workspace=Path(__file__).resolve().parents[1]
+        (workspace / 'results').mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=workspace/'results',prefix='synthetic-benign-test-') as parent:
             eligibility=Path(parent)/'input.json'
             data=json.dumps(self.eligibility,ensure_ascii=False,indent=3).encode()+b'\n\n'
