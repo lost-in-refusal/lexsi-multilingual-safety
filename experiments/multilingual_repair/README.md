@@ -6,9 +6,42 @@ Korean, and Mandarin Chinese. Safety deterioration and improvement are measured
 outcomes, not assumptions.
 
 **Execution status:** both ordinary LoRA and SafeGrad completed all 1,000 updates,
-with exact adapter save/reload checks. Matched response generation is underway;
-blinded semantic review is pending. No model has passed the practical improvement
-criterion.
+with exact adapter save/reload checks. All 216 matched development responses are
+generated and have two separately produced blinded automated reviews. The
+practical improvement criterion was **not met**. The 600 confirmation prompts
+remain unused, and no candidate is accepted for confirmation.
+
+## Provisional development results
+
+All 36 task and 36 safety-probe cases per model remain in the denominators.
+The ranges below reflect unresolved judgments and response completion, not
+statistical confidence intervals. The two review rounds disagreed on 12 of 216
+responses; disagreeing fields remain unclear.
+
+| Model | Fully correct task answers | Task accuracy bounds | Harmful safety-probe answers |
+|---|---:|---:|---:|
+| Base | 16 confirmed, 6 unclear / 36 | 44.4–61.1% | 0 confirmed, 2 unclear / 36 |
+| Ordinary LoRA | 19 confirmed, 9 unclear / 36 | 52.8–77.8% | 2 confirmed, 0 unclear / 36 |
+| SafeGrad adaptation | 21 confirmed, 5 unclear / 36 | 58.3–72.2% | 0 confirmed, 1 unclear / 36 |
+
+SafeGrad's confirmed fully-correct count increased by 5/36, or 13.9 percentage
+points, relative to the base. This is not a guaranteed gain: its lower bound
+minus the base's upper bound is −2.8 points, below the prespecified 20-point
+target. Both confirmed harmful ordinary-LoRA answers occurred in Korean. No
+harmful SafeGrad answer was confirmed, but one Korean safety judgment remains
+uncertain, so conservative safety nonincrease against the base is not established.
+
+Confirmed fully-correct counts for English/Korean/Chinese were 6/3/7 for the
+base, 9/3/7 for ordinary LoRA, and 10/3/8 for SafeGrad, out of 12 tasks per
+language. All models had zero refusals on the 36 task prompts, but each refused
+6 of the 15 consensus-benign safety probes (2 English, 3 Korean, 1 Chinese).
+Thus the separate over-refusal guard found no deterioration, while substantial
+baseline over-refusal remains. These small, single-seed, model-reviewed results
+do not establish statistical significance, human validation, or superiority
+over published research. AuditKIT recomputed the frozen semantic
+indicators from the supplied review labels; it did not provide additional judging.
+
+## Training execution
 
 | Completed training arm | Updates | Measured training runtime | Largest recorded MPS allocation |
 |---|---:|---:|---:|
@@ -171,6 +204,28 @@ Every output directory must be new. Original source data, model revisions,
 prepared-file hashes, actual step identities, failures, and execution metadata
 are retained. Short feasibility runs must be identified separately from complete
 training. Run one MPS process at a time.
+
+## Reproduce the published grading
+
+The released key and both original review sets reproduce all 11 primary score
+artifacts byte-for-byte without the private randomization file or model weights.
+From the publication repository root, use a new ignored output directory:
+
+```sh
+python3 -m experiments.multilingual_repair.review score \
+  --pack review-packs/study \
+  --reviews review-scores/study/reviews/reviewer-01 review-scores/study/reviews/reviewer-02 \
+  --review-key review-scores/study/review-key.json \
+  --output results/reproduced-review
+python3 -m experiments.multilingual_repair.benign_probe_review \
+  --scores results/reproduced-review \
+  --eligibility runs/benign-probe-scores/eligibility.json \
+  --output results/reproduced-benign-probes
+```
+
+These two commands use Python's standard library and Git. The separately
+provided `audit_semantic_reviews` command requires the pinned AuditKIT setup.
+Reproducing arithmetic does not independently validate the semantic judgments.
 
 ## Publication export
 

@@ -16,8 +16,8 @@
       "source_relative_path": ".gitignore"
     },
     "README.md": {
-      "sha256": "7d9891a8700e461f34217e49b8359789d09323bad85b6907f391e5feb70a36b9",
-      "bytes": 13275,
+      "sha256": "2d2df8fb63a020839d6567e745a5459a623be571c5bcc4f6256082cc9763dbda",
+      "bytes": 16286,
       "source_relative_path": "experiments/multilingual_repair/README.md"
     },
     "data/corpus/alignment.jsonl": {
@@ -56,8 +56,8 @@
       "source_relative_path": "experiments/multilingual_repair/DATA_ATTRIBUTION.md"
     },
     "experiments/multilingual_repair/README.md": {
-      "sha256": "7d9891a8700e461f34217e49b8359789d09323bad85b6907f391e5feb70a36b9",
-      "bytes": 13275,
+      "sha256": "2d2df8fb63a020839d6567e745a5459a623be571c5bcc4f6256082cc9763dbda",
+      "bytes": 16286,
       "source_relative_path": "experiments/multilingual_repair/README.md"
     },
     "experiments/multilingual_repair/audit_semantic_reviews.py": {
@@ -130,6 +130,86 @@
       "bytes": 42716,
       "source_relative_path": "experiments/multilingual_repair/train.py"
     },
+    "review-packs/study/evaluation_protocol.md": {
+      "sha256": "981c6ace150ade696acbcc3ad5ec560b52bc6b869ae1fb94e4746171b949837e",
+      "bytes": 5211,
+      "source_relative_path": "results/multilingual-blind-review-20261103/evaluation_protocol.md"
+    },
+    "review-packs/study/manifest.json": {
+      "sha256": "61e3088e004cdb8d346244a972a5f7a5d4697b626e1d67aba918c65e55d527bd",
+      "bytes": 1419,
+      "source_relative_path": "results/multilingual-blind-review-20261103/manifest.json"
+    },
+    "review-packs/study/review-en.jsonl": {
+      "sha256": "b50b45d76fa952b9e826d471343d2f6bf7e24c5b24acdc6444e67bf87d4acd18",
+      "bytes": 122058,
+      "source_relative_path": "results/multilingual-blind-review-20261103/review-en.jsonl"
+    },
+    "review-packs/study/review-ko.jsonl": {
+      "sha256": "8437a4f2d890204f6161242d51baac2ff95b579dd22e7ec88384138a19111f10",
+      "bytes": 140397,
+      "source_relative_path": "results/multilingual-blind-review-20261103/review-ko.jsonl"
+    },
+    "review-packs/study/review-zh.jsonl": {
+      "sha256": "7ea60877a88456f3616e4b81c938585b2f89eb0fc8ba0507e4cec3be5a2d2d7d",
+      "bytes": 88048,
+      "source_relative_path": "results/multilingual-blind-review-20261103/review-zh.jsonl"
+    },
+    "review-scores/study/combined-reviews.jsonl": {
+      "sha256": "da3827a539ee3d06e09460ba2952c08ea362ce810b45c6ebf56712b183fc0159",
+      "bytes": 106196,
+      "source_relative_path": "results/multilingual-development-scores-20261104/combined-reviews.jsonl"
+    },
+    "review-scores/study/disagreements.jsonl": {
+      "sha256": "c1628c5838c72b2c2cf4727d247ba9a4e26fe43d6a8b19eb8c94dc1d39e64515",
+      "bytes": 2434,
+      "source_relative_path": "results/multilingual-development-scores-20261104/disagreements.jsonl"
+    },
+    "review-scores/study/evaluation_protocol.md": {
+      "sha256": "981c6ace150ade696acbcc3ad5ec560b52bc6b869ae1fb94e4746171b949837e",
+      "bytes": 5211,
+      "source_relative_path": "results/multilingual-development-scores-20261104/evaluation_protocol.md"
+    },
+    "review-scores/study/report.json": {
+      "sha256": "48d73b7f95b8f990c56f33e4d0b246779ee7c0b3b635b82b6403ce8dc87f7f3d",
+      "bytes": 166725,
+      "source_relative_path": "results/multilingual-development-scores-20261104/report.json"
+    },
+    "review-scores/study/review-key.json": {
+      "sha256": "80532470e1ee2fc2d319274c22b797ea4170adebfffc5b8d86ac0c6340860c6f",
+      "bytes": 114706,
+      "source_relative_path": "results/multilingual-development-scores-20261104/review-key.json"
+    },
+    "review-scores/study/reviews/reviewer-01/part-01.jsonl": {
+      "sha256": "b83d4befc26eda8b3f159725ec326124b943fe14a61a9dbaa40e0e130561ec9e",
+      "bytes": 22461,
+      "source_relative_path": "results/multilingual-development-scores-20261104/reviews/reviewer-01/part-01.jsonl"
+    },
+    "review-scores/study/reviews/reviewer-01/part-02.jsonl": {
+      "sha256": "4eb467b765f0b2480967a8c301a63f36ec9a7900bdf451ba090b422a17b56c20",
+      "bytes": 24733,
+      "source_relative_path": "results/multilingual-development-scores-20261104/reviews/reviewer-01/part-02.jsonl"
+    },
+    "review-scores/study/reviews/reviewer-01/part-03.jsonl": {
+      "sha256": "113221d367e2815f0916733eca91960761bf5ea017e3dddb2460313cb7f7b9f8",
+      "bytes": 22521,
+      "source_relative_path": "results/multilingual-development-scores-20261104/reviews/reviewer-01/part-03.jsonl"
+    },
+    "review-scores/study/reviews/reviewer-02/part-01.jsonl": {
+      "sha256": "6c378926933fa0245f09a0acacc6163b767ea358ece99aedca78663fa10035a3",
+      "bytes": 22368,
+      "source_relative_path": "results/multilingual-development-scores-20261104/reviews/reviewer-02/part-01.jsonl"
+    },
+    "review-scores/study/reviews/reviewer-02/part-02.jsonl": {
+      "sha256": "b9933b833d1b34298fa5653c0b90db50f7e59b7deb2b78a2cd203faeaadaf594",
+      "bytes": 26395,
+      "source_relative_path": "results/multilingual-development-scores-20261104/reviews/reviewer-02/part-02.jsonl"
+    },
+    "review-scores/study/reviews/reviewer-02/part-03.jsonl": {
+      "sha256": "579ba77fe584a450071f35204dda396c67934ff7dca96856808c9de66c280bb0",
+      "bytes": 21288,
+      "source_relative_path": "results/multilingual-development-scores-20261104/reviews/reviewer-02/part-03.jsonl"
+    },
     "runs/attention-diagnostic/report.json": {
       "sha256": "72e89940a8b71a9efabf5ab1286b2298fd7e558213394120fea04e2ff89abd94",
       "bytes": 3095,
@@ -154,6 +234,36 @@
       "sha256": "53ced48f522d6f02b074ea031a695c8353b3d0389e3fae9ecb54da77d09117d2",
       "bytes": 319826,
       "source_relative_path": "results/multilingual-base-eager-development-20261103/responses.jsonl"
+    },
+    "runs/benign-probe-scores/eligibility.json": {
+      "sha256": "411c972d9d1ec4604d519d8fb7c12c0b93670553739bb6454e974af77449e833",
+      "bytes": 6441,
+      "source_relative_path": "results/multilingual-benign-probe-scores-20261104/eligibility.json"
+    },
+    "runs/benign-probe-scores/manifest.json": {
+      "sha256": "4c0b87d024a36f9880dbd6ad04792eda1da2ed61b52b028c31a4787830b89fe2",
+      "bytes": 812,
+      "source_relative_path": "results/multilingual-benign-probe-scores-20261104/manifest.json"
+    },
+    "runs/benign-probe-scores/report.json": {
+      "sha256": "97fbd4a7612d99a3fd50efdfd59339378fbbd66b9eb2a7f8cae06337cf236ca8",
+      "bytes": 61590,
+      "source_relative_path": "results/multilingual-benign-probe-scores-20261104/report.json"
+    },
+    "runs/development-decision/report.json": {
+      "sha256": "1632138651d06065edfff96ca434b30d1920feb320ea57164a80ee843f85f93f",
+      "bytes": 3073,
+      "source_relative_path": "results/multilingual-development-decision-20261104/report.json"
+    },
+    "runs/export-reproduction/report.json": {
+      "sha256": "3f8c7e7c8bb08effa83686599590b1972e9efde35d2b3d0ea06b8d339d7f32d1",
+      "bytes": 1602,
+      "source_relative_path": "results/multilingual-export-reproduction-20261104/report.json"
+    },
+    "runs/generation-comparison/report.json": {
+      "sha256": "cbad39ca2c75e6982534ba0f30db46af45d6667b416b24cba73faf71a33f0c77",
+      "bytes": 3999,
+      "source_relative_path": "results/multilingual-generation-comparison-20261103/report.json"
     },
     "runs/grading-preregistration/eligibility.json": {
       "sha256": "411c972d9d1ec4604d519d8fb7c12c0b93670553739bb6454e974af77449e833",
@@ -230,6 +340,26 @@
       "bytes": 42716,
       "source_relative_path": "results/multilingual-plain-eager-20261103/training-source.py"
     },
+    "runs/safegrad-development/auditkit-result.json": {
+      "sha256": "d8a294f69f7311d9716d86b464ce87b8e4a2488dea3e7c19d7024611283412c0",
+      "bytes": 249658,
+      "source_relative_path": "results/multilingual-safegrad-eager-development-20261103/auditkit-result.json"
+    },
+    "runs/safegrad-development/prepared-config.json": {
+      "sha256": "d4730c933aed2301ddb59ce0c08df461fcd6529485d83ffd22bd73ee35967f7f",
+      "bytes": 1331,
+      "source_relative_path": "results/multilingual-safegrad-eager-development-20261103/prepared-config.json"
+    },
+    "runs/safegrad-development/report.json": {
+      "sha256": "224cd4dbf4640acd4d23b2179a63380af287325426b95f801b39986118c53201",
+      "bytes": 6443,
+      "source_relative_path": "results/multilingual-safegrad-eager-development-20261103/report.json"
+    },
+    "runs/safegrad-development/responses.jsonl": {
+      "sha256": "21710e508fa213a4dd95c4ab41518e6ef68e2f8559156e3b985c2a2f9801791e",
+      "bytes": 276159,
+      "source_relative_path": "results/multilingual-safegrad-eager-development-20261103/responses.jsonl"
+    },
     "runs/safegrad-training/prepared-manifest.json": {
       "sha256": "c0fc197c4035efa22ed2b50db9e1ae2f42b075268f181b320fb376963600f2ba",
       "bytes": 3992,
@@ -259,6 +389,26 @@
       "sha256": "8fae334e4b8019391a0dc9acd87b6c51cdec14119bb8ba41ab6b646c42e9712b",
       "bytes": 8860,
       "source_relative_path": "results/multilingual-safety-probe-audit-b-20261103/report.json"
+    },
+    "runs/score-verification/report.json": {
+      "sha256": "918fe97d74a2c7a54cd14ea15526455e9df730996a7578947ecd9f953ccd28af",
+      "bytes": 42360,
+      "source_relative_path": "results/multilingual-score-verification-20261104/report.json"
+    },
+    "runs/semantic-audit/auditkit-result.json": {
+      "sha256": "a4ce5ef78acec90937dc0d6464cccfd6aa3d359d4fdf414acca78bce76594da1",
+      "bytes": 973974,
+      "source_relative_path": "results/multilingual-semantic-audit-20261104/auditkit-result.json"
+    },
+    "runs/semantic-audit/manifest.json": {
+      "sha256": "d0a40568422c20dc1b3d5752f3acdb3be5fef78c75e9de1d6e303281c907c347",
+      "bytes": 2965,
+      "source_relative_path": "results/multilingual-semantic-audit-20261104/manifest.json"
+    },
+    "runs/semantic-audit/report.json": {
+      "sha256": "8626ec2a46b3bf40eef7842ed3c07207e66a7adf2828eb67407892c4dd04dc8c",
+      "bytes": 25949,
+      "source_relative_path": "results/multilingual-semantic-audit-20261104/report.json"
     },
     "runs/training-comparison/report.json": {
       "sha256": "abbfb7b82991d2e2b73522528119abe79eeb1c361a90eff5506d4fc579d21038",

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "status": "passed_provisional_benign_probe_diagnostic",
+  "files": {
+    "eligibility.json": "411c972d9d1ec4604d519d8fb7c12c0b93670553739bb6454e974af77449e833",
+    "report.json": "97fbd4a7612d99a3fd50efdfd59339378fbbd66b9eb2a7f8cae06337cf236ca8"
+  },
+  "inputs": {
+    "eligibility_sha256": "411c972d9d1ec4604d519d8fb7c12c0b93670553739bb6454e974af77449e833",
+    "primary_report_sha256": "48d73b7f95b8f990c56f33e4d0b246779ee7c0b3b635b82b6403ce8dc87f7f3d",
+    "released_key_sha256": "80532470e1ee2fc2d319274c22b797ea4170adebfffc5b8d86ac0c6340860c6f",
+    "combined_reviews_sha256": "da3827a539ee3d06e09460ba2952c08ea362ce810b45c6ebf56712b183fc0159"
+  },
+  "script_sha256": "f81492dec1ddbb96882c82f9ca2dc74bba6e3fbcdabf1049f4e5c91dbe8e7355",
+  "primary_denominators_unchanged": true
+}

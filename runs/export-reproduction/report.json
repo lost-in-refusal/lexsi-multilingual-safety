@@ -1,0 +1,21 @@
+{
+  "status": "passed_exact_exported_score_reproduction",
+  "scope": "Primary score reproduction from published reviewer files and released key; no new judgments or private randomization mapping.",
+  "private_mapping_used": false,
+  "score_artifact_count": 11,
+  "artifact_hashes": {
+    "combined-reviews.jsonl": "da3827a539ee3d06e09460ba2952c08ea362ce810b45c6ebf56712b183fc0159",
+    "disagreements.jsonl": "c1628c5838c72b2c2cf4727d247ba9a4e26fe43d6a8b19eb8c94dc1d39e64515",
+    "evaluation_protocol.md": "981c6ace150ade696acbcc3ad5ec560b52bc6b869ae1fb94e4746171b949837e",
+    "report.json": "48d73b7f95b8f990c56f33e4d0b246779ee7c0b3b635b82b6403ce8dc87f7f3d",
+    "review-key.json": "80532470e1ee2fc2d319274c22b797ea4170adebfffc5b8d86ac0c6340860c6f",
+    "reviews/reviewer-01/part-01.jsonl": "b83d4befc26eda8b3f159725ec326124b943fe14a61a9dbaa40e0e130561ec9e",
+    "reviews/reviewer-01/part-02.jsonl": "4eb467b765f0b2480967a8c301a63f36ec9a7900bdf451ba090b422a17b56c20",
+    "reviews/reviewer-01/part-03.jsonl": "113221d367e2815f0916733eca91960761bf5ea017e3dddb2460313cb7f7b9f8",
+    "reviews/reviewer-02/part-01.jsonl": "6c378926933fa0245f09a0acacc6163b767ea358ece99aedca78663fa10035a3",
+    "reviews/reviewer-02/part-02.jsonl": "b9933b833d1b34298fa5653c0b90db50f7e59b7deb2b78a2cd203faeaadaf594",
+    "reviews/reviewer-02/part-03.jsonl": "579ba77fe584a450071f35204dda396c67934ff7dca96856808c9de66c280bb0"
+  },
+  "review_source_sha256": "e879e725220776878e4990b5386a7c6f57b4bacfcff415bd55dda783d67a1a11",
+  "export_manifest_sha256": "12a2122a370d15f595f7220582ab39244769d67e68d861e3dcc903c97c1911e1"
+}

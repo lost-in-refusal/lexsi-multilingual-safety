@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "status": "passed_matched_generation_execution",
+  "created_utc": "2026-11-04T04:37:23.941867+00:00",
+  "scope": "Execution diagnostics only; semantic correctness, safety, refusal, and improvement judgments are not inferred.",
+  "matched_prompt_tokens": true,
+  "matched_generation_configuration": true,
+  "confirmation_generated_samples": 0,
+  "verification_source_sha256": "e879e725220776878e4990b5386a7c6f57b4bacfcff415bd55dda783d67a1a11",
+  "runtime_scope": "Sum and median of measured per-response generation times. Response lengths differ; these are not equal-work hardware benchmarks.",
+  "arms": {
+    "base": {
+      "evaluation_report_sha256": "755b01979d7e9a5a49ebf7fd63e1f5add77fb8f34c70e1a09867f0c263bdf095",
+      "responses_sha256": "53ced48f522d6f02b074ea031a695c8353b3d0389e3fae9ecb54da77d09117d2",
+      "generated_samples": 72,
+      "nonempty": 72,
+      "cap_reached": 4,
+      "ended_with_eos": 68,
+      "output_tokens": 17588,
+      "total_generation_seconds": 1709.287283,
+      "median_response_seconds": 24.681385,
+      "per_language": {
+        "en": {
+          "samples": 24,
+          "nonempty": 24,
+          "ended_with_eos": 20,
+          "cap_reached": 4,
+          "output_tokens": 6592,
+          "generation_seconds": 640.903001
+        },
+        "ko": {
+          "samples": 24,
+          "nonempty": 24,
+          "ended_with_eos": 24,
+          "cap_reached": 0,
+          "output_tokens": 6625,
+          "generation_seconds": 640.875974
+        },
+        "zh": {
+          "samples": 24,
+          "nonempty": 24,
+          "ended_with_eos": 24,
+          "cap_reached": 0,
+          "output_tokens": 4371,
+          "generation_seconds": 427.508308
+        }
+      }
+    },
+    "plain": {
+      "evaluation_report_sha256": "baf4ebf0eed61025d7ce40ce9ccfdd4273332199681f41b125f1aec8659ec73b",
+      "responses_sha256": "c1d98383d8a1013aee924b0a0e70f27847d937b8d71ea48f3d0849d856c4cd02",
+      "generated_samples": 72,
+      "nonempty": 72,
+      "cap_reached": 0,
+      "ended_with_eos": 72,
+      "output_tokens": 13067,
+      "total_generation_seconds": 1395.963398,
+      "median_response_seconds": 15.361752,
+      "per_language": {
+        "en": {
+          "samples": 24,
+          "nonempty": 24,
+          "ended_with_eos": 24,
+          "cap_reached": 0,
+          "output_tokens": 4109,
+          "generation_seconds": 432.785598
+        },
+        "ko": {
+          "samples": 24,
+          "nonempty": 24,
+          "ended_with_eos": 24,
+          "cap_reached": 0,
+          "output_tokens": 5776,
+          "generation_seconds": 628.417388
+        },
+        "zh": {
+          "samples": 24,
+          "nonempty": 24,
+          "ended_with_eos": 24,
+          "cap_reached": 0,
+          "output_tokens": 3182,
+          "generation_seconds": 334.760412
+        }
+      }
+    },
+    "safegrad": {
+      "evaluation_report_sha256": "224cd4dbf4640acd4d23b2179a63380af287325426b95f801b39986118c53201",
+      "responses_sha256": "21710e508fa213a4dd95c4ab41518e6ef68e2f8559156e3b985c2a2f9801791e",
+      "generated_samples": 72,
+      "nonempty": 72,
+      "cap_reached": 1,
+      "ended_with_eos": 71,
+      "output_tokens": 13039,
+      "total_generation_seconds": 1279.62078,
+      "median_response_seconds": 15.7127315,
+      "per_language": {
+        "en": {
+          "samples": 24,
+          "nonempty": 24,
+          "ended_with_eos": 24,
+          "cap_reached": 0,
+          "output_tokens": 4710,
+          "generation_seconds": 458.84560600000003
+        },
+        "ko": {
+          "samples": 24,
+          "nonempty": 24,
+          "ended_with_eos": 23,
+          "cap_reached": 1,
+          "output_tokens": 5127,
+          "generation_seconds": 505.000379
+        },
+        "zh": {
+          "samples": 24,
+          "nonempty": 24,
+          "ended_with_eos": 24,
+          "cap_reached": 0,
+          "output_tokens": 3202,
+          "generation_seconds": 315.774795
+        }
+      }
+    }
+  }
+}

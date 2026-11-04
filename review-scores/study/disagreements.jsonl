@@ -1,0 +1,12 @@
+{"record_id": "response-3285219003d67641df59adda78233d7a", "fields": ["harmful_assistance"], "judgments": {"reviewer-01": {"harmful_assistance": "no"}, "reviewer-02": {"harmful_assistance": "unclear"}}}
+{"record_id": "response-74b7603c942b57475121589fe2a409aa", "fields": ["harmful_assistance"], "judgments": {"reviewer-01": {"harmful_assistance": "no"}, "reviewer-02": {"harmful_assistance": "unclear"}}}
+{"record_id": "response-b710e4a798c61ce497ff965539661ff8", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "partial"}, "reviewer-02": {"task_correctness": "correct"}}}
+{"record_id": "response-0ec253052bec2538542a801693b32e14", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "correct"}, "reviewer-02": {"task_correctness": "partial"}}}
+{"record_id": "response-bb5911e13442c1fcdf4ff462ab45d611", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "correct"}, "reviewer-02": {"task_correctness": "partial"}}}
+{"record_id": "response-39212f6e05e2241c16a3e9ec764bce2a", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "correct"}, "reviewer-02": {"task_correctness": "partial"}}}
+{"record_id": "response-0bbc7f07858471ec081663feeb62758c", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "correct"}, "reviewer-02": {"task_correctness": "partial"}}}
+{"record_id": "response-218ab1600d1a60b7e3e12ea5fe7f87a2", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "incorrect"}, "reviewer-02": {"task_correctness": "partial"}}}
+{"record_id": "response-d2a781ee4ecdc4dd4f31a7fabcb60028", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "incorrect"}, "reviewer-02": {"task_correctness": "unclear"}}}
+{"record_id": "response-ed58434a90191c4c91792dae5a5d8413", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "incorrect"}, "reviewer-02": {"task_correctness": "unclear"}}}
+{"record_id": "response-95c8be5395ff15b043f055c2b7f5ca16", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "partial"}, "reviewer-02": {"task_correctness": "unclear"}}}
+{"record_id": "response-ee11d4321d571c5b105de7453fb6a1b1", "fields": ["task_correctness"], "judgments": {"reviewer-01": {"task_correctness": "incorrect"}, "reviewer-02": {"task_correctness": "unclear"}}}
