@@ -168,7 +168,7 @@ class CalibrationTests(unittest.TestCase):
 
     def fake_generate(self, model, tokenizer, input_ids, *, generation_config, device):
         self.calls.extend(input_ids)
-        raw = self.raw_override if self.raw_override is not None else tokenizer.encode(self.raw_text, add_special_tokens=False)+[255001]
+        raw = self.raw_override if self.raw_override is not None else tokenizer.encode(self.raw_text, add_special_tokens=False)+[generation_config.eos_token_id[0]]
         return [runtime.completion_evidence(tokenizer, ids, raw, generation_config=generation_config,
             padded_width=len(ids), elapsed_batch_seconds=.1) for ids in input_ids]
 
@@ -430,3 +430,147 @@ class CalibrationTests(unittest.TestCase):
             quality.main(['calibrate',*args,'--max-families','1','--rubric-version','2'])
             quality.main(['verify',*args])
         self.assertEqual(self.load()['config']['settings']['rubric_version'],2)
+
+
+    def test_qwen_frozen_profile_reader_inference_and_cross_profile_resume_rejection(self):
+        from transformers import AutoTokenizer
+        from experiments.tiny_aya.guard import _snapshot
+        snapshot, files = _snapshot('Qwen/Qwen3-14B', '40c069824f4251a91eefaf281ebe4c544efd3e18', False)
+        self.tokenizer = AutoTokenizer.from_pretrained(snapshot, local_files_only=True, trust_remote_code=False)
+        with patch.object(quality, '_tokenizer', return_value=(self.tokenizer, files)):
+            self.calibrate(max_families=1, rubric_version=2, judge_profile='qwen3-14b')
+            loaded = self.load()
+            config = loaded['config'];settings = config['settings']
+            self.assertEqual(settings['judge_profile'], 'qwen3-14b')
+            self.assertEqual(settings['model'], 'Qwen/Qwen3-14B')
+            self.assertEqual(settings['revision'], '40c069824f4251a91eefaf281ebe4c544efd3e18')
+            self.assertEqual(settings['mps_memory_fraction'], .9)
+            self.assertEqual(settings['chat_template_kwargs'], dict(tokenize=True, add_generation_prompt=True,
+                return_dict=False, truncation=False, enable_thinking=False))
+            self.assertTrue(loaded['rows'][0]['judgment']['family_pass'])
+            before = {p.relative_to(self.output): p.read_bytes() for p in self.output.rglob('*') if p.is_file()}
+            with self.assertRaises(ValueError): self.calibrate(max_families=2, rubric_version=2)
+            self.assertEqual(before, {p.relative_to(self.output): p.read_bytes() for p in self.output.rglob('*') if p.is_file()})
+            self.calibrate(max_families=2, rubric_version=2, judge_profile='qwen3-14b')
+            self.assertEqual(len(self.load()['rows']), 2)
+            path = self.output/'run-config.json';original = path.read_bytes()
+            mutations = [lambda c: c['settings'].update(judge_profile='aya-expanse-8b'),
+                lambda c: c['settings'].update(revision=quality.REVISION),
+                lambda c: c['settings']['chat_template_kwargs'].update(enable_thinking=True),
+                lambda c: c['settings']['chat_template_kwargs'].pop('return_dict'),
+                lambda c: c['settings'].update(mps_memory_fraction=.8),
+                lambda c: c['generation'].update(bos_token_id=None)]
+            for mutate in mutations:
+                value = quality._read(path);mutate(value);train._write(path, value);self.rehash()
+                with self.subTest(mutate=mutate), self.assertRaises(ValueError): self.load()
+                with self.assertRaises(ValueError): self.calibrate(max_families=3, rubric_version=2, judge_profile='qwen3-14b')
+                path.write_bytes(original);self.rehash()
+            sources = quality._source_paths();changed = self.root/'changed-qwen.py'
+            changed.write_bytes(sources['quality.py'].read_bytes()+b'\n# Changed implementation.\n')
+            with patch.object(quality, '_source_paths', return_value={**sources, 'quality.py': changed}):
+                self.assertEqual(len(self.load()['rows']), 2)
+                with self.assertRaisesRegex(ValueError, 'Current implementation source'):
+                    self.calibrate(max_families=3, rubric_version=2, judge_profile='qwen3-14b')
+
+    def test_qwen_cli_selection_and_invalid_profile_fail_before_output_mutation(self):
+        import contextlib
+        import io
+        for profile in (None, True, 'qwen3', 'other'):
+            with self.subTest(profile=profile), self.assertRaises(ValueError):
+                self.calibrate(max_families=1, judge_profile=profile)
+        self.assertFalse(self.output.exists())
+        args = ['--prepared', str(self.prepared), '--review-evidence', str(self.review), '--output', str(self.output)]
+        with patch.object(quality, 'calibrate', return_value={'status': 'incomplete'}) as run, contextlib.redirect_stdout(io.StringIO()):
+            quality.main(['calibrate', *args, '--rubric-version', '2', '--judge-profile', 'qwen3-14b'])
+        self.assertEqual(run.call_args.kwargs, dict(rubric_version=2, judge_profile='qwen3-14b'))
+
+
+class JudgeProfileTests(unittest.TestCase):
+    def test_qwen_profile_selection_and_canonical_generation(self):
+        import inspect
+        self.assertIn('judge_profile', inspect.signature(quality.calibrate).parameters,
+                      'Explicit pinned judge profile selection is missing')
+        config = quality.generation_config(judge_profile='qwen3-14b')
+        self.assertEqual(config.eos_token_id, [151645, 151643])
+        self.assertEqual(config.pad_token_id, 151643)
+        self.assertEqual(config.bos_token_id, 151643)
+        self.assertEqual(config.max_new_tokens, 384)
+        self.assertFalse(config.do_sample)
+        with self.assertRaises(ValueError): quality.generation_config(judge_profile='unknown')
+
+    def test_qwen_official_template_exact_ids_and_empty_thinking_prefix(self):
+        from transformers import AutoTokenizer
+        from experiments.tiny_aya.guard import _snapshot
+        snapshot, _ = _snapshot('Qwen/Qwen3-14B', '40c069824f4251a91eefaf281ebe4c544efd3e18', False)
+        tokenizer = AutoTokenizer.from_pretrained(snapshot, local_files_only=True, trust_remote_code=False)
+        self.assertEqual((len(tokenizer), tokenizer.eos_token_id, tokenizer.pad_token_id, tokenizer.bos_token_id),
+                         (151669, 151645, 151643, None))
+        rows = [dict(lang=lang, instruction='Say hello.', response='Hello.') for lang in ('en','ko','zh')]
+        data = dict(families=[dict(family_id='f', rows=rows)])
+        frozen = quality._freeze_inputs(data, tokenizer, rubric_version=2, judge_profile='qwen3-14b')[0]
+        messages = quality.family_messages(rows, rubric_version=2)
+        self.assertEqual(frozen['messages'], messages)
+        expected = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True,
+            return_dict=False, truncation=False, enable_thinking=False)
+        self.assertEqual(frozen['input_ids'], expected)
+        self.assertTrue(tokenizer.decode(expected, skip_special_tokens=False).endswith(
+            '<|im_start|>assistant\n<think>\n\n</think>\n\n'))
+        enabled = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True,
+            return_dict=False, truncation=False, enable_thinking=True)
+        self.assertNotEqual(expected, enabled)
+        generation = quality.generation_config(judge_profile='qwen3-14b')
+        for eos in (151645, 151643):
+            raw = tokenizer.encode(json.dumps(judgment()), add_special_tokens=False) + [eos, 151643]
+            evidence = runtime.completion_evidence(tokenizer, expected, raw, generation_config=generation,
+                padded_width=len(expected), elapsed_batch_seconds=0)
+            self.assertTrue(quality.parse_judgment(evidence['response'], finish_reason=evidence['finish_reason'])['family_pass'])
+
+    def test_qwen_mps_budget_is_explicit_and_aya_legacy_budget_unchanged(self):
+        with patch('torch.backends.mps.is_available', return_value=True), \
+             patch('torch.mps.set_per_process_memory_fraction') as fraction:
+            self.assertEqual(quality._device(judge_profile='qwen3-14b'), 'mps')
+            fraction.assert_called_once_with(.9)
+        with patch('torch.backends.mps.is_available', return_value=True), \
+             patch('torch.mps.set_per_process_memory_fraction') as fraction:
+            self.assertEqual(quality._device(), 'mps')
+            fraction.assert_called_once_with(.8)
+
+    def test_qwen_direct_cpu_loader_validates_architecture_attention_and_every_tensor(self):
+        import torch
+        from types import SimpleNamespace
+        class Fixture(torch.nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.config = SimpleNamespace(model_type='qwen3', architectures=['Qwen3ForCausalLM'],
+                    num_hidden_layers=40, hidden_size=5120, vocab_size=151936,
+                    num_attention_heads=40, num_key_value_heads=8, head_dim=128, _attn_implementation='eager')
+                self.layers = torch.nn.ModuleList([torch.nn.Module() for _ in range(40)])
+                for layer in self.layers:
+                    layer.self_attn = torch.nn.Module();layer.self_attn.config = self.config
+                self.weight = torch.nn.Parameter(torch.ones(2, dtype=torch.bfloat16))
+            def set_attn_implementation(self, value): self.config._attn_implementation = value
+            def _prepare_generation_config(self, config): return config, {}
+            def to(self, *args, **kwargs): raise AssertionError('Direct device loader must not duplicate via .to()')
+        generation = quality.generation_config(judge_profile='qwen3-14b')
+        model = Fixture()
+        with patch('transformers.AutoModelForCausalLM.from_pretrained', return_value=model) as loader:
+            loaded = quality._new_model(Path('/fixture'), 'cpu', generation, judge_profile='qwen3-14b')
+        self.assertIs(loaded, model)
+        self.assertEqual(loader.call_args.kwargs, dict(local_files_only=True, trust_remote_code=False,
+            dtype=torch.bfloat16, attn_implementation='eager', device_map='cpu'))
+        self.assertFalse(model.training);self.assertFalse(model.weight.requires_grad)
+        changes = [lambda m: setattr(m.config, 'num_key_value_heads', 40),
+            lambda m: setattr(m.config, 'head_dim', 64), lambda m: setattr(m.config, 'vocab_size', 151669),
+            lambda m: setattr(m.config, 'architectures', ['OtherModel']), lambda m: m.layers.pop(-1),
+            lambda m: setattr(m, 'peft_config', {'adapter': True}),
+            lambda m: setattr(m, 'weight', torch.nn.Parameter(torch.ones(2))),
+            lambda m: m.weight.data.fill_(float('nan')),
+            lambda m: setattr(m.weight, 'grad', torch.ones_like(m.weight)),
+            lambda m: setattr(m, '_hf_peft_config_loaded', True),
+            lambda m: setattr(m, 'weight', torch.nn.Parameter(torch.empty(2, device='meta', dtype=torch.bfloat16))),
+            lambda m: m.layers[0].register_parameter('lora_A', torch.nn.Parameter(torch.ones(2, dtype=torch.bfloat16)))]
+        for change in changes:
+            model = Fixture();change(model)
+            with self.subTest(change=change), patch('transformers.AutoModelForCausalLM.from_pretrained', return_value=model):
+                with self.assertRaises(ValueError):
+                    quality._new_model(Path('/fixture'), 'cpu', generation, judge_profile='qwen3-14b')

@@ -35,6 +35,9 @@ SETTINGS = dict(schema_version=1, purpose='bounded_calibration_only', model=MODE
     max_new_tokens=384, eos_token_ids=[255001], pad_token_id=0, truncation=False,
     template='official default, user only, add_generation_prompt=True', seed=42,
     mps_memory_fraction=.8, rubric_version=1, reason_max_characters=240)
+JUDGE_PROFILES = ('aya-expanse-8b', 'qwen3-14b')
+QWEN_MODEL = 'Qwen/Qwen3-14B'
+QWEN_REVISION = '40c069824f4251a91eefaf281ebe4c544efd3e18'
 require = train.require
 _json = train._json
 _digest = train._digest
@@ -251,21 +254,39 @@ def _reference_inputs(prepared, review_evidence):
                       prepared_candidates_sha256=_hash_file(prepared/'candidates.jsonl'), reference_files=hashes))
 
 
-def generation_config():
-    return runtime.resolved_generation_config(max_new_tokens=384, eos_token_id=[255001], pad_token_id=0, bos_token_id=5)
+def _profile_settings(judge_profile):
+    require(type(judge_profile) is str and judge_profile in JUDGE_PROFILES, 'Unknown judge_profile')
+    settings = copy.deepcopy(SETTINGS)
+    if judge_profile == 'qwen3-14b':
+        settings.update(judge_profile=judge_profile, model=QWEN_MODEL, revision=QWEN_REVISION,
+            eos_token_ids=[151645, 151643], pad_token_id=151643, mps_memory_fraction=.9,
+            chat_template_kwargs=dict(tokenize=True, add_generation_prompt=True,
+                return_dict=False, truncation=False, enable_thinking=False))
+    return settings
 
 
-def _tokenizer():
+def generation_config(*, judge_profile='aya-expanse-8b'):
+    settings = _profile_settings(judge_profile)
+    return runtime.resolved_generation_config(max_new_tokens=384, eos_token_id=settings['eos_token_ids'],
+        pad_token_id=settings['pad_token_id'], bos_token_id=151643 if judge_profile == 'qwen3-14b' else 5)
+
+
+def _tokenizer(*, judge_profile='aya-expanse-8b'):
     from transformers import AutoTokenizer
-    snapshot, files = train._snapshot(MODEL, REVISION, False)
+    settings = _profile_settings(judge_profile)
+    snapshot, files = train._snapshot(settings['model'], settings['revision'], False)
     tokenizer = AutoTokenizer.from_pretrained(snapshot, local_files_only=True, trust_remote_code=False)
-    require(tokenizer.eos_token_id == 255001 and tokenizer.pad_token_id == 0 and
-            type(tokenizer.get_chat_template()) is str and bool(tokenizer.get_chat_template()), 'Unexpected official Aya tokenizer/template')
+    expected_eos = 151645 if judge_profile == 'qwen3-14b' else 255001
+    require(tokenizer.eos_token_id == expected_eos and tokenizer.pad_token_id == settings['pad_token_id'] and
+            type(tokenizer.get_chat_template()) is str and bool(tokenizer.get_chat_template()), 'Unexpected official judge tokenizer/template')
+    if judge_profile == 'qwen3-14b':
+        require(len(tokenizer) == 151669 and tokenizer.bos_token_id is None, 'Unexpected pinned Qwen tokenizer vocabulary/BOS')
     return tokenizer, files
 
 
-def _checkpoint():
-    return train._snapshot(MODEL, REVISION, True)
+def _checkpoint(*, judge_profile='aya-expanse-8b'):
+    settings = _profile_settings(judge_profile)
+    return train._snapshot(settings['model'], settings['revision'], True)
 
 
 def _environment():
@@ -303,12 +324,14 @@ def _verify_sources(output, sources, *, executing=False):
                 'Current implementation source differs from frozen source; use a fresh output directory')
 
 
-def _freeze_inputs(data, tokenizer, *, rubric_version=1):
+def _freeze_inputs(data, tokenizer, *, rubric_version=1, judge_profile='aya-expanse-8b'):
+    settings = _profile_settings(judge_profile)
+    kwargs = settings.get('chat_template_kwargs', dict(tokenize=True, add_generation_prompt=True,
+        return_dict=False, truncation=False))
     families = []
     for family in data['families']:
         messages = family_messages(family['rows'], rubric_version=rubric_version)
-        ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True,
-            return_dict=False, truncation=False)
+        ids = tokenizer.apply_chat_template(messages, **kwargs)
         runtime.token_ids(ids, len(tokenizer))
         item = dict(family_id=family['family_id'], rows=family['rows'], messages=messages, input_ids=ids,
                     source_rows_sha256=_digest(family['rows']), messages_sha256=_digest(messages))
@@ -317,12 +340,12 @@ def _freeze_inputs(data, tokenizer, *, rubric_version=1):
     return families
 
 
-def _settings(data, tokenizer, tokenizer_files, checkpoint_files, families, *, rubric_version=1):
-    return dict(settings={**SETTINGS, 'rubric_version': _rubric_version(rubric_version)}, rubric=RUBRIC, rubric_sha256=hashlib.sha256(RUBRIC.encode()).hexdigest(),
+def _settings(data, tokenizer, tokenizer_files, checkpoint_files, families, *, rubric_version=1, judge_profile='aya-expanse-8b'):
+    return dict(settings={**_profile_settings(judge_profile), 'rubric_version': _rubric_version(rubric_version)}, rubric=RUBRIC, rubric_sha256=hashlib.sha256(RUBRIC.encode()).hexdigest(),
         judgment_schema=SCHEMA, bindings=data['bindings'], tokenizer_files=tokenizer_files,
         template=tokenizer.get_chat_template(), template_sha256=hashlib.sha256(tokenizer.get_chat_template().encode()).hexdigest(),
         template_inventory_sha256=_digest(tokenizer.chat_template),
-        checkpoint_files=checkpoint_files, generation=generation_config().to_dict(), environment=_environment(),
+        checkpoint_files=checkpoint_files, generation=generation_config(judge_profile=judge_profile).to_dict(), environment=_environment(),
         family_ids=[r['family_id'] for r in families], inputs_sha256=_digest(families))
 
 
@@ -415,24 +438,43 @@ def _ledger(output, config, families, tokenizer, *, records=None, start_index=0)
     return validated
 
 
-def _device():
-    return train._device()
+def _device(*, judge_profile='aya-expanse-8b'):
+    settings = _profile_settings(judge_profile)
+    if judge_profile == 'aya-expanse-8b':
+        return train._device()
+    import torch
+    require(torch.backends.mps.is_available(), 'Pinned MPS device unavailable')
+    torch.mps.set_per_process_memory_fraction(settings['mps_memory_fraction'])
+    return 'mps'
 
 
-def _new_model(snapshot, device, generation):
-    """Root-invoked only: independent cached unadapted BF16 Aya model."""
+def _new_model(snapshot, device, generation, *, judge_profile='aya-expanse-8b'):
+    """Root-invoked only: independent cached unadapted BF16 pinned judge."""
     import torch
     from transformers import AutoModelForCausalLM
+    _profile_settings(judge_profile)
+    kwargs = dict(device_map=device) if judge_profile == 'qwen3-14b' else {}
     model = AutoModelForCausalLM.from_pretrained(snapshot, local_files_only=True, trust_remote_code=False,
-        dtype=torch.bfloat16, attn_implementation='eager').to(device)
-    require(model.config.model_type == 'cohere' and model.config.num_hidden_layers == 32 and
-        model.config.hidden_size == 4096 and model.config.vocab_size == 256000, 'Unexpected pinned Aya architecture')
+        dtype=torch.bfloat16, attn_implementation='eager', **kwargs)
+    if judge_profile == 'qwen3-14b':
+        architecture = dict(model_type='qwen3', architectures=['Qwen3ForCausalLM'], num_hidden_layers=40,
+            hidden_size=5120, vocab_size=151936, num_attention_heads=40, num_key_value_heads=8, head_dim=128)
+        require(all(_same(getattr(model.config, k, None), v) for k, v in architecture.items()),
+            'Unexpected pinned Qwen architecture')
+        require(not getattr(model, 'peft_config', None) and not getattr(model, '_hf_peft_config_loaded', False),
+            'Adapted Qwen model')
+        attention_count = 40
+    else:
+        model = model.to(device)
+        require(model.config.model_type == 'cohere' and model.config.num_hidden_layers == 32 and
+            model.config.hidden_size == 4096 and model.config.vocab_size == 256000, 'Unexpected pinned Aya architecture')
+        attention_count = 32
     train.pin_attention_backend(model, 'eager')
-    require(train.verify_attention_backend(model, 'eager')['attention_modules'] == 32, 'Incorrect eager attention coverage')
+    require(train.verify_attention_backend(model, 'eager')['attention_modules'] == attention_count, 'Incorrect eager attention coverage')
     for name, parameter in model.named_parameters():
         require('.lora_' not in name and parameter.device.type == device and parameter.grad is None and
                 parameter.dtype == torch.bfloat16 and torch.isfinite(parameter).all().item(),
-                'Adapted, invalid or nonfinite Aya tensor')
+                'Adapted, invalid or nonfinite judge tensor')
         parameter.requires_grad_(False)
     model.eval()
     model.generation_config = copy.deepcopy(generation)
@@ -442,9 +484,10 @@ def _new_model(snapshot, device, generation):
 
 
 def calibrate(prepared: Path, review_evidence: Path, output: Path, max_families: int | None = None,
-              *, rubric_version: int = 1) -> dict:
+              *, rubric_version: int = 1, judge_profile: str = 'aya-expanse-8b') -> dict:
     """Run/resume the 30 preview families under one explicitly frozen prompt version."""
     _rubric_version(rubric_version)
+    _profile_settings(judge_profile)
     require(max_families is None or type(max_families) is int and 0 < max_families < FAMILIES,
             'max_families must be a strict incomplete prefix between 1 and 29')
     prepared, review_evidence, output = Path(prepared), Path(review_evidence), Path(output)
@@ -452,10 +495,11 @@ def calibrate(prepared: Path, review_evidence: Path, output: Path, max_families:
                     p.resolve().is_relative_to(output.resolve()) for p in (prepared, review_evidence)),
             'Calibration output and input directories must be independent')
     data = _reference_inputs(prepared, review_evidence)
-    tokenizer, tokenizer_files = _tokenizer()
-    snapshot, checkpoint_files = _checkpoint()
-    families = _freeze_inputs(data, tokenizer, rubric_version=rubric_version)
-    expected = _settings(data, tokenizer, tokenizer_files, checkpoint_files, families, rubric_version=rubric_version)
+    tokenizer, tokenizer_files = _tokenizer(judge_profile=judge_profile)
+    snapshot, checkpoint_files = _checkpoint(judge_profile=judge_profile)
+    families = _freeze_inputs(data, tokenizer, rubric_version=rubric_version, judge_profile=judge_profile)
+    expected = _settings(data, tokenizer, tokenizer_files, checkpoint_files, families,
+        rubric_version=rubric_version, judge_profile=judge_profile)
     existed = output.exists()
     from transformers import GenerationConfig
     with _lock(output):
@@ -489,8 +533,8 @@ def calibrate(prepared: Path, review_evidence: Path, output: Path, max_families:
                     record.update(state='input_cap', evidence=None, judgment=_unknown('input_cap'))
                 else:
                     if model is None:
-                        device = _device();train._reset_seed(device)
-                        model = _new_model(snapshot, device, generation)
+                        device = _device(judge_profile=judge_profile);train._reset_seed(device)
+                        model = _new_model(snapshot, device, generation, judge_profile=judge_profile)
                     evidence = runtime.generate_batch(model, tokenizer, [source['input_ids']],
                         generation_config=generation, device=device)
                     require(len(evidence) == 1, 'Generation omitted whole-family evidence')
@@ -517,13 +561,18 @@ def load_calibration(output: Path, prepared: Path, review_evidence: Path) -> dic
     output = Path(output)
     require(not (output/'.writer.lock').exists(), 'Calibration writer lock exists')
     data = _reference_inputs(prepared, review_evidence)
-    tokenizer, tokenizer_files = _tokenizer()
-    _, checkpoint_files = _checkpoint()
     config = _read(output/'run-config.json')
-    rubric_version = _rubric_version(config.get('settings', {}).get('rubric_version'))
-    families = _freeze_inputs(data, tokenizer, rubric_version=rubric_version)
+    settings = config.get('settings', {})
+    judge_profile = settings.get('judge_profile', 'aya-expanse-8b')
+    canonical = _profile_settings(judge_profile)
+    require(settings.get('model') == canonical['model'] and settings.get('revision') == canonical['revision'],
+        'Calibration profile/model/revision binding changed')
+    tokenizer, tokenizer_files = _tokenizer(judge_profile=judge_profile)
+    _, checkpoint_files = _checkpoint(judge_profile=judge_profile)
+    rubric_version = _rubric_version(settings.get('rubric_version'))
+    families = _freeze_inputs(data, tokenizer, rubric_version=rubric_version, judge_profile=judge_profile)
     _validate_config(config, _settings(data, tokenizer, tokenizer_files, checkpoint_files, families,
-        rubric_version=rubric_version), output)
+        rubric_version=rubric_version, judge_profile=judge_profile), output)
     require(_same(_rows(output/'inputs.jsonl'), families), 'Frozen original family/prompt/token mismatch')
     rows = _ledger(output, config, families, tokenizer)
     report = _read(output/'report.json')
@@ -544,10 +593,11 @@ def main(argv=None):
         if name == 'calibrate':
             command.add_argument('--max-families', type=int)
             command.add_argument('--rubric-version', type=int, choices=(1, 2), default=1)
+            command.add_argument('--judge-profile', choices=JUDGE_PROFILES, default='aya-expanse-8b')
     args = parser.parse_args(argv)
     if args.command == 'calibrate':
         report = calibrate(args.prepared, args.review_evidence, args.output, args.max_families,
-            rubric_version=args.rubric_version)
+            rubric_version=args.rubric_version, judge_profile=args.judge_profile)
     else:
         report = load_calibration(args.output, args.prepared, args.review_evidence)['report']
     print(_json(report))
