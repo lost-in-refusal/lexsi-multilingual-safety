@@ -365,3 +365,68 @@ class CalibrationTests(unittest.TestCase):
             verified=quality.main(['verify',*args])
         self.assertEqual(report,verified)
         self.assertEqual(json.loads(output.getvalue())['human_review'],'pending')
+
+    def test_v2_explicit_output_contract_preserves_v1_bytes_and_semantic_rubric(self):
+        import hashlib
+        rows=[dict(lang=lang,instruction='Classify this.',response='Answer in '+lang)
+              for lang in ('en','ko','zh')]
+        v1=quality.family_messages(rows)
+        self.assertEqual(hashlib.sha256(quality._json(v1).encode()).hexdigest(),
+                         '6fc3a552bfc6bc4b94cb415f21c92ccbee6c95967a705d1f4de66775f53d09fb')
+        v2=quality.family_messages(rows,rubric_version=2)
+        self.assertTrue(v2[0]['content'].startswith(v1[0]['content']))
+        contract=v2[0]['content'].split('END QUOTED FAMILY DATA',1)[1]
+        for phrase in ('five top-level keys','en, ko, zh, equivalent_tasks, equivalence_reason',
+                       'only quality and reason','only at the root','80 characters','no Markdown'):
+            self.assertIn(phrase,contract)
+        self.assertEqual(v2[0]['content'].count(quality.RUBRIC),1)
+        # Version2 clarifies output layout, never repairs the same invalid output.
+        malformed='```json\n'+json.dumps(judgment())+'\n```'
+        self.assertFalse(quality.parse_judgment(malformed,finish_reason='eos')['family_pass'])
+
+    def test_version2_frozen_selection_resume_and_reader_inference(self):
+        import inspect
+        self.assertIn('rubric_version',inspect.signature(quality.calibrate).parameters, 'Explicit prompt version selection is missing')
+        self.calibrate(max_families=1,rubric_version=2)
+        loaded=self.load()
+        self.assertEqual(loaded['config']['settings']['rubric_version'],2)
+        self.assertIn('80 characters',loaded['families'][0]['messages'][0]['content'])
+        before={p.relative_to(self.output):p.read_bytes() for p in self.output.rglob('*') if p.is_file()}
+        with self.assertRaisesRegex(ValueError,'binding changed'):self.calibrate(max_families=2)
+        self.assertEqual(before,{p.relative_to(self.output):p.read_bytes() for p in self.output.rglob('*') if p.is_file()})
+        self.calibrate(max_families=2,rubric_version=2)
+        self.assertEqual(len(self.load()['rows']),2)
+
+    def test_v1_archive_reader_uses_frozen_version_but_cannot_append_changed_source(self):
+        self.calibrate(max_families=1)
+        before=self.load()
+        sources=quality._source_paths();changed=self.root/'v2-implementation.py'
+        changed.write_bytes(sources['quality.py'].read_bytes()+b'\n# New executing version.\n')
+        with patch.object(quality,'_source_paths',return_value={**sources,'quality.py':changed}):
+            loaded=self.load()
+            self.assertEqual(loaded,before)
+            self.assertEqual(loaded['config']['settings']['rubric_version'],1)
+            with self.assertRaisesRegex(ValueError,'Current implementation source'):
+                self.calibrate(max_families=2)
+            with self.assertRaisesRegex(ValueError,'binding changed'):
+                self.calibrate(max_families=2,rubric_version=2)
+
+    def test_invalid_versions_and_version_relabeling_cannot_change_bound_prompts(self):
+        for version in (True,False,0,3,'2',None):
+            with self.subTest(version=version),self.assertRaises(ValueError):
+                self.calibrate(max_families=1,rubric_version=version)
+        self.assertFalse(self.output.exists())
+        self.calibrate(max_families=1)
+        config_path=self.output/'run-config.json';config=quality._read(config_path)
+        config['settings']['rubric_version']=2;train._write(config_path,config)
+        with self.assertRaises(ValueError):self.load()
+        with self.assertRaises(ValueError):self.calibrate(max_families=2,rubric_version=2)
+
+    def test_cli_explicit_v2_and_verify_infers_version_without_selection_argument(self):
+        import contextlib
+        import io
+        args=['--prepared',str(self.prepared),'--review-evidence',str(self.review),'--output',str(self.output)]
+        with contextlib.redirect_stdout(io.StringIO()):
+            quality.main(['calibrate',*args,'--max-families','1','--rubric-version','2'])
+            quality.main(['verify',*args])
+        self.assertEqual(self.load()['config']['settings']['rubric_version'],2)

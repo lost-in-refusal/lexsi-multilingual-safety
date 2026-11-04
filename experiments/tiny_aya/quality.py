@@ -105,8 +105,14 @@ def _reason(value):
             'Expected nonempty evidence reason of at most 240 characters')
 
 
-def family_messages(rows):
+def _rubric_version(value):
+    require(type(value) is int and value in (1, 2), 'rubric_version must be 1 or 2')
+    return value
+
+
+def family_messages(rows, *, rubric_version=1):
     """Only explicitly selected source fields enter the quoted-data prompt."""
+    _rubric_version(rubric_version)
     require(type(rows) is list and len(rows) == 3 and [r.get('lang') for r in rows] == list(LANGUAGES),
             'Expected ordered EN/KO/ZH family')
     data = {r['lang']: dict(instruction=r['instruction'], answer=r['response']) for r in rows}
@@ -114,6 +120,15 @@ def family_messages(rows):
                + _json(SCHEMA) + '\nUse specific compact reasons (about 120 characters, at most 240 each). '
                'Do not provide replacement answers or restate examples.\n'
                'BEGIN QUOTED FAMILY DATA (JSON)\n' + _json(data) + '\nEND QUOTED FAMILY DATA')
+    if rubric_version == 2:
+        content += ('\n\nOUTPUT CONTRACT: The output must start with { and end with }. '
+                    'Use no Markdown, no code fences, and no text before or after the JSON object. '
+                    'Use exactly these five top-level keys: en, ko, zh, equivalent_tasks, equivalence_reason. '
+                    'Each language object must contain only quality and reason. '
+                    'The equivalent_tasks and equivalence_reason fields must appear only at the root, '
+                    'never inside a language object. For this output use concise evidence reasons of '
+                    'at most 80 characters each, including equivalence_reason. '
+                    'Keep the quality and equivalence enum values exactly as specified above.')
     return [dict(role='user', content=content)]
 
 
@@ -288,10 +303,10 @@ def _verify_sources(output, sources, *, executing=False):
                 'Current implementation source differs from frozen source; use a fresh output directory')
 
 
-def _freeze_inputs(data, tokenizer):
+def _freeze_inputs(data, tokenizer, *, rubric_version=1):
     families = []
     for family in data['families']:
-        messages = family_messages(family['rows'])
+        messages = family_messages(family['rows'], rubric_version=rubric_version)
         ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True,
             return_dict=False, truncation=False)
         runtime.token_ids(ids, len(tokenizer))
@@ -302,8 +317,8 @@ def _freeze_inputs(data, tokenizer):
     return families
 
 
-def _settings(data, tokenizer, tokenizer_files, checkpoint_files, families):
-    return dict(settings=SETTINGS, rubric=RUBRIC, rubric_sha256=hashlib.sha256(RUBRIC.encode()).hexdigest(),
+def _settings(data, tokenizer, tokenizer_files, checkpoint_files, families, *, rubric_version=1):
+    return dict(settings={**SETTINGS, 'rubric_version': _rubric_version(rubric_version)}, rubric=RUBRIC, rubric_sha256=hashlib.sha256(RUBRIC.encode()).hexdigest(),
         judgment_schema=SCHEMA, bindings=data['bindings'], tokenizer_files=tokenizer_files,
         template=tokenizer.get_chat_template(), template_sha256=hashlib.sha256(tokenizer.get_chat_template().encode()).hexdigest(),
         template_inventory_sha256=_digest(tokenizer.chat_template),
@@ -426,8 +441,10 @@ def _new_model(snapshot, device, generation):
     return model
 
 
-def calibrate(prepared: Path, review_evidence: Path, output: Path, max_families: int | None = None) -> dict:
-    """Run/resume only the 30 original preview families; max is an absolute prefix."""
+def calibrate(prepared: Path, review_evidence: Path, output: Path, max_families: int | None = None,
+              *, rubric_version: int = 1) -> dict:
+    """Run/resume the 30 preview families under one explicitly frozen prompt version."""
+    _rubric_version(rubric_version)
     require(max_families is None or type(max_families) is int and 0 < max_families < FAMILIES,
             'max_families must be a strict incomplete prefix between 1 and 29')
     prepared, review_evidence, output = Path(prepared), Path(review_evidence), Path(output)
@@ -437,8 +454,8 @@ def calibrate(prepared: Path, review_evidence: Path, output: Path, max_families:
     data = _reference_inputs(prepared, review_evidence)
     tokenizer, tokenizer_files = _tokenizer()
     snapshot, checkpoint_files = _checkpoint()
-    families = _freeze_inputs(data, tokenizer)
-    expected = _settings(data, tokenizer, tokenizer_files, checkpoint_files, families)
+    families = _freeze_inputs(data, tokenizer, rubric_version=rubric_version)
+    expected = _settings(data, tokenizer, tokenizer_files, checkpoint_files, families, rubric_version=rubric_version)
     existed = output.exists()
     from transformers import GenerationConfig
     with _lock(output):
@@ -502,9 +519,11 @@ def load_calibration(output: Path, prepared: Path, review_evidence: Path) -> dic
     data = _reference_inputs(prepared, review_evidence)
     tokenizer, tokenizer_files = _tokenizer()
     _, checkpoint_files = _checkpoint()
-    families = _freeze_inputs(data, tokenizer)
     config = _read(output/'run-config.json')
-    _validate_config(config, _settings(data, tokenizer, tokenizer_files, checkpoint_files, families), output)
+    rubric_version = _rubric_version(config.get('settings', {}).get('rubric_version'))
+    families = _freeze_inputs(data, tokenizer, rubric_version=rubric_version)
+    _validate_config(config, _settings(data, tokenizer, tokenizer_files, checkpoint_files, families,
+        rubric_version=rubric_version), output)
     require(_same(_rows(output/'inputs.jsonl'), families), 'Frozen original family/prompt/token mismatch')
     rows = _ledger(output, config, families, tokenizer)
     report = _read(output/'report.json')
@@ -522,10 +541,13 @@ def main(argv=None):
         command.add_argument('--prepared', type=Path, required=True)
         command.add_argument('--review-evidence', type=Path, required=True)
         command.add_argument('--output', type=Path, required=True)
-        if name == 'calibrate':command.add_argument('--max-families', type=int)
+        if name == 'calibrate':
+            command.add_argument('--max-families', type=int)
+            command.add_argument('--rubric-version', type=int, choices=(1, 2), default=1)
     args = parser.parse_args(argv)
     if args.command == 'calibrate':
-        report = calibrate(args.prepared, args.review_evidence, args.output, args.max_families)
+        report = calibrate(args.prepared, args.review_evidence, args.output, args.max_families,
+            rubric_version=args.rubric_version)
     else:
         report = load_calibration(args.output, args.prepared, args.review_evidence)['report']
     print(_json(report))
