@@ -115,7 +115,7 @@ def full_fixture():
     for arm in ('plain','safegrad'):
         evidence['training'][arm]=dict(config=dict(loader='Transformers + PEFT; SafeTune KL helper'),
             report=dict(status='complete',run_kind='full',arm=arm,optimizer_steps=171))
-    pack=dict(rows=[],audit=[],toolkit_evidence=evidence)
+    pack=dict(config=dict(schema_version=1),rows=[],audit=[],toolkit_evidence=evidence)
     safety=dict(config=dict(kind='safety'),report=dict(status='complete'),rows=[])
     task=dict(config=dict(kind='task'),report=dict(status='complete'),rows=[])
     import hashlib
