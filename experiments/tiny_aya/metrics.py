@@ -61,7 +61,7 @@ def measure_row(source, safety, task=None):
             refusal=parsed.get('refusal') if observed else None,task_scores=(task or {}).get('parsed',{}).get('scores')))
 
 
-def aggregate(rows):
+def aggregate(rows, *, macro=False):
     require(bool(rows),'Cannot aggregate empty rows')
     names=set(rows[0]['endpoints'])
     require(all(set(r['endpoints'])==names for r in rows),'Inconsistent endpoint schema')
@@ -71,6 +71,18 @@ def aggregate(rows):
         result[name]=dict(total=n,known=len(known),unknown=n-len(known),coverage=len(known)/n,
             missingness_bounds=[sum(r['endpoints'][name][i] for r in rows)/n for i in (0,1)],
             scorable_only=sum(known)/len(known) if known else None,known_sum=sum(known))
+        if macro:
+            languages=sorted({r['lang'] for r in rows})
+            coverage={}
+            for lang in languages:
+                selected=[r for r in rows if r['lang']==lang]
+                valid=[r['endpoints'][name][0] for r in selected if r['known'][name]]
+                coverage[lang]=dict(total=len(selected),known=len(valid),coverage=len(valid)/len(selected),
+                    scorable_only=sum(valid)/len(valid) if valid else None)
+            undefined=[lang for lang in languages if not coverage[lang]['known']]
+            result[name].update(scorable_only=None if undefined else
+                sum(coverage[lang]['scorable_only'] for lang in languages)/len(languages),
+                language_coverage=coverage,undefined_languages=undefined,scorable_only_weighting='equal_language')
     return result
 
 
@@ -85,6 +97,7 @@ def paired_comparison(old,new):
     require(bool(older) and older.keys()==newer.keys(),'Paired item sets differ')
     families=sorted({k[0] for k in older});langs={f:{k[1] for k in older if k[0]==f} for f in families}
     require(len({tuple(sorted(v)) for v in langs.values()})==1,'Incomplete translated family')
+    languages=sorted(next(iter(langs.values())))
     names=set(old[0]['endpoints'])
     require(all(set(r['endpoints'])==names for r in old+new),'Paired metric sets differ')
     draws=np.random.default_rng(SEED).integers(0,len(families),size=(BOOTSTRAP_SAMPLES,len(families)))
@@ -94,21 +107,35 @@ def paired_comparison(old,new):
     for name in sorted(names):
         lower=[];upper=[];complete_sum=[];complete_n=[]
         for family in families:
-            pairs=[(older[(family,l)],newer[(family,l)]) for l in sorted(langs[family])]
+            pairs=[(older[(family,l)],newer[(family,l)]) for l in languages]
             lower.append(sum(b['endpoints'][name][0]-a['endpoints'][name][1] for a,b in pairs)/len(pairs))
             upper.append(sum(b['endpoints'][name][1]-a['endpoints'][name][0] for a,b in pairs)/len(pairs))
-            complete=[b['endpoints'][name][0]-a['endpoints'][name][0] for a,b in pairs if a['known'][name] and b['known'][name]]
-            complete_sum.append(sum(complete));complete_n.append(len(complete))
+            complete=[a['known'][name] and b['known'][name] for a,b in pairs]
+            complete_sum.append([b['endpoints'][name][0]-a['endpoints'][name][0] if valid else 0.
+                                 for (a,b),valid in zip(pairs,complete)])
+            complete_n.append([int(valid) for valid in complete])
         lo,hi=np.array(lower),np.array(upper)
         sums,counts=np.array(complete_sum),np.array(complete_n)
-        sample_counts=counts[draws].sum(axis=1);valid=sample_counts>0
-        sample_deltas=sums[draws].sum(axis=1)[valid]/sample_counts[valid]
-        count=int(counts.sum())
+        sample_counts=counts[draws].sum(axis=1);valid=(sample_counts>0).all(axis=1)
+        sample_deltas=(sums[draws].sum(axis=1)[valid]/sample_counts[valid]).mean(axis=1)
+        language_counts=counts.sum(axis=0);language_sums=sums.sum(axis=0)
+        undefined=[lang for lang,count in zip(languages,language_counts) if count==0]
+        count=int(language_counts.sum())
+        delta=float((language_sums/language_counts).mean()) if not undefined else None
         result[name]=dict(missingness_delta_bounds=[float(lo.mean()),float(hi.mean())],
             endpoint_ci95=dict(lower=ci(lo[draws].mean(axis=1)),upper=ci(hi[draws].mean(axis=1))),
             paired_complete_case=dict(count=count,total=len(old),coverage=count/len(old),
-                delta=float(sums.sum()/count) if count else None,ci95=ci(sample_deltas),
+                delta=delta,ci95=ci(sample_deltas),
                 bootstrap_replicates_with_pairs=int(valid.sum())))
+        result[name]['paired_complete_case'].update(
+                weighting='equal_language',undefined_languages=undefined,
+                language_coverage={lang:dict(count=int(language_counts[i]),total=len(families),
+                    coverage=float(language_counts[i]/len(families)),
+                    delta=float(language_sums[i]/language_counts[i]) if language_counts[i] else None)
+                    for i,lang in enumerate(languages)},
+                bootstrap_replicates_without_all_languages=int((~valid).sum()),
+                bootstrap_estimable_fraction=float(valid.mean()),
+                ci95_scope='Conditional on bootstrap replicates with at least one complete pair in every language; undefined if none are estimable.')
     return result
 
 
@@ -282,7 +309,7 @@ def summarize(pack:Path,safety:Path,task:Path,output:Path)->dict:
         config=dict(schema_version=1,seed=SEED,bootstrap_samples=BOOTSTRAP_SAMPLES,
             inputs={name:_hash_file(path/'manifest.json') for name,path in (('pack',pack),('safety',safety),('task',task))},
             source_hashes=source_hashes,rows_sha256=_digest(rows),bootstrap_unit='Matched family IDs; translations stay together; attack and task resampled separately.',
-            interval_policy='95% percentile bootstrap intervals for each missingness-bound endpoint and paired complete cases; unknowns never become zero.')
+            interval_policy='95% percentile bootstrap intervals for each missingness-bound endpoint use all draws. Paired complete-case intervals are conditional on draws estimable in every language; unknowns never become zero.')
         _write(output/'run-config.json',config)
         groups={};diagnostics={};native={}
         for arm in ARMS:
@@ -293,8 +320,9 @@ def summarize(pack:Path,safety:Path,task:Path,output:Path)->dict:
                     selected=[r for r in rows if r['arm']==arm and r['split']==split and r['lang']==lang]
                     pooled+=selected;groups[key]=aggregate(selected);diagnostics[key]=_diagnostics(selected)
                     native[key]=run_auditkit(selected,output/'auditkit'/arm/split/lang/'native.json')
-                # Balanced denominators make this pooled mean exactly the equal-language macro.
-                groups[f'{arm}/{split}/macro']=aggregate(pooled)
+                # Full-denominator bounds are balanced; observed-only estimates
+                # additionally require equal weights for per-language estimates.
+                groups[f'{arm}/{split}/macro']=aggregate(pooled,macro=True)
                 diagnostics[f'{arm}/{split}/macro']=_diagnostics(pooled)
         comparisons={}
         for old,new in (('base','plain'),('base','safegrad'),('plain','safegrad')):
@@ -309,7 +337,8 @@ def summarize(pack:Path,safety:Path,task:Path,output:Path)->dict:
             uncertainty=dict(seed=SEED,samples=BOOTSTRAP_SAMPLES,unit='family ID',confidence_level=.95,
                 missingness_bounds='Full frozen denominators with unknown binary [0,1] and task [1,7].',
                 confidence_intervals='95% percentile family-paired bootstrap, separately for bound endpoints and complete-case differences.',
-                macro='Equal language mean; matched translations remain together in pooled family draws.'),
+                macro='Equal language mean, including scorable-only and paired complete-case estimates. A language without valid observations makes that macro undefined; translations stay together in family draws.',
+                complete_case_ci_scope='Conditional on replicates estimable in every language; estimable counts/fraction reported. Full-set bound endpoint intervals use all 10000 draws.'),
             config_sha256=_hash_file(output/'run-config.json'),groups=groups,diagnostics=diagnostics,
             comparisons=comparisons,native=native,toolkit_roles={**toolkit_roles,
                 'auditkit':dict(status='executed',role='Native PrecomputedModel and explicit frozen endpoint scorers; no new model or judge calls.',

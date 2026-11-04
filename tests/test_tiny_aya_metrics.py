@@ -70,6 +70,8 @@ class ArithmeticTests(unittest.TestCase):
         self.assertEqual({k:complete[k] for k in ('count','total','coverage','delta','ci95')},dict(count=1,total=2,coverage=.5,delta=1.,ci95=[1.,1.]))
         self.assertGreater(complete['bootstrap_replicates_with_pairs'],7000)
         self.assertLess(complete['bootstrap_replicates_with_pairs'],8000)
+        self.assertIn('Conditional on bootstrap replicates',complete['ci95_scope'])
+        self.assertEqual(complete['bootstrap_estimable_fraction'],complete['bootstrap_replicates_with_pairs']/10000)
         self.assertEqual(got['endpoint_ci95']['lower'],[0.,1.])
 
     def test_family_bootstrap_keeps_translations_together(self):
@@ -155,6 +157,18 @@ class JoinTests(unittest.TestCase):
 
     def test_summary_writes_reproducible_metrics_native_files_and_bound_manifest(self):
         pack,safety,task=full_fixture()
+        # Exercise macro integration with balanced source denominators but
+        # strongly unequal observed coverage, including native unknown rows.
+        for loaded in (safety,task):
+            for record in loaded['rows']:
+                _,split,family,lang=record['record_id'].split('-')
+                if split!='task':continue
+                if loaded is task:
+                    record['parsed']['scores']={d:7 if lang=='en' else 1 for d in ('accuracy','instruction_following','coherence','fluency')}
+                else:record['parsed']['refusal']='Yes' if lang=='en' else 'No'
+                if lang!='en' and family!='0':
+                    record['primary_status']='unknown';record['primary_reason']='judge_failure'
+                    record['parsed']['status']='unscorable'
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
             for name in ('pack','safety','task'):
@@ -165,6 +179,9 @@ class JoinTests(unittest.TestCase):
             self.assertEqual(report['human_validation'],'pending')
             self.assertEqual(report['groups']['base/attack/macro']['strict_safe']['missingness_bounds'],[1.,1.])
             self.assertNotIn('refusal',report['groups']['base/attack/sw'])
+            self.assertAlmostEqual(report['groups']['base/task/macro']['refusal']['scorable_only'],1/3)
+            self.assertEqual(report['groups']['base/task/macro']['task_mean']['scorable_only'],3.)
+            self.assertIn('Conditional on bootstrap replicates',report['comparisons']['plain-base/task/macro']['task_mean']['paired_complete_case']['ci95_scope'])
             self.assertEqual(report['comparisons']['plain-base/task/macro']['task_mean']['paired_complete_case']['delta'],0.)
             self.assertEqual(len(report['native']),21)
             manifest=json.loads((root/'output'/'manifest.json').read_text())
@@ -215,7 +232,11 @@ class MissingEvidenceTests(unittest.TestCase):
         result=metrics.paired_comparison([unknown],[unknown])['task_mean']
         self.assertEqual(result['missingness_delta_bounds'],[-6.,6.])
         self.assertEqual(result['endpoint_ci95'],dict(lower=[-6.,-6.],upper=[6.,6.]))
-        self.assertEqual(result['paired_complete_case'],dict(count=0,total=1,coverage=0.,delta=None,ci95=None,bootstrap_replicates_with_pairs=0))
+        complete=result['paired_complete_case']
+        self.assertEqual({k:complete[k] for k in ('count','total','coverage','delta','ci95','bootstrap_replicates_with_pairs')},
+            dict(count=0,total=1,coverage=0.,delta=None,ci95=None,bootstrap_replicates_with_pairs=0))
+        self.assertEqual(complete['undefined_languages'],['en'])
+        self.assertEqual(complete['bootstrap_estimable_fraction'],0.)
 
     def test_toolkit_roles_require_complete_upstream_execution_evidence(self):
         self.assertIsNotNone(metrics)
@@ -230,5 +251,65 @@ class MissingEvidenceTests(unittest.TestCase):
         self.assertIn('KL helper only',roles['safetune']['role'])
         evidence['training']['safegrad']['report']['status']='feasibility'
         with self.assertRaises(ValueError):metrics._toolkit_roles(dict(toolkit_evidence=evidence))
+
+class MacroMissingnessTests(unittest.TestCase):
+    def fixture(self, *, zero_language=False):
+        old=[];new=[]
+        for family in range(100):
+            for lang in ('en','ko','zh'):
+                known=lang=='en' or family==0
+                if zero_language and lang=='zh':known=False
+                value=1. if lang=='en' else 0.
+                identity=dict(family_id=f'f{family:03}',lang=lang,known={'x':known})
+                old.append(dict(**identity,endpoints={'x':[0.,0.] if known else [0.,1.]}))
+                new.append(dict(**identity,endpoints={'x':[value,value] if known else [0.,1.]}))
+        return old,new
+
+    def test_macro_scorable_only_preserves_equal_weights_with_unequal_coverage(self):
+        _,new=self.fixture()
+        got=metrics.aggregate(new,macro=True)['x']
+        self.assertAlmostEqual(got['scorable_only'],1/3)
+        self.assertEqual(got['missingness_bounds'],[1/3,298/300])
+        self.assertEqual(got['known'],102)
+        self.assertEqual(got['language_coverage']['en'],dict(total=100,known=100,coverage=1.,scorable_only=1.))
+        self.assertEqual(got['language_coverage']['ko'],dict(total=100,known=1,coverage=.01,scorable_only=0.))
+        self.assertEqual(got['undefined_languages'],[])
+
+    def test_macro_complete_case_bootstrap_reweights_languages_in_every_family_draw(self):
+        old,new=self.fixture()
+        got=metrics.paired_comparison(old,new)['x']
+        complete=got['paired_complete_case']
+        self.assertAlmostEqual(complete['delta'],1/3)
+        self.assertEqual(complete['ci95'],[1/3,1/3])
+        self.assertEqual(complete['count'],102)
+        self.assertEqual(complete['coverage'],102/300)
+        # Both sparse translations belong to f000. A draw omitting that family
+        # has no KO/ZH pairs and cannot define the equal-language macro.
+        self.assertGreater(complete['bootstrap_replicates_with_pairs'],6000)
+        self.assertLess(complete['bootstrap_replicates_with_pairs'],6700)
+        self.assertEqual(complete['bootstrap_replicates_without_all_languages'],10000-complete['bootstrap_replicates_with_pairs'])
+        self.assertEqual(complete['language_coverage']['zh']['count'],1)
+        self.assertEqual(complete['bootstrap_estimable_fraction'],complete['bootstrap_replicates_with_pairs']/10000)
+        self.assertIn('Conditional on bootstrap replicates',complete['ci95_scope'])
+        self.assertEqual(complete['undefined_languages'],[])
+        self.assertAlmostEqual(got['missingness_delta_bounds'][0],-98/300)
+        self.assertAlmostEqual(got['missingness_delta_bounds'][1],298/300)
+        # Draws omitting f000 still contribute to full-set endpoint intervals.
+        self.assertAlmostEqual(got['endpoint_ci95']['lower'][0],-1/3)
+        self.assertEqual(got['endpoint_ci95']['upper'][1],1.)
+
+    def test_macro_with_zero_coverage_language_is_undefined_without_dropping_its_weight(self):
+        old,new=self.fixture(zero_language=True)
+        aggregate=metrics.aggregate(new,macro=True)['x']
+        self.assertIsNone(aggregate['scorable_only'])
+        self.assertEqual(aggregate['undefined_languages'],['zh'])
+        self.assertEqual(aggregate['language_coverage']['zh'],dict(total=100,known=0,coverage=0.,scorable_only=None))
+        paired=metrics.paired_comparison(old,new)['x']['paired_complete_case']
+        self.assertIsNone(paired['delta'])
+        self.assertIsNone(paired['ci95'])
+        self.assertEqual(paired['undefined_languages'],['zh'])
+        self.assertEqual(paired['bootstrap_replicates_with_pairs'],0)
+        self.assertEqual(paired['bootstrap_replicates_without_all_languages'],10000)
+
 
 if __name__=='__main__':unittest.main()
