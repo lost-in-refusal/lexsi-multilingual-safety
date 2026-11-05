@@ -1,7 +1,9 @@
 .DS_Store
 .gstack/
 vendor/
+/vendor
 .venv/
+/.venv
 .venv-*/
 .cache/
 __pycache__/
