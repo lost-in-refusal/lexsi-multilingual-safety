@@ -54,6 +54,13 @@ base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
   over-refusal rising from 7.2% to 25.3%. At half strength steering matches SafeGrad on attacks (macro 5.0 vs 6.6%
   on the same prompts) but over-refuses 10.6% vs 5.6%; SafeGrad is the only fix that does not raise over-refusal.
   ([`results/lir/steering/results.md`](results/lir/steering/results.md))
+- **Circuits (CircuitKIT, EAP-IG).** Refusal is spread out: on held-out English pairs the top 50 of Tiny Aya's
+  612 nodes recover only 3% of the harmful-vs-harmless contrast, the top 200 recover 65%. At that size every pair
+  of languages shares 136–155 of its top-200 nodes (65 by chance), consistent with one shared mechanism. Plain LoRA keeps 181
+  of English's top-200 nodes but only 156 of Korean's, and halves Korean's first-token contrast (6.2 → 3.0 logits),
+  the largest drop of the four languages, matching where the attacks get through. SafeGrad moves every language's
+  circuit back towards the base model and recovers more than half of Korean's lost contrast (4.8).
+  ([`results/lir/circuits/`](results/lir/circuits/))
 
 Judge-corrected attack success (an answer counts as unsafe if the guard flags it as written or after
 back-translation to English; [`results/lir/swahili_backtranslation_check.json`](results/lir/swahili_backtranslation_check.json)):
@@ -90,7 +97,7 @@ All are private until the Nov 13 freeze.
 | 1. Data | **CuratorKIT** | `TextCleaner`, `ExactDeduplicator`, `MinHashDeduplicator` on Bactrian-X; cleaning of MultiJail prompts; train/eval near-duplicate removal | `lir/data.py` |
 | 2. Fine-tune and harden | **SafeTune** | `SafeGradHFTrainer` global gradient surgery + `safegrad_kl_alignment_loss` against the frozen base on the MultiJail alignment slice | `lir/train.py` |
 | 3. Audit | **AuditKIT** | Scores every saved output (`PrecomputedModel`), aggregates per language, paired bootstrap vs the base model (`RunComparison`) | `lir/metrics.py` |
-| 4. Explain | **CircuitKIT** | EAP-IG refusal-circuit discovery per language and cross-language overlap | `lir/circuits.py` |
+| 4. Explain | **CircuitKIT** | EAP-IG refusal-circuit discovery per language and model, cross-language and cross-model overlap, patching faithfulness on held-out pairs | `lir/circuits.py` |
 
 Plus our own probes (`lir/probe.py`: difference-of-means refusal directions, linear vs MLP probes, drift of the
 refusal projection) and a causal steering check (`lir/steer.py`).

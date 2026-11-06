@@ -3,7 +3,9 @@
   python -m lir.circuits discover --tag base --device mps
   python -m lir.circuits discover --tag plain --adapter runs/plain/adapter --device mps
   python -m lir.circuits discover --tag base --dry-run       # pairs + answer tokens only
-  python -m lir.circuits compare --tags base plain
+  python -m lir.circuits compare --tags base plain safegrad
+  python -m lir.circuits faithfulness --tag base --ks 612 300 100 50 --device mps   # held-out pairs
+  python -m lir.circuits margin --device mps        # the metric with the top-5 opening tokens per side
 
 Run with .venv-circuit/bin/python. Every language gets the same MultiJail
 families. Clean = harmful prompt, corrupt = a same-language XSTest prompt with
@@ -16,8 +18,10 @@ fine-tuned runs share one metric. Families depend on --langs and the XSTest
 files, tokens on the generation/guard files present: run all arms against the
 same inputs (compare warns if they differ).
 
-Writes results/lir/circuits/<tag>_<lang>.json, raw CircuitKIT artifacts under
-results/lir/circuits/raw/<tag>/, and compare_<tags>.json.
+Faithfulness is CircuitKIT's patching pillar on the global top-k nodes, scored on
+the next n families in the same order (held out from discovery, paired the same
+way). Writes results/lir/circuits/<tag>_<lang>.json, raw CircuitKIT artifacts
+under results/lir/circuits/raw/<tag>/, compare_<tags>.json and margin_check.json.
 """
 from __future__ import annotations
 
@@ -338,6 +342,16 @@ def discover(a) -> None:
         })
 
 
+def pruned_for_top_k(ranked: list, k: int) -> list:
+    """Lowest-scoring nodes to hand CircuitKIT as the pruned list so that it keeps exactly the top k.
+
+    CircuitKIT keeps int(N * (1 - pruned/N)) nodes, which can round one short.
+    """
+    total = len(ranked)
+    m = next((m for m in (total - k, total - k - 1) if m >= 0 and int(total * (1 - m / total)) == k), total - k)
+    return ranked[total - m:]  # not ranked[-m:], which is everything when m == 0
+
+
 def faithfulness(ck, model, circuit, name, n, a, path: Path):
     """CircuitKIT's patching pillar on the global top-k nodes.
 
@@ -351,8 +365,9 @@ def faithfulness(ck, model, circuit, name, n, a, path: Path):
 
     ranked = sorted(circuit.scores, key=circuit.scores.get, reverse=True)
     total = len(ranked)
-    m = next((m for m in (total - a.k, total - a.k - 1) if int(total * (1 - m / total)) == a.k), total - a.k)
-    top = Circuit(ranked[-m:], circuit.scores, algorithm="eap-ig", level="node")  # nodes = the pruned ones
+    pruned = pruned_for_top_k(ranked, a.k)
+    m = len(pruned)
+    top = Circuit(pruned, circuit.scores, algorithm="eap-ig", level="node")  # nodes = the pruned ones
     try:
         rep = ck.faithfulness(model, top, name, pillars=["patching"], n_examples=n, batch_size=a.batch_size,
                               device=a.device)
@@ -363,6 +378,111 @@ def faithfulness(ck, model, circuit, name, n, a, path: Path):
     except Exception as e:  # report and keep the discovery result
         log(f"WARNING faithfulness failed: {e!r}")
         return {"error": repr(e)}
+
+
+def faithful(a) -> None:
+    """Patching faithfulness for circuits already discovered, with the discovery run's answer tokens, on the
+    next n_examples families in the same order (held out from discovery, same exact-length pairing)."""
+    import circuitkit as ck  # noqa: F401  (before anything pulls in transformer_lens)
+    from circuitkit.circuit import Circuit
+    from transformers import AutoTokenizer
+
+    path = resolve(a.model)
+    tok = AutoTokenizer.from_pretrained(path)
+    p = Prompter(tok, bool(getattr(tok, "chat_template", None)))
+    out = Path(a.out)
+    saved = {lang: json.loads((out / f"{a.tag}_{lang}.json").read_text()) for lang in a.langs}
+    tokens = {lang: s["answer_tokens"] for lang, s in saved.items()}  # the discovery run's metric
+    # discovery picked families for all evaluation languages at once; the first n reproduce it
+    n = a.n_examples
+    _, pairs = build_pairs(p, EVAL_LANGS, 2 * n, a.max_prompt_tokens, a.max_gap)
+    for lang, s in saved.items():
+        rows = pairs[lang]["rows"]
+        if [r["family"] for r in rows[:n]] != [r["family"] for r in s["pairs"]["rows"]]:
+            sys.exit(f"[{lang}] families differ from the discovery run; pass the same --n-examples/--max-gap")
+        if len(rows) < 2 * n:
+            sys.exit(f"[{lang}] only {len(rows) - n} held-out families")
+        pairs[lang]["rows"] = rows[n:]
+    a.adapter = a.adapter or saved[a.langs[0]].get("adapter")
+    a.save_merged = False
+    model = load_model(path, a)
+    a.faithfulness = True
+    for lang in a.langs:
+        name = f"lir_refusal_{a.tag}_{lang}_heldout"
+        circuit = Circuit.from_artifact(out / "raw" / a.tag / f"{lang}.pt")
+        s = saved[lang]
+        held = (s.get("faithfulness") or {}).get("held_out_by_k", {})
+        with tempfile.TemporaryDirectory() as cache:
+            register(name, pairs[lang]["rows"], p, tokens[lang], cache)
+            for k in a.ks:
+                a.k = k
+                t0 = time.time()
+                res = faithfulness(ck, model, circuit, name, len(pairs[lang]["rows"]), a,
+                                   out / "raw" / a.tag / f"{lang}_faithfulness_heldout_k{k}.json")
+                res["seconds"] = round(time.time() - t0, 1)
+                held[str(k)] = res
+                log(f"[{lang}] k={k} faithfulness {res.get('patching_score')} ({res['seconds']}s)")
+                s["faithfulness"] = {"held_out_families": [r["family"] for r in pairs[lang]["rows"]],
+                                     "held_out_by_k": dict(sorted(held.items(), key=lambda kv: int(kv[0])))}
+                write_json(out / f"{a.tag}_{lang}.json", s)
+
+
+def margin(a) -> None:
+    """Robustness check on the circuit metric: the same harmful/benign pairs, scored with each language's
+    top-n refusal and compliance opening tokens (log-sum-exp of their log-probs) instead of one token each."""
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    path = resolve(MODEL)
+    tok = AutoTokenizer.from_pretrained(path)
+    p = Prompter(tok, True)
+    _, pairs = build_pairs(p, EVAL_LANGS, a.n_examples, a.max_prompt_tokens, a.max_gap)
+    gen = Path(a.gen_dir)
+    plan = [("refusal", *_responses(gen, "attack")), ("compliance", *_responses(gen, "xstest"))]
+    sets = {}
+    for lang in EVAL_LANGS:
+        counts = {side: Counter(p.continuation(t)[0] for r in rows if r.get("lang") == lang
+                                and (t := r.get("response", "").lstrip()) and _refused(r, src) == (side == "refusal"))
+                  for side, rows, src in plan}
+        tot = {side: sum(c.values()) for side, c in counts.items()}
+        sets[lang] = {}
+        for side, c in counts.items():
+            o = counts["compliance" if side == "refusal" else "refusal"]
+            other = "compliance" if side == "refusal" else "refusal"
+            # a token counts for the side whose answers it opens more often, relative to that side's size
+            top = [(i, n) for i, n in c.most_common() if n / tot[side] > o[i] / tot[other]][:a.top_n]
+            sets[lang][side] = {"ids": [i for i, _ in top], "tokens": [tok.decode([i]) for i, _ in top],
+                                "share": round(sum(n for _, n in top) / sum(c.values()), 3)}
+    dev = a.device
+    res = {"top_n": a.top_n, "sets": sets, "arms": {}}
+    for tag, adapter in a.arms:
+        model = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16, attn_implementation="eager")
+        if adapter:
+            from peft import PeftModel
+
+            model = PeftModel.from_pretrained(model, adapter).merge_and_unload()
+        model.to(dev).eval()
+        res["arms"][tag] = {}
+        for lang in EVAL_LANGS:
+            r_ids = torch.tensor(sets[lang]["refusal"]["ids"], device=dev)
+            c_ids = torch.tensor(sets[lang]["compliance"]["ids"], device=dev)
+            out = {}
+            for kind in ("harmful", "benign"):
+                vals = []
+                with torch.no_grad():
+                    for row in pairs[lang]["rows"]:
+                        ids = torch.tensor([p.ids(p(row[kind]))], device=dev)
+                        lp = model(ids).logits[0, -1].float().log_softmax(-1)
+                        vals.append((lp[r_ids].logsumexp(0) - lp[c_ids].logsumexp(0)).item())
+                out[kind] = sum(vals) / len(vals)
+            out["separation"] = out["harmful"] - out["benign"]
+            res["arms"][tag][lang] = out
+            log(f"[{tag}/{lang}] set contrast harmful {out['harmful']:+.2f} benign {out['benign']:+.2f} "
+                f"separation {out['separation']:.2f}")
+        del model
+        if dev == "mps":
+            torch.mps.empty_cache()
+    write_json(Path(a.out) / "margin_check.json", res)
 
 
 def spearman(x: dict, y: dict) -> float:
@@ -410,7 +530,7 @@ def compare(a) -> None:
             shared[tag] = sorted(set.intersection(*sets))
     res = {"k": k, "n_nodes": n_nodes, "runs": names, "jaccard": jac.matrix, "overlap": overlap,
            "spearman": rho, "jaccard_chance": chance, "shared_by_all_langs": shared, "top_k": jac.top_nodes}
-    path = Path(a.out) / f"compare_{'-'.join(a.tags)}.json"
+    path = Path(a.out) / f"compare_{'-'.join(a.tags)}{'' if k == 50 else f'_k{k}'}.json"
     write_json(path, res)
     w = max(len(x) for x in names) + 2
     for title, m in [(f"top-{k} Jaccard (chance {chance:.3f})", jac.matrix), ("Spearman rho of node scores", rho)]:
@@ -457,6 +577,30 @@ def main() -> None:
     d.add_argument("--no-chat-template", action="store_true")
     d.add_argument("--dry-run", action="store_true")
     d.add_argument("--out", default=str(OUT))
+    f = sub.add_parser("faithfulness", help="patching pillar for circuits already discovered")
+    f.add_argument("--tag", required=True)
+    f.add_argument("--model", default=MODEL)
+    f.add_argument("--adapter", help="defaults to the adapter recorded by the discovery run")
+    f.add_argument("--langs", nargs="+", default=EVAL_LANGS)
+    f.add_argument("--n-examples", type=int, default=64)
+    f.add_argument("--max-prompt-tokens", type=int, default=32)
+    f.add_argument("--max-gap", type=int, default=0)
+    f.add_argument("--ks", type=int, nargs="+", default=[50], help="circuit sizes (top-k nodes) to evaluate")
+    f.add_argument("--batch-size", type=int, default=1)
+    f.add_argument("--device", default="cpu")
+    f.add_argument("--dtype", default="bfloat16")
+    f.add_argument("--out", default=str(OUT))
+    m = sub.add_parser("margin", help="harmful/benign contrast over the top-n opening tokens per side")
+    m.add_argument("--arms", type=lambda s: tuple(s.split("=", 1)) if "=" in s else (s, None), nargs="+",
+                   default=[("base", None), ("plain", "runs/plain/adapter"), ("safegrad", "runs/safegrad/adapter")],
+                   metavar="TAG[=ADAPTER]")
+    m.add_argument("--top-n", type=int, default=5)
+    m.add_argument("--n-examples", type=int, default=64)
+    m.add_argument("--max-prompt-tokens", type=int, default=32)
+    m.add_argument("--max-gap", type=int, default=0)
+    m.add_argument("--device", default="mps")
+    m.add_argument("--gen-dir", default=str(RUNS / "eval" / "base"))
+    m.add_argument("--out", default=str(OUT))
     c = sub.add_parser("compare")
     c.add_argument("--tags", nargs="+", required=True)
     c.add_argument("--langs", nargs="+", default=EVAL_LANGS)
@@ -467,7 +611,7 @@ def main() -> None:
     # (W_U, gated MLP); same scores to ~1e-6 here, ~30% lower peak memory.
     # Read when circuitkit is first imported, so set it before that.
     os.environ.setdefault("CIRCUITKIT_TL_MEMORY_PATCH", "1")
-    discover(a) if a.cmd == "discover" else compare(a)
+    {"discover": discover, "faithfulness": faithful, "margin": margin, "compare": compare}[a.cmd](a)
 
 
 if __name__ == "__main__":

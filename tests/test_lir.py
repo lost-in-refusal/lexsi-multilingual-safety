@@ -2,6 +2,7 @@
 import unittest
 
 from lir import guard, judge, metrics
+from lir.circuits import pruned_for_top_k
 from lir.common import rank_key
 
 
@@ -66,3 +67,22 @@ class Encode(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CircuitSize(unittest.TestCase):
+    def kept(self, ranked, pruned):
+        n = len(ranked)
+        return int(n * (1 - len(pruned) / n))
+
+    def test_keep_all_prunes_nothing(self):
+        ranked = [f"n{i}" for i in range(612)]
+        self.assertEqual(pruned_for_top_k(ranked, 612), [])
+
+    def test_kept_count(self):
+        # CircuitKIT truncates int(N * (1 - m / N)); for some k (200 of 612) no m gives exactly k
+        ranked = [f"n{i}" for i in range(612)]
+        for k in (20, 50, 64, 100, 200, 300, 400):
+            pruned = pruned_for_top_k(ranked, k)
+            self.assertIn(self.kept(ranked, pruned), (k - 1, k))
+            self.assertNotIn("n0", pruned)  # the top-scoring node is never pruned
+        self.assertEqual(self.kept(ranked, pruned_for_top_k(ranked, 50)), 50)

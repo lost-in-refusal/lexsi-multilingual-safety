@@ -3,7 +3,7 @@ title: "Lost in Refusal: fine-tuning a multilingual support bot breaks its refus
 authors: [aishwarya-nikkumbh, xtnayk, pham215]
 ---
 
-<!-- Draft for Aish to own. Every number comes from results/lir/*.json; {{...}} marks numbers still being computed. -->
+<!-- Draft for Aish to own. Every number comes from results/lir/*.json; {{...}} marks results still pending (human labels). -->
 
 # Lost in Refusal
 
@@ -175,7 +175,57 @@ prompts, Korean 7.5% for both) but refuses 10.6% of safe prompts against SafeGra
 here that does not raise over-refusal, and it needs no change at inference time. With 80 families per language
 these differences are a few prompts each, so read them as a trade-off curve, not a ranking.
 
-{{CircuitKIT: overlap of per-language refusal circuits (EAP-IG, top-k nodes), base vs plain}}
+**Circuits: what fine-tuning changes inside.** CircuitKIT's EAP-IG scores each of the model's 612 nodes (36 MLPs,
+576 attention heads) by how much it carries one contrast: the logit of the model's usual first refusal token minus
+that of its usual first compliant token, at the first response position, between a harmful MultiJail prompt and a
+same-language XSTest prompt of identical templated length. The tokens come from the base model's own answers ("I'm"
+vs "To" in English, "죄" vs "물론" in Korean) and are the same for every model, as are the 64 MultiJail families per
+language.
+
+Refusal turns out to be spread across the network. In CircuitKIT's patching test on 64 held-out English pairs
+(every node outside the circuit fed from the harmless prompt), the top 50 nodes recover 3% of the contrast, 100
+nodes 18%, 200 nodes 65%, 300 nodes 89% and 400 nodes 97%. We therefore compare models at 200 nodes and over the
+full ranking, not on a small circuit.
+
+| Per language | en | ko | zh | sw |
+|---|---|---|---|---|
+| Harmful − harmless contrast (logits), base → plain → SafeGrad | 8.1 → 8.2 → 8.1 | **6.2 → 3.0 → 4.8** | 4.9 → 5.3 → 5.0 | 4.3 → 4.7 → 5.3 |
+| Base top-200 nodes still in the top 200, plain / SafeGrad | 181 / 185 | **156** / 170 | 164 / 175 | 161 / 178 |
+| Rank correlation with base over all 612 nodes, plain / SafeGrad | 0.90 / 0.94 | **0.79** / 0.85 | 0.80 / 0.87 | 0.81 / 0.90 |
+
+- **One shared mechanism.** In the base model every pair of languages shares 136–155 of its top-200 nodes (65 by
+  chance), and 102 nodes are in all four languages' top 200. Even among the 50 highest-scoring nodes, 23 are common
+  to all four, including 8 attention heads in layers 10–21 (A10.9, A13.10, A14.13, A16.2, A17.8, A20.4, A20.6,
+  A21.14), around layer 17 where the English refusal direction separates best. With the steering result, this
+  points to one refusal mechanism that every language uses, not a separate one per language.
+- **Fine-tuning leaves English's circuit in place and reshapes Korean's most.** English was in the fine-tuning data
+  too, yet 181 of its top-200 nodes stay and the full ranking barely moves (ρ 0.90). Korean loses 44 of 200 (ρ
+  0.79); Mandarin and Swahili, the latter never trained on, lose 36–39.
+- **Korean's decision margin falls the most.** The contrast the circuit carries halves in Korean and holds in the
+  other three languages. That tracks behaviour (Korean attack success 5.2 → 19.2%, English unchanged) more closely
+  than the layer-17 projection, which shrinks by about a third in every language. One reading: fine-tuning weakens
+  the refusal signal everywhere, and the other languages still turn the weaker signal into the same first token more
+  often than Korean does. Mandarin's attack success rose (8.6 → 13.4%) without its first-token contrast falling, so
+  the first token is not the whole story.
+- **SafeGrad pulls every circuit back towards the base model.** It keeps more of the base top 200 than plain LoRA in
+  every language, and its full ranking is closer to base in every language. In Korean it recovers 55% of the lost
+  contrast (3.0 → 4.8 of the original 6.2). Swahili's contrast ends above the base model's (5.3 vs 4.3), in line with
+  SafeGrad raising Swahili refusal above the base rate (56.4% vs 50.9%) with no Swahili data in training or
+  alignment.
+
+Limits. The metric is one pair of first tokens: "我" opens 43% of base Mandarin refusals and "물론" only 8 of 231
+compliant Korean answers, so those contrasts are rough proxies, comparable within a language but not across
+languages. Scored instead with each language's five most common refusal and compliance opening tokens (81–99% of
+refusals, but only 13–45% of compliant answers), the same pairs give the same picture for Korean (−25% after plain
+LoRA, −2% after SafeGrad, relative to base) but show English dropping too (−18%, −8% after SafeGrad), so English's
+margin shrinks somewhat rather than not at all; Mandarin (+11%) and Swahili (−6%) stay close to base
+(`results/lir/circuits/margin_check.json`). The faithfulness sweep was run for the English base model only (CircuitKIT's rounding keeps 199 nodes at
+the 200-node point). The
+top-300 overlaps give the same ordering as the top 200; among the top 50, Korean ties with Mandarin and SafeGrad
+keeps one English node fewer than plain (`results/lir/circuits/compare_*.json`). MLP 0
+tops almost every ranking, which is common for a first-layer MLP that acts as an extended embedding; we do not read
+it as a refusal unit. CircuitKIT returns unsigned scores, so we cannot say which nodes push towards refusal and
+which towards compliance. 64 pairs per language, one seed, 5 integration steps.
 
 ## 6. ROI
 

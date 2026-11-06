@@ -65,6 +65,21 @@ the accumulated gradient."""),
 !python -m lir.probe analyze --arms base plain safegrad
 from IPython.display import Image
 Image("results/lir/refusal_geometry.png")"""),
+    md("""## 6. Refusal circuits with CircuitKIT
+
+The comparison below recomputes cross-language and cross-model overlap from the published node scores (CPU).
+CircuitKIT pins `huggingface-hub<2` and `transformer-lens==3.8.0`, so discovery runs in its own environment;
+each language takes ~15 minutes on a 24 GB GPU or an M-series Mac."""),
+    code("""snapshot_download("lost-in-refusal/lost-in-refusal-eval-outputs", repo_type="dataset", local_dir="results/lir",
+                  allow_patterns=["circuits/*"])
+!git clone -q https://github.com/Lexsi-Labs/CircuitKIT.git vendor/CircuitKIT && git -C vendor/CircuitKIT checkout -q e71d5e1
+!python -m venv .venv-circuit && .venv-circuit/bin/pip install -q -e vendor/CircuitKIT peft scipy
+!.venv-circuit/bin/python -m lir.circuits compare --tags base plain safegrad"""),
+    code("""# full re-run (GPU): discovery, patching faithfulness, multi-token check on the metric
+!.venv-circuit/bin/python -m lir.circuits discover --tag base --device cuda
+!.venv-circuit/bin/python -m lir.circuits discover --tag plain --adapter runs/plain/adapter --device cuda
+!.venv-circuit/bin/python -m lir.circuits faithfulness --tag base --device cuda
+!.venv-circuit/bin/python -m lir.circuits margin --device cuda"""),
 ]
 
 nb = nbf.v4.new_notebook(cells=cells, metadata={"accelerator": "GPU", "colab": {"gpuType": "L4"},

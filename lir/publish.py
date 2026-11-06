@@ -54,7 +54,7 @@ def push_evals(api: HfApi, arms: list[str], public: bool) -> None:
         res = ROOT / "results" / "lir"
         for p in list(res.glob("*.json")) + list(res.glob("*.md")) + list(res.glob("*.png")):
             shutil.copy(p, t / p.name)
-        for sub in ["vs_plain", "steering", "replication"]:
+        for sub in ["vs_plain", "steering", "replication", "circuits"]:
             if (res / sub).exists():
                 shutil.copytree(res / sub, t / sub)
         shutil.copy(CARDS / "evals.md", t / "README.md")
