@@ -62,6 +62,18 @@ Full tables: [`results/lir/results.md`](results/lir/results.md) (vs base) and
 [`results/lir/vs_plain/results.md`](results/lir/vs_plain/results.md) (SafeGrad vs plain). Write-up draft:
 [`docs/lir/article.md`](docs/lir/article.md). ROI: [`docs/lir/roi.md`](docs/lir/roi.md).
 
+## Artifacts on Hugging Face
+
+| | |
+|---|---|
+| Demo (static Space) | [lost-in-refusal/lost-in-refusal-demo](https://huggingface.co/spaces/lost-in-refusal/lost-in-refusal-demo) |
+| Frozen datasets | [lost-in-refusal/lost-in-refusal-data](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-data) |
+| Every generation and judge verdict | [lost-in-refusal/lost-in-refusal-eval-outputs](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-eval-outputs) |
+| Plain LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-plain](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-plain) |
+| SafeGrad LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad) |
+
+All are private until the Nov 13 freeze.
+
 ## Pipeline: four Lexsi tools, chained
 
 | Step | Lexsi tool | What it does here | Code |
