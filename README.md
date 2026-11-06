@@ -39,6 +39,11 @@ base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
   0.97–0.99 at layer 17), and a linear probe does as well as an MLP, so the model still *recognises* harm. Plain
   LoRA shrinks the harmful-vs-harmless projection on that direction by about a third in every language; SafeGrad
   restores most of it. Across languages and models, refusal rate tracks the median projection of harmful prompts.
+- **One direction is enough, but steering is blunt.** Adding the English refusal direction at layer 17 to the plain
+  model cuts Korean attack success from 21.2% to 1.2% on the same prompts (Korean's own direction: 10.0%), so
+  Korean is not slipping past a shared direction; fine-tuning shrank the magnitude. The cost is XSTest
+  over-refusal rising from 7.2% to 25.3%; SafeGrad gets most of the safety back at 6.4%.
+  ([`results/lir/steering/results.md`](results/lir/steering/results.md))
 
 ![Attack success, over-refusal and task score by language](results/lir/headline.png)
 ![Refusal geometry](results/lir/refusal_geometry.png)
