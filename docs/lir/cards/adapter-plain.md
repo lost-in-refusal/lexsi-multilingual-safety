@@ -23,7 +23,7 @@ method. It exists to measure how much refusal behaviour benign fine-tuning remov
 | LoRA | r=16, alpha=32, dropout 0, all attention and MLP projections (q,k,v,o,gate,up,down) |
 | Data | `bactrian_train.jsonl` (sha256 in `run.json`), loss on assistant tokens only, default Tiny Aya chat template |
 | Optimizer | AdamW, peak LR 2e-4, cosine, 3% warmup, weight decay 0, grad-norm clip 1.0 |
-| Batch | effective 32 (micro-batch 8 × 4 accumulation), length-grouped sampler, seed 42 |
+| Batch | effective 32 (micro-batch 4 × 8 accumulation), length-grouped sampler, seed 42 |
 | Epochs | 3 |
 | Hardware | Apple M5 Pro (48 GB), PyTorch MPS, bf16 base weights, fp32 adapters |
 

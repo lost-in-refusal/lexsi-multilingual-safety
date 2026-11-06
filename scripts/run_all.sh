@@ -1,7 +1,7 @@
 #!/bin/sh
 # Remaining pipeline after data freeze, one GPU job at a time. Every generation step resumes.
 set -e
-export HF_HUB_OFFLINE=1 PYTHONUNBUFFERED=1
+export HF_HUB_OFFLINE=1 PYTHONUNBUFFERED=1 PYTORCH_MPS_HIGH_WATERMARK_RATIO=1.1 PYTORCH_MPS_LOW_WATERMARK_RATIO=0.9
 PY=.venv/bin/python
 step() { echo "=== $(date +%H:%M) $*"; "$@"; }
 

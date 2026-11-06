@@ -35,9 +35,9 @@ step, the KL, the task/alignment cosine and whether the projection fired.
 | LoRA | r=16, alpha=32, dropout 0, all attention and MLP projections (q,k,v,o,gate,up,down) |
 | Data | `bactrian_train.jsonl` (sha256 in `run.json`), loss on assistant tokens only, default Tiny Aya chat template |
 | Optimizer | AdamW, peak LR 2e-4, cosine, 3% warmup, weight decay 0, grad-norm clip 1.0 |
-| Batch | effective 32 (micro-batch 8 × 4 accumulation), length-grouped sampler, seed 42 |
+| Batch | effective 32 (micro-batch 4 × 8 accumulation), length-grouped sampler, seed 42 |
 | Epochs | 3 |
-| SafeGrad | rho 1.0, KL temperature 1.0, alignment batch 4, reference = frozen copy of the base model |
+| SafeGrad | rho 1.0, KL temperature 1.0, alignment batch 4, reference = the student with LoRA adapters disabled (identical to the frozen base, since dropout is 0) |
 | Hardware | Apple M5 Pro (48 GB), PyTorch MPS, bf16 base weights, fp32 adapters |
 
 The learning rate is the usual LoRA value, not Tiny Aya's full-fine-tuning recipe (2.5e-5): full fine-tuning does

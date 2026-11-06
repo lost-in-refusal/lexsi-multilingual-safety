@@ -142,6 +142,11 @@ class LogCallback(TrainerCallback):
     def __init__(self, path: Path):
         self.path, self.rows, self.t0 = path, [], time.time()
 
+    def on_step_end(self, args, state, control, **kw):
+        # Long-sequence batches grow the MPS cache; on a 48 GB machine that tips into swap.
+        if torch.backends.mps.is_available():
+            torch.mps.empty_cache()
+
     def on_log(self, args, state, control, logs=None, **kw):
         row = dict(logs or {}, step=state.global_step, elapsed_s=round(time.time() - self.t0, 1))
         if torch.backends.mps.is_available():
@@ -158,7 +163,7 @@ def main() -> None:
     ap.add_argument("--output", required=True)
     ap.add_argument("--epochs", type=float, default=3)
     ap.add_argument("--lr", type=float, default=2e-4)
-    ap.add_argument("--micro-batch", type=int, default=8)
+    ap.add_argument("--micro-batch", type=int, default=4)
     ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--rho", type=float, default=1.0)
     ap.add_argument("--align-batch", type=int, default=4)
