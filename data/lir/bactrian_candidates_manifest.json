@@ -1,0 +1,18 @@
+{
+  "source": "MBZUAI/Bactrian-X",
+  "revision": "3698480a001cb3f62c61c314d4acb181eb31e983",
+  "source_sha256": {
+    "en": "e2dc58091a296cc4e63530db49c9d176c058d7777e0ac0b059797af1777a5dbc",
+    "ko": "0285f1c2abef4422374756f4dad772838b4ecc98cb81f600f49a7e4d5e7732a8",
+    "zh": "bdc5fb68626f855a53b284bb888afb9ee9924031fea0e19647c001ffd411cb18"
+  },
+  "shared_ids": 67017,
+  "candidate_ids": 1000,
+  "drop_reasons": {
+    "near_empty": 303,
+    "has_input": 1805,
+    "refusal_or_disclaimer": 364,
+    "dedup_removed": 0
+  },
+  "ranking": "sha256('42:bactrian-<id>') ascending"
+}

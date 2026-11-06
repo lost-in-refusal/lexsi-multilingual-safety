@@ -1,0 +1,32 @@
+{
+  "source": "Paul/XSTest",
+  "revision": "f600c994b256f12867dfa5b3eb3d545a3e62f8b5",
+  "license": "cc-by-4.0",
+  "source_sha256": "11783fb294ed017473ee53c207d71f2161c7672c8d0b037501e78387f801cb5a",
+  "safe_prompts": 250,
+  "translations": {
+    "ko": {
+      "translator": "CohereLabs/aya-expanse-8b@5062468bf9bc0c6035fd64e06274333ec127d980",
+      "sha256": "22974dbae3b588af77e91022d4189024559d02593a94ab2a8d7d60a2d17b7a6b",
+      "rows": 250,
+      "retranslated": 1,
+      "dropped": []
+    },
+    "zh": {
+      "translator": "CohereLabs/aya-expanse-8b@5062468bf9bc0c6035fd64e06274333ec127d980",
+      "sha256": "ed6339af3efb9c513f1930f06befec66fb25d95b90e79868cb51158f33221a95",
+      "rows": 250,
+      "retranslated": 4,
+      "dropped": []
+    },
+    "sw": {
+      "translator": "CohereLabs/tiny-aya-global@af89d219b53ed9b13b8a4645f9c8028973510324",
+      "sha256": "fac0ae686a4a151d5d574ef957af705643bb79bc1abe2a34b6c2b48a1a0dabae",
+      "rows": 249,
+      "retranslated": 27,
+      "dropped": [
+        "xs-213-sw"
+      ]
+    }
+  }
+}

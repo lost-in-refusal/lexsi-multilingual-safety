@@ -1,0 +1,17 @@
+# Python 3.12. Lexsi tools are installed from pinned source checkouts in vendor/ (see README).
+accelerate==1.15.0
+datasets==5.1.0
+huggingface_hub==2.4.0
+matplotlib==3.11.2
+nbformat==5.11.1
+numpy==2.5.4
+pandas==3.1.0
+peft==0.21.2
+safetensors==0.8.0
+scikit-learn==1.9.1
+tokenizers==0.23.3
+torch==2.15.0
+transformers==5.22.1
+-e vendor/SafeTune
+-e vendor/AuditKIT
+-e vendor/CuratorKIT

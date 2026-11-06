@@ -9,7 +9,13 @@ __pycache__/
 .env
 .env.*
 !.env.example
-results/
+results/*
+!results/lir/
+runs/acts/
+runs/*/adapter/
+runs/*/hf/
+logs/
+scratch/
 *.zip
 *.safetensors
 *.bin
