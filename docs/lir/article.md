@@ -155,17 +155,25 @@ at every position during generation, to the plain fine-tuned model, using either
 language or each language's own vector. Same 80 held-out families per language, compared with the unsteered plain
 model on the same prompts:
 
-| plain LoRA + steering (coef 1) | ASR en / ko / zh / sw | Refusal on attacks, macro | XSTest over-refusal, macro |
-|---|---|---:|---:|
-| none (same prompts) | 2.5 / 21.2 / 12.5 / 6.2 | 52.2 | 7.2 |
-| English direction | 0.0 / **1.2** / 2.5 / 0.0 | 77.5 | **25.3** |
-| each language's own direction | 0.0 / 10.0 / 2.5 / 5.0 | 71.9 | 19.1 |
+| Same 80 families per language | ASR en / ko / zh / sw | ASR macro | Refusal on attacks, macro | XSTest over-refusal, macro |
+|---|---|---:|---:|---:|
+| Tiny Aya Global | 6.2 / 2.5 / 10.0 / 5.0 | 5.9 | 59.4 | 6.6 |
+| + plain LoRA | 2.5 / 21.2 / 12.5 / 6.2 | 10.6 | 52.2 | 7.2 |
+| + SafeGrad LoRA | 5.0 / 7.5 / 10.0 / 3.8 | 6.6 | 61.6 | **5.6** |
+| plain + English direction, 0.5× | 2.5 / 7.5 / 6.2 / 3.8 | **5.0** | 63.1 | 10.6 |
+| plain + own-language direction, 0.5× | 2.5 / 11.2 / 8.8 / 6.2 | 7.2 | 61.9 | 9.1 |
+| plain + English direction, 1× | 0.0 / **1.2** / 2.5 / 0.0 | 0.9 | 77.5 | 25.3 |
+| plain + own-language direction, 1× | 0.0 / 10.0 / 2.5 / 5.0 | 4.4 | 71.9 | 19.1 |
 
 The English direction restores refusal in every language, and in Korean it works better than Korean's own
 direction. So a single, shared refusal direction does exist at this layer; Korean is not slipping past it. What
 fine-tuning removed is magnitude along that direction, which matches the projection analysis above. Steering is a
 blunt fix, though: at this strength a quarter of XSTest's safe prompts are refused. SafeGrad recovers most of the
-safety at 6.4% over-refusal because it constrains training instead of pushing every activation. {{coef 0.5 row}}
+safety at 6.4% over-refusal because it constrains training instead of pushing every activation. At half strength
+the trade-off is closer: English-direction steering matches SafeGrad on attacks (macro 5.0 vs 6.6% on the same
+prompts, Korean 7.5% for both) but refuses 10.6% of safe prompts against SafeGrad's 5.6%. SafeGrad is the only fix
+here that does not raise over-refusal, and it needs no change at inference time. With 80 families per language
+these differences are a few prompts each, so read them as a trade-off curve, not a ranking.
 
 {{CircuitKIT: overlap of per-language refusal circuits (EAP-IG, top-k nodes), base vs plain}}
 

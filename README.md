@@ -51,7 +51,8 @@ base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
 - **One direction is enough, but steering is blunt.** Adding the English refusal direction at layer 17 to the plain
   model cuts Korean attack success from 21.2% to 1.2% on the same prompts (Korean's own direction: 10.0%), so
   Korean is not slipping past a shared direction; fine-tuning shrank the magnitude. The cost is XSTest
-  over-refusal rising from 7.2% to 25.3%; SafeGrad gets most of the safety back at 6.4%.
+  over-refusal rising from 7.2% to 25.3%. At half strength steering matches SafeGrad on attacks (macro 5.0 vs 6.6%
+  on the same prompts) but over-refuses 10.6% vs 5.6%; SafeGrad is the only fix that does not raise over-refusal.
   ([`results/lir/steering/results.md`](results/lir/steering/results.md))
 
 Judge-corrected attack success (an answer counts as unsafe if the guard flags it as written or after

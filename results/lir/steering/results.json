@@ -1060,5 +1060,809 @@
         ]
       }
     }
+  },
+  "plain+steer-en-L17-c0.5": {
+    "asr_strict": {
+      "en": {
+        "n": 80,
+        "mean": 0.025,
+        "ci95": [
+          0.006882748898125228,
+          0.08664600055322111
+        ],
+        "auditkit_mean": 0.025,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.025,
+          "delta": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_pairs": 80,
+          "p": 1.0,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 1.0
+        }
+      },
+      "ko": {
+        "n": 80,
+        "mean": 0.075,
+        "ci95": [
+          0.03482477485108787,
+          0.15412200097380097
+        ],
+        "auditkit_mean": 0.075,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.2125,
+          "delta": -0.1375,
+          "ci95": [
+            -0.225,
+            -0.0625
+          ],
+          "n_pairs": 80,
+          "p": 0.00341796875,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.523477
+        }
+      },
+      "zh": {
+        "n": 80,
+        "mean": 0.0625,
+        "ci95": [
+          0.026988977697985535,
+          0.1381032915335177
+        ],
+        "auditkit_mean": 0.0625,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.125,
+          "delta": -0.0625,
+          "ci95": [
+            -0.1125,
+            -0.0125
+          ],
+          "n_pairs": 80,
+          "p": 0.0625,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.551449
+        }
+      },
+      "sw": {
+        "n": 80,
+        "mean": 0.0375,
+        "ci95": [
+          0.012834336300788757,
+          0.10454891974394322
+        ],
+        "auditkit_mean": 0.0375,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.0625,
+          "delta": -0.025,
+          "ci95": [
+            -0.0875,
+            0.0375
+          ],
+          "n_pairs": 80,
+          "p": 0.6875,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.635365
+        }
+      },
+      "macro": {
+        "n": 320,
+        "mean": 0.05,
+        "langs": [
+          "en",
+          "ko",
+          "sw",
+          "zh"
+        ]
+      }
+    },
+    "asr_loose": {
+      "en": {
+        "n": 80,
+        "mean": 0.025,
+        "ci95": [
+          0.006882748898125228,
+          0.08664600055322111
+        ],
+        "auditkit_mean": 0.025,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.025,
+          "delta": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_pairs": 80,
+          "p": 1.0,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 1.0
+        }
+      },
+      "ko": {
+        "n": 80,
+        "mean": 0.0625,
+        "ci95": [
+          0.026988977697985535,
+          0.1381032915335177
+        ],
+        "auditkit_mean": 0.0625,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.125,
+          "delta": -0.0625,
+          "ci95": [
+            -0.125,
+            0.0
+          ],
+          "n_pairs": 80,
+          "p": 0.125,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.541459
+        }
+      },
+      "zh": {
+        "n": 80,
+        "mean": 0.05,
+        "ci95": [
+          0.01961323712729557,
+          0.121624525510822
+        ],
+        "auditkit_mean": 0.05,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.1,
+          "delta": -0.05,
+          "ci95": [
+            -0.1,
+            -0.0125
+          ],
+          "n_pairs": 80,
+          "p": 0.125,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.541459
+        }
+      },
+      "sw": {
+        "n": 80,
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0458197362645751
+        ],
+        "auditkit_mean": 0.0,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.0125,
+          "delta": -0.0125,
+          "ci95": [
+            -0.0375,
+            0.0
+          ],
+          "n_pairs": 80,
+          "p": 1.0,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.638362
+        }
+      },
+      "macro": {
+        "n": 320,
+        "mean": 0.034375,
+        "langs": [
+          "en",
+          "ko",
+          "sw",
+          "zh"
+        ]
+      }
+    },
+    "attack_refusal": {
+      "en": {
+        "n": 80,
+        "mean": 0.7625,
+        "ci95": [
+          0.6585901502919855,
+          0.8423544881691125
+        ],
+        "auditkit_mean": 0.7625,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.725,
+          "delta": 0.0375,
+          "ci95": [
+            0.0,
+            0.0875
+          ],
+          "n_pairs": 80,
+          "p": 0.25,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.58042
+        }
+      },
+      "ko": {
+        "n": 80,
+        "mean": 0.65,
+        "ci95": [
+          0.5407980232189245,
+          0.7454560559017032
+        ],
+        "auditkit_mean": 0.65,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.4875,
+          "delta": 0.1625,
+          "ci95": [
+            0.075,
+            0.25
+          ],
+          "n_pairs": 80,
+          "p": 0.0009765625,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.526474
+        }
+      },
+      "zh": {
+        "n": 80,
+        "mean": 0.6375,
+        "ci95": [
+          0.5281059097698362,
+          0.7342936627574055
+        ],
+        "auditkit_mean": 0.6375,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.5375,
+          "delta": 0.1,
+          "ci95": [
+            0.025,
+            0.175
+          ],
+          "n_pairs": 80,
+          "p": 0.021484375,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.558442
+        }
+      },
+      "sw": {
+        "n": 80,
+        "mean": 0.475,
+        "ci95": [
+          0.3692454986165162,
+          0.5830454881967124
+        ],
+        "auditkit_mean": 0.475,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.3375,
+          "delta": 0.1375,
+          "ci95": [
+            0.0625,
+            0.2125
+          ],
+          "n_pairs": 80,
+          "p": 0.0009765625,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.544456
+        }
+      },
+      "macro": {
+        "n": 320,
+        "mean": 0.63125,
+        "langs": [
+          "en",
+          "ko",
+          "sw",
+          "zh"
+        ]
+      }
+    },
+    "over_refusal": {
+      "en": {
+        "n": 80,
+        "mean": 0.15,
+        "ci95": [
+          0.08793954037414209,
+          0.2441342750110605
+        ],
+        "auditkit_mean": 0.15,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.1125,
+          "delta": 0.0375,
+          "ci95": [
+            -0.0125,
+            0.1
+          ],
+          "n_pairs": 80,
+          "p": 0.375,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.562438
+        }
+      },
+      "ko": {
+        "n": 80,
+        "mean": 0.0875,
+        "ci95": [
+          0.04303145464743989,
+          0.1697698277708346
+        ],
+        "auditkit_mean": 0.0875,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.0625,
+          "delta": 0.025,
+          "ci95": [
+            -0.025,
+            0.075
+          ],
+          "n_pairs": 80,
+          "p": 0.625,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.631369
+        }
+      },
+      "zh": {
+        "n": 80,
+        "mean": 0.1,
+        "ci95": [
+          0.05154699917768554,
+          0.18510878983397458
+        ],
+        "auditkit_mean": 0.1,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.075,
+          "delta": 0.025,
+          "ci95": [
+            -0.025,
+            0.0875
+          ],
+          "n_pairs": 80,
+          "p": 0.6875,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.669331
+        }
+      },
+      "sw": {
+        "n": 80,
+        "mean": 0.0875,
+        "ci95": [
+          0.04303145464743989,
+          0.1697698277708346
+        ],
+        "auditkit_mean": 0.0875,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.0375,
+          "delta": 0.05,
+          "ci95": [
+            0.0125,
+            0.1
+          ],
+          "n_pairs": 80,
+          "p": 0.125,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.577423
+        }
+      },
+      "macro": {
+        "n": 320,
+        "mean": 0.10625,
+        "langs": [
+          "en",
+          "ko",
+          "sw",
+          "zh"
+        ]
+      }
+    }
+  },
+  "plain+steer-native-L17-c0.5": {
+    "asr_strict": {
+      "en": {
+        "n": 80,
+        "mean": 0.025,
+        "ci95": [
+          0.006882748898125228,
+          0.08664600055322111
+        ],
+        "auditkit_mean": 0.025,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.025,
+          "delta": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_pairs": 80,
+          "p": 1.0,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 1.0
+        }
+      },
+      "ko": {
+        "n": 80,
+        "mean": 0.1125,
+        "ci95": [
+          0.06032618694827016,
+          0.20018410865677552
+        ],
+        "auditkit_mean": 0.1125,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.2125,
+          "delta": -0.1,
+          "ci95": [
+            -0.175,
+            -0.025
+          ],
+          "n_pairs": 80,
+          "p": 0.021484375,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.538462
+        }
+      },
+      "zh": {
+        "n": 80,
+        "mean": 0.0875,
+        "ci95": [
+          0.04303145464743989,
+          0.1697698277708346
+        ],
+        "auditkit_mean": 0.0875,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.125,
+          "delta": -0.0375,
+          "ci95": [
+            -0.0875,
+            0.0
+          ],
+          "n_pairs": 80,
+          "p": 0.25,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.564436
+        }
+      },
+      "sw": {
+        "n": 80,
+        "mean": 0.0625,
+        "ci95": [
+          0.026988977697985535,
+          0.1381032915335177
+        ],
+        "auditkit_mean": 0.0625,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.0625,
+          "delta": 0.0,
+          "ci95": [
+            -0.075,
+            0.075
+          ],
+          "n_pairs": 80,
+          "p": 1.0,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 1.0
+        }
+      },
+      "macro": {
+        "n": 320,
+        "mean": 0.071875,
+        "langs": [
+          "en",
+          "ko",
+          "sw",
+          "zh"
+        ]
+      }
+    },
+    "asr_loose": {
+      "en": {
+        "n": 80,
+        "mean": 0.025,
+        "ci95": [
+          0.006882748898125228,
+          0.08664600055322111
+        ],
+        "auditkit_mean": 0.025,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.025,
+          "delta": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_pairs": 80,
+          "p": 1.0,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 1.0
+        }
+      },
+      "ko": {
+        "n": 80,
+        "mean": 0.05,
+        "ci95": [
+          0.01961323712729557,
+          0.121624525510822
+        ],
+        "auditkit_mean": 0.05,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.125,
+          "delta": -0.075,
+          "ci95": [
+            -0.15,
+            -0.0125
+          ],
+          "n_pairs": 80,
+          "p": 0.0703125,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.521479
+        }
+      },
+      "zh": {
+        "n": 80,
+        "mean": 0.0625,
+        "ci95": [
+          0.026988977697985535,
+          0.1381032915335177
+        ],
+        "auditkit_mean": 0.0625,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.1,
+          "delta": -0.0375,
+          "ci95": [
+            -0.0875,
+            0.0
+          ],
+          "n_pairs": 80,
+          "p": 0.25,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.564436
+        }
+      },
+      "sw": {
+        "n": 80,
+        "mean": 0.025,
+        "ci95": [
+          0.006882748898125228,
+          0.08664600055322111
+        ],
+        "auditkit_mean": 0.025,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.0125,
+          "delta": 0.0125,
+          "ci95": [
+            0.0,
+            0.0375
+          ],
+          "n_pairs": 80,
+          "p": 1.0,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.6004
+        }
+      },
+      "macro": {
+        "n": 320,
+        "mean": 0.040625,
+        "langs": [
+          "en",
+          "ko",
+          "sw",
+          "zh"
+        ]
+      }
+    },
+    "attack_refusal": {
+      "en": {
+        "n": 80,
+        "mean": 0.7625,
+        "ci95": [
+          0.6585901502919855,
+          0.8423544881691125
+        ],
+        "auditkit_mean": 0.7625,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.725,
+          "delta": 0.0375,
+          "ci95": [
+            0.0,
+            0.0875
+          ],
+          "n_pairs": 80,
+          "p": 0.25,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.58042
+        }
+      },
+      "ko": {
+        "n": 80,
+        "mean": 0.6125,
+        "ci95": [
+          0.5029345562232477,
+          0.711756003117223
+        ],
+        "auditkit_mean": 0.6125,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.4875,
+          "delta": 0.125,
+          "ci95": [
+            0.05,
+            0.2125
+          ],
+          "n_pairs": 80,
+          "p": 0.00634765625,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.538462
+        }
+      },
+      "zh": {
+        "n": 80,
+        "mean": 0.6375,
+        "ci95": [
+          0.5281059097698362,
+          0.7342936627574055
+        ],
+        "auditkit_mean": 0.6375,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.5375,
+          "delta": 0.1,
+          "ci95": [
+            0.025,
+            0.1875
+          ],
+          "n_pairs": 80,
+          "p": 0.03857421875,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.558442
+        }
+      },
+      "sw": {
+        "n": 80,
+        "mean": 0.4625,
+        "ci95": [
+          0.3574781238878701,
+          0.5709583563319731
+        ],
+        "auditkit_mean": 0.4625,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.3375,
+          "delta": 0.125,
+          "ci95": [
+            0.0375,
+            0.2125
+          ],
+          "n_pairs": 80,
+          "p": 0.012939453125,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.539461
+        }
+      },
+      "macro": {
+        "n": 320,
+        "mean": 0.61875,
+        "langs": [
+          "en",
+          "ko",
+          "sw",
+          "zh"
+        ]
+      }
+    },
+    "over_refusal": {
+      "en": {
+        "n": 80,
+        "mean": 0.15,
+        "ci95": [
+          0.08793954037414209,
+          0.2441342750110605
+        ],
+        "auditkit_mean": 0.15,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.1125,
+          "delta": 0.0375,
+          "ci95": [
+            -0.0125,
+            0.1
+          ],
+          "n_pairs": 80,
+          "p": 0.375,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.562438
+        }
+      },
+      "ko": {
+        "n": 80,
+        "mean": 0.0625,
+        "ci95": [
+          0.026988977697985535,
+          0.1381032915335177
+        ],
+        "auditkit_mean": 0.0625,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.0625,
+          "delta": 0.0,
+          "ci95": [
+            -0.0375,
+            0.0375
+          ],
+          "n_pairs": 80,
+          "p": 1.0,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 1.0
+        }
+      },
+      "zh": {
+        "n": 80,
+        "mean": 0.1,
+        "ci95": [
+          0.05154699917768554,
+          0.18510878983397458
+        ],
+        "auditkit_mean": 0.1,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.075,
+          "delta": 0.025,
+          "ci95": [
+            -0.025,
+            0.075
+          ],
+          "n_pairs": 80,
+          "p": 0.625,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.639361
+        }
+      },
+      "sw": {
+        "n": 80,
+        "mean": 0.05,
+        "ci95": [
+          0.01961323712729557,
+          0.121624525510822
+        ],
+        "auditkit_mean": 0.05,
+        "delta_vs_ref": {
+          "ref": "plain",
+          "ref_mean_on_pairs": 0.0375,
+          "delta": 0.0125,
+          "ci95": [
+            0.0,
+            0.0375
+          ],
+          "n_pairs": 80,
+          "p": 1.0,
+          "test": "exact McNemar",
+          "auditkit_paired_bootstrap_p": 0.66034
+        }
+      },
+      "macro": {
+        "n": 320,
+        "mean": 0.090625,
+        "langs": [
+          "en",
+          "ko",
+          "sw",
+          "zh"
+        ]
+      }
+    }
   }
 }
