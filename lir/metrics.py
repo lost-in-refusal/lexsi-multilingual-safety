@@ -107,7 +107,10 @@ def summarize(arms: list[str], out_dir: Path, ref: str = "base") -> dict:
                     cell.pop("ci95", None)
                     cell["langs"] = langs
                 if lang != "macro":
-                    runs[(arm, metric, lang)] = (auditkit_run(arm, metric, rows), {r["uid"]: fn(r) for r in rows})
+                    run = auditkit_run(arm, metric, rows)
+                    cell["auditkit_mean"] = run.headline[metric]
+                    assert abs(cell["auditkit_mean"] - cell["mean"]) < 1e-9, (arm, metric, lang)
+                    runs[(arm, metric, lang)] = (run, {r["uid"]: fn(r) for r in rows})
                 table.setdefault(arm, {}).setdefault(metric, {})[lang] = cell
 
     # deltas vs the reference arm (paired on shared prompts)
