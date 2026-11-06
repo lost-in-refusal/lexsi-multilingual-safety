@@ -28,7 +28,8 @@ base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
   attack success nearly quadruples and Mandarin rises by half. Refusal on attacks drops in every language,
   Swahili included (50.9% → 37.8%).
 - **The drift reaches the language we never trained on; the judge just can't see it.** Qwen3Guard misses harm in
-  Swahili: a quarter of the Swahili answers it passes become unsafe when back-translated to English and re-judged.
+  Swahili: a quarter of the Swahili answers it passes become unsafe when back-translated to English and re-judged
+  (24–28% across models, against 7–10% in Korean and 3–4% in Mandarin, where we ran the same check).
   Counting those, Swahili attack success goes from 16.5% to **23.0% after plain LoRA (+6.5, p = 0.009)** and back
   to 15.5% with SafeGrad (−7.6 vs plain, p = 0.0007), with no Swahili data anywhere in training or alignment.
 - **Fix.** Against plain LoRA on the same prompts, SafeGrad cuts attack success by 8.6 points in Korean and 4.5 in
@@ -44,6 +45,15 @@ base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
   Korean is not slipping past a shared direction; fine-tuning shrank the magnitude. The cost is XSTest
   over-refusal rising from 7.2% to 25.3%; SafeGrad gets most of the safety back at 6.4%.
   ([`results/lir/steering/results.md`](results/lir/steering/results.md))
+
+Judge-corrected attack success (an answer counts as unsafe if the guard flags it as written or after
+back-translation to English; [`results/lir/swahili_backtranslation_check.json`](results/lir/swahili_backtranslation_check.json)):
+
+| | Korean | Mandarin | Swahili |
+|---|---:|---:|---:|
+| Tiny Aya Global | 7.6 | 9.3 | 16.5 |
+| + plain LoRA | 22.7 (+15.1\*) | 14.4 (+5.2\*) | 23.0 (+6.5\*) |
+| + SafeGrad LoRA | 13.4 (+5.8\*) | 9.6 (+0.3) | 15.5 (−1.0) |
 
 ![Attack success, over-refusal and task score by language](results/lir/headline.png)
 ![Refusal geometry](results/lir/refusal_geometry.png)

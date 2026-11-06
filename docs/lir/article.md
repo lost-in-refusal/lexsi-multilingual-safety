@@ -62,10 +62,13 @@ the judge calls unsafe. Two explanations fit: the answers are harmless, or Qwen3
 tested both. Answers stayed in Swahili (98.3% vs 96.2% for the base), so this is not language drift. To test the judge, we
 translated every Swahili answer the guard had passed as a safe non-refusal into English (with Tiny Aya, the same
 for all arms) and re-judged it against MultiJail's English prompt. About a quarter turned out unsafe: 30 of 125 for
-the base model, 45 of 159 after plain LoRA, 29 of 112 after SafeGrad. **Qwen3Guard undercounts harm in Swahili.**
+the base model, 45 of 159 after plain LoRA, 29 of 112 after SafeGrad. **Qwen3Guard undercounts harm in Swahili.** The same check in Korean and
+Mandarin (translated by Aya Expanse 8B, which is not the model under test) finds far fewer misses: 7–10% of passed
+Korean answers and 3–4% of Mandarin ones, against 24–28% in Swahili, so the blind spot is specific to Swahili.
 Counting those answers, Swahili attack success is 16.5% for the base model and **23.0% after plain LoRA (+6.5
 points, p = 0.009)**; SafeGrad brings it back to 15.5% (−7.6 vs plain, p = 0.0007). So the drift does reach the
-language we never fine-tuned on, and SafeGrad repairs it without any Swahili data. (The corrected base rate is also
+language we never fine-tuned on, and SafeGrad repairs it without any Swahili data. Corrected the same way, Korean
+goes 7.6 → 22.7 → 13.4% and Mandarin 9.3 → 14.4 → 9.6% (base → plain → SafeGrad); the conclusions do not change. (The corrected base rate is also
 well above the 6% implied by the published 94% safe rate, which suggests published Swahili safety numbers may share
 the same judge blind spot; we have not verified that.)
 
