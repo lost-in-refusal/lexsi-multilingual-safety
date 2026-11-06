@@ -148,7 +148,7 @@ def summarize(arms: list[str], out_dir: Path, ref: str = "base") -> dict:
             sig = RunComparison(brun, run).significance(metric)
             lo, hi = boot_delta(pairs)
             binary = metric != "task_score"
-            table[arm][metric][lang]["delta_vs_ref"] = {"ref": ref,
+            table[arm][metric][lang]["delta_vs_ref"] = {"ref": ref, "ref_mean_on_pairs": sum(b for b, _ in pairs) / len(pairs),
                 "delta": sum(c - b for b, c in pairs) / len(pairs), "ci95": (lo, hi), "n_pairs": len(pairs),
                 "p": mcnemar_p(pairs) if binary else centered_boot_p(pairs),
                 "test": "exact McNemar" if binary else "centred paired bootstrap",
@@ -185,7 +185,12 @@ def fmt_table(table: dict, arms: list[str]) -> str:
                 if d:
                     dv = d["delta"] * (100 if pct else 1)
                     star = "*" if d["p"] < 0.05 else ""
-                    s += f" ({dv:+.1f}{star})" if pct else f" ({dv:+.2f}{star})"
+                    sub = ""
+                    ref_cell = table.get(d["ref"], {}).get(metric, {}).get(l, {})
+                    if ref_cell and d["n_pairs"] != ref_cell.get("n"):  # compared on a subset of the ref's prompts
+                        rm = d["ref_mean_on_pairs"] * (100 if pct else 1)
+                        sub = f" from {rm:.1f}" if pct else f" from {rm:.2f}"
+                    s += f" ({dv:+.1f}{star}{sub})" if pct else f" ({dv:+.2f}{star}{sub})"
                 cells.append(s)
             lines.append(f"| {arm} | " + " | ".join(cells) + " |")
     lines.append("\nParentheses: change vs the reference arm on the same prompts; * = p < 0.05 (exact McNemar for rates, "
