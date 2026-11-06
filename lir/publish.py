@@ -49,11 +49,14 @@ def push_evals(api: HfApi, arms: list[str], public: bool) -> None:
         t = Path(tmp)
         for arm in arms:
             shutil.copytree(RUNS / "eval" / arm, t / arm)
+        if (RUNS / "swcheck").exists():  # back-translations behind the judge check
+            shutil.copytree(RUNS / "swcheck", t / "judge-check-backtranslations")
         res = ROOT / "results" / "lir"
-        for p in res.glob("*.json"):
+        for p in list(res.glob("*.json")) + list(res.glob("*.md")) + list(res.glob("*.png")):
             shutil.copy(p, t / p.name)
-        if (res / "results.md").exists():
-            shutil.copy(res / "results.md", t / "results.md")
+        for sub in ["vs_plain", "steering", "replication"]:
+            if (res / sub).exists():
+                shutil.copytree(res / sub, t / sub)
         shutil.copy(CARDS / "evals.md", t / "README.md")
         api.upload_folder(folder_path=t, repo_id=EVAL_REPO, repo_type="dataset",
                           commit_message=f"Evaluation outputs: {', '.join(arms)}")

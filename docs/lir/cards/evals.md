@@ -14,8 +14,10 @@ All model outputs behind the Lost in Refusal results table, so any number can be
 
 ## Layout
 
-One folder per evaluated arm (`base`, `plain`, `safegrad`, plus steering variants named
-`<arm>+steer-<direction>-L<layer>-c<coef>`):
+One folder per evaluated arm: `base`, `plain`, `safegrad`, `plain-hannah` (the same plain LoRA trained on Hannah's
+independently curated sample, for replication), and steering variants named `<arm>+steer-<direction>-L<layer>-c<coef>`
+(80 held-out families per language). `judge-check-backtranslations/` holds the English back-translations of answers
+the guard passed and their re-judged verdicts. `vs_plain/`, `steering/` and `replication/` hold the matching tables.
 
 | File | What |
 |---|---|
