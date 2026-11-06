@@ -10,6 +10,8 @@ Bugs and gaps we hit while chaining CuratorKIT, SafeTune, AuditKIT and CircuitKI
 
 3. **Silent fallback to plain fine-tuning.** `SafeGradHFTrainer._alignment_gradient` catches every exception, logs a warning and skips surgery for that step. A shape or OOM error in the alignment pass therefore turns a SafeGrad run into ordinary fine-tuning with no error. We count surgery steps and assert one per optimizer step. Suggest a strict mode that raises, plus a counter in the trainer state.
 
+13. **`safegrad_kl_alignment_loss` is computed in the logits' dtype.** `log_softmax`/`softmax` run in whatever dtype the logits have. With a bf16 model (the usual case for SafeGrad on one GPU), the KL between two *identical* distributions comes out around 0.6 per sequence (Tiny Aya tokenizer, 262k vocabulary, ~400-token sequences) instead of ~1e-6 in fp32, so at the start of training the alignment gradient is rounding noise. We upcast to fp32 and evaluate the KL in 512-position chunks to bound memory. Suggest `.float()` inside the loss (and a chunked path for large vocabularies).
+
 ## CuratorKIT
 
 4. **No multilingual safety screening.** `ToxicityGate` uses Detoxify, whose multilingual model covers en/fr/es/it/pt/tr/ru but not Korean, Chinese or Swahili. We screened Bactrian-X with Qwen3Guard-Gen-4B outside CuratorKIT. A pluggable guard-model gate (prompt + response moderation) would fit multilingual post-training data.

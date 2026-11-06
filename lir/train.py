@@ -83,15 +83,20 @@ def make_safegrad_trainer():
     from safetune.interventions.harden.safegrad import SafeGradHFTrainer
 
     class AccumulatingSafeGrad(MaskedLoss, SafeGradHFTrainer):
-        def __init__(self, *args, safety_dataset, reference_model, rho=1.0, kl_temperature=1.0, **kw):
+        def __init__(self, *args, safety_dataset, rho=1.0, kl_temperature=1.0, **kw):
             Trainer.__init__(self, *args, **kw)  # skip the accumulation check, see module docstring
             self._safety_dataset = safety_dataset
             self._safety_iter = cycle(iter(safety_dataset))
             self._rho, self._kl_temperature = float(rho), float(kl_temperature)
-            self._reference_model = reference_model.eval()
-            for p in self._reference_model.parameters():
-                p.requires_grad_(False)
+            # The frozen reference is the student with its LoRA adapters switched off: with
+            # dropout 0 and frozen base weights that is exactly the base model, without a
+            # second 6.7 GB copy in memory.
+            self._reference_model = None
             self.surgery_log = []
+
+        def _reference_logits(self, model, **kw):
+            with torch.no_grad(), model.disable_adapter():
+                return model(**kw).logits
 
         def _alignment_gradient(self, model, batch):
             # Same as SafeTune's KL mode, but padding positions are excluded from
@@ -100,11 +105,17 @@ def make_safegrad_trainer():
             keep = batch["attention_mask"].bool()
             student = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"],
                             logits_to_keep=keep).logits  # (non-pad tokens, vocab)
-            with torch.no_grad():
-                ref = self._reference_model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"],
-                                            logits_to_keep=keep).logits
-            loss = safegrad_kl_alignment_loss(student.unsqueeze(0), ref.unsqueeze(0).to(student.device),
-                                              temperature=self._kl_temperature) / keep.shape[0]
+            ref = self._reference_logits(model, input_ids=batch["input_ids"], attention_mask=batch["attention_mask"],
+                                         logits_to_keep=keep)
+            # SafeTune's KL runs softmax in the input dtype; in bf16 two identical distributions
+            # come out at KL ~0.6 per sequence, so upcast to fp32. Chunks keep the 262k-vocab
+            # fp32 tensors small; the KL is a sum over positions, so chunking is exact.
+            loss = 0.0
+            for i in range(0, student.shape[0], 512):
+                loss = loss + safegrad_kl_alignment_loss(student[i:i + 512].float().unsqueeze(0),
+                                                         ref[i:i + 512].float().unsqueeze(0),
+                                                         temperature=self._kl_temperature)
+            loss = loss / keep.shape[0]
             params = self._trainable_params(model)
             grads = torch.autograd.grad(loss, params, allow_unused=True)
             self._last_kl = float(loss.detach())
@@ -196,11 +207,9 @@ def main() -> None:
         g = torch.Generator().manual_seed(SEED)
         loader = torch.utils.data.DataLoader(aenc, batch_size=a.align_batch, shuffle=True, generator=g,
                                              collate_fn=collate(tok.pad_token_id))
-        ref = AutoModelForCausalLM.from_pretrained(MODEL, revision=MODEL_REV, dtype=torch.bfloat16,
-                                                   attn_implementation="eager").to(dev)
-        trainer = make_safegrad_trainer()(**common, safety_dataset=loader, reference_model=ref, rho=a.rho)
+        trainer = make_safegrad_trainer()(**common, safety_dataset=loader, rho=a.rho)
         align_info = {"file": a.align_file, "sha256": sha256_file(Path(a.align_file)), "rows": len(aenc),
-                      "batch": a.align_batch, "rho": a.rho}
+                      "batch": a.align_batch, "rho": a.rho, "reference": "base model = student with adapters disabled"}
 
     t0 = time.time()
     result = trainer.train()
