@@ -35,4 +35,5 @@ self-hosting; a GPU server with vLLM would be several times faster, but we did n
 | Over-refusal on XSTest, macro **(measured)** | 5.3% | 6.4% | +1.1 pts |
 
 The hardening costs 14 minutes of laptop time per fine-tune. Skipping it nearly quadruples Korean attack success
-relative to the base model, and an English-only safety check would not notice.
+relative to the base model, and an English-only safety check understates the damage (by 2.5 times or more across
+two training samples).

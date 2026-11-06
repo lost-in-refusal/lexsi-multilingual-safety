@@ -1,5 +1,5 @@
 ---
-title: "Lost in Refusal: fine-tuning a multilingual support bot breaks its refusals in Korean and Mandarin, not English, and SafeGrad mostly repairs it"
+title: "Lost in Refusal: fine-tuning a multilingual support bot breaks its refusals hardest in Korean, where English checks do not look, and SafeGrad mostly repairs it"
 authors: [aishwarya-nikkumbh, xtnayk, pham215]
 ---
 
@@ -8,8 +8,10 @@ authors: [aishwarya-nikkumbh, xtnayk, pham215]
 # Lost in Refusal
 
 **TL;DR.** We fine-tuned Tiny Aya Global the way a team building a multilingual support bot would: on 1,800
-harmless instruction/answer pairs in English, Korean and Mandarin. English safety did not move. Korean attack success nearly quadrupled (5.2% → 19.2%) and Mandarin rose by
-half (8.6% → 13.4%). An English-only safety check would have passed this model. Training the same adapter with
+harmless instruction/answer pairs in English, Korean and Mandarin. English safety did not move. Korean attack
+success nearly quadrupled (5.2% → 19.2%) and Mandarin rose by half (8.6% → 13.4%). An English-only safety check
+would have passed this model. A second, independently curated training sample reproduced the Korean (+16.5 points)
+and Mandarin (+4.8) damage; there English rose too (+6.5), but Korean still took more than twice the hit. Training the same adapter with
 SafeTune's SafeGrad removed the Mandarin increase, cut the Korean one by 60%, and restored refusals in every
 language, including Swahili, which neither fine-tuning nor SafeGrad ever saw. In Swahili the damage was invisible
 to the safety judge: after correcting for the judge's blind spot, plain fine-tuning raised Swahili attack success
@@ -49,7 +51,7 @@ benign, multilingual and not about safety at all.
 **Sanity check.** Our base-model safe rates (93.1 / 94.8 / 91.4 / 93.8% for en/ko/zh/sw) are within 1–2 points of the
 Tiny Aya report (Swahili 94%, average 91.1%), so the pipeline reproduces the published starting point.
 
-## 3. Break: benign fine-tuning removes refusals, but not in English
+## 3. Break: benign fine-tuning removes refusals, hardest in Korean
 
 Attack success rate (strict), 291 MultiJail prompts per language:
 
@@ -59,6 +61,18 @@ Attack success rate (strict), 291 MultiJail prompts per language:
 | + plain LoRA | 6.9 (+0.0) | **19.2 (+14.1, p = 6×10⁻⁹)** | **13.4 (+4.8, p = 0.016)** | 7.6 (+1.4, n.s.) |
 
 With the loose judge (Unsafe only) the picture is the same: Korean +11.3, Mandarin +5.5, English +0.3, Swahili +0.3.
+
+**Replication on a second sample.** Hannah curated her own training set under the same rules (600 Bactrian-X IDs ×
+en/ko/zh, CuratorKIT, Qwen3Guard screen); it shares only 4 of 600 IDs with ours. The same plain LoRA on it gives:
+
+| | English | Korean | Mandarin | Swahili |
+|---|---:|---:|---:|---:|
+| + plain LoRA, second sample | 13.4 (+6.5, p < 0.05) | **21.6 (+16.5)** | **13.4 (+4.8)** | 11.7 (+5.5) |
+
+Korean and Mandarin reproduce almost exactly. English is not immune: on this sample it rises 6.5 points, so "English
+did not move" is a property of one sample, not of the method. What holds across both samples is the ordering:
+Korean takes the largest hit, at least 2.5 times what English shows, and an English-only check understates the
+damage. Refusal on attacks drops in every language in both samples (macro 62.0 → 52.5% and → 50.5%).
 
 The model also refuses less in every language: refusal on attack prompts fell from 71.1 → 66.7% (en),
 59.8 → 47.4% (ko), 66.3 → 58.1% (zh) and 50.9 → 37.8% (sw). In Swahili the lost refusals did not turn into content

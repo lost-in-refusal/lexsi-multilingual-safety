@@ -28,9 +28,13 @@ base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
 | + plain LoRA | 6.9 (+0.0) | **19.2 (+14.1\*)** | **13.4 (+4.8\*)** | 7.6 (+1.4) |
 | + SafeGrad LoRA | 4.5 (−2.4) | 10.7 (+5.5\*) | 8.9 (+0.3) | 5.5 (−0.7) |
 
-- **Break.** Benign fine-tuning leaves English untouched, so an English-only check passes the model, while Korean
-  attack success nearly quadruples and Mandarin rises by half. Refusal on attacks drops in every language,
-  Swahili included (50.9% → 37.8%).
+- **Break.** Benign fine-tuning leaves English untouched in our run, so an English-only check passes the model,
+  while Korean attack success nearly quadruples and Mandarin rises by half. Refusal on attacks drops in every
+  language, Swahili included (50.9% → 37.8%).
+- **Replicated on an independent sample.** A plain LoRA on Hannah's separately curated training set (4 of 600 IDs
+  shared) gives Korean +16.5, Mandarin +4.8, English +6.5 and Swahili +5.5 points. Korean is hit hardest in both
+  samples, at least 2.5 times English; English is not always untouched.
+  ([`results/lir/replication/results.md`](results/lir/replication/results.md))
 - **The drift reaches the language we never trained on; the judge just can't see it.** Qwen3Guard misses harm in
   Swahili: a quarter of the Swahili answers it passes become unsafe when back-translated to English and re-judged
   (24–28% across models, against 7–10% in Korean and 3–4% in Mandarin, where we ran the same check).
