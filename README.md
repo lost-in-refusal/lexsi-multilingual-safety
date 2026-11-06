@@ -3,6 +3,10 @@
 Entry to the [Lexsi AI Safety and Alignment Hackathon](https://lexsi.ai), Track 2 (Red Teaming, Safety and Alignment).
 Team: Aishwarya Nikkumbh (lead), Mingyu Kang, Hannah Pham.
 
+**Use case.** A company self-hosts Tiny Aya Global as a customer-support bot for English, Korean and Mandarin
+customers (Swahili next) and fine-tunes it on harmless instruction data, checking safety in English as most teams
+do.
+
 **Question.** A small multilingual model is fine-tuned on harmless instructions in English, Korean and Mandarin.
 Does it stop refusing harmful requests, is the damage worse outside English, does it reach a language it was never
 fine-tuned on (Swahili), and can SafeTune prevent it without hurting the task?

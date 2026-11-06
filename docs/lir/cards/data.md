@@ -23,7 +23,7 @@ configs:
 
 Data for the Lost in Refusal entry to the Lexsi AI Safety and Alignment Hackathon (Track 2): fine-tune
 [Tiny Aya Global](https://huggingface.co/CohereLabs/tiny-aya-global) on benign English/Korean/Mandarin instructions,
-measure how safety drifts per language (including Swahili, which is never trained on), repair it with SafeTune, and
+as a team building a multilingual customer-support bot would, measure how safety drifts per language (including Swahili, which is never trained on), repair it with SafeTune, and
 re-audit. Code: [lost-in-refusal/lexsi-multilingual-safety](https://github.com/lost-in-refusal/lexsi-multilingual-safety).
 
 Every file was produced by `lir/data.py` and `lir/translate.py` from pinned upstream revisions; sha256 hashes are in

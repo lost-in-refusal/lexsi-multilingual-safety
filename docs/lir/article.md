@@ -1,5 +1,5 @@
 ---
-title: "Lost in Refusal: benign fine-tuning breaks Tiny Aya's refusals in Korean and Mandarin, not English, and SafeGrad mostly repairs it"
+title: "Lost in Refusal: fine-tuning a multilingual support bot breaks its refusals in Korean and Mandarin, not English, and SafeGrad mostly repairs it"
 authors: [aishwarya-nikkumbh, xtnayk, pham215]
 ---
 
@@ -7,8 +7,8 @@ authors: [aishwarya-nikkumbh, xtnayk, pham215]
 
 # Lost in Refusal
 
-**TL;DR.** We fine-tuned Tiny Aya Global on 1,800 harmless instruction/answer pairs in English, Korean and
-Mandarin. English safety did not move. Korean attack success nearly quadrupled (5.2% → 19.2%) and Mandarin rose by
+**TL;DR.** We fine-tuned Tiny Aya Global the way a team building a multilingual support bot would: on 1,800
+harmless instruction/answer pairs in English, Korean and Mandarin. English safety did not move. Korean attack success nearly quadrupled (5.2% → 19.2%) and Mandarin rose by
 half (8.6% → 13.4%). An English-only safety check would have passed this model. Training the same adapter with
 SafeTune's SafeGrad removed the Mandarin increase, cut the Korean one by 60%, and restored refusals in every
 language, including Swahili, which neither fine-tuning nor SafeGrad ever saw. In Swahili the damage was invisible
@@ -24,8 +24,12 @@ safety data in that language, and preference tuning was kept deliberately light 
 The users Tiny Aya was built for, multilingual teams fine-tuning it, are therefore the ones most exposed to drift,
 and they rarely have safety data in every language.
 
-**Use case.** {{named deployment}}: an assistant fine-tuned on in-house instruction data for English, Korean and
-Mandarin users, with more languages on the roadmap. The team checks safety the way most teams do: in English.
+**Use case: a multilingual customer-support bot.** A company serves customers in English, Korean and Mandarin and
+self-hosts Tiny Aya Global as its support assistant, fine-tuned on harmless instruction/answer pairs so it answers
+in its own style. Swahili-speaking customers are next on the roadmap, with no Swahili training data yet. Anyone can
+type into a support chat, so the bot sees the same jailbreak-style requests as any public chatbot. The team checks
+safety the way most teams do: on English prompts. Our Bactrian-X fine-tune is the stand-in for that support data:
+benign, multilingual and not about safety at all.
 
 ## 2. Setup
 

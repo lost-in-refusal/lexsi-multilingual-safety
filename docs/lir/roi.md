@@ -1,4 +1,7 @@
-# ROI: self-hosting a hardened Tiny Aya vs a closed API
+# ROI: self-hosting a hardened Tiny Aya support bot vs a closed API
+
+Scenario: a customer-support bot for English, Korean and Mandarin customers, self-hosted on Tiny Aya Global and
+fine-tuned on in-house data, against calling a closed model per request.
 
 Numbers measured in our runs are marked **(measured)**; prices are inputs dated 2026-11-06 (OpenAI list prices as
 reported for Oct 2026; confirm on openai.com/api/pricing before quoting). Source: `results/lir/roi.json`
