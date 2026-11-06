@@ -88,8 +88,9 @@ plain and 8.4% for the base model, so the restored refusals are not indiscrimina
 Korean difference (−0.19) is significant. Both fine-tunes score below the base model (6.32). Training on
 Bactrian-X's short GPT-3.5 answers cut answer length from about 420 to 170 tokens without improving reference
 match (chrF en 41.1 → 40.5, ko 18.6 → 18.3, zh 13.1 → 15.3), and the judge prefers the base model's fuller
-answers. In other words this fine-tune bought very little on the task and still broke Korean and Mandarin safety.
-A deployment with a sharper target task would see a real task gain; the safety cost would be the same kind.
+answers. Fine-tuning on generic instructions changed style, not content. That is itself a finding: the safety
+cost was not a price paid for a task gain. The model got no better at the task and still lost its Korean and
+Mandarin refusals.
 
 What it cost: 18.5% more training time (89.7 vs 75.7 minutes on one laptop GPU) and a final training loss 0.8%
 higher (1.436 vs 1.425). The task and alignment gradients were nearly orthogonal (median cosine −0.002); the

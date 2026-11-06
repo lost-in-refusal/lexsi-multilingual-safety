@@ -75,6 +75,8 @@ failed was dropped (listed in `xstest_manifest.json`).
 - The Swahili XSTest translation was produced by the model under test.
 - Qwen3Guard screening is automatic. Its agreement with human labels is checked separately (target ≥ 80% per
   language); see the results repo.
+- As a fine-tuning target, Bactrian-X's short GPT-3.5 answers make Tiny Aya's answers shorter without improving
+  reference match or judged quality; it works as a benign fine-tuning set, not as a way to improve the model.
 - Pretraining contamination of MultiJail, XSTest or Bactrian-X in Tiny Aya cannot be ruled out.
 
 ## Licenses
