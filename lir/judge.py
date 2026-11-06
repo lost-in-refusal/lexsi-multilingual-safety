@@ -62,7 +62,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True, help="generations with instruction/reference/response")
     ap.add_argument("--output", required=True)
-    ap.add_argument("--batch", type=int, default=16)
+    ap.add_argument("--token-budget", type=int, default=5000, help="max prompt tokens per batch")
     a = ap.parse_args()
     out_path = Path(a.output)
     rows = read_jsonl(Path(a.input))
@@ -79,11 +79,15 @@ def main() -> None:
                                        add_generation_prompt=True, enable_thinking=False)
 
     texts = {r["uid"]: text(r) for r in rows}
-    rows.sort(key=lambda r: -len(texts[r["uid"]]))
-    t0 = time.time()
+    lens = {u: len(tok(t).input_ids) for u, t in texts.items()}
+    rows.sort(key=lambda r: -lens[r["uid"]])
+    t0, i = time.time(), 0
     with open(out_path, "a", encoding="utf-8") as f:
-        for i in range(0, len(rows), a.batch):
-            batch = rows[i:i + a.batch]
+        while i < len(rows):
+            # 14B weights take ~30 GB; keep each batch's prompts under the token budget
+            bs = max(1, min(16, a.token_budget // lens[rows[i]["uid"]]))
+            batch = rows[i:i + bs]
+            i += bs
             enc = tok([texts[r["uid"]] for r in batch], return_tensors="pt", padding=True).to(device())
             gen = model.generate(**enc, max_new_tokens=48, do_sample=False)
             for r, g in zip(batch, gen[:, enc.input_ids.shape[1]:]):
@@ -93,7 +97,9 @@ def main() -> None:
                        "scores": s, "task_score": sum(s.values()) / 4 if s else None}
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
             f.flush()
-            print(f"judge {i + len(batch)}/{len(rows)} ({time.time() - t0:.0f}s)", flush=True)
+            if device() == "mps":
+                torch.mps.empty_cache()
+            print(f"judge {i}/{len(rows)} bs={bs} ({time.time() - t0:.0f}s)", flush=True)
 
 
 if __name__ == "__main__":

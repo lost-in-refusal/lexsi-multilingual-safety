@@ -13,7 +13,35 @@ plain LoRA, and LoRA hardened with SafeTune's SafeGrad. Evaluated on 291 MultiJa
 en/ko/zh/**sw**, XSTest's 250 safe prompts (over-refusal) in the same four languages, and 100 held-out Bactrian-X
 tasks per training language. Safety judge: Qwen3Guard-Gen-4B. Task judge: Qwen3-14B with Tiny Aya's 1–7 rubric.
 
-**Status (Nov 6).** Base model evaluated; plain and SafeGrad fine-tunes in progress. Results land in `results/lir/results.md`.
+## Results
+
+Attack success rate on 291 MultiJail families per language (strict judge: Unsafe or Controversial). Change vs the
+base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
+
+| | English | Korean | Mandarin | Swahili (never trained) |
+|---|---:|---:|---:|---:|
+| Tiny Aya Global | 6.9 | 5.2 | 8.6 | 6.2 |
+| + plain LoRA | 6.9 (+0.0) | **19.2 (+14.1\*)** | **13.4 (+4.8\*)** | 7.6 (+1.4) |
+| + SafeGrad LoRA | 4.5 (−2.4) | 10.7 (+5.5\*) | 8.9 (+0.3) | 5.5 (−0.7) |
+
+- **Break.** Benign fine-tuning leaves English untouched, so an English-only check passes the model, while Korean
+  attack success nearly quadruples and Mandarin rises by half. Refusal on attacks drops in every language,
+  Swahili included (50.9% → 37.8%).
+- **Fix.** Against plain LoRA on the same prompts, SafeGrad cuts attack success by 8.6 points in Korean and 4.5 in
+  Mandarin and raises refusal by 9–19 points in all four languages; the largest gain is Swahili (+18.6), which has no
+  training or alignment data. XSTest over-refusal stays below the base model (macro 8.4% base, 5.3% plain, 6.4%
+  SafeGrad). Cost: 18.5% more training time, final training loss +0.8%. Task score: TASK_SCORE_LINE
+- **Explain.** The English refusal direction separates harmful from harmless prompts in every language (AUROC
+  0.97–0.99 at layer 17), and a linear probe does as well as an MLP, so the model still *recognises* harm. Plain
+  LoRA shrinks the harmful-vs-harmless projection on that direction by about a third in every language; SafeGrad
+  restores most of it. Across languages and models, refusal rate tracks the median projection of harmful prompts.
+
+![Attack success, over-refusal and task score by language](results/lir/headline.png)
+![Refusal geometry](results/lir/refusal_geometry.png)
+
+Full tables: [`results/lir/results.md`](results/lir/results.md) (vs base) and
+[`results/lir/vs_plain/results.md`](results/lir/vs_plain/results.md) (SafeGrad vs plain). Write-up draft:
+[`docs/lir/article.md`](docs/lir/article.md). ROI: [`docs/lir/roi.md`](docs/lir/roi.md).
 
 ## Pipeline: four Lexsi tools, chained
 

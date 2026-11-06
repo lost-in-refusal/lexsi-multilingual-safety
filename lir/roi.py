@@ -21,11 +21,7 @@ PRICES = {
         "OpenAI GPT-5 mini": (0.25, 2.00),
         "OpenAI GPT-5 nano": (0.05, 0.40),
     },
-    # self-hosting: USD per hour for the hardware the numbers were measured on
-    "self_hosted_usd_per_hour": {
-        # 48 GB M5 Pro laptop amortised over 3 years of 8h/day use, plus ~60 W power
-        "Apple M5 Pro 48 GB (amortised)": None,
-    },
+    "source": "OpenAI list prices as reported for Oct 2026; confirm on openai.com/api/pricing before quoting",
 }
 
 
@@ -73,7 +69,12 @@ def main() -> None:
     tot_out = sum(u["output_tokens"] for u in usage.values())
     for name, (pin, pout) in PRICES["api"].items():
         api_cost[name] = {"per_eval_pass_usd": tot_in / 1e6 * pin + tot_out / 1e6 * pout}
+    # wall-clock generation time of one pass on our hardware, from the base arm's measured throughput
+    gen_s = sum(usage[n]["output_tokens"] / tp[f"base/{n}"] for n in usage if f"base/{n}" in tp)
+    for name in api_cost:
+        api_cost[name]["break_even_usd_per_hour"] = api_cost[name]["per_eval_pass_usd"] / (gen_s / 3600)
     res = {"prices": PRICES, "throughput_tok_s": tp, "one_eval_pass_tokens": usage,
+           "one_eval_pass_generation_hours": gen_s / 3600,
            "one_eval_pass_totals": {"input": tot_in, "output": tot_out}, "api_cost": api_cost, "training": train}
     write_json(ROOT / "results" / "lir" / "roi.json", res)
     print(json.dumps(res, indent=2))

@@ -1,0 +1,8 @@
+{
+  "source": "lost-in-refusal/bactrian-x-curated@18118626 (train.jsonl), curated by Hannah Pham",
+  "rows": 1800,
+  "sha256": "e558caffcfb76691f047e4e400cd76e72c1a47fcfdd0c1cc6532e37e00ae9e64",
+  "overlap_with_bactrian_train_ids": 4,
+  "overlap_with_bactrian_eval_task_ids": 2,
+  "use": "independent replication of the plain LoRA arm; same rules (Nov 4 spec), different sample"
+}
