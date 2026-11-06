@@ -63,6 +63,8 @@ def write_json(path: Path, obj) -> None:
 def device() -> str:
     import torch
 
+    if os.environ.get("LIR_DEVICE"):
+        return os.environ["LIR_DEVICE"]
     if torch.cuda.is_available():
         return "cuda"
     if torch.backends.mps.is_available():

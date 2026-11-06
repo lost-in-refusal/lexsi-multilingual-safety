@@ -170,7 +170,9 @@ def figure(res: dict, results: dict | None, path: Path) -> None:
     w = 0.8 / len(arms)
     for i, arm in enumerate(arms):
         vals = [res["drift"][arm][l]["gap_at_best"] for l in EVAL_LANGS]
-        ax[2].bar(np.arange(4) + i * w, vals, w, label=arm)
+        ax[2].bar(np.arange(4) + i * w, vals, w, label={"base": "Tiny Aya Global", "plain": "+ plain LoRA",
+                                                        "safegrad": "+ SafeGrad LoRA"}.get(arm, arm),
+                  color={"base": "#9aa5b1", "plain": "#d1495b", "safegrad": "#2e86ab"}.get(arm))
     ax[2].set_xticks(np.arange(4) + w * (len(arms) - 1) / 2, [names[l].split()[0] for l in EVAL_LANGS])
     ax[2].set(title=f"Harmful − harmless projection on base English\nrefusal direction (layer {res['best_layer']})",
               ylabel="projection gap")

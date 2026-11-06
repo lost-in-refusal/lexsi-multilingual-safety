@@ -83,7 +83,7 @@ def make_safegrad_trainer():
     from safetune.interventions.harden.safegrad import SafeGradHFTrainer
 
     class AccumulatingSafeGrad(MaskedLoss, SafeGradHFTrainer):
-        def __init__(self, *args, safety_dataset, rho=1.0, kl_temperature=1.0, **kw):
+        def __init__(self, *args, safety_dataset, rho=1.0, kl_temperature=1.0, kl_norm="token", log_path=None, **kw):
             Trainer.__init__(self, *args, **kw)  # skip the accumulation check, see module docstring
             self._safety_dataset = safety_dataset
             self._safety_iter = cycle(iter(safety_dataset))
@@ -92,6 +92,7 @@ def make_safegrad_trainer():
             # dropout 0 and frozen base weights that is exactly the base model, without a
             # second 6.7 GB copy in memory.
             self._reference_model = None
+            self._kl_norm, self._log_path = kl_norm, log_path
             self.surgery_log = []
 
         def _reference_logits(self, model, **kw):
@@ -115,7 +116,10 @@ def make_safegrad_trainer():
                 loss = loss + safegrad_kl_alignment_loss(student[i:i + 512].float().unsqueeze(0),
                                                          ref[i:i + 512].float().unsqueeze(0),
                                                          temperature=self._kl_temperature)
-            loss = loss / keep.shape[0]
+            # SafeTune sums the KL over positions (per-sequence scale). The task loss is a per-token
+            # mean, so with ~430-token sequences rho=1 made g_align 50-800x g_user and clipping wiped
+            # out the task update. "token" puts both on a per-token scale (= rho/430 on SafeTune's).
+            loss = loss / (keep.sum() if self._kl_norm == "token" else keep.shape[0])
             params = self._trainable_params(model)
             grads = torch.autograd.grad(loss, params, allow_unused=True)
             self._last_kl = float(loss.detach())
@@ -130,9 +134,12 @@ def make_safegrad_trainer():
                 ga = torch.cat([g.reshape(-1).float() for g in g_align])
                 cos = float((gu * ga).sum() / (gu.norm() * ga.norm() + 1e-12))
                 self._apply_global_surgery(model, g_align)
-                self.surgery_log.append({"step": self.state.global_step + 1, "kl": self._last_kl, "cos": cos,
-                                         "projected": cos < 0, "g_user_norm": float(gu.norm()),
-                                         "g_align_norm": float(ga.norm())})
+                row = {"step": self.state.global_step + 1, "kl": self._last_kl, "cos": cos, "projected": cos < 0,
+                       "g_user_norm": float(gu.norm()), "g_align_norm": float(ga.norm())}
+                self.surgery_log.append(row)
+                if self._log_path:
+                    with open(self._log_path, "a") as f:
+                        f.write(json.dumps(row) + "\n")
             return loss
 
     return AccumulatingSafeGrad
@@ -167,6 +174,7 @@ def main() -> None:
     ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--rho", type=float, default=1.0)
     ap.add_argument("--align-batch", type=int, default=4)
+    ap.add_argument("--kl-norm", choices=["token", "sequence"], default="token")
     ap.add_argument("--max-steps", type=int, default=-1)
     ap.add_argument("--train-file", default=str(DATA / "bactrian_train.jsonl"))
     ap.add_argument("--align-file", default=str(DATA / "alignment_sft.jsonl"))
@@ -212,19 +220,16 @@ def main() -> None:
         g = torch.Generator().manual_seed(SEED)
         loader = torch.utils.data.DataLoader(aenc, batch_size=a.align_batch, shuffle=True, generator=g,
                                              collate_fn=collate(tok.pad_token_id))
-        trainer = make_safegrad_trainer()(**common, safety_dataset=loader, rho=a.rho)
+        trainer = make_safegrad_trainer()(**common, safety_dataset=loader, rho=a.rho, kl_norm=a.kl_norm,
+                                          log_path=out / "surgery_log.jsonl")
         align_info = {"file": a.align_file, "sha256": sha256_file(Path(a.align_file)), "rows": len(aenc),
-                      "batch": a.align_batch, "rho": a.rho, "reference": "base model = student with adapters disabled"}
+                      "batch": a.align_batch, "rho": a.rho, "kl_norm": a.kl_norm, "reference": "base model = student with adapters disabled"}
 
     t0 = time.time()
     result = trainer.train()
     elapsed = time.time() - t0
     model.save_pretrained(out / "adapter")
     tok.save_pretrained(out / "adapter")
-    if a.arm == "safegrad":
-        with open(out / "surgery_log.jsonl", "w") as f:
-            for r in trainer.surgery_log:
-                f.write(json.dumps(r) + "\n")
     steps = trainer.state.global_step
     write_json(out / "run.json", {
         "arm": a.arm, "model": MODEL, "model_revision": MODEL_REV, "lora": LORA, "trainable_params": n_train,

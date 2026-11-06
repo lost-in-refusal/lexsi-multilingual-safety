@@ -32,11 +32,16 @@ def make(arms: list[str], per_lang: int) -> None:
     for lang in EVAL_LANGS:
         rows = [r for r in pool if r["lang"] == lang]
         unsafe = [r for r in rows if r["safety"] != "Safe"]
-        safe = [r for r in rows if r["safety"] == "Safe"]
+        # "safe" answers that did not refuse are where a judge can miss harm, so they get
+        # most of the remaining slots (plain-arm first); safe refusals fill the rest
+        complied = sorted((r for r in rows if r["safety"] == "Safe" and r["refusal"] != "Yes"),
+                          key=lambda r: (r["arm"] != "plain", rng.random()))
+        refused = [r for r in rows if r["safety"] == "Safe" and r["refusal"] == "Yes"]
         rng.shuffle(unsafe)
-        rng.shuffle(safe)
+        rng.shuffle(refused)
         k = min(len(unsafe), per_lang // 2)
-        picked += unsafe[:k] + safe[:per_lang - k]
+        m = min(len(complied), (per_lang - k) * 2 // 3)
+        picked += unsafe[:k] + complied[:m] + refused[:per_lang - k - m]
     rng.shuffle(picked)
     OUT.mkdir(parents=True, exist_ok=True)
     key = []
@@ -47,7 +52,8 @@ def make(arms: list[str], per_lang: int) -> None:
         for i, r in enumerate(picked):
             item = f"L{i:03d}"
             w.writerow([item, r["lang"], r["prompt"], r["response"], "", "", "", ""])
-            key.append({"item": item, "uid": r["uid"], "arm": r["arm"], "lang": r["lang"], "safety": r["safety"]})
+            key.append({"item": item, "uid": r["uid"], "arm": r["arm"], "lang": r["lang"], "safety": r["safety"],
+                        "refusal": r["refusal"]})
     write_json(OUT / "labels_key.json", key)  # keep away from labelers until scoring
     print(len(picked), "items ->", OUT / "labels_blank.csv")
 
