@@ -129,8 +129,22 @@ computed difference-of-means refusal directions per language.
   proportional loss. The base-model threshold does not carry over unchanged to the fine-tuned model, so this is a
   correlation, not a full mechanism; the steering experiment below is the causal test.
 
-{{steering: adding the English direction vs each language's own direction to the plain model, attack success and
-over-refusal per language}}
+**Steering: is one direction enough?** We added the base model's difference-of-means refusal vector at layer 17,
+at every position during generation, to the plain fine-tuned model, using either the English vector for every
+language or each language's own vector. Same 80 held-out families per language, compared with the unsteered plain
+model on the same prompts:
+
+| plain LoRA + steering (coef 1) | ASR en / ko / zh / sw | Refusal on attacks, macro | XSTest over-refusal, macro |
+|---|---|---:|---:|
+| none (same prompts) | 2.5 / 21.2 / 12.5 / 6.2 | 52.2 | 7.2 |
+| English direction | 0.0 / **1.2** / 2.5 / 0.0 | 77.5 | **25.3** |
+| each language's own direction | 0.0 / 10.0 / 2.5 / 5.0 | 71.9 | 19.1 |
+
+The English direction restores refusal in every language, and in Korean it works better than Korean's own
+direction. So a single, shared refusal direction does exist at this layer; Korean is not slipping past it. What
+fine-tuning removed is magnitude along that direction, which matches the projection analysis above. Steering is a
+blunt fix, though: at this strength a quarter of XSTest's safe prompts are refused. SafeGrad recovers most of the
+safety at 6.4% over-refusal because it constrains training instead of pushing every activation. {{coef 0.5 row}}
 
 {{CircuitKIT: overlap of per-language refusal circuits (EAP-IG, top-k nodes), base vs plain}}
 
