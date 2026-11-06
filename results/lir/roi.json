@@ -1,0 +1,70 @@
+{
+  "prices": {
+    "as_of": "2026-11-06",
+    "api": {
+      "OpenAI GPT-5 mini": [
+        0.25,
+        2.0
+      ],
+      "OpenAI GPT-5 nano": [
+        0.05,
+        0.4
+      ]
+    },
+    "source": "OpenAI list prices as reported for Oct 2026; confirm on openai.com/api/pricing before quoting"
+  },
+  "throughput_tok_s": {
+    "safegrad/attack": 165.6236842105263,
+    "plain/xstest": 181.71069182389937,
+    "plain/task": 56.934282584885,
+    "safegrad/xstest": 194.62857142857143,
+    "safegrad/task": 63.89655172413793,
+    "base/xstest": 282.3561430793157,
+    "plain/attack": 138.9869109947644,
+    "base/task": 233.55314533622558,
+    "base/alignment": 139.34782608695653,
+    "base/attack": 191.51409395973155
+  },
+  "one_eval_pass_tokens": {
+    "attack": {
+      "requests": 1164,
+      "input_tokens": 444929,
+      "output_tokens": 164168
+    },
+    "xstest": {
+      "requests": 999,
+      "input_tokens": 376781,
+      "output_tokens": 181555
+    },
+    "task": {
+      "requests": 300,
+      "input_tokens": 113474,
+      "output_tokens": 127113
+    }
+  },
+  "one_eval_pass_generation_hours": 0.5679078734211562,
+  "one_eval_pass_totals": {
+    "input": 935184,
+    "output": 472836
+  },
+  "api_cost": {
+    "OpenAI GPT-5 mini": {
+      "per_eval_pass_usd": 1.179468,
+      "break_even_usd_per_hour": 2.0768650254745022
+    },
+    "OpenAI GPT-5 nano": {
+      "per_eval_pass_usd": 0.2358936,
+      "break_even_usd_per_hour": 0.41537300509490044
+    }
+  },
+  "training": {
+    "plain": {
+      "runtime_h": 1.2614722222222223,
+      "steps": 171
+    },
+    "safegrad": {
+      "runtime_h": 1.4950555555555556,
+      "steps": 171
+    }
+  }
+}

@@ -20,4 +20,25 @@
 | plain | 66.7 | 47.4 | 58.1 | 37.8 | 52.5 |
 | safegrad | 75.9 (+9.3*) | 57.0 (+9.6*) | 67.4 (+9.3*) | 56.4 (+18.6*) | 64.2 |
 
+### Over-refusal on XSTest safe prompts (%)
+
+| Arm | en | ko | zh | sw | macro |
+|---|---:|---:|---:|---:|---:|
+| plain | 7.2 | 5.6 | 5.6 | 2.8 | 5.3 |
+| safegrad | 7.6 (+0.4) | 6.8 (+1.2) | 5.6 (+0.0) | 5.6 (+2.8*) | 6.4 |
+
+### Refusal on task prompts (%)
+
+| Arm | en | ko | zh | macro |
+|---|---:|---:|---:|---:|
+| plain | 0.0 | 0.0 | 0.0 | 0.0 |
+| safegrad | 0.0 (+0.0) | 0.0 (+0.0) | 1.0 (+1.0) | 0.3 |
+
+### Task score (1-7)
+
+| Arm | en | ko | zh | macro |
+|---|---:|---:|---:|---:|
+| plain | 6.36 | 5.59 | 5.86 | 5.94 |
+| safegrad | 6.33 (-0.03) | 5.40 (-0.19*) | 5.72 (-0.14) | 5.82 |
+
 Parentheses: change vs the reference arm on the same prompts; * = p < 0.05 (exact McNemar for rates, centred paired bootstrap for task score). macro = equal-weight mean over languages.

@@ -11,7 +11,7 @@ authors: [aishwarya-nikkumbh, xtnayk, pham215]
 Mandarin. English safety did not move. Korean attack success nearly quadrupled (5.2% → 19.2%) and Mandarin rose by
 half (8.6% → 13.4%). An English-only safety check would have passed this model. Training the same adapter with
 SafeTune's SafeGrad removed the Mandarin increase, cut the Korean one by 60%, and restored refusals in every
-language, including Swahili, which neither fine-tuning nor SafeGrad ever saw. {{task-score sentence}}
+language, including Swahili, which neither fine-tuning nor SafeGrad ever saw. The cost against plain fine-tuning was 0.12 points of judged task quality on a 1–7 scale and 18.5% more training time.
 
 ## 1. Why this matters
 
@@ -64,13 +64,23 @@ result: of N Swahili answers the guard passed without a refusal, M became unsafe
 
 | | ASR strict en / ko / zh / sw | Refusal on attacks (macro) | Over-refusal, XSTest (macro) | Task score (1–7, macro) |
 |---|---|---:|---:|---:|
-| Tiny Aya Global | 6.9 / 5.2 / 8.6 / 6.2 | 62.0 | 8.4 | {{}} |
-| + plain LoRA | 6.9 / 19.2 / 13.4 / 7.6 | 52.5 | {{}} | {{}} |
-| + SafeGrad LoRA | 4.5 / 10.7 / 8.9 / 5.5 | 64.2 | {{}} | {{}} |
+| Tiny Aya Global | 6.9 / 5.2 / 8.6 / 6.2 | 62.0 | 8.4 | 6.32 |
+| + plain LoRA | 6.9 / 19.2 / 13.4 / 7.6 | 52.5 | 5.3 | 5.94 |
+| + SafeGrad LoRA | 4.5 / 10.7 / 8.9 / 5.5 | 64.2 | 6.4 | 5.82 |
 
 Against the plain adapter on the same prompts, SafeGrad lowers attack success by 8.6 points in Korean and 4.5 in
 Mandarin (both p < 0.05) and raises refusal by 9.3 (en), 9.6 (ko), 9.3 (zh) and **18.6 (sw)** points. The Swahili
 gain comes with no Swahili data anywhere in training or alignment.
+
+Over-refusal stays below the base model: SafeGrad refuses 6.4% of XSTest's safe prompts (macro) against 5.3% for
+plain and 8.4% for the base model, so the restored refusals are not indiscriminate.
+
+**Task quality.** Against plain LoRA, SafeGrad's judged task score is 0.12 lower (5.82 vs 5.94 macro); only the
+Korean difference (−0.19) is significant. Both fine-tunes score below the base model (6.32). Training on
+Bactrian-X's short GPT-3.5 answers cut answer length from about 420 to 170 tokens without improving reference
+match (chrF en 41.1 → 40.5, ko 18.6 → 18.3, zh 13.1 → 15.3), and the judge prefers the base model's fuller
+answers. In other words this fine-tune bought very little on the task and still broke Korean and Mandarin safety.
+A deployment with a sharper target task would see a real task gain; the safety cost would be the same kind.
 
 What it cost: 18.5% more training time (89.7 vs 75.7 minutes on one laptop GPU) and a final training loss 0.8%
 higher (1.436 vs 1.425). The task and alignment gradients were nearly orthogonal (median cosine −0.002); the

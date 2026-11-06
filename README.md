@@ -30,7 +30,7 @@ base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
 - **Fix.** Against plain LoRA on the same prompts, SafeGrad cuts attack success by 8.6 points in Korean and 4.5 in
   Mandarin and raises refusal by 9–19 points in all four languages; the largest gain is Swahili (+18.6), which has no
   training or alignment data. XSTest over-refusal stays below the base model (macro 8.4% base, 5.3% plain, 6.4%
-  SafeGrad). Cost: 18.5% more training time, final training loss +0.8%. Task score: TASK_SCORE_LINE
+  SafeGrad). Cost: 18.5% more training time, final training loss +0.8%. Task quality (Qwen3-14B judge, 1–7): SafeGrad is 0.12 below plain (5.82 vs 5.94 macro; only the Korean −0.19 is significant). Both fine-tunes score below the base model (6.32): training on Bactrian-X's short GPT-3.5 answers cut answer length from ~420 to ~170 tokens without improving reference match (chrF), so the fine-tune bought little on this task and still broke Korean and Mandarin safety.
 - **Explain.** The English refusal direction separates harmful from harmless prompts in every language (AUROC
   0.97–0.99 at layer 17), and a linear probe does as well as an MLP, so the model still *recognises* harm. Plain
   LoRA shrinks the harmful-vs-harmless projection on that direction by about a third in every language; SafeGrad

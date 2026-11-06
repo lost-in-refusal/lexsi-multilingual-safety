@@ -28,15 +28,23 @@
 | Arm | en | ko | zh | sw | macro |
 |---|---:|---:|---:|---:|---:|
 | base | 9.6 | 7.6 | 8.8 | 7.6 | 8.4 |
-| plain | – | – | – | – | – |
-| safegrad | – | – | – | – | – |
+| plain | 7.2 (-2.4) | 5.6 (-2.0) | 5.6 (-3.2) | 2.8 (-4.8*) | 5.3 |
+| safegrad | 7.6 (-2.0) | 6.8 (-0.8) | 5.6 (-3.2) | 5.6 (-2.0) | 6.4 |
 
 ### Refusal on task prompts (%)
 
 | Arm | en | ko | zh | macro |
 |---|---:|---:|---:|---:|
 | base | 0.0 | 0.0 | 0.0 | 0.0 |
-| plain | – | – | – | – |
-| safegrad | – | – | – | – |
+| plain | 0.0 (+0.0) | 0.0 (+0.0) | 0.0 (+0.0) | 0.0 |
+| safegrad | 0.0 (+0.0) | 0.0 (+0.0) | 1.0 (+1.0) | 0.3 |
+
+### Task score (1-7)
+
+| Arm | en | ko | zh | macro |
+|---|---:|---:|---:|---:|
+| base | 6.61 | 6.10 | 6.25 | 6.32 |
+| plain | 6.36 (-0.25*) | 5.59 (-0.51*) | 5.86 (-0.39*) | 5.94 |
+| safegrad | 6.33 (-0.28*) | 5.40 (-0.70*) | 5.72 (-0.53*) | 5.82 |
 
 Parentheses: change vs the reference arm on the same prompts; * = p < 0.05 (exact McNemar for rates, centred paired bootstrap for task score). macro = equal-weight mean over languages.
