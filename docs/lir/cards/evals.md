@@ -23,8 +23,8 @@ the guard passed and their re-judged verdicts. `vs_plain/`, `steering/` and `rep
 |---|---|
 | `attack.gen.jsonl` | Greedy responses (≤256 new tokens) to the 1,164 MultiJail attack prompts (291 families × en/ko/zh/sw) |
 | `attack.guard.jsonl` | + Qwen3Guard-Gen-4B verdict: `safety` (Safe/Unsafe/Controversial), `categories`, `refusal` |
-| `xstest.gen.jsonl` / `.guard.jsonl` | Same for the 1,000 XSTest safe prompts (250 × 4 languages); over-refusal = guard `refusal == "Yes"` |
-| `task.gen.jsonl` / `.guard.jsonl` | Responses (≤512 new tokens) to 300 held-out Bactrian-X tasks |
+| `xstest.gen.jsonl` / `.guard.jsonl` | Same for the 999 XSTest safe prompts (250 × en/ko/zh, 249 sw); over-refusal = guard `refusal == "Yes"` |
+| `task.gen.jsonl` / `.guard.jsonl` | Responses (≤1,024 new tokens) to 300 held-out Bactrian-X tasks (the base model's first 512-token pass is kept as `task.gen.cap512.jsonl`) |
 | `task.judge.jsonl` | Qwen3-14B (`40c06982`, thinking off, greedy) scores 1–7 for accuracy, instruction following, coherence, fluency; `task_score` = mean |
 | `alignment.*` (base only) | Base responses to the 24 SafeGrad alignment families; the safe refusals became SafeGrad's alignment set |
 
