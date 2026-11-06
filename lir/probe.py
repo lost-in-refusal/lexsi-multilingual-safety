@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from lir.common import EVAL_LANGS, ROOT, RUNS, device, rank_key, write_json
+from lir.common import EVAL_LANGS, ROOT, RUNS, device, rank_key, read_jsonl, write_json
 from lir.evaluate import rows_for
 
 ACT = RUNS / "acts"
@@ -73,7 +73,16 @@ def _load(arm):
 def _auroc(scores, labels):
     from sklearn.metrics import roc_auc_score
 
-    return float(roc_auc_score(labels, scores)) if len(set(labels)) == 2 else float("nan")
+    if len(set(labels)) != 2 or not np.isfinite(scores).all():
+        return float("nan")
+    return float(roc_auc_score(labels, scores))
+
+
+def _unit(v):
+    # layer 0 is the embedding of <|START_RESPONSE|>, identical for every prompt, so the
+    # difference of means there is exactly zero
+    n = np.linalg.norm(v, axis=-1, keepdims=True)
+    return np.divide(v, n, out=np.zeros_like(v), where=n > 0)
 
 
 def analyze(arms: list[str]) -> dict:
@@ -98,11 +107,11 @@ def analyze(arms: list[str]) -> dict:
         return acts[mask(lang, False, 1)].mean(0) - acts[mask(lang, False, 0)].mean(0)  # [layers, d]
 
     dirs = {l: direction(X, l) for l in EVAL_LANGS}
-    unit_en = dirs["en"] / np.linalg.norm(dirs["en"], axis=-1, keepdims=True)
+    unit_en = _unit(dirs["en"])
 
     # 1. cosine between each language's refusal direction and English's, per layer
     for l in EVAL_LANGS:
-        cos = (dirs[l] * dirs["en"]).sum(-1) / (np.linalg.norm(dirs[l], axis=-1) * np.linalg.norm(dirs["en"], axis=-1))
+        cos = (_unit(dirs[l]) * unit_en).sum(-1)
         res["per_lang"].setdefault(l, {})["cos_to_en"] = cos.tolist()
 
     # 2. separation with the English direction on held-out families
@@ -110,12 +119,12 @@ def analyze(arms: list[str]) -> dict:
         k = mask(l, True)
         proj = np.einsum("nld,ld->nl", X[k], unit_en)
         res["per_lang"][l]["auroc_en_direction"] = [_auroc(proj[:, j], m["harmful"][k]) for j in range(n_layers)]
-        own = dirs[l] / np.linalg.norm(dirs[l], axis=-1, keepdims=True)
+        own = _unit(dirs[l])
         projo = np.einsum("nld,ld->nl", X[k], own)
         res["per_lang"][l]["auroc_own_direction"] = [_auroc(projo[:, j], m["harmful"][k]) for j in range(n_layers)]
 
     # pick the layer where the English direction separates English best (ignoring the first quarter)
-    en_auc = np.array(res["per_lang"]["en"]["auroc_en_direction"])
+    en_auc = np.nan_to_num(np.array(res["per_lang"]["en"]["auroc_en_direction"]), nan=0.0)
     lo = n_layers // 4
     best = int(lo + np.argmax(en_auc[lo:]))
     res["best_layer"] = best
@@ -144,6 +153,20 @@ def analyze(arms: list[str]) -> dict:
             res["drift"].setdefault(arm, {})[l] = {
                 "harmful_proj": p.mean(0).tolist(), "harmless_proj": pb.mean(0).tolist(),
                 "gap_at_best": float(p[:, best].mean() - pb[:, best].mean())}
+    # 5. per-language margin: harmful prompts' projection vs the arm's own refusal rate
+    res["margin"] = {}
+    for arm in arms:
+        Xa, ma = (X, m) if arm == "base" else _load(arm)
+        g_path = RUNS / "eval" / arm / "attack.guard.jsonl"
+        if not g_path.exists():
+            continue
+        g = {r["uid"]: r for r in read_jsonl(g_path)}
+        for l in EVAL_LANGS:
+            k = (ma["lang"] == l) & (ma["harmful"] == 1)
+            p = Xa[k, best] @ unit_en[best]
+            ref = np.array([g[u]["refusal"] == "Yes" for u in ma["uid"][k]])
+            res["margin"].setdefault(arm, {})[l] = {"median_proj": float(np.median(p)), "refusal_rate": float(ref.mean()),
+                                                    "auroc_proj_to_refusal": _auroc(p, ref.astype(int))}
     write_json(OUT / "probe.json", res)
     return res
 
@@ -156,7 +179,7 @@ def figure(res: dict, results: dict | None, path: Path) -> None:
 
     colors = {"en": "#1f4e79", "ko": "#c0504d", "zh": "#9bbb59", "sw": "#8064a2"}
     names = {"en": "English", "ko": "Korean", "zh": "Mandarin", "sw": "Swahili (never trained)"}
-    fig, ax = plt.subplots(1, 3, figsize=(16, 4.6))
+    fig, ax = plt.subplots(1, 4, figsize=(21, 4.6))
     L = range(res["layers"])
     for l in EVAL_LANGS:
         ax[0].plot(L, res["per_lang"][l]["cos_to_en"], color=colors[l], label=names[l])
@@ -177,6 +200,16 @@ def figure(res: dict, results: dict | None, path: Path) -> None:
     ax[2].set(title=f"Harmful − harmless projection on base English\nrefusal direction (layer {res['best_layer']})",
               ylabel="projection gap")
     ax[2].legend(frameon=False)
+    arm_c = {"base": "#9aa5b1", "plain": "#d1495b", "safegrad": "#2e86ab"}
+    for arm, by_l in res.get("margin", {}).items():
+        xs = [by_l[l]["median_proj"] for l in EVAL_LANGS]
+        ys = [100 * by_l[l]["refusal_rate"] for l in EVAL_LANGS]
+        ax[3].scatter(xs, ys, color=arm_c.get(arm), s=40, zorder=3)
+        for l, x, y in zip(EVAL_LANGS, xs, ys):
+            ax[3].annotate(l, (x, y), textcoords="offset points", xytext=(4, 3), fontsize=8)
+    ax[3].set(title="Refusal rate tracks the refusal signal\n(harmful prompts, median projection)",
+              xlabel=f"median projection on base English direction (layer {res['best_layer']})",
+              ylabel="refusal rate on attacks (%)")
     for a in ax:
         a.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()

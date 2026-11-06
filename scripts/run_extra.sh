@@ -4,8 +4,8 @@ export HF_HUB_OFFLINE=1 PYTHONUNBUFFERED=1 CIRCUITKIT_TL_MEMORY_PATCH=1 PYTORCH_
 PY=.venv/bin/python
 CK=.venv-circuit/bin/python
 step() { echo "=== $(date +%H:%M) $*"; "$@" || echo "!!! failed: $*"; }
-until grep -q ALL_DONE logs/run_all.log; do
-  pgrep -f run_all.sh >/dev/null || { echo "run_all.sh stopped without ALL_DONE"; exit 1; }
+until grep -q ALL_DONE logs/run_rest.log 2>/dev/null; do
+  pgrep -f "scripts/run_rest.sh" >/dev/null || { echo "run_rest.sh stopped without ALL_DONE"; exit 1; }
   sleep 60
 done
 step $PY -m lir.swcheck backtranslate --arms base plain safegrad
