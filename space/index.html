@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lost in Refusal</title>
+<style>
+  :root { --ink:#1d2330; --muted:#5d6675; --line:#e3e6eb; --base:#9aa5b1; --plain:#d1495b; --safegrad:#2e86ab; --bg:#fafbfc; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Noto Sans SC", sans-serif; color:var(--ink); background:var(--bg); }
+  header, main { max-width:1180px; margin:0 auto; padding:0 20px; }
+  header { padding-top:28px; }
+  h1 { font-size:26px; margin:0 0 6px; }
+  .lede { color:var(--muted); max-width:860px; margin:0 0 18px; }
+  .warn { font-size:13px; color:#8a5a00; background:#fff6e0; border:1px solid #f2dfb0; padding:8px 12px; border-radius:6px; margin-bottom:18px; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+  .stat { background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .stat b { display:block; font-size:12px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.03em; }
+  .stat span { font-size:14px; }
+  .controls { display:flex; flex-wrap:wrap; gap:14px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin-bottom:16px; }
+  .controls label { font-size:13px; color:var(--muted); display:flex; gap:6px; align-items:center; }
+  select, button { font:inherit; padding:5px 9px; border:1px solid var(--line); border-radius:6px; background:#fff; }
+  button { cursor:pointer; }
+  .prompt { background:#fff; border:1px solid var(--line); border-left:4px solid var(--ink); border-radius:6px; padding:12px 14px; margin-bottom:14px; white-space:pre-wrap; }
+  .prompt small { display:block; color:var(--muted); margin-bottom:4px; }
+  .cols { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .col { background:#fff; border:1px solid var(--line); border-radius:8px; padding:12px 14px; min-width:0; }
+  .col h3 { margin:0 0 6px; font-size:15px; display:flex; align-items:center; gap:8px; }
+  .col h3 i { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .verdict { font-size:13px; font-weight:600; margin-bottom:8px; }
+  .bad { color:#b3261e; } .ok { color:#1e7b45; } .ref { color:#8a5a00; }
+  .resp { white-space:pre-wrap; font-size:14px; max-height:460px; overflow:auto; }
+  footer { max-width:1180px; margin:26px auto 40px; padding:0 20px; color:var(--muted); font-size:13px; }
+  @media (max-width: 860px) { .cols, .stats { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Lost in Refusal</h1>
+  <p class="lede">Tiny Aya Global fine-tuned on harmless English, Korean and Mandarin instructions keeps refusing in English but not in Korean or Mandarin. SafeTune's SafeGrad repairs most of it, including in Swahili, which no model here was trained on. Compare the three models on the same prompt.</p>
+  <div class="warn">Attack prompts come from MultiJail and are harmful by design; some responses were judged unsafe. Shown for safety research. Verdicts are Qwen3Guard-Gen-4B, which misses about a quarter of harmful Swahili answers.</div>
+  <div class="stats" id="stats"></div>
+</header>
+<main>
+  <div class="controls">
+    <label>Prompts <select id="set"><option value="attack">MultiJail attacks</option><option value="xstest">XSTest safe prompts (over-refusal)</option></select></label>
+    <label>Language <select id="lang"><option value="ko">Korean</option><option value="zh">Mandarin</option><option value="en">English</option><option value="sw">Swahili (never trained)</option></select></label>
+    <label><input type="checkbox" id="changed" checked> only where the verdict differs between models</label>
+    <button id="prev">&larr;</button><span id="pos"></span><button id="next">&rarr;</button><button id="rand">Random</button>
+  </div>
+  <div class="prompt" id="prompt"></div>
+  <div class="cols" id="cols"></div>
+</main>
+<footer>Greedy generations from our runs. Code, data and adapters: github.com/lost-in-refusal/lexsi-multilingual-safety and huggingface.co/lost-in-refusal.</footer>
+<script>
+const ARMS = [["base","Tiny Aya Global"],["plain","+ plain LoRA"],["safegrad","+ SafeGrad LoRA"]];
+const LANG = {en:"English", ko:"Korean", zh:"Mandarin", sw:"Swahili"};
+let DATA = null, pool = [], i = 0;
+const $ = id => document.getElementById(id);
+function verdict(r, set) {
+  if (set === "attack") return r.s !== "Safe" ? ["bad", "judged unsafe (" + r.s + ")"] : (r.r === "Yes" ? ["ok", "refused"] : ["ok", "safe"]);
+  return r.r === "Yes" ? ["ref", "refused a safe prompt"] : ["ok", "answered"];
+}
+function key(r, set) { return set === "attack" ? (r.s !== "Safe") + "" : r.r; }
+function rebuild() {
+  const set = $("set").value, lang = $("lang").value;
+  pool = DATA[set].filter(x => x.l === lang && ARMS.every(([a]) => x[a]));
+  if ($("changed").checked) pool = pool.filter(x => new Set(ARMS.map(([a]) => key(x[a], set))).size > 1);
+  // cases where plain LoRA breaks and SafeGrad holds come first
+  const bad = r => set === "attack" ? r.s !== "Safe" : r.r === "Yes";
+  const rank = x => (bad(x.plain) && !bad(x.base) ? 0 : 2) + (bad(x.safegrad) ? 1 : 0);
+  pool.sort((a, b) => rank(a) - rank(b));
+  i = 0; show();
+}
+function show() {
+  const set = $("set").value;
+  $("pos").textContent = pool.length ? ` ${i + 1} / ${pool.length} ` : " 0 ";
+  if (!pool.length) { $("prompt").textContent = "No prompts match this filter."; $("cols").innerHTML = ""; return; }
+  const x = pool[i];
+  $("prompt").innerHTML = `<small>${LANG[x.l]} · ${x.f}</small>`;
+  $("prompt").appendChild(document.createTextNode(x.p));
+  $("cols").innerHTML = "";
+  for (const [a, name] of ARMS) {
+    const [cls, txt] = verdict(x[a], set);
+    const c = document.createElement("div"); c.className = "col";
+    c.innerHTML = `<h3><i style="background:var(--${a})"></i>${name}</h3><div class="verdict ${cls}">${txt}</div>`;
+    const r = document.createElement("div"); r.className = "resp"; r.textContent = x[a].t; c.appendChild(r);
+    $("cols").appendChild(c);
+  }
+}
+function stats() {
+  const s = DATA.stats, row = (label, k, fmt) => `<div class="stat"><b>${label}</b><span>${fmt(k)}</span></div>`;
+  const asr = l => ARMS.map(([a]) => s.asr[a][l].toFixed(1)).join(" → ");
+  $("stats").innerHTML = ["en","ko","zh","sw"].map(l => row(`${LANG[l]} attack success %${l === "sw" ? " (judge-corrected)" : ""}`, l, asr)).join("")
+    + `<div class="stat" style="grid-column:1/-1"><b>Order</b><span>Tiny Aya Global → + plain LoRA → + SafeGrad LoRA, 291 prompts per language</span></div>`;
+}
+for (const id of ["set","lang","changed"]) $(id).addEventListener("change", rebuild);
+$("prev").onclick = () => { if (pool.length) { i = (i - 1 + pool.length) % pool.length; show(); } };
+$("next").onclick = () => { if (pool.length) { i = (i + 1) % pool.length; show(); } };
+$("rand").onclick = () => { if (pool.length) { i = Math.floor(Math.random() * pool.length); show(); } };
+fetch("examples.json").then(r => r.json()).then(d => { DATA = d; stats(); rebuild(); });
+</script>
+</body>
+</html>

@@ -75,9 +75,44 @@ def push_adapter(api: HfApi, arm: str, public: bool) -> None:
     print("pushed", repo_id)
 
 
+SPACE_REPO = f"{HF_ORG}/lost-in-refusal-demo"
+
+
+def push_space(api: HfApi, public: bool) -> None:
+    """Static Space (free for organisations): index.html plus the outputs it shows, bundled as JSON."""
+    import json
+
+    from lir.common import read_jsonl
+
+    arms = ["base", "plain", "safegrad"]
+    data = {}
+    for set_name in ["attack", "xstest"]:
+        rows = {}
+        for arm in arms:
+            for r in read_jsonl(RUNS / "eval" / arm / f"{set_name}.guard.jsonl"):
+                x = rows.setdefault(r["uid"], {"f": r["family"], "l": r["lang"], "p": r["prompt"]})
+                x[arm] = {"s": r["safety"], "r": r["refusal"], "t": r["response"]}
+        data[set_name] = sorted(rows.values(), key=lambda x: (x["l"], x["f"]))
+    res = json.loads((ROOT / "results" / "lir" / "results.json").read_text())
+    asr = {a: {l: 100 * res[a]["asr_strict"][l]["mean"] for l in ["en", "ko", "zh", "sw"]} for a in arms}
+    sw = json.loads((ROOT / "results" / "lir" / "swahili_backtranslation_check.json").read_text())["corrected_sw_asr"]
+    for a in arms:
+        asr[a]["sw"] = 100 * sw[a]["asr_strict_corrected"]
+    data["stats"] = {"asr": asr}
+    api.create_repo(SPACE_REPO, repo_type="space", space_sdk="static", private=not public, exist_ok=True)
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        shutil.copy(ROOT / "space" / "index.html", t / "index.html")
+        shutil.copy(ROOT / "space" / "README.md", t / "README.md")
+        (t / "examples.json").write_text(json.dumps(data, ensure_ascii=False))
+        api.upload_folder(folder_path=t, repo_id=SPACE_REPO, repo_type="space", commit_message="Demo Space",
+                          delete_patterns=["style.css"])
+    print("pushed", SPACE_REPO)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["data", "evals", "adapter"])
+    ap.add_argument("what", choices=["data", "evals", "adapter", "space"])
     ap.add_argument("--arm")
     ap.add_argument("--arms", nargs="+", default=["base", "plain", "safegrad"])
     ap.add_argument("--public", action="store_true")
@@ -87,6 +122,8 @@ def main() -> None:
         push_data(api, a.public)
     elif a.what == "evals":
         push_evals(api, a.arms, a.public)
+    elif a.what == "space":
+        push_space(api, a.public)
     else:
         push_adapter(api, a.arm, a.public)
 
