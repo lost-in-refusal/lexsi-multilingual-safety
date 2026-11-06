@@ -27,6 +27,10 @@ base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
 - **Break.** Benign fine-tuning leaves English untouched, so an English-only check passes the model, while Korean
   attack success nearly quadruples and Mandarin rises by half. Refusal on attacks drops in every language,
   Swahili included (50.9% → 37.8%).
+- **The drift reaches the language we never trained on; the judge just can't see it.** Qwen3Guard misses harm in
+  Swahili: a quarter of the Swahili answers it passes become unsafe when back-translated to English and re-judged.
+  Counting those, Swahili attack success goes from 16.5% to **23.0% after plain LoRA (+6.5, p = 0.009)** and back
+  to 15.5% with SafeGrad (−7.6 vs plain, p = 0.0007), with no Swahili data anywhere in training or alignment.
 - **Fix.** Against plain LoRA on the same prompts, SafeGrad cuts attack success by 8.6 points in Korean and 4.5 in
   Mandarin and raises refusal by 9–19 points in all four languages; the largest gain is Swahili (+18.6), which has no
   training or alignment data. XSTest over-refusal stays below the base model (macro 8.4% base, 5.3% plain, 6.4%
