@@ -20,6 +20,8 @@ Bugs and gaps we hit while chaining CuratorKIT, SafeTune, AuditKIT and CircuitKI
 
 5. **Paired bootstrap returns a p-value but no interval.** `RunComparison.significance()` reports `delta` and `p_value`; a 95% CI on the delta is what a results table needs. We compute it separately in `lir/metrics.py`.
 
+14. **The paired-bootstrap p-value is ~0.5 for any non-zero effect.** `_bootstrap.paired_bootstrap` resamples the raw differences and counts resamples with `|mean| >= |observed|`. The differences are not centred under the null, so the resampled means are centred on the observed effect and about half of them exceed it, whatever its size. On our data: Korean attack success rose 14.1 points over 291 paired prompts (95% CI 9.6–18.9, exact McNemar p = 6e-9) and Mandarin 4.8 points (CI 1.4–8.6, p = 0.016); `RunComparison.significance()` returned p = 0.53 for both. Fix: resample `d - mean(d)` (or report the bootstrap CI and check whether it contains 0). We report McNemar for rates and a centred bootstrap for scores, and keep AuditKIT's value in `results.json` for transparency.
+
 ## CircuitKIT
 
 6. **Dependency cap.** CircuitKIT requires `huggingface-hub<2` and `transformer-lens==3.8.0`; a default install of the other three tools pulls hub 2.x, so one environment for all four needs a manual downgrade. We used a second venv (`.venv-circuit`).

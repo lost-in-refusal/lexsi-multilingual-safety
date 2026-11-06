@@ -64,6 +64,27 @@ def boot_delta(pairs: list[tuple[float, float]], iters: int = 5000, seed: int = 
     return ds[int(0.025 * iters)], ds[int(0.975 * iters)]
 
 
+def mcnemar_p(pairs: list[tuple[float, float]]) -> float:
+    """Exact two-sided McNemar test for paired 0/1 outcomes."""
+    b = sum(1 for x, y in pairs if x == 0 and y == 1)
+    c = sum(1 for x, y in pairs if x == 1 and y == 0)
+    n = b + c
+    if n == 0:
+        return 1.0
+    k = min(b, c)
+    return min(1.0, 2 * sum(math.comb(n, i) for i in range(k + 1)) / 2 ** n)
+
+
+def centered_boot_p(pairs: list[tuple[float, float]], iters: int = 5000, seed: int = 0) -> float:
+    """Two-sided paired bootstrap p-value with the differences centred under the null."""
+    d = [c - b for b, c in pairs]
+    n, obs = len(d), sum(d) / len(d)
+    d0 = [x - obs for x in d]
+    rng = random.Random(seed)
+    hits = sum(abs(sum(d0[rng.randrange(n)] for _ in range(n)) / n) >= abs(obs) for _ in range(iters))
+    return (hits + 1) / (iters + 1)
+
+
 def auditkit_run(arm: str, metric: str, rows: list[dict]):
     import auditkit as ak
     from auditkit.model import PrecomputedModel
@@ -125,9 +146,13 @@ def summarize(arms: list[str], out_dir: Path, ref: str = "base") -> dict:
             pairs = [(bvals[u], vals[u]) for u in common]
             sig = RunComparison(brun, run).significance(metric)
             lo, hi = boot_delta(pairs)
+            binary = metric != "task_score"
             table[arm][metric][lang]["delta_vs_ref"] = {"ref": ref,
-                "delta": sum(c - b for b, c in pairs) / len(pairs), "ci95": (lo, hi),
-                "auditkit_paired_bootstrap_p": sig.get("p_value"), "n_pairs": len(pairs)}
+                "delta": sum(c - b for b, c in pairs) / len(pairs), "ci95": (lo, hi), "n_pairs": len(pairs),
+                "p": mcnemar_p(pairs) if binary else centered_boot_p(pairs),
+                "test": "exact McNemar" if binary else "centred paired bootstrap",
+                # reported for transparency; AuditKIT 71316da does not centre the bootstrap (p ~ 0.5 for any effect)
+                "auditkit_paired_bootstrap_p": sig.get("p_value")}
     write_json(out_dir / "results.json", table)
     return table
 
@@ -157,11 +182,12 @@ def fmt_table(table: dict, arms: list[str]) -> str:
                 d = c.get("delta_vs_ref")
                 if d:
                     dv = d["delta"] * (100 if pct else 1)
-                    star = "*" if (d["auditkit_paired_bootstrap_p"] or 1) < 0.05 else ""
+                    star = "*" if d["p"] < 0.05 else ""
                     s += f" ({dv:+.1f}{star})" if pct else f" ({dv:+.2f}{star})"
                 cells.append(s)
             lines.append(f"| {arm} | " + " | ".join(cells) + " |")
-    lines.append("\nParentheses: change vs the reference arm on the same prompts; * = AuditKIT paired bootstrap p < 0.05. "
+    lines.append("\nParentheses: change vs the reference arm on the same prompts; * = p < 0.05 (exact McNemar for rates, "
+                 "centred paired bootstrap for task score). "
                  "macro = equal-weight mean over languages.")
     return "\n".join(lines)
 
