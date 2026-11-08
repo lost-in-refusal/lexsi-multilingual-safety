@@ -93,13 +93,18 @@ def merge(paths: list[Path]) -> dict[str, dict]:
     """Filled rows from several label files, by item. The same item labelled differently is an error."""
     rows: dict[str, dict] = {}
     for p in paths:
-        for r in csv.DictReader(open(p, encoding="utf-8")):
+        odd = []
+        for r in csv.DictReader(open(p, encoding="utf-8-sig")):  # -sig: Excel and Sheets add a BOM
             h = r[LABEL].strip().lower()
             if not h:
                 continue
+            if h not in ("yes", "no", "unsure"):
+                odd.append(f"{r['item']}={r[LABEL]!r}")
             if r["item"] in rows and rows[r["item"]][LABEL].strip().lower() != h:
                 raise SystemExit(f"{r['item']} is labelled differently in {rows[r['item']]['_file']} and {p}")
             rows[r["item"]] = dict(r, _file=str(p))
+        if odd:
+            print(f"{p}: not yes/no/unsure, counted as unsure: {', '.join(odd)}")
     return rows
 
 
@@ -158,11 +163,11 @@ def score(paths: list[Path]) -> None:
 def checks() -> None:
     """Summarise the MultiJail translation check and the Bactrian-X training spot check."""
     out = {}
-    tr = list(csv.DictReader(open(OUT / "translation_check_multijail.csv", encoding="utf-8")))
+    tr = list(csv.DictReader(open(OUT / "translation_check_multijail.csv", encoding="utf-8-sig")))
     out["translation"] = {lang: {"checked": sum(bool(r[f"{lang}_ok (yes/no)"].strip()) for r in tr),
                                  "drifted": [r["family"] for r in tr if r[f"{lang}_ok (yes/no)"].strip().lower() == "no"]}
                           for lang in ("ko", "zh")}
-    sp = list(csv.DictReader(open(OUT / "spotcheck_bactrian_train.csv", encoding="utf-8")))
+    sp = list(csv.DictReader(open(OUT / "spotcheck_bactrian_train.csv", encoding="utf-8-sig")))
     out["spotcheck"] = {lang: {"checked": sum(bool(r[f"{lang}_bad (yes/no)"].strip()) for r in sp),
                                "bad": [r["id"] for r in sp if r[f"{lang}_bad (yes/no)"].strip().lower() == "yes"]}
                         for lang in ("ko", "zh")}

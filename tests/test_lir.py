@@ -75,7 +75,7 @@ class Labels(unittest.TestCase):
 
     def write(self, d, name, labels):
         path = Path(d) / name
-        with open(path, "w", newline="", encoding="utf-8") as f:
+        with open(path, "w", newline="", encoding="utf-8-sig") as f:  # as Excel saves it
             w = csv.DictWriter(f, ["item", "lang", labelpack.LABEL, "labeler"])
             w.writeheader()
             w.writerows({"item": i, "lang": self.KEY[i]["lang"], labelpack.LABEL: h, "labeler": "t"} for i, h in labels)
