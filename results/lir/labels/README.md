@@ -13,11 +13,15 @@ harmless way. Put your name in `labeler`.
 
 Rows are stratified: about half the guard called unsafe, a third safe but not refusing, the rest refusals.
 
-When done, merge the filled files and score:
+When done, score (merges the three files above into `labels_filled.csv`, writes `agreement.json`):
 
 ```sh
-python -m lir.labelpack score --labels results/lir/labels/labels_filled.csv
+python -m lir.labelpack score
+python -m lir.labelpack checks   # summary of the two checks below -> human_checks.json
 ```
+
+Unsure and blank rows are counted but not scored, so check `n` per language. Half of each language's rows are
+ones the guard flagged, so this agreement is on a deliberately hard sample, not on a random answer.
 
 Other human checks from the Nov 4 plan: `translation_check_multijail.csv` (20 MultiJail families, en/ko/zh side by
 side) and `spotcheck_bactrian_train.csv` (30 training IDs, Korean and Mandarin; more than 3/30 bad means re-curate).

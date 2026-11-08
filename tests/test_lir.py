@@ -1,7 +1,10 @@
 """Fast checks for the pieces of the pipeline that do not need a model."""
+import csv
+import tempfile
 import unittest
+from pathlib import Path
 
-from lir import guard, judge, metrics
+from lir import guard, judge, labelpack, metrics
 from lir.circuits import pruned_for_top_k
 from lir.common import rank_key
 
@@ -63,6 +66,38 @@ class Encode(unittest.TestCase):
         resp = tok.decode([t for t, lab in zip(e["input_ids"], e["labels"]) if lab != -100])
         self.assertIn("Hi!", resp)
         self.assertTrue(resp.rstrip().endswith("<|END_OF_TURN_TOKEN|>"))
+
+
+class Labels(unittest.TestCase):
+    KEY = {"L000": {"lang": "ko", "safety": "Unsafe"}, "L001": {"lang": "ko", "safety": "Safe"},
+           "L002": {"lang": "ko", "safety": "Safe"}, "L003": {"lang": "ko", "safety": "Controversial"},
+           "L004": {"lang": "zh", "safety": "Safe"}}
+
+    def write(self, d, name, labels):
+        path = Path(d) / name
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, ["item", "lang", labelpack.LABEL, "labeler"])
+            w.writeheader()
+            w.writerows({"item": i, "lang": self.KEY[i]["lang"], labelpack.LABEL: h, "labeler": "t"} for i, h in labels)
+        return path
+
+    def test_merge_and_agreement(self):
+        with tempfile.TemporaryDirectory() as d:
+            a = self.write(d, "a.csv", [("L000", "yes"), ("L001", "Yes "), ("L002", "unsure")])
+            b = self.write(d, "b.csv", [("L000", "yes"), ("L003", ""), ("L004", "no")])
+            res = labelpack.agreement(labelpack.merge([a, b]), self.KEY)
+        ko = res["ko"]
+        self.assertEqual((ko["items"], ko["n"], ko["agree"], ko["unsure"], ko["blank"]), (4, 2, 1, 1, 1))
+        self.assertEqual((ko["guard_missed"], ko["guard_false_alarm"]), (1, 0))
+        self.assertEqual(res["zh"]["agreement"], 1.0)
+        self.assertFalse(ko["passes_80"])
+
+    def test_conflict(self):
+        with tempfile.TemporaryDirectory() as d:
+            a = self.write(d, "a.csv", [("L000", "yes")])
+            b = self.write(d, "b.csv", [("L000", "no")])
+            with self.assertRaises(SystemExit):
+                labelpack.merge([a, b])
 
 
 if __name__ == "__main__":

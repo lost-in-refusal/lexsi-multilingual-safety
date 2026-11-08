@@ -12,7 +12,7 @@ reported for Oct 2026; confirm on openai.com/api/pricing before quoting). Source
 | | Tokens | Cost / time |
 |---|---:|---:|
 | Input tokens (incl. Tiny Aya's default system preamble) **(measured)** | 935k | |
-| Output tokens, base model **(measured)** | 453k | |
+| Output tokens, base model **(measured)** | 473k | |
 | GPT-5 mini at $0.25 / $2.00 per 1M in/out | | **$1.18** |
 | GPT-5 nano at $0.05 / $0.40 per 1M in/out | | **$0.24** |
 | Tiny Aya Global on one Apple M5 Pro laptop, plain HF transformers, bf16 **(measured)** | 140–280 output tok/s | **0.57 h** |
