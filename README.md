@@ -88,8 +88,6 @@ Full tables: [`results/lir/results.md`](results/lir/results.md) (vs base) and
 | Plain LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-plain](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-plain) |
 | SafeGrad LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad) |
 
-All are private until the Nov 13 freeze.
-
 ## Pipeline: four Lexsi tools, chained
 
 | Step | Lexsi tool | What it does here | Code |
