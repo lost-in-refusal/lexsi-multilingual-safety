@@ -474,7 +474,7 @@ The main results are significant and replicate on a second training set, but the
 - **Harmful text.** Raw unsafe outputs are only in the evaluation dataset, which carries a content warning. This article describes them by category.
 - **Responsible disclosure.** 12 of the 14 tool issues are filed with the Lexsi-Labs maintainers (Appendix). No deployed system was attacked.
 
-## With more credits
+## With more credits and time
 
 The biggest gaps are seeds, the Swahili judge, and whether our results are specific to one model and one data mix. The forecasts below are hypotheses, not measurements.
 
