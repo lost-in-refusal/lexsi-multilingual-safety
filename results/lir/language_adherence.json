@@ -1,0 +1,98 @@
+{
+  "base": {
+    "en": {
+      "in_language": 1.0,
+      "detected": {
+        "en": 291
+      },
+      "n": 291
+    },
+    "ko": {
+      "in_language": 1.0,
+      "detected": {
+        "ko": 291
+      },
+      "n": 291
+    },
+    "zh": {
+      "in_language": 1.0,
+      "detected": {
+        "zh": 291
+      },
+      "n": 291
+    },
+    "sw": {
+      "in_language": 0.9621993127147767,
+      "detected": {
+        "sw": 280,
+        "other": 11
+      },
+      "n": 291
+    }
+  },
+  "plain": {
+    "en": {
+      "in_language": 0.9965635738831615,
+      "detected": {
+        "en": 290,
+        "other": 1
+      },
+      "n": 291
+    },
+    "ko": {
+      "in_language": 0.9965635738831615,
+      "detected": {
+        "ko": 290,
+        "en": 1
+      },
+      "n": 291
+    },
+    "zh": {
+      "in_language": 1.0,
+      "detected": {
+        "zh": 291
+      },
+      "n": 291
+    },
+    "sw": {
+      "in_language": 0.9828178694158075,
+      "detected": {
+        "sw": 286,
+        "other": 5
+      },
+      "n": 291
+    }
+  },
+  "safegrad": {
+    "en": {
+      "in_language": 1.0,
+      "detected": {
+        "en": 291
+      },
+      "n": 291
+    },
+    "ko": {
+      "in_language": 0.993127147766323,
+      "detected": {
+        "ko": 289,
+        "en": 2
+      },
+      "n": 291
+    },
+    "zh": {
+      "in_language": 1.0,
+      "detected": {
+        "zh": 291
+      },
+      "n": 291
+    },
+    "sw": {
+      "in_language": 0.9621993127147767,
+      "detected": {
+        "sw": 280,
+        "other": 11
+      },
+      "n": 291
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "translation": {
+    "ko": {
+      "checked": 20,
+      "drifted": [
+        "mj-189"
+      ]
+    },
+    "zh": {
+      "checked": 20,
+      "drifted": [
+        "mj-218"
+      ]
+    }
+  },
+  "spotcheck": {
+    "ko": {
+      "checked": 30,
+      "bad": [
+        "alpaca-25168",
+        "alpaca-31311",
+        "alpaca-29939",
+        "alpaca-44679",
+        "alpaca-39246",
+        "alpaca-10213",
+        "alpaca-41858"
+      ],
+      "recurate": true
+    },
+    "zh": {
+      "checked": 30,
+      "bad": [
+        "alpaca-31311",
+        "alpaca-29939",
+        "alpaca-39246"
+      ],
+      "recurate": false
+    }
+  }
+}

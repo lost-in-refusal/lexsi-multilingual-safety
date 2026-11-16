@@ -1,0 +1,166 @@
+{
+  "families_per_language": 80,
+  "values_percent": {
+    "base": {
+      "asr_strict": {
+        "en": 6.25,
+        "ko": 2.5,
+        "zh": 10.0,
+        "sw": 5.0,
+        "macro": 5.9375
+      },
+      "attack_refusal": {
+        "en": 70.0,
+        "ko": 60.0,
+        "zh": 57.5,
+        "sw": 50.0,
+        "macro": 59.375
+      },
+      "over_refusal": {
+        "en": 8.75,
+        "ko": 3.75,
+        "zh": 7.5,
+        "sw": 6.25,
+        "macro": 6.5625
+      }
+    },
+    "plain": {
+      "asr_strict": {
+        "en": 2.5,
+        "ko": 21.25,
+        "zh": 12.5,
+        "sw": 6.25,
+        "macro": 10.625
+      },
+      "attack_refusal": {
+        "en": 72.5,
+        "ko": 48.75,
+        "zh": 53.75,
+        "sw": 33.75,
+        "macro": 52.1875
+      },
+      "over_refusal": {
+        "en": 11.25,
+        "ko": 6.25,
+        "zh": 7.5,
+        "sw": 3.75,
+        "macro": 7.1875
+      }
+    },
+    "safegrad": {
+      "asr_strict": {
+        "en": 5.0,
+        "ko": 7.5,
+        "zh": 10.0,
+        "sw": 3.75,
+        "macro": 6.5625
+      },
+      "attack_refusal": {
+        "en": 73.75,
+        "ko": 57.5,
+        "zh": 63.75,
+        "sw": 51.25,
+        "macro": 61.5625
+      },
+      "over_refusal": {
+        "en": 8.75,
+        "ko": 5.0,
+        "zh": 5.0,
+        "sw": 3.75,
+        "macro": 5.625
+      }
+    },
+    "plain+steer-en-L17-c0.5": {
+      "asr_strict": {
+        "en": 2.5,
+        "ko": 7.5,
+        "zh": 6.25,
+        "sw": 3.75,
+        "macro": 5.0
+      },
+      "attack_refusal": {
+        "en": 76.25,
+        "ko": 65.0,
+        "zh": 63.75,
+        "sw": 47.5,
+        "macro": 63.125
+      },
+      "over_refusal": {
+        "en": 15.0,
+        "ko": 8.75,
+        "zh": 10.0,
+        "sw": 8.75,
+        "macro": 10.625
+      }
+    },
+    "plain+steer-native-L17-c0.5": {
+      "asr_strict": {
+        "en": 2.5,
+        "ko": 11.25,
+        "zh": 8.75,
+        "sw": 6.25,
+        "macro": 7.1875
+      },
+      "attack_refusal": {
+        "en": 76.25,
+        "ko": 61.25,
+        "zh": 63.75,
+        "sw": 46.25,
+        "macro": 61.875
+      },
+      "over_refusal": {
+        "en": 15.0,
+        "ko": 6.25,
+        "zh": 10.0,
+        "sw": 5.0,
+        "macro": 9.0625
+      }
+    },
+    "plain+steer-en-L17-c1": {
+      "asr_strict": {
+        "en": 0.0,
+        "ko": 1.25,
+        "zh": 2.5,
+        "sw": 0.0,
+        "macro": 0.9375
+      },
+      "attack_refusal": {
+        "en": 86.25,
+        "ko": 72.5,
+        "zh": 85.0,
+        "sw": 66.25,
+        "macro": 77.5
+      },
+      "over_refusal": {
+        "en": 37.5,
+        "ko": 23.75,
+        "zh": 20.0,
+        "sw": 20.0,
+        "macro": 25.3125
+      }
+    },
+    "plain+steer-native-L17-c1": {
+      "asr_strict": {
+        "en": 0.0,
+        "ko": 10.0,
+        "zh": 2.5,
+        "sw": 5.0,
+        "macro": 4.375
+      },
+      "attack_refusal": {
+        "en": 86.25,
+        "ko": 67.5,
+        "zh": 78.75,
+        "sw": 55.0,
+        "macro": 71.875
+      },
+      "over_refusal": {
+        "en": 37.5,
+        "ko": 15.0,
+        "zh": 16.25,
+        "sw": 7.5,
+        "macro": 19.0625
+      }
+    }
+  }
+}

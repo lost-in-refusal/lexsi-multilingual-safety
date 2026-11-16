@@ -1,0 +1,12 @@
+{
+  "source": "Tiny Aya Global (base) greedy responses to multijail_alignment.jsonl",
+  "filter": "Qwen3Guard Safety=Safe and Refusal=Yes, not truncated",
+  "rows": 47,
+  "of": 72,
+  "per_lang": {
+    "en": 18,
+    "ko": 13,
+    "zh": 16
+  },
+  "sha256": "82492ae2b479d2f128c1f55bd9b7a988fbe9554e9b0b8fae34f3bc83a605777d"
+}

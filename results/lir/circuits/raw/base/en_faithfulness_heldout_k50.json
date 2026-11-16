@@ -1,0 +1,26 @@
+{
+  "patching_score": 0.025621816002397362,
+  "ablation_score": null,
+  "stability": null,
+  "robustness": null,
+  "baseline_comparison": null,
+  "generalization": null,
+  "intervention_reliability": null,
+  "metadata": {
+    "patching_raw_ratio": 0.025621816002397362,
+    "algorithm": "eap-ig",
+    "model": "af89d219b53ed9b13b8a4645f9c8028973510324",
+    "task": "lir_refusal_base_en_heldout",
+    "level": "node",
+    "scope": "unknown",
+    "sparsity": 0.9183006535947712,
+    "pillars_computed": [
+      "patching"
+    ],
+    "timestamp": 1794004417.4671948,
+    "total_duration_seconds": 318.07709217071533,
+    "per_pillar_duration_seconds": {
+      "patching": 317.8889870643616
+    }
+  }
+}

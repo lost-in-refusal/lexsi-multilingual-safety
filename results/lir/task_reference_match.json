@@ -1,0 +1,53 @@
+{
+  "base": {
+    "en": {
+      "chrf": 41.1,
+      "mean_tokens": 394,
+      "truncated": 2
+    },
+    "ko": {
+      "chrf": 18.6,
+      "mean_tokens": 421,
+      "truncated": 3
+    },
+    "zh": {
+      "chrf": 13.1,
+      "mean_tokens": 456,
+      "truncated": 4
+    }
+  },
+  "plain": {
+    "en": {
+      "chrf": 40.5,
+      "mean_tokens": 167,
+      "truncated": 0
+    },
+    "ko": {
+      "chrf": 18.3,
+      "mean_tokens": 188,
+      "truncated": 4
+    },
+    "zh": {
+      "chrf": 15.3,
+      "mean_tokens": 166,
+      "truncated": 2
+    }
+  },
+  "safegrad": {
+    "en": {
+      "chrf": 38.5,
+      "mean_tokens": 163,
+      "truncated": 1
+    },
+    "ko": {
+      "chrf": 18.2,
+      "mean_tokens": 212,
+      "truncated": 7
+    },
+    "zh": {
+      "chrf": 14.7,
+      "mean_tokens": 162,
+      "truncated": 2
+    }
+  }
+}

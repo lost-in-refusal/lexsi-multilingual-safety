@@ -1,0 +1,14 @@
+{
+  "train_ids": 600,
+  "eval_task_ids": 100,
+  "screening": {
+    "guard_refusal": 12,
+    "guard_not_safe": 14,
+    "train_near_dup_of_eval": 0
+  },
+  "guard": "Qwen3Guard-Gen-4B response moderation on (instruction, response), all three languages",
+  "files": {
+    "bactrian_train.jsonl": "0abf09c487a899a324521182865e988e7b9bf6da3a311309c12b5627257b3743",
+    "bactrian_eval_task.jsonl": "331770bac249cf92d248d3829ed679110c513edc8683ec8ee06f52433b913184"
+  }
+}

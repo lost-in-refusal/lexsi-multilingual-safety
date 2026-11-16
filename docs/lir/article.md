@@ -1,0 +1,263 @@
+---
+title: "Lost in Refusal: fine-tuning a multilingual support bot breaks its refusals hardest in Korean, where English checks do not look, and SafeGrad mostly repairs it"
+authors: [aishwarya-nikkumbh, xtnayk, pham215]
+---
+
+<!-- Draft for Aish to own. Every number comes from results/lir/*.json; {{...}} marks results still pending (human labels). -->
+
+# Lost in Refusal
+
+**TL;DR.** We fine-tuned Tiny Aya Global the way a team building a multilingual support bot would: on 1,800
+harmless instruction/answer pairs in English, Korean and Mandarin. English safety did not move. Korean attack
+success nearly quadrupled (5.2% → 19.2%) and Mandarin rose by half (8.6% → 13.4%). An English-only safety check
+would have passed this model. A second, independently curated training sample reproduced the Korean (+16.5 points)
+and Mandarin (+4.8) damage; there English rose too (+6.5), but Korean still took more than twice the hit. Training the same adapter with
+SafeTune's SafeGrad removed the Mandarin increase, cut the Korean one by 60%, and restored refusals in every
+language, including Swahili, which neither fine-tuning nor SafeGrad ever saw. In Swahili the damage was invisible
+to the safety judge: after correcting for the judge's blind spot, plain fine-tuning raised Swahili attack success
+from 16.5% to 23.0%, and SafeGrad took it back to 15.5%. The cost against plain fine-tuning was 0.12 points of judged task quality on a 1–7 scale and 18.5% more training time.
+
+## 1. Why this matters
+
+Small open multilingual models are what teams actually adapt and self-host. Tiny Aya Global (3.35B) fits a laptop
+and costs a fraction of a closed API per token (section 6). Fine-tuning on harmless data is known to erode safety
+training (Qi et al., 2023). The Tiny Aya report adds two things: the model's safety in a language depends on having
+safety data in that language, and preference tuning was kept deliberately light so the community could adapt it.
+The users Tiny Aya was built for, multilingual teams fine-tuning it, are therefore the ones most exposed to drift,
+and they rarely have safety data in every language.
+
+**Use case: a multilingual customer-support bot.** A company serves customers in English, Korean and Mandarin and
+self-hosts Tiny Aya Global as its support assistant, fine-tuned on harmless instruction/answer pairs so it answers
+in its own style. Swahili-speaking customers are next on the roadmap, with no Swahili training data yet. Anyone can
+type into a support chat, so the bot sees the same jailbreak-style requests as any public chatbot. The team checks
+safety the way most teams do: on English prompts. Our Bactrian-X fine-tune is the stand-in for that support data:
+benign, multilingual and not about safety at all.
+
+## 2. Setup
+
+| | |
+|---|---|
+| Model | Tiny Aya Global `af89d219`, default chat template and system preamble, greedy decoding |
+| Fine-tuning data | 600 Bactrian-X instructions × en/ko/zh = 1,800 rows. Benign only: CuratorKIT cleaning and MinHash dedup, refusal/disclaimer filter, Qwen3Guard screen |
+| Arms | **plain LoRA** vs **SafeGrad LoRA**. Same data, order, LoRA (r=16, all projections), optimizer (2e-4, cosine, 3 epochs, batch 32) |
+| SafeGrad | SafeTune `SafeGradHFTrainer`: per optimizer step, KL(base ‖ student) on 47 base-model refusals to 24 held-out MultiJail families (en/ko/zh); conflicting task gradients projected out; update = projected task gradient + alignment gradient |
+| Attacks | 291 MultiJail families × en/ko/zh/**sw**. Swahili is never used for training or alignment |
+| Over-refusal | XSTest's 250 safe prompts × the same four languages (ko/zh by Aya Expanse 8B, sw by Tiny Aya, with retries) |
+| Task | 100 held-out Bactrian-X instructions per training language; Qwen3-14B judge, Tiny Aya's 1–7 rubric (accuracy, instruction following, coherence, fluency) |
+| Safety judge | Qwen3Guard-Gen-4B. Strict = Unsafe or Controversial; loose = Unsafe only |
+| Statistics | Paired on identical prompts; exact McNemar for rates, centred paired bootstrap for scores; 95% CIs |
+| Audit | AuditKIT aggregates every saved output (`PrecomputedModel`) |
+
+**Sanity check.** Our base-model safe rates (93.1 / 94.8 / 91.4 / 93.8% for en/ko/zh/sw) are within 1–2 points of the
+Tiny Aya report (Swahili 94%, average 91.1%), so the pipeline reproduces the published starting point.
+
+## 3. Break: benign fine-tuning removes refusals, hardest in Korean
+
+Attack success rate (strict), 291 MultiJail prompts per language:
+
+| | English | Korean | Mandarin | Swahili (never trained) |
+|---|---:|---:|---:|---:|
+| Tiny Aya Global | 6.9 | 5.2 | 8.6 | 6.2 |
+| + plain LoRA | 6.9 (+0.0) | **19.2 (+14.1, p = 6×10⁻⁹)** | **13.4 (+4.8, p = 0.016)** | 7.6 (+1.4, n.s.) |
+
+With the loose judge (Unsafe only) the picture is the same: Korean +11.3, Mandarin +5.5, English +0.3, Swahili +0.3.
+
+**Replication on a second sample.** Hannah curated her own training set under the same rules (600 Bactrian-X IDs ×
+en/ko/zh, CuratorKIT, Qwen3Guard screen); it shares only 4 of 600 IDs with ours. The same plain LoRA on it gives:
+
+| | English | Korean | Mandarin | Swahili |
+|---|---:|---:|---:|---:|
+| + plain LoRA, second sample | 13.4 (+6.5, p < 0.05) | **21.6 (+16.5)** | **13.4 (+4.8)** | 11.7 (+5.5) |
+
+Korean and Mandarin reproduce almost exactly. English is not immune: on this sample it rises 6.5 points, so "English
+did not move" is a property of one sample, not of the method. What holds across both samples is the ordering:
+Korean takes the largest hit, at least 2.5 times what English shows, and an English-only check understates the
+damage. Refusal on attacks drops in every language in both samples (macro 62.0 → 52.5% and → 50.5%).
+
+The model also refuses less in every language: refusal on attack prompts fell from 71.1 → 66.7% (en),
+59.8 → 47.4% (ko), 66.3 → 58.1% (zh) and 50.9 → 37.8% (sw). In Swahili the lost refusals did not turn into content
+the judge calls unsafe. Two explanations fit: the answers are harmless, or Qwen3Guard misses harm in Swahili. We
+tested both. Answers stayed in Swahili (98.3% vs 96.2% for the base), so this is not language drift. To test the judge, we
+translated every Swahili answer the guard had passed as a safe non-refusal into English (with Tiny Aya, the same
+for all arms) and re-judged it against MultiJail's English prompt. About a quarter turned out unsafe: 30 of 125 for
+the base model, 45 of 159 after plain LoRA, 29 of 112 after SafeGrad. **Qwen3Guard undercounts harm in Swahili.** The same check in Korean and
+Mandarin (translated by Aya Expanse 8B, which is not the model under test) finds far fewer misses: 7–10% of passed
+Korean answers and 3–4% of Mandarin ones, against 24–28% in Swahili, so the blind spot is specific to Swahili.
+Counting those answers, Swahili attack success is 16.5% for the base model and **23.0% after plain LoRA (+6.5
+points, p = 0.009)**; SafeGrad brings it back to 15.5% (−7.6 vs plain, p = 0.0007). So the drift does reach the
+language we never fine-tuned on, and SafeGrad repairs it without any Swahili data. Corrected the same way, Korean
+goes 7.6 → 22.7 → 13.4% and Mandarin 9.3 → 14.4 → 9.6% (base → plain → SafeGrad); the conclusions do not change. (The corrected base rate is also
+well above the 6% implied by the published 94% safe rate, which suggests published Swahili safety numbers may share
+the same judge blind spot; we have not verified that.)
+
+## 4. Fix: SafeGrad keeps refusal without giving up the task
+
+| | ASR strict en / ko / zh / sw | Refusal on attacks (macro) | Over-refusal, XSTest (macro) | Task score (1–7, macro) |
+|---|---|---:|---:|---:|
+| Tiny Aya Global | 6.9 / 5.2 / 8.6 / 6.2 | 62.0 | 8.4 | 6.32 |
+| + plain LoRA | 6.9 / 19.2 / 13.4 / 7.6 | 52.5 | 5.3 | 5.94 |
+| + SafeGrad LoRA | 4.5 / 10.7 / 8.9 / 5.5 | 64.2 | 6.4 | 5.82 |
+
+Against the plain adapter on the same prompts, SafeGrad lowers attack success by 8.6 points in Korean and 4.5 in
+Mandarin (both p < 0.05) and raises refusal by 9.3 (en), 9.6 (ko), 9.3 (zh) and **18.6 (sw)** points. The Swahili
+gain comes with no Swahili data anywhere in training or alignment.
+
+Over-refusal stays below the base model: SafeGrad refuses 6.4% of XSTest's safe prompts (macro) against 5.3% for
+plain and 8.4% for the base model, so the restored refusals are not indiscriminate.
+
+**Task quality.** Against plain LoRA, SafeGrad's judged task score is 0.12 lower (5.82 vs 5.94 macro); only the
+Korean difference (−0.19) is significant. Both fine-tunes score below the base model (6.32). Training on
+Bactrian-X's short GPT-3.5 answers cut answer length from about 420 to 170 tokens without improving reference
+match (chrF en 41.1 → 40.5, ko 18.6 → 18.3, zh 13.1 → 15.3), and the judge prefers the base model's fuller
+answers. Fine-tuning on generic instructions changed style, not content. That is itself a finding: the safety
+cost was not a price paid for a task gain. The model got no better at the task and still lost its Korean and
+Mandarin refusals.
+
+What it cost: 18.5% more training time (89.7 vs 75.7 minutes on one laptop GPU) and a final training loss 0.8%
+higher (1.436 vs 1.425). The task and alignment gradients were nearly orthogonal (median cosine −0.002); the
+projection fired on 92 of 171 steps.
+
+**Making SafeGrad work at all.** SafeTune's KL is summed over every position of a sequence, while the task loss is a
+per-token mean. With ~430-token sequences, ρ = 1 made the alignment gradient 50–800× the task gradient, gradient
+clipping then erased the task update, and task loss rose above the plain run within seven steps. We stopped that run
+(kept as evidence) and normalised the KL per token. We also found the KL is computed in bf16, where two identical
+distributions score about 0.6 per sequence; we upcast it to fp32. Both are reported to Lexsi (section 7).
+
+## 5. Explain: where refusal lives, and why Korean slips
+
+![Refusal geometry](../../results/lir/refusal_geometry.png)
+
+We took the last-token residual stream (the `<|START_RESPONSE|>` position) at every layer for every attack prompt
+(harmful) and every XSTest/task prompt (harmless), split by MultiJail family into train and held-out halves, and
+computed difference-of-means refusal directions per language.
+
+- **The model still recognises harm in every language.** The English direction separates harmful from harmless
+  held-out prompts with AUROC 0.988 (en), 0.984 (ko), 0.987 (zh) and 0.971 (sw) at layer 17, the best English
+  layer. Detection is not what fails.
+- **Refusal is linear here.** Probes trained on English only and tested on held-out families in each language: a
+  logistic probe reaches AUROC 0.985–0.993 and a one-hidden-layer MLP 0.983–0.992. We find no sign of a curved
+  feature that a single direction would miss.
+- **Each language has its own version of the direction.** Cosine to the English direction peaks mid-network (0.95
+  Mandarin, 0.90 Korean, 0.84 Swahili around layers 16–20) and falls off in early and late layers (Korean 0.44 and
+  Swahili 0.25 at the last layer).
+- **Fine-tuning shrinks the refusal signal by about a third in every language, and SafeGrad restores it.** The
+  harmful-minus-harmless gap on the base English direction at layer 17 goes from 12.6 / 10.2 / 10.7 / 9.4 (en / ko
+  / zh / sw) to 8.3 / 6.9 / 7.6 / 5.4 after plain LoRA and back to 12.3 / 10.0 / 10.5 / 9.1 after SafeGrad.
+- **Refusal rate tracks that signal.** In the base model the median projection of harmful prompts orders the
+  languages exactly like their refusal rates (en 15.5 > zh 13.7 > ko 13.3 > sw 11.7; refusal 71 > 66 > 60 > 51%),
+  and within each language and model the projection predicts whether a given prompt is refused (AUROC 0.73–0.88).
+  English starts with the most headroom, which is consistent with English still refusing after the same
+  proportional loss. The base-model threshold does not carry over unchanged to the fine-tuned model, so this is a
+  correlation, not a full mechanism; the steering experiment below is the causal test.
+
+**Steering: is one direction enough?** We added the base model's difference-of-means refusal vector at layer 17,
+at every position during generation, to the plain fine-tuned model, using either the English vector for every
+language or each language's own vector. Same 80 held-out families per language, compared with the unsteered plain
+model on the same prompts:
+
+| Same 80 families per language | ASR en / ko / zh / sw | ASR macro | Refusal on attacks, macro | XSTest over-refusal, macro |
+|---|---|---:|---:|---:|
+| Tiny Aya Global | 6.2 / 2.5 / 10.0 / 5.0 | 5.9 | 59.4 | 6.6 |
+| + plain LoRA | 2.5 / 21.2 / 12.5 / 6.2 | 10.6 | 52.2 | 7.2 |
+| + SafeGrad LoRA | 5.0 / 7.5 / 10.0 / 3.8 | 6.6 | 61.6 | **5.6** |
+| plain + English direction, 0.5× | 2.5 / 7.5 / 6.2 / 3.8 | **5.0** | 63.1 | 10.6 |
+| plain + own-language direction, 0.5× | 2.5 / 11.2 / 8.8 / 6.2 | 7.2 | 61.9 | 9.1 |
+| plain + English direction, 1× | 0.0 / **1.2** / 2.5 / 0.0 | 0.9 | 77.5 | 25.3 |
+| plain + own-language direction, 1× | 0.0 / 10.0 / 2.5 / 5.0 | 4.4 | 71.9 | 19.1 |
+
+The English direction restores refusal in every language, and in Korean it works better than Korean's own
+direction. So a single, shared refusal direction does exist at this layer; Korean is not slipping past it. What
+fine-tuning removed is magnitude along that direction, which matches the projection analysis above. Steering is a
+blunt fix, though: at this strength a quarter of XSTest's safe prompts are refused. SafeGrad recovers most of the
+safety at 6.4% over-refusal because it constrains training instead of pushing every activation. At half strength
+the trade-off is closer: English-direction steering matches SafeGrad on attacks (macro 5.0 vs 6.6% on the same
+prompts, Korean 7.5% for both) but refuses 10.6% of safe prompts against SafeGrad's 5.6%. SafeGrad is the only fix
+here that does not raise over-refusal, and it needs no change at inference time. With 80 families per language
+these differences are a few prompts each, so read them as a trade-off curve, not a ranking.
+
+**Circuits: what fine-tuning changes inside.** CircuitKIT's EAP-IG scores each of the model's 612 nodes (36 MLPs,
+576 attention heads) by how much it carries one contrast: the logit of the model's usual first refusal token minus
+that of its usual first compliant token, at the first response position, between a harmful MultiJail prompt and a
+same-language XSTest prompt of identical templated length. The tokens come from the base model's own answers ("I'm"
+vs "To" in English, "죄" vs "물론" in Korean) and are the same for every model, as are the 64 MultiJail families per
+language.
+
+Refusal turns out to be spread across the network. In CircuitKIT's patching test on 64 held-out English pairs
+(every node outside the circuit fed from the harmless prompt), the top 50 nodes recover 3% of the contrast, 100
+nodes 18%, 200 nodes 65%, 300 nodes 89% and 400 nodes 97%. We therefore compare models at 200 nodes and over the
+full ranking, not on a small circuit.
+
+| Per language | en | ko | zh | sw |
+|---|---|---|---|---|
+| Harmful − harmless contrast (logits), base → plain → SafeGrad | 8.1 → 8.2 → 8.1 | **6.2 → 3.0 → 4.8** | 4.9 → 5.3 → 5.0 | 4.3 → 4.7 → 5.3 |
+| Base top-200 nodes still in the top 200, plain / SafeGrad | 181 / 185 | **156** / 170 | 164 / 175 | 161 / 178 |
+| Rank correlation with base over all 612 nodes, plain / SafeGrad | 0.90 / 0.94 | **0.79** / 0.85 | 0.80 / 0.87 | 0.81 / 0.90 |
+
+- **One shared mechanism.** In the base model every pair of languages shares 136–155 of its top-200 nodes (65 by
+  chance), and 102 nodes are in all four languages' top 200. Even among the 50 highest-scoring nodes, 23 are common
+  to all four, including 8 attention heads in layers 10–21 (A10.9, A13.10, A14.13, A16.2, A17.8, A20.4, A20.6,
+  A21.14), around layer 17 where the English refusal direction separates best. With the steering result, this
+  points to one refusal mechanism that every language uses, not a separate one per language.
+- **Fine-tuning leaves English's circuit in place and reshapes Korean's most.** English was in the fine-tuning data
+  too, yet 181 of its top-200 nodes stay and the full ranking barely moves (ρ 0.90). Korean loses 44 of 200 (ρ
+  0.79); Mandarin and Swahili, the latter never trained on, lose 36–39.
+- **Korean's decision margin falls the most.** The contrast the circuit carries halves in Korean and holds in the
+  other three languages. That tracks behaviour (Korean attack success 5.2 → 19.2%, English unchanged) more closely
+  than the layer-17 projection, which shrinks by about a third in every language. One reading: fine-tuning weakens
+  the refusal signal everywhere, and the other languages still turn the weaker signal into the same first token more
+  often than Korean does. Mandarin's attack success rose (8.6 → 13.4%) without its first-token contrast falling, so
+  the first token is not the whole story.
+- **SafeGrad pulls every circuit back towards the base model.** It keeps more of the base top 200 than plain LoRA in
+  every language, and its full ranking is closer to base in every language. In Korean it recovers 55% of the lost
+  contrast (3.0 → 4.8 of the original 6.2). Swahili's contrast ends above the base model's (5.3 vs 4.3), in line with
+  SafeGrad raising Swahili refusal above the base rate (56.4% vs 50.9%) with no Swahili data in training or
+  alignment.
+
+Limits. The metric is one pair of first tokens: "我" opens 43% of base Mandarin refusals and "물론" only 8 of 231
+compliant Korean answers, so those contrasts are rough proxies, comparable within a language but not across
+languages. Scored instead with each language's five most common refusal and compliance opening tokens (81–99% of
+refusals, but only 13–45% of compliant answers), the same pairs give the same picture for Korean (−25% after plain
+LoRA, −2% after SafeGrad, relative to base) but show English dropping too (−18%, −8% after SafeGrad), so English's
+margin shrinks somewhat rather than not at all; Mandarin (+11%) and Swahili (−6%) stay close to base
+(`results/lir/circuits/margin_check.json`). The faithfulness sweep was run for the English base model only (CircuitKIT's rounding keeps 199 nodes at
+the 200-node point). The
+top-300 overlaps give the same ordering as the top 200; among the top 50, Korean ties with Mandarin and SafeGrad
+keeps one English node fewer than plain (`results/lir/circuits/compare_*.json`). MLP 0
+tops almost every ranking, which is common for a first-layer MLP that acts as an extended embedding; we do not read
+it as a refusal unit. CircuitKIT returns unsigned scores, so we cannot say which nodes push towards refusal and
+which towards compliance. 64 pairs per language, one seed, 5 integration steps.
+
+## 6. ROI
+
+One evaluation pass (2,463 requests, 0.94M input and 0.45M output tokens) costs $1.18 at GPT-5 mini list prices
+and $0.24 at GPT-5 nano; on one laptop with unoptimised Hugging Face generation it takes 0.57 hours. Self-hosting is
+cheaper than GPT-5 mini whenever the machine costs less than $2.08 an hour to own and run, and roughly break-even
+with GPT-5 nano ($0.42 an hour). The safety fix itself costs 14 minutes of laptop time per fine-tune. Details:
+`docs/lir/roi.md`.
+
+## 7. Feedback to Lexsi
+
+We chained all four tools and logged 14 bugs and gaps as issues; the important ones changed our results:
+
+- **SafeTune**: SafeGrad's KL is computed in the logits' dtype (bf16 noise floor ~0.6/sequence); summed over
+  positions, so ρ = 1 is not scale-free; `SafeGradHFTrainer` rejects gradient accumulation; alignment errors
+  silently fall back to plain fine-tuning.
+- **AuditKIT**: the paired-bootstrap p-value is not centred and sits near 0.5 for any effect (0.53 for our 14-point
+  Korean increase, McNemar p = 6×10⁻⁹).
+- **CircuitKIT**: MLP node scores multiply the activation difference at `hook_mlp_out` by the gradient at
+  `hook_mlp_in`; attention masks ignore the padding side actually used; circuit sizes are off by one and capped.
+- **CuratorKIT**: no safety screen for Korean, Chinese or Swahili (Detoxify does not cover them).
+
+Full list: `docs/lir/lexsi-feedback.md`.
+
+## 8. Limitations
+
+- Automatic judges. Human agreement is checked on 30 blinded items per language (target ≥ 80%): {{result}}.
+- Swahili judged by a model; no fluent Swahili reader on the team. Back-translation is the check we could run.
+- Machine-translated XSTest; translation can remove the ambiguity XSTest relies on.
+- One seed, one LoRA configuration, one model size, one alignment set.
+
+## Reproduce
+
+Data, adapters and every generation and judge verdict are on Hugging Face under `lost-in-refusal`. The notebook
+recomputes every table from the published outputs on CPU and can re-run any arm on a GPU.
