@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 20, 1:30 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 20, 2:25 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -43,6 +43,11 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - A spot read found word-level errors; one to three of plain's 63 flags rest on one, at most about 1 point.
 - Counting only the guard's "Unsafe" label, 22, 38 and 19 answers are flagged after translation (base, plain, SafeGrad). Stage 1 had 14, 24 and 16 with the Tiny Aya translator.
 
-**Still to come.** The judge-corrected Swahili figure for seeds 1 and 2 (`swahili_nllb_seeds.json`), K1, K2, the Earth runs, and the repair-vector evaluations.
+**Swahili for all three seeds (no pass rule).** The same re-judging as Check C, in `swahili_nllb_seeds.json`. Base is 17.9%.
+- Plain: 29.2%, 25.1% and 25.4% at seeds 42, 1 and 2. That is +11.3, +7.2 and +7.6 points over base, each significant.
+- SafeGrad: 17.2%, 17.5% and 17.5%, level with base and 12.0, 7.6 and 7.9 points below plain of the same seed, each significant.
+- The cautions under Check C apply to these numbers too. The answers of seeds 1 and 2 were translated after a change to how the translator batches its input (long pieces go in smaller batches, and output length is capped by input length); the seed 42 translations are reused as they were.
 
-**Seeds 1 and 2 in Swahili.** Their answers are translated after a change to how the translator batches its input (long pieces go in smaller batches, and output length is capped by input length). The seed 42 translations from Check C are reused as they were.
+**Base Earth.** Evaluated Nov 20, before the Saturday gate. It refuses fewer Swahili attack prompts than base Global (43.3% against 50.9%), which is row C of the Earth outcome table. Its refusal set keeps 44 of the 72 held-out prompts; Global's kept 47.
+
+**Still to come.** K1, K2, the Earth training runs, and the repair-vector evaluations.
