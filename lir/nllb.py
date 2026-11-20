@@ -34,7 +34,9 @@ def chunks(text: str, limit: int = 300) -> list[str]:
         if not line:
             continue
         cur = ""
-        for sent in re.split(r"(?<=[.!?。])\s+", line):
+        for sent in re.split(r"(?<=[.!?])\s+|(?<=[。！？])\s*", line):  # Chinese has no space after a full stop
+            if not sent:
+                continue
             if cur and len(cur) + len(sent) + 1 > limit:
                 out.append(cur)
                 cur = sent
@@ -54,26 +56,31 @@ def load():
     return tok, model
 
 
-def translate(tok, model, texts: list[str], src: str, batch: int = 24) -> list[str]:
+def translate(tok, model, texts: list[str], src: str, batch: int = 24, token_budget: int = 3000) -> list[str]:
     """Translate whole answers to English, chunk by chunk, and join the chunks back in order."""
     import torch
 
     tok.src_lang = CODES[src]
-    pieces = [(i, c) for i, t in enumerate(texts) for c in chunks(t)]
-    order = sorted(range(len(pieces)), key=lambda k: -len(pieces[k][1]))
+    pieces = [(i, c) for i, t in enumerate(texts) for c in chunks(t, 150 if src == "zh" else 300)]
+    n_tok = [len(tok(c, truncation=True, max_length=512).input_ids) for _, c in pieces]
+    order = sorted(range(len(pieces)), key=lambda k: -n_tok[k])
     done: dict[int, str] = {}
     with torch.no_grad():
-        for s in range(0, len(order), batch):
-            idx = order[s:s + batch]
+        s = 0
+        while s < len(order):
+            # beam search keeps a cache per beam that grows with every token, so long pieces go in small batches
+            longest = n_tok[order[s]]
+            idx = order[s:s + max(1, min(batch, token_budget // longest))]
             enc = tok([pieces[k][1] for k in idx], return_tensors="pt", padding=True, truncation=True,
                       max_length=512).to(device())
             gen = model.generate(**enc, forced_bos_token_id=tok.convert_tokens_to_ids(CODES["en"]),
-                                 max_new_tokens=400, num_beams=4)
+                                 max_new_tokens=min(400, 3 * longest + 50), num_beams=4)
             for k, text in zip(idx, tok.batch_decode(gen, skip_special_tokens=True)):
                 done[k] = text.strip()
             del enc, gen
-            empty_cache()  # beam search leaves a growing pile of cached blocks on MPS otherwise
-            print(f"nllb {min(s + batch, len(order))}/{len(order)}", flush=True)
+            empty_cache()
+            s += len(idx)
+            print(f"nllb {s}/{len(order)}", flush=True)
     out = [[] for _ in texts]
     for k, (i, _) in enumerate(pieces):
         out[i].append(done[k])

@@ -153,6 +153,9 @@ class SecondJudge(unittest.TestCase):
         parts = chunks(long, limit=100)
         self.assertTrue(all(len(p) <= 100 for p in parts))
         self.assertEqual(" ".join(parts), long)
+        zh = "你好。我很好！真的吗？是的"
+        self.assertEqual(chunks(zh, limit=6), ["你好。", "我很好！", "真的吗？", "是的"])
+        self.assertEqual(chunks(zh), ["你好。 我很好！ 真的吗？ 是的"])
 
 
 class SeedChecks(unittest.TestCase):
