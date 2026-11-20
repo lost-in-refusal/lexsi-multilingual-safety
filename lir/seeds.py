@@ -3,6 +3,7 @@
   python -m lir.seeds                      # writes results/lir/stage2/seeds.{json,md}
   python -m lir.seeds --judge guard2       # the same checks under the second judge: seeds_guard2.{json,md}
   python -m lir.seeds --judge granite      # under the replacement second judge: seeds_granite.{json,md}
+  python -m lir.seeds --times              # training time per run, from runs/<arm>/run.json: train_time.{json,md}
 
 H1 drift:  in every seed the Korean rise in strict attack success (plain vs base) is
            significant and larger than the English rise; the pooled gap is above zero.
@@ -176,12 +177,45 @@ def fmt(res: dict) -> str:
     return "\n".join(lines)
 
 
+def times(out: Path) -> None:
+    """Training time is a registered cost. The run folders are not tracked, so the numbers are copied here."""
+    import json
+
+    extra = ["plain-mix1", "plain-mix5", "earth-plain", "earth-safegrad"]
+    rows = {}
+    for arm in [x for pair in SEEDS.values() for x in pair] + extra:
+        p = RUNS / arm / "run.json"
+        if p.exists():
+            r = json.loads(p.read_text())
+            rows[arm] = {"seed": r["seed"], "minutes": r["train_runtime_s"] / 60, "optimizer_steps": r["optimizer_steps"],
+                         "train_rows": r["train_rows"]}
+    over = {}
+    for seed, (p_arm, s_arm) in SEEDS.items():
+        if p_arm in rows and s_arm in rows:
+            d = rows[s_arm]["minutes"] - rows[p_arm]["minutes"]
+            over[seed] = {"minutes": d, "percent": 100 * d / rows[p_arm]["minutes"]}
+    write_json(out / "train_time.json", {"runs": rows, "safegrad_minus_plain": over})
+    lines = ["### Training time on the laptop (minutes)", "", "| Run | Seed | Rows | Optimizer steps | Minutes |",
+             "|---|---:|---:|---:|---:|"]
+    lines += [f"| {a} | {r['seed']} | {r['train_rows']} | {r['optimizer_steps']} | {r['minutes']:.1f} |" for a, r in rows.items()]
+    lines += ["", "SafeGrad against plain at the same seed: " + "; ".join(
+        f"seed {s}: {d['minutes']:+.1f} min ({d['percent']:+.1f}%)" for s, d in over.items()) + ".",
+        f"Mean over the seeds: {sum(d['minutes'] for d in over.values()) / len(over):+.1f} min "
+        f"({sum(d['percent'] for d in over.values()) / len(over):+.1f}%)." if over else ""]
+    (out / "train_time.md").write_text("\n".join(lines) + "\n")
+    print("\n".join(lines))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT / "results" / "lir" / "stage2"))
+    ap.add_argument("--times", action="store_true", help="write the training-time table and stop")
     ap.add_argument("--judge", choices=["guard", "guard2", "granite"], default="guard",
                     help="guard2: the second judge's labels, from lir.guard2 arms; granite: from lir.granite arms")
     a = ap.parse_args()
+    if a.times:
+        times(Path(a.out))
+        return
     n_attack = len(read_jsonl(DATA / "multijail_attack.jsonl"))
     data, counts = {}, {}
     for arm in ["base"] + [x for pair in SEEDS.values() for x in pair]:

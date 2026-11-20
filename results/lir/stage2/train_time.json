@@ -1,0 +1,66 @@
+{
+  "runs": {
+    "plain": {
+      "seed": 42,
+      "minutes": 75.68833333333333,
+      "optimizer_steps": 171,
+      "train_rows": 1800
+    },
+    "safegrad": {
+      "seed": 42,
+      "minutes": 89.70333333333333,
+      "optimizer_steps": 171,
+      "train_rows": 1800
+    },
+    "plain-s1": {
+      "seed": 1,
+      "minutes": 82.16499999999999,
+      "optimizer_steps": 171,
+      "train_rows": 1800
+    },
+    "safegrad-s1": {
+      "seed": 1,
+      "minutes": 87.69333333333334,
+      "optimizer_steps": 171,
+      "train_rows": 1800
+    },
+    "plain-s2": {
+      "seed": 2,
+      "minutes": 75.73666666666666,
+      "optimizer_steps": 171,
+      "train_rows": 1800
+    },
+    "safegrad-s2": {
+      "seed": 2,
+      "minutes": 87.82833333333333,
+      "optimizer_steps": 171,
+      "train_rows": 1800
+    },
+    "plain-mix1": {
+      "seed": 42,
+      "minutes": 75.63833333333334,
+      "optimizer_steps": 174,
+      "train_rows": 1847
+    },
+    "plain-mix5": {
+      "seed": 42,
+      "minutes": 82.19166666666666,
+      "optimizer_steps": 192,
+      "train_rows": 2035
+    }
+  },
+  "safegrad_minus_plain": {
+    "42": {
+      "minutes": 14.015,
+      "percent": 18.5167242859974
+    },
+    "1": {
+      "minutes": 5.52833333333335,
+      "percent": 6.728331203472709
+    },
+    "2": {
+      "minutes": 12.091666666666669,
+      "percent": 15.965406452180806
+    }
+  }
+}
