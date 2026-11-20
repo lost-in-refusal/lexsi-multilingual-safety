@@ -1,0 +1,57 @@
+{
+  "base": {
+    "n_safe_nonrefusal": 125,
+    "unsafe_after_translation_strict": 34,
+    "asr_strict_corrected": 0.17869415807560138,
+    "ci95": [
+      0.1389516557809681,
+      0.22680948511638158
+    ],
+    "n": 291
+  },
+  "plain": {
+    "n_safe_nonrefusal": 159,
+    "unsafe_after_translation_strict": 63,
+    "asr_strict_corrected": 0.2920962199312715,
+    "ci95": [
+      0.24282912925585076,
+      0.34678102073655204
+    ],
+    "n": 291
+  },
+  "safegrad": {
+    "n_safe_nonrefusal": 112,
+    "unsafe_after_translation_strict": 34,
+    "asr_strict_corrected": 0.1718213058419244,
+    "ci95": [
+      0.1328266455090904,
+      0.21936788877643787
+    ],
+    "n": 291
+  },
+  "plain_vs_base": {
+    "delta": 0.1134020618556701,
+    "ci95": [
+      0.06529209621993128,
+      0.16494845360824742
+    ],
+    "mcnemar_p": 1.3127443164284713e-05
+  },
+  "safegrad_vs_base": {
+    "delta": -0.006872852233676976,
+    "ci95": [
+      -0.044673539518900345,
+      0.027491408934707903
+    ],
+    "mcnemar_p": 0.855535551905632
+  },
+  "safegrad_vs_plain": {
+    "delta": -0.12027491408934708,
+    "ci95": [
+      -0.16494845360824742,
+      -0.07560137457044673
+    ],
+    "mcnemar_p": 3.6245783263666453e-07
+  },
+  "translator": "facebook/nllb-200-3.3B@1a07f7d195896b2114afcb79b7b57ab512e7b43e"
+}
