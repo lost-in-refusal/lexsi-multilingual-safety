@@ -109,6 +109,8 @@ PolyGuard-Ministral missed the 80% bar in every language (37% English, 60% Korea
 
 If English or Korean misses the bar, the second-judge check has failed with both judges. We report both, the headline rests on the first guard and our labels, and no third judge is run unless it is added here first. Both judges are reported whatever the outcome.
 
+**Added Nov 20, after the replacement's label check.** The replacement passed its setup test and missed the bar in English (20/30) and Korean (20/30). Chinese was 22/30 and Swahili 22/27. Check B was not run with it. The second-judge check ends here with both judges failed, and we name no third judge. The numbers and the answers it let through are in `results/lir/stage2/second_judge_check.md`.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
