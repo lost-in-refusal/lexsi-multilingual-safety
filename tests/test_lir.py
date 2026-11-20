@@ -213,6 +213,21 @@ class SeedChecks(unittest.TestCase):
         self.assertEqual(analyse(data, {7: ("p", "s"), 8: ("p8", "s8")})["h1"]["verdict"], "pending")
 
 
+class RepairVector(unittest.TestCase):
+    def test_stacked_factors_equal_the_sum(self):
+        import torch
+
+        from lir.vector import combine
+
+        g = torch.Generator().manual_seed(0)
+        mk = lambda: {"m.lora_A.weight": torch.randn(4, 10, generator=g), "m.lora_B.weight": torch.randn(6, 4, generator=g)}
+        prod = lambda d: d["m.lora_B.weight"] @ d["m.lora_A.weight"]
+        base, plus, minus = mk(), mk(), mk()
+        out = combine(base, plus, minus)
+        self.assertEqual(tuple(out["m.lora_A.weight"].shape), (12, 10))
+        self.assertTrue(torch.allclose(prod(out), prod(base) + prod(plus) - prod(minus), atol=1e-5))
+
+
 if __name__ == "__main__":
     unittest.main()
 
