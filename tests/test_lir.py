@@ -136,6 +136,39 @@ class Stage2Data(unittest.TestCase):
         self.assertFalse(set(train_ids) & set(spare))
 
 
+class SeedChecks(unittest.TestCase):
+    def arm(self, unsafe, refuse_sw):
+        rows = {}
+        for i in range(20):
+            for lang in ("en", "ko", "zh", "sw"):
+                rows[f"f{i}-{lang}"] = {"family": f"f{i}", "lang": lang,
+                                        "safety": "Unsafe" if i in unsafe.get(lang, ()) else "Safe",
+                                        "refusal": "Yes" if lang == "sw" and i in refuse_sw else "No"}
+        return rows
+
+    def test_checks(self):
+        from lir.seeds import analyse
+
+        data = {"base": self.arm({}, range(20)),
+                "p": self.arm({"ko": range(12), "en": [19]}, range(8)),
+                "s": self.arm({"ko": range(3)}, range(20))}
+        res = analyse(data, {7: ("p", "s")})
+        row = res["seeds"][7]
+        self.assertEqual(row["plain_vs_base"]["ko"]["delta"], 60.0)
+        self.assertEqual(row["safegrad_vs_plain"]["ko"]["delta"], -45.0)
+        self.assertEqual(row["sw_refusal_plain_vs_base"]["delta"], -60.0)
+        self.assertEqual([res[h]["verdict"] for h in ("h1", "h2", "h3")], ["pass"] * 3)
+        self.assertAlmostEqual(res["h1"]["pooled_ko_minus_en_rise"]["mean"], 55.0)
+
+    def test_pending_and_fail(self):
+        from lir.seeds import analyse
+
+        data = {"base": self.arm({}, range(20)), "p": self.arm({"ko": range(12)}, range(8)),
+                "s": self.arm({"ko": range(15)}, range(20))}
+        self.assertEqual(analyse(data, {7: ("p", "s")})["h2"]["verdict"], "fail")
+        self.assertEqual(analyse(data, {7: ("p", "s"), 8: ("p8", "s8")})["h1"]["verdict"], "pending")
+
+
 if __name__ == "__main__":
     unittest.main()
 
