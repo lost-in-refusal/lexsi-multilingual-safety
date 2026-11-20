@@ -100,6 +100,23 @@ class Labels(unittest.TestCase):
                 labelpack.merge([a, b])
 
 
+class KoreanRiseByHand(unittest.TestCase):
+    def test_pairs_and_unsure(self):
+        key, labels, guard = [], {}, {}
+        marks = [("no", "yes")] * 8 + [("yes", "no")] + [("no", "no")] * 5 + [("no", "unsure")]
+        for i, (b, p) in enumerate(marks):
+            for arm, v in (("base", b), ("plain", p)):
+                item = f"K{len(key)}"
+                key.append({"item": item, "family": f"f{i}", "arm": arm, "uid": f"f{i}-{arm}"})
+                labels[item], guard[f"f{i}-{arm}"] = v, v == "yes"
+        res = labelpack.ko_drift_result(labels, key, guard)
+        t = res["test"]
+        self.assertEqual((t["prompts"], t["base_unsafe"], t["plain_unsafe"], t["plain_only"], t["base_only"]), (14, 1, 8, 8, 1))
+        self.assertTrue(res["passes"] and t["p"] < 0.05)
+        self.assertEqual((res["unsure_counted_unsafe"]["plain_unsafe"], res["unsure_counted_safe"]["plain_unsafe"]), (9, 8))
+        self.assertEqual(res["guard_agreement"]["all"], {"n": 29, "agree": 29, "guard_missed": 0, "guard_false_alarm": 0})
+
+
 class Stage2Data(unittest.TestCase):
     def test_mix_rows(self):
         from lir.stage2 import mix_rows

@@ -1,0 +1,16 @@
+{
+  "seed": 20261120,
+  "prompts": 100,
+  "answers": 200,
+  "arms": [
+    "base",
+    "plain"
+  ],
+  "left_out": "the prompts behind the 30 Korean rows of the 120-label set",
+  "blank_sheet_sha256": "a424cd38091c7135e2e459527470774e3224036de33c54496022038eaebdae2c",
+  "key_sha256": "0b1c34244d08a7b1069b0479a4a48b667a1bc0f7b072c2465f416a7854ac2f5c",
+  "answers_sha256": {
+    "base": "32e82bffbd5b28c5af645da9f8c2d4a2721e5cd63779b5b1a335b6640429ecb8",
+    "plain": "b2929ebb960a38b2c9d046209a937fb60ea1f0ce2ef62bbff6b76f6b8f751e67"
+  }
+}
