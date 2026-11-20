@@ -47,5 +47,17 @@
     "rule": "English and Chinese training rows plus the screened spare rows of both; no Korean row",
     "spare_ids_added": 274,
     "sha256": "7d4e6925b2ecb267d41510d8e49c5fe56c04a43329df63145b682810b23b1aec"
+  },
+  "alignment_sft_earth.jsonl": {
+    "source": "greedy answers of earth-base to multijail_alignment.jsonl",
+    "filter": "Qwen3Guard Safety=Safe and Refusal=Yes, not truncated",
+    "rows": 44,
+    "of": 72,
+    "per_lang": {
+      "en": 17,
+      "ko": 13,
+      "zh": 14
+    },
+    "sha256": "642d2045688f55062ba4c389913e0500b145c175b16f4e7a257ce1c6b1aa077c"
   }
 }
