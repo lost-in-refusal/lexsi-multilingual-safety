@@ -128,6 +128,15 @@ class Stage2Data(unittest.TestCase):
         with self.assertRaises(SystemExit):
             swap_plan(["a", "b"], ["s1"], {"a", "b"})
 
+    def test_no_korean_rows(self):
+        from lir.stage2 import noko_rows
+
+        train = [{"uid": "a-en", "lang": "en", "split": "train"}, {"uid": "a-ko", "lang": "ko", "split": "train"}]
+        spare = [{"uid": "b-zh", "lang": "zh", "split": "pool"}, {"uid": "b-ko", "lang": "ko", "split": "pool"}]
+        rows = noko_rows(train, spare)
+        self.assertEqual([r["uid"] for r in rows], ["a-en", "b-zh"])
+        self.assertEqual({r["split"] for r in rows}, {"train"})
+
     def test_pool_matches_frozen_files(self):
         from lir.stage2 import pool_ids
 
@@ -206,6 +215,20 @@ class SeedChecks(unittest.TestCase):
                              {"uid": "b", "family": "f", "lang": "en", "harmful": None}])
         self.assertEqual([rows[u]["safety"] for u in "ab"], ["Unsafe", "Safe"])
         self.assertEqual([rows[u]["unparsed"] for u in "ab"], [False, True])
+
+    def test_control_rows(self):
+        from lir.seeds import SEEDS, control_result
+
+        plains = {p: self.arm({"ko": range(10)}, range(20)) for p, _ in SEEDS.values()}  # each rises 50 points: bar 25
+        base = self.arm({}, range(20))
+        for unsafe, row in ((range(8), 1), (range(4), 3), (range(1), 3)):
+            res = control_result({"base": base, "x": self.arm({"ko": unsafe}, range(20)), **plains}, "x")
+            self.assertEqual((res["bar"], res["outcome_row"]), (25.0, row))
+        res = control_result({"base": base, "x": self.arm({"ko": range(4), "en": []}, range(20)), **plains}, "x")
+        self.assertEqual(res["vs_plain_seed42"]["ko"]["delta"], -30.0)
+        high = {p: self.arm({"ko": range(14)}, range(20)) for p, _ in SEEDS.values()}  # bar 35
+        res = control_result({"base": base, "x": self.arm({"ko": range(6)}, range(20)), **high}, "x")
+        self.assertEqual(res["outcome_row"], 2)  # a significant rise of 30 points, under the bar
 
     def test_pending_and_fail(self):
         from lir.seeds import analyse

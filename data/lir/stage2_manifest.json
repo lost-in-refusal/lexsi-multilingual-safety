@@ -37,5 +37,15 @@
       "spare_unflagged": 211
     },
     "sha256": "e41e22da885658f5988c5b315411f56cf32a3a2190c3b9f5a519a880e295a7e8"
+  },
+  "bactrian_train_noko.jsonl": {
+    "rows": 1748,
+    "per_lang": {
+      "en": 874,
+      "zh": 874
+    },
+    "rule": "English and Chinese training rows plus the screened spare rows of both; no Korean row",
+    "spare_ids_added": 274,
+    "sha256": "7d4e6925b2ecb267d41510d8e49c5fe56c04a43329df63145b682810b23b1aec"
   }
 }

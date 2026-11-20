@@ -7,6 +7,7 @@
   python -m lir.stage2 ko-clean --cutoff 4 --check 30
   python -m lir.stage2 ko-check     # after the new spot check is filled in
   python -m lir.stage2 refusals --arm earth-base --out alignment_sft_earth.jsonl
+  python -m lir.stage2 noko         # training set with no Korean row (check K1 in the preregistration)
 
 mix: SafeGrad draws 4 refusal examples per optimizer step (171 steps, about 684
 views). Mixing the 47 examples into the data once gives 141 views over three
@@ -85,6 +86,25 @@ def build_refusals(arm: str, name: str) -> None:
                 "rows": len(keep), "of": len(judged), "per_lang": dict(Counter(r["lang"] for r in keep)),
                 "sha256": sha256_file(DATA / name)})
     print(len(keep), "of", len(judged), "kept ->", DATA / name)
+
+
+# ---------------------------------------------------------------- run without Korean rows
+
+def noko_rows(train: list[dict], spare_rows: list[dict]) -> list[dict]:
+    """The other languages' training rows plus their screened spare rows. No Korean row."""
+    return [r for r in train if r["lang"] != "ko"] + [dict(r, split="train") for r in spare_rows if r["lang"] != "ko"]
+
+
+def build_noko() -> None:
+    _, spare = pool_ids()
+    by_uid = {r["uid"]: r for r in read_jsonl(DATA / "bactrian_candidates.jsonl")}
+    rows = noko_rows(read_jsonl(DATA / "bactrian_train.jsonl"), [by_uid[f"{s}-{l}"] for s in spare for l in TRAIN_LANGS])
+    name = "bactrian_train_noko.jsonl"
+    write_jsonl(DATA / name, rows)
+    note(name, {"rows": len(rows), "per_lang": dict(Counter(r["lang"] for r in rows)),
+                "rule": "English and Chinese training rows plus the screened spare rows of both; no Korean row",
+                "spare_ids_added": len(spare), "sha256": sha256_file(DATA / name)})
+    print(name, len(rows), "rows", dict(Counter(r["lang"] for r in rows)))
 
 
 # ---------------------------------------------------------------- Korean clean set
@@ -228,7 +248,7 @@ def check(limit_share: float = 0.1) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["mix", "ko-pool", "ko-cutoff", "ko-clean", "ko-check", "refusals"])
+    ap.add_argument("cmd", choices=["mix", "ko-pool", "ko-cutoff", "ko-clean", "ko-check", "refusals", "noko"])
     ap.add_argument("--cutoff", type=int)
     ap.add_argument("--check", type=int, default=30, help="rows in the new spot-check sheet")
     ap.add_argument("--arm", default="earth-base", help="refusals: the base-model arm to read")
@@ -238,6 +258,8 @@ def main() -> None:
         build_mix()
     elif a.cmd == "refusals":
         build_refusals(a.arm, a.out)
+    elif a.cmd == "noko":
+        build_noko()
     elif a.cmd == "ko-pool":
         build_ko_pool()
     elif a.cmd == "ko-cutoff":
