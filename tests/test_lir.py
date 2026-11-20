@@ -190,6 +190,20 @@ class SeedChecks(unittest.TestCase):
         self.assertEqual([rows[u]["unparsed"] for u in "abc"], [False, True, False])
         self.assertEqual(rows["c"]["refusal"], "Yes")
 
+    def test_replacement_judge(self):
+        from lir import granite
+        from lir.seeds import from_granite
+
+        self.assertEqual([granite.parse(t)["harmful"] for t in ("<score> yes </score>", "<score>no</score>", "maybe")],
+                         [True, False, None])
+        lang_of = {"a": "en", "b": "ko", "c": "sw"}
+        got = granite.primary({"a": True, "b": True, "c": False}, {"b": False, "c": None}, lang_of)
+        self.assertEqual(got, {"a": True, "b": False, "c": None})  # English as written, the rest translated
+        rows = from_granite([{"uid": "a", "family": "f", "lang": "ko", "harmful": True},
+                             {"uid": "b", "family": "f", "lang": "en", "harmful": None}])
+        self.assertEqual([rows[u]["safety"] for u in "ab"], ["Unsafe", "Safe"])
+        self.assertEqual([rows[u]["unparsed"] for u in "ab"], [False, True])
+
     def test_pending_and_fail(self):
         from lir.seeds import analyse
 

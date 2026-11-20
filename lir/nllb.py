@@ -1,7 +1,8 @@
 """Swahili re-translation with a translator that is not the model under test.
 
   python -m lir.nllb backtranslate --arms base plain safegrad   # translate, re-judge, corrected ASR
-  python -m lir.nllb labels                                     # Swahili human-label rows in English
+  python -m lir.nllb labels --langs sw ko zh                    # human-label rows in English
+  python -m lir.nllb arms --arms base plain --langs ko          # every attack answer of an arm in English
 
 Stage 1 translated Swahili answers with base Tiny Aya (lir.swcheck). This does the
 same check with NLLB-200 3.3B: every Swahili attack answer the guard called Safe
@@ -120,27 +121,60 @@ def backtranslate(arms: list[str]) -> dict:
     return res
 
 
-def labels() -> None:
-    """English versions of the Swahili human-label rows, for the second judge."""
+def labels(langs: list[str]) -> None:
+    """English versions of the human-label rows in these languages, for the second judge. One file per language."""
     key = {k["item"]: k for k in json.loads((LABELS / "labels_key.json").read_text())}
     en_prompt = {r["family"]: r["prompt"] for r in read_jsonl(DATA / "multijail_attack.jsonl") if r["lang"] == "en"}
     family = {r["uid"]: r["family"] for r in read_jsonl(DATA / "multijail_attack.jsonl")}
-    rows = [r for r in csv.DictReader(open(LABELS / "labels_blank.csv", encoding="utf-8")) if r["lang"] == "sw"]
+    todo = [l for l in langs if not (LABELS / f"labels_{l}_nllb.jsonl").exists()]
+    if not todo:
+        print("label rows already translated for", ", ".join(langs))
+        return
     tok, model = load()
-    en = translate(tok, model, [r["response"] for r in rows], "sw")
-    write_jsonl(LABELS / "labels_sw_nllb.jsonl",
-                [{"uid": r["item"], "item": r["item"], "lang": "sw", "prompt": en_prompt[family[key[r["item"]]["uid"]]],
-                  "response": t, "translator": f"{NLLB}@{NLLB_REV}"} for r, t in zip(rows, en)])
-    print(len(rows), "Swahili label rows ->", LABELS / "labels_sw_nllb.jsonl")
+    for lang in todo:
+        rows = [r for r in csv.DictReader(open(LABELS / "labels_blank.csv", encoding="utf-8")) if r["lang"] == lang]
+        en = translate(tok, model, [r["response"] for r in rows], lang)
+        write_jsonl(LABELS / f"labels_{lang}_nllb.jsonl",
+                    [{"uid": r["item"], "item": r["item"], "lang": lang,
+                      "prompt": en_prompt[family[key[r["item"]]["uid"]]], "response": t,
+                      "translator": f"{NLLB}@{NLLB_REV}"} for r, t in zip(rows, en)])
+        print(len(rows), lang, "label rows ->", LABELS / f"labels_{lang}_nllb.jsonl")
+
+
+def arms(names: list[str], langs: list[str]) -> None:
+    """Every attack answer of each arm in these languages, in English: runs/nllb/<arm>.<lang>.jsonl.
+
+    Swahili answers already translated for the re-judging check are reused, so both checks read the same text."""
+    out_dir = RUNS / "nllb"
+    tok = model = None
+    for lang in langs:
+        for arm in names:
+            path = out_dir / f"{arm}.{lang}.jsonl"
+            rows = [r for r in read_jsonl(RUNS / "eval" / arm / "attack.gen.jsonl") if r["lang"] == lang]
+            if path.exists() and {r["uid"] for r in read_jsonl(path)} >= {r["uid"] for r in rows}:
+                print(f"{arm} {lang}: already translated")
+                continue
+            old = RUNS / "swcheck" / f"{arm}.nllb.bt.jsonl"
+            have = {r["uid"]: r["response"] for r in read_jsonl(old)} if lang == "sw" and old.exists() else {}
+            new = [r for r in rows if r["uid"] not in have]
+            if tok is None:
+                tok, model = load()
+            have.update(zip((r["uid"] for r in new), translate(tok, model, [r["response"] for r in new], lang)))
+            write_jsonl(path, [{"uid": r["uid"], "family": r["family"], "lang": lang, "response": have[r["uid"]],
+                                "translator": f"{NLLB}@{NLLB_REV}"} for r in rows])
+            print(f"{arm} {lang}: {len(new)} answers translated, {len(rows) - len(new)} reused -> {path}", flush=True)
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["backtranslate", "labels"])
+    ap.add_argument("cmd", choices=["backtranslate", "labels", "arms"])
     ap.add_argument("--arms", nargs="+", default=["base", "plain", "safegrad"])
+    ap.add_argument("--langs", nargs="+", default=["sw"], choices=["sw", "ko", "zh"])
     a = ap.parse_args()
     if a.cmd == "labels":
-        labels()
+        labels(a.langs)
+    elif a.cmd == "arms":
+        arms(a.arms, a.langs)
     else:
         print(json.dumps(backtranslate(a.arms), indent=2))
 
