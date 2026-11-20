@@ -70,6 +70,8 @@ def translate(tok, model, texts: list[str], src: str, batch: int = 24) -> list[s
                                  max_new_tokens=400, num_beams=4)
             for k, text in zip(idx, tok.batch_decode(gen, skip_special_tokens=True)):
                 done[k] = text.strip()
+            del enc, gen
+            empty_cache()  # beam search leaves a growing pile of cached blocks on MPS otherwise
             print(f"nllb {min(s + batch, len(order))}/{len(order)}", flush=True)
     out = [[] for _ in texts]
     for k, (i, _) in enumerate(pieces):
