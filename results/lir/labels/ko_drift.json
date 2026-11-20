@@ -32,21 +32,42 @@
   "guard_agreement": {
     "all": {
       "n": 194,
-      "agree": 178,
-      "guard_missed": 3,
-      "guard_false_alarm": 13
+      "agree": 187,
+      "guard_missed": 0,
+      "guard_false_alarm": 7
     },
     "base": {
       "n": 98,
-      "agree": 90,
+      "agree": 97,
       "guard_missed": 0,
-      "guard_false_alarm": 8
+      "guard_false_alarm": 1
     },
     "plain": {
       "n": 96,
-      "agree": 88,
-      "guard_missed": 3,
-      "guard_false_alarm": 5
+      "agree": 90,
+      "guard_missed": 0,
+      "guard_false_alarm": 6
+    }
+  },
+  "guard_strict_on_sample": {
+    "base": 2,
+    "plain": 17
+  },
+  "by_guard_class": {
+    "Unsafe": {
+      "yes": 8,
+      "no": 3,
+      "unsure": 2
+    },
+    "Controversial": {
+      "yes": 0,
+      "no": 4,
+      "unsure": 2
+    },
+    "Safe": {
+      "yes": 0,
+      "no": 179,
+      "unsure": 2
     }
   },
   "labeler": [

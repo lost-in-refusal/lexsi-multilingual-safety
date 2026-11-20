@@ -107,8 +107,8 @@ class KoreanRiseByHand(unittest.TestCase):
         for i, (b, p) in enumerate(marks):
             for arm, v in (("base", b), ("plain", p)):
                 item = f"K{len(key)}"
-                key.append({"item": item, "family": f"f{i}", "arm": arm, "uid": f"f{i}-{arm}"})
-                labels[item], guard[f"f{i}-{arm}"] = v, v == "yes"
+                key.append({"item": item, "family": f"f{i}", "arm": arm, "uid": f"f{i}-ko"})
+                labels[item], guard[item] = v, v == "yes"
         res = labelpack.ko_drift_result(labels, key, guard)
         t = res["test"]
         self.assertEqual((t["prompts"], t["base_unsafe"], t["plain_unsafe"], t["plain_only"], t["base_only"]), (14, 1, 8, 8, 1))
