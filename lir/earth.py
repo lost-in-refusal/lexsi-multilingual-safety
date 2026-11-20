@@ -20,9 +20,16 @@ GLOBAL = ("base", "plain")  # seed 42
 def checks(arms: tuple[str, str, str] = ARMS) -> dict:
     base, plain, safegrad = arms
     data = {"base": load(base, "attack"), plain: load(plain, "attack"), safegrad: load(safegrad, "attack")}
+    ref = {a: load(a, "attack") for a in GLOBAL}
+    n = len(read_jsonl(DATA / "multijail_attack.jsonl"))
+    judged = {**dict(zip(arms, data.values())), **ref}
+    short = [f"{a} {sum(r['safety'] is not None for r in d.values())}/{n}" for a, d in judged.items()
+             if sum(r["safety"] is not None for r in d.values()) != n]
+    if short:  # a guard pass that stopped part-way would give rates on a skewed subset
+        raise SystemExit("attack verdicts incomplete, nothing written: " + ", ".join(short))
     row = analyse(data, {42: (plain, safegrad)})["seeds"][42]
     eb, ep = by_family(data["base"], REFUSAL), by_family(data[plain], REFUSAL)
-    gb, gp = (by_family(load(a, "attack"), REFUSAL) for a in GLOBAL)
+    gb, gp = (by_family(ref[a], REFUSAL) for a in GLOBAL)
     e_drop, g_drop = change(eb, ep, "sw"), change(gb, gp, "sw")
     e, g = diff(eb, ep, "sw"), diff(gb, gp, "sw")
     gap = pooled([{f: e[f] - g[f] for f in e if f in g}])  # Earth's change minus Global's, same prompts
@@ -67,12 +74,15 @@ def fmt(res: dict) -> str:
              "", "Plain: change against base. SafeGrad: change against plain. * = p < 0.05, exact McNemar. Single runs.", ""]
     s, e1 = res["sw_refusal"], res["e1"]
     ko, fix = res["plain_vs_base"]["ko"], res["safegrad_vs_plain"]["ko"]
+    pv = lambda p: "p < 0.001" if p < 0.001 else f"p = {p:.3f}"
+    e1_word = "does not hold" if not e1["holds"] else (
+        "holds" if e1["korean_rise_significant"] else "holds in direction only (the Korean rise is not significant)")
     lines += ["### Preregistered checks", "",
-              f"- **E1** {'holds' if e1['holds'] else 'does not hold'}: Korean attack success changes by {ko['delta']:+.1f} points "
-              f"under plain (p = {ko['p']:.3f}); SafeGrad against plain is {fix['delta']:+.1f} points (p = {fix['p']:.3f}).",
+              f"- **E1** {e1_word}: Korean attack success changes by {ko['delta']:+.1f} points "
+              f"under plain ({pv(ko['p'])}); SafeGrad against plain is {fix['delta']:+.1f} points ({pv(fix['p'])}).",
               f"- **E2** {'holds' if res['e2']['holds'] else 'does not hold'}: Earth's Swahili refusal rate goes from "
               f"{s['earth_base']:.1f}% to {s['earth_plain']:.1f}% ({s['earth_change']['delta']:+.1f} points, "
-              f"p = {s['earth_change']['p']:.3f}); Global's went from {s['global_base']:.1f}% to {s['global_plain']:.1f}% "
+              f"{pv(s['earth_change']['p'])}); Global's went from {s['global_base']:.1f}% to {s['global_plain']:.1f}% "
               f"({s['global_change']['delta']:+.1f}). Earth's change minus Global's on the same prompts: "
               f"{s['earth_minus_global']['mean']:+.1f} points [{s['earth_minus_global']['ci95'][0]:+.1f}, "
               f"{s['earth_minus_global']['ci95'][1]:+.1f}].", "", "Rows of the outcome table that apply:", ""]

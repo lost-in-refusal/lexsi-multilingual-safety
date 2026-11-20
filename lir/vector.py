@@ -17,7 +17,7 @@ import argparse
 import json
 from pathlib import Path
 
-from lir.common import EVAL_LANGS, ROOT, RUNS, git_commit, sha256_file, write_json
+from lir.common import DATA, EVAL_LANGS, ROOT, RUNS, git_commit, read_jsonl, sha256_file, write_json
 
 SOURCE = ("safegrad", "plain")  # seed 42: the vector is the first minus the second
 TEST_SEEDS = (1, 2)
@@ -72,11 +72,20 @@ def report() -> dict:
     from lir.metrics import load
     from lir.seeds import STRICT, by_family, change, macro, rate
 
-    base = by_family(load("base", "attack"), STRICT)
+    n = len(read_jsonl(DATA / "multijail_attack.jsonl"))
+
+    def full(arm: str) -> dict:
+        rows = load(arm, "attack")
+        have = sum(r["safety"] is not None for r in rows.values())
+        if have != n:  # a part-judged arm would give rates on a skewed subset
+            raise SystemExit(f"{arm}: {have} of {n} attack answers judged, nothing written")
+        return by_family(rows, STRICT)
+
+    base = full("base")
     res = {"note": "Exploratory, single runs, not preregistered.", "seeds": {}}
     for seed in TEST_SEEDS:
         arms = {"plain": f"plain-s{seed}", "edited": f"plain-s{seed}-vec", "safegrad": f"safegrad-s{seed}"}
-        v = {k: by_family(load(a, "attack"), STRICT) for k, a in arms.items()}
+        v = {k: full(a) for k, a in arms.items()}
         ko = {k: rate(d, "ko") for k, d in v.items()}
         gap = ko["plain"] - ko["safegrad"]
         res["seeds"][seed] = {
@@ -85,7 +94,7 @@ def report() -> dict:
             "edited_vs_plain": {l: change(v["plain"], v["edited"], l) for l in EVAL_LANGS},
             "edited_vs_safegrad": {l: change(v["safegrad"], v["edited"], l) for l in EVAL_LANGS},
             "edited_vs_base": {l: change(base, v["edited"], l) for l in EVAL_LANGS},
-            "ko_share_of_safegrad_repair": (ko["plain"] - ko["edited"]) / gap if gap else None}
+            "ko_share_of_safegrad_repair": (ko["plain"] - ko["edited"]) / gap if gap > 0 else None}
     star = lambda c: "*" if c["p"] < 0.05 else ""
     lines = ["### Repair vector added to another seed's plain model: strict attack success (%)", "",
              "Exploratory and not preregistered. Single runs. The vector is SafeGrad minus plain at seed 42; "
@@ -99,10 +108,17 @@ def report() -> dict:
             f"{r['strict']['edited'][l]:.1f} ({r['edited_vs_plain'][l]['delta']:+.1f}{star(r['edited_vs_plain'][l])})"
             for l in EVAL_LANGS) + f" | {r['macro']['edited']:.1f} |")
     lines += ["", "Parentheses: change against the plain model of the same seed. * = p < 0.05, exact McNemar.", ""]
+    pv = lambda p: "p < 0.001" if p < 0.001 else f"p = {p:.3f}"
     for seed, r in res["seeds"].items():
-        s, d = r["ko_share_of_safegrad_repair"], r["edited_vs_safegrad"]["ko"]
-        lines.append(f"Seed {seed}, Korean: the edit gives {'n/a' if s is None else f'{100 * s:.0f}%'} of the drop that "
-                     f"training with SafeGrad gave; edited against SafeGrad {d['delta']:+.1f} points (p = {d['p']:.3f}).")
+        s, d, e = r["ko_share_of_safegrad_repair"], r["edited_vs_safegrad"]["ko"], r["edited_vs_plain"]["ko"]
+        if s is None:
+            what = "SafeGrad was not below plain at this seed, so there is no trained repair to compare the edit with"
+        elif s <= 0:
+            what = f"the edit did not lower attack success ({e['delta']:+.1f} points against plain)"
+        else:
+            what = f"the edit gives {100 * s:.0f}% of the drop that training with SafeGrad gave"
+        lines.append(f"Seed {seed}, Korean: {what}; edited against SafeGrad {d['delta']:+.1f} points ({pv(d['p'])}).")
+    lines += ["", "Over-refusal and task score for the edited models are in `vector/results.md`. They are exploratory too."]
     out = ROOT / "results" / "lir" / "stage2"
     write_json(out / "vector.json", res)
     (out / "vector.md").write_text("\n".join(lines) + "\n")
