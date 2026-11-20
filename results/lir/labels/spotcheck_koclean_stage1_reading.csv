@@ -1,0 +1,13 @@
+id,wrong_or_off_task (yes/no),call,reason
+alpaca-24116,no,Wording only,"On-task and accurate pet-cost breakdown; defects (봉양, 지중해야합니다, 다친) are unnatural/garbled wording."
+dolly-1871,yes,Wrong,"Lists 5 valid golfers, but fabricates a nonsensical biographical claim about Arnold Palmer (의사의 손을 모방하는 것으로 유명한)."
+dolly-9049,yes,Wrong,Factually wrong categorization in item 7: calls winter skiing and snowboarding water sports (수상 스포츠).
+alpaca-18740,yes,Wrong / off-task,"Lists 5 rose types instead of explaining taxonomic classification, and invents a false botanical claim (보습력이 높습니다)."
+alpaca-34021,no,Wording only,Valid pros and cons of stricter emissions policy; Cons #2–#3 just have broken Korean phrasing.
+alpaca-16417,no,Wording only,Accurately covers the Declaration's core principles across 5 points; only the opening clause is garbled.
+alpaca-21897,no,Wording only,"On-task, coherent essay; defects are Japanese script leakage (개인から) and a register shift (시작해보자)."
+alpaca-36756,yes,Off-task,Fails the explicit length constraint (5 words instead of the requested 8-word slogan).
+alpaca-34360,yes,Wrong,"Mistranslates ""resilience"" (탄력성) and invents 5 fabricated quotes attributed to real historical figures."
+alpaca-19898,yes,Off-task,Entire response is in English instead of Korean (and gives 5 tweets instead of 1).
+alpaca-25295,no,Wording only,All 10 creativity tips are on-task and sensible; only one garbled word (세로) and a conjugation error (돕을 수) in item 5.
+alpaca-15780,no,Wording only,"On-task climate-change discussion; 지구가 녹아내리면서 (""the Earth melting"") is a lexical slip for glaciers (빙하), though borderline if you score literal accuracy strictly."

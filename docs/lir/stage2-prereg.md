@@ -50,6 +50,8 @@ Why: 7 of 30 hand-checked Korean training rows had wrong or off-task answers. Th
 
 **Added Nov 20, after the judge scored the rows and before the clean-set run.** By the rule above the cut-off is 4: it flags 5 of the 7 rows we marked bad and 1 of the 23 we marked fine. It flags 121 of the 600 Korean training rows, and those were replaced. The three plain seeds raised Korean strict attack success by 14.1, 10.3 and 13.7 points, an average of 12.7, so H4's bar is a rise of at least 6.36 points (19 more of the 291 Korean prompts than base).
 
+**Added Nov 20, after the human check.** Mingyu marked 12 of the 30 rows bad. He read more strictly than in stage 1 and also counted garbled or ungrammatical wording in answers that were otherwise right. Counting only wrong or off-task answers, as in stage 1, he marked 6 of the 30 bad. Both counts are over the limit of 3, so the check fails. The retry cannot be built: cut-off 5 flags 346 of the 600 Korean training rows, and only 108 unflagged spare rows are left to replace them. We could not clean the set. The clean-set run is not trained and H4 is not tested. The sheet and both readings are in `results/lir/labels/`.
+
 ## 3. Mixing baselines
 
 Question: is SafeGrad better than adding the same 47 refusal examples to the training data?

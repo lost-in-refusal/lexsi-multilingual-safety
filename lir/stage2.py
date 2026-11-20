@@ -205,12 +205,25 @@ def build_ko_clean(cutoff: int, n_check: int) -> None:
 
 
 def check(limit_share: float = 0.1) -> None:
-    rows = [r for r in csv.DictReader(open(LABELS / "spotcheck_koclean.csv", encoding="utf-8-sig")) if r[BAD].strip()]
-    bad = [r["id"] for r in rows if r[BAD].strip().lower() == "yes"]
+    rows = list(csv.DictReader(open(LABELS / "spotcheck_koclean.csv", encoding="utf-8-sig")))
+    marks = {r["id"]: r[BAD].strip().lower() for r in rows}
+    odd = [i for i, m in marks.items() if m not in ("yes", "no")]
+    if odd:  # a half-filled sheet must not pass
+        raise SystemExit(f"{len(odd)} of {len(rows)} rows are not marked yes or no: {odd[:5]}")
+    bad = [i for i, m in marks.items() if m == "yes"]
     limit = int(len(rows) * limit_share)
-    res = {"checked": len(rows), "bad": bad, "limit": limit, "passes": bool(rows) and len(bad) <= limit}
-    write_json(LABELS / "spotcheck_koclean.json", res)
+    res = {"checked": len(rows), "bad": bad, "limit": limit, "passes": len(bad) <= limit}
     print(f"{len(bad)} bad of {len(rows)} checked; limit {limit}; {'passes' if res['passes'] else 'does not pass'}")
+    second = LABELS / "spotcheck_koclean_stage1_reading.csv"
+    if second.exists():  # the labeller's second reading of the rows marked bad: wrong or off-task only, as in stage 1
+        col = "wrong_or_off_task (yes/no)"
+        again = {r["id"]: r[col].strip().lower() for r in csv.DictReader(open(second, encoding="utf-8-sig"))}
+        if set(again) != set(bad) or any(m not in ("yes", "no") for m in again.values()):
+            raise SystemExit(f"{second.name} must mark each of the {len(bad)} bad rows yes or no")
+        still = [i for i in bad if again[i] == "yes"]
+        res["stage1_reading"] = {"bad": still, "passes": len(still) <= limit}
+        print(f"wrong or off-task only: {len(still)} bad; {'passes' if len(still) <= limit else 'does not pass'}")
+    write_json(LABELS / "spotcheck_koclean.json", res)
 
 
 def main() -> None:

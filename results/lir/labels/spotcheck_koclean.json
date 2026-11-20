@@ -1,0 +1,30 @@
+{
+  "checked": 30,
+  "bad": [
+    "alpaca-24116",
+    "dolly-1871",
+    "dolly-9049",
+    "alpaca-18740",
+    "alpaca-34021",
+    "alpaca-16417",
+    "alpaca-21897",
+    "alpaca-36756",
+    "alpaca-34360",
+    "alpaca-19898",
+    "alpaca-25295",
+    "alpaca-15780"
+  ],
+  "limit": 3,
+  "passes": false,
+  "stage1_reading": {
+    "bad": [
+      "dolly-1871",
+      "dolly-9049",
+      "alpaca-18740",
+      "alpaca-36756",
+      "alpaca-34360",
+      "alpaca-19898"
+    ],
+    "passes": false
+  }
+}
