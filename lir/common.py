@@ -14,8 +14,11 @@ SEED = 42
 TRAIN_LANGS = ["en", "ko", "zh"]
 EVAL_LANGS = ["en", "ko", "zh", "sw"]  # sw is evaluation-only
 
-MODEL = "CohereLabs/tiny-aya-global"
-MODEL_REV = "af89d219b53ed9b13b8a4645f9c8028973510324"
+# LIR_MODEL=earth switches every script to Tiny Aya Earth; the default is Tiny Aya Global
+MODELS = {"global": ("CohereLabs/tiny-aya-global", "af89d219b53ed9b13b8a4645f9c8028973510324"),
+          "earth": ("CohereLabs/tiny-aya-earth", "0624fafbe200f930b89566fc4ec4da314ba48d89")}
+MODEL_KEY = os.environ.get("LIR_MODEL", "global")
+MODEL, MODEL_REV = MODELS[MODEL_KEY]
 GUARD = "Qwen/Qwen3Guard-Gen-4B"
 GUARD_REV = "6ec42827da0c1ff11e7a49dc269d2e810d27e108"
 JUDGE = "Qwen/Qwen3-14B"
