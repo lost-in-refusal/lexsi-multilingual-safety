@@ -1,0 +1,20 @@
+{
+  "bactrian_train_mix1.jsonl": {
+    "rows": 1847,
+    "train_rows": 1800,
+    "refusal_rows": 47,
+    "copies": 1,
+    "refusal_views_over_3_epochs": 141,
+    "sha256": "8bfb9c68eeb73dfbcd66ad3f511d0f070c47bb7780e8954435abcebb31344075",
+    "alignment_sha256": "82492ae2b479d2f128c1f55bd9b7a988fbe9554e9b0b8fae34f3bc83a605777d"
+  },
+  "bactrian_train_mix5.jsonl": {
+    "rows": 2035,
+    "train_rows": 1800,
+    "refusal_rows": 47,
+    "copies": 5,
+    "refusal_views_over_3_epochs": 705,
+    "sha256": "0b1af0666fccadc368dd9ae06ac64ae3b5275aab4e8068865343c0f15e8ccc88",
+    "alignment_sha256": "82492ae2b479d2f128c1f55bd9b7a988fbe9554e9b0b8fae34f3bc83a605777d"
+  }
+}

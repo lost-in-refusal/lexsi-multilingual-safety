@@ -1,0 +1,215 @@
+"""Stage 2 training data: the mixing baselines and the Korean clean set.
+
+  python -m lir.stage2 mix          # 1,800 rows + the SafeGrad refusal examples, once and five times
+  python -m lir.stage2 ko-pool      # Korean train rows and spare rows, as input for the judge
+  python -m lir.judge --input runs/koclean/ko_pool.jsonl --output runs/koclean/ko_pool.judge.jsonl
+  python -m lir.stage2 ko-cutoff    # how each cut-off does on the 30 rows we spot-checked by hand
+  python -m lir.stage2 ko-clean --cutoff 4 --check 30
+  python -m lir.stage2 ko-check     # after the new spot check is filled in
+
+mix: SafeGrad draws 4 refusal examples per optimizer step (171 steps, about 684
+views). Mixing the 47 examples into the data once gives 141 views over three
+epochs; five copies give 705, which matches SafeGrad.
+
+ko-clean: a Korean row is flagged when the judge gives it `cutoff` or less on
+accuracy or on instruction following. Flagged rows are replaced by the next
+unflagged Korean rows from the ids that passed the stage 1 screening but were
+not used, in the same hash order. English and Mandarin rows are not touched.
+The new spot-check sheet samples the final Korean set, leaves out the 30 rows
+used to pick the cut-off, and does not say which rows are replacements.
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+import random
+from collections import Counter
+from pathlib import Path
+
+from lir.common import DATA, ROOT, RUNS, TRAIN_LANGS, read_jsonl, sha256_file, write_json, write_jsonl
+
+KO = RUNS / "koclean"
+LABELS = ROOT / "results" / "lir" / "labels"
+MANIFEST = DATA / "stage2_manifest.json"
+N_EVAL, N_TRAIN = 100, 600
+BAD = "ko_bad (yes/no)"
+CHECK_SEED = 11
+
+
+def note(key: str, value: dict) -> None:
+    m = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
+    m[key] = value
+    write_json(MANIFEST, m)
+
+
+# ---------------------------------------------------------------- mixing baselines
+
+def mix_rows(train: list[dict], align: list[dict], copies: int) -> list[dict]:
+    extra = [{"uid": f"align-{r['uid']}", "id": r["family"], "lang": r["lang"], "instruction": r["prompt"],
+              "response": r["response"], "source": "alignment_sft.jsonl", "split": "train"} for r in align]
+    return train + extra * copies
+
+
+def build_mix() -> None:
+    train = read_jsonl(DATA / "bactrian_train.jsonl")
+    align = read_jsonl(DATA / "alignment_sft.jsonl")
+    for copies in (1, 5):
+        name = f"bactrian_train_mix{copies}.jsonl"
+        rows = mix_rows(train, align, copies)
+        write_jsonl(DATA / name, rows)
+        note(name, {"rows": len(rows), "train_rows": len(train), "refusal_rows": len(align), "copies": copies,
+                    "refusal_views_over_3_epochs": len(align) * copies * 3,
+                    "sha256": sha256_file(DATA / name),
+                    "alignment_sha256": sha256_file(DATA / "alignment_sft.jsonl")})
+        print(name, len(rows), "rows")
+
+
+# ---------------------------------------------------------------- Korean clean set
+
+def pool_ids() -> tuple[list[str], list[str]]:
+    """Training ids and the unused ids that passed the same screening, in the frozen hash order."""
+    cand = read_jsonl(DATA / "bactrian_candidates.jsonl")
+    screen = {r["uid"]: r for r in read_jsonl(DATA / "bactrian_guard.jsonl")}
+    order = list(dict.fromkeys(r["id"] for r in cand))
+    ok = [s for s in order
+          if all(screen[f"{s}-{l}"]["safety"] == "Safe" and screen[f"{s}-{l}"]["refusal"] != "Yes" for l in TRAIN_LANGS)]
+    train_ids = list(dict.fromkeys(r["id"] for r in read_jsonl(DATA / "bactrian_train.jsonl")))
+    eval_ids = list(dict.fromkeys(r["id"] for r in read_jsonl(DATA / "bactrian_eval_task.jsonl")))
+    assert ok[:N_EVAL] == eval_ids and ok[N_EVAL:N_EVAL + N_TRAIN] == train_ids, "pool order does not match the frozen files"
+    return train_ids, ok[N_EVAL + N_TRAIN:]
+
+
+def build_ko_pool() -> None:
+    train_ids, spare = pool_ids()
+    by_uid = {r["uid"]: r for r in read_jsonl(DATA / "bactrian_candidates.jsonl")}
+    rows = []
+    for pool, ids in (("train", train_ids), ("spare", spare)):
+        for rank, s in enumerate(ids):
+            ko, en = by_uid[f"{s}-ko"], by_uid[f"{s}-en"]
+            rows.append({"uid": ko["uid"], "id": s, "lang": "ko", "pool": pool, "rank": rank,
+                         "prompt": ko["instruction"], "reference": en["response"], "response": ko["response"]})
+    write_jsonl(KO / "ko_pool.jsonl", rows)
+    print(len(train_ids), "train +", len(spare), "spare Korean rows ->", KO / "ko_pool.jsonl")
+
+
+def is_flagged(rec: dict | None, cutoff: int) -> bool:
+    """Unscored rows count as flagged: we cannot say they are fine."""
+    s = rec and rec.get("scores")
+    return not s or min(s["accuracy"], s["instruction_following"]) <= cutoff
+
+
+def swap_plan(train_ids: list[str], spare_ids: list[str], flagged: set[str]) -> dict[str, str]:
+    """Each flagged training id gets the next unflagged spare id, in order."""
+    good = iter(s for s in spare_ids if s not in flagged)
+    plan = {}
+    for s in train_ids:
+        if s in flagged:
+            try:
+                plan[s] = next(good)
+            except StopIteration:
+                raise SystemExit(f"ran out of spare Korean rows after {len(plan)} swaps; "
+                                 f"{sum(t in flagged for t in train_ids)} needed") from None
+    return plan
+
+
+def judged() -> dict[str, dict]:
+    return {r["uid"]: r for r in read_jsonl(KO / "ko_pool.judge.jsonl")}
+
+
+def flagged_ids(cutoff: int) -> set[str]:
+    j = judged()
+    train_ids, spare = pool_ids()
+    return {s for s in train_ids + spare if is_flagged(j.get(f"{s}-ko"), cutoff)}
+
+
+def hand_labels() -> dict[str, bool]:
+    rows = csv.DictReader(open(LABELS / "spotcheck_bactrian_train.csv", encoding="utf-8-sig"))
+    return {r["id"]: r[BAD].strip().lower() == "yes" for r in rows if r[BAD].strip()}
+
+
+def cutoff_table() -> list[dict]:
+    hand = hand_labels()
+    train_ids, spare = pool_ids()
+    out = []
+    for c in range(1, 7):
+        fl = flagged_ids(c)
+        out.append({"cutoff": c, "bad_caught": sum(b and i in fl for i, b in hand.items()), "bad": sum(hand.values()),
+                    "good_flagged": sum(not b and i in fl for i, b in hand.items()),
+                    "good": sum(not b for b in hand.values()),
+                    "train_flagged": sum(i in fl for i in train_ids), "spare_unflagged": sum(i not in fl for i in spare)})
+    return out
+
+
+def show_cutoffs() -> None:
+    print("cutoff  bad caught  good flagged  train rows flagged  spare rows left")
+    for r in cutoff_table():
+        print(f"{r['cutoff']:>6}  {r['bad_caught']:>5}/{r['bad']:<4}  {r['good_flagged']:>7}/{r['good']:<4}  "
+              f"{r['train_flagged']:>18}  {r['spare_unflagged']:>15}")
+
+
+def build_ko_clean(cutoff: int, n_check: int) -> None:
+    train_ids, spare = pool_ids()
+    fl = flagged_ids(cutoff)
+    plan = swap_plan(train_ids, spare, fl)
+    by_uid = {r["uid"]: r for r in read_jsonl(DATA / "bactrian_candidates.jsonl")}
+    rows = []
+    for r in read_jsonl(DATA / "bactrian_train.jsonl"):
+        if r["lang"] == "ko" and r["id"] in plan:
+            r = dict(by_uid[f"{plan[r['id']]}-ko"], split="train")
+        rows.append(r)
+    name = "bactrian_train_koclean.jsonl"
+    write_jsonl(DATA / name, rows)
+    table = next(r for r in cutoff_table() if r["cutoff"] == cutoff)
+    note(name, {"rows": len(rows), "per_lang": dict(Counter(r["lang"] for r in rows)), "cutoff": cutoff,
+                "rule": "flag if judge accuracy or instruction_following <= cutoff, or the row has no score",
+                "korean_rows_replaced": len(plan), "on_hand_labelled_rows": table, "sha256": sha256_file(DATA / name)})
+    write_json(KO / "swaps.json", plan)
+
+    hand = hand_labels()
+    ko = [r for r in rows if r["lang"] == "ko" and r["id"] not in hand]
+    sample = random.Random(CHECK_SEED).sample(ko, n_check)
+    LABELS.mkdir(parents=True, exist_ok=True)
+    with open(LABELS / "spotcheck_koclean.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["id", "en_instruction", "en_response", "ko_instruction", "ko_response", BAD, "notes"])
+        for r in sample:
+            en = by_uid[f"{r['id']}-en"]
+            w.writerow([r["id"], en["instruction"], en["response"], r["instruction"], r["response"], "", ""])
+    replaced = set(plan.values())
+    write_json(KO / "spotcheck_koclean_key.json", {r["id"]: r["id"] in replaced for r in sample})
+    print(f"{len(plan)} Korean rows replaced at cut-off {cutoff} -> {DATA / name}")
+    print(f"{n_check} rows to check -> {LABELS / 'spotcheck_koclean.csv'}")
+
+
+def check(limit_share: float = 0.1) -> None:
+    rows = [r for r in csv.DictReader(open(LABELS / "spotcheck_koclean.csv", encoding="utf-8-sig")) if r[BAD].strip()]
+    bad = [r["id"] for r in rows if r[BAD].strip().lower() == "yes"]
+    limit = int(len(rows) * limit_share)
+    res = {"checked": len(rows), "bad": bad, "limit": limit, "passes": bool(rows) and len(bad) <= limit}
+    write_json(LABELS / "spotcheck_koclean.json", res)
+    print(f"{len(bad)} bad of {len(rows)} checked; limit {limit}; {'passes' if res['passes'] else 'does not pass'}")
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("cmd", choices=["mix", "ko-pool", "ko-cutoff", "ko-clean", "ko-check"])
+    ap.add_argument("--cutoff", type=int)
+    ap.add_argument("--check", type=int, default=30, help="rows in the new spot-check sheet")
+    a = ap.parse_args()
+    if a.cmd == "mix":
+        build_mix()
+    elif a.cmd == "ko-pool":
+        build_ko_pool()
+    elif a.cmd == "ko-cutoff":
+        show_cutoffs()
+    elif a.cmd == "ko-clean":
+        if a.cutoff is None:
+            raise SystemExit("--cutoff is required")
+        build_ko_clean(a.cutoff, a.check)
+    else:
+        check()
+
+
+if __name__ == "__main__":
+    main()

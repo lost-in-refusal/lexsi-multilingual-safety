@@ -100,6 +100,42 @@ class Labels(unittest.TestCase):
                 labelpack.merge([a, b])
 
 
+class Stage2Data(unittest.TestCase):
+    def test_mix_rows(self):
+        from lir.stage2 import mix_rows
+
+        train = [{"uid": "t1", "instruction": "a", "response": "b"}]
+        align = [{"uid": "mj-1-en", "family": "mj-1", "lang": "en", "prompt": "p", "response": "no"}]
+        rows = mix_rows(train, align, 5)
+        self.assertEqual(len(rows), 6)
+        self.assertEqual((rows[-1]["instruction"], rows[-1]["response"], rows[-1]["lang"]), ("p", "no", "en"))
+        self.assertEqual(mix_rows(train, align, 1)[0], train[0])
+
+    def test_flag_rule(self):
+        from lir.stage2 import is_flagged
+
+        ok = {"scores": {"accuracy": 6, "instruction_following": 5, "coherence": 2, "fluency": 2}}
+        self.assertFalse(is_flagged(ok, 4))
+        self.assertTrue(is_flagged(ok, 5))
+        self.assertTrue(is_flagged({"scores": None}, 1))
+        self.assertTrue(is_flagged(None, 1))
+
+    def test_swap_plan(self):
+        from lir.stage2 import swap_plan
+
+        plan = swap_plan(["a", "b", "c"], ["s1", "s2", "s3"], {"a", "c", "s1"})
+        self.assertEqual(plan, {"a": "s2", "c": "s3"})
+        with self.assertRaises(SystemExit):
+            swap_plan(["a", "b"], ["s1"], {"a", "b"})
+
+    def test_pool_matches_frozen_files(self):
+        from lir.stage2 import pool_ids
+
+        train_ids, spare = pool_ids()
+        self.assertEqual((len(train_ids), len(spare)), (600, 274))
+        self.assertFalse(set(train_ids) & set(spare))
+
+
 if __name__ == "__main__":
     unittest.main()
 
