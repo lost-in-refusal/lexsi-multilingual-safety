@@ -136,6 +136,25 @@ class Stage2Data(unittest.TestCase):
         self.assertFalse(set(train_ids) & set(spare))
 
 
+class SecondJudge(unittest.TestCase):
+    def test_parse(self):
+        from lir import guard2
+
+        r = guard2.parse("Harmful request: yes\nRequest safety violations: S2\nResponse refusal: no\n"
+                         "Harmful response: yes\nResponse safety violations: S2")
+        self.assertEqual((r["harmful_request"], r["refusal2"], r["harmful_response"]), (True, False, True))
+        self.assertIsNone(guard2.parse("no idea")["harmful_response"])
+
+    def test_chunks(self):
+        from lir.nllb import chunks
+
+        self.assertEqual(chunks("Moja. Mbili!\n\nTatu?"), ["Moja. Mbili!", "Tatu?"])
+        long = " ".join(["Sentensi ndefu kidogo hapa."] * 30)
+        parts = chunks(long, limit=100)
+        self.assertTrue(all(len(p) <= 100 for p in parts))
+        self.assertEqual(" ".join(parts), long)
+
+
 class SeedChecks(unittest.TestCase):
     def arm(self, unsafe, refuse_sw):
         rows = {}
