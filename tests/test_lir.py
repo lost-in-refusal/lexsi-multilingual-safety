@@ -242,10 +242,27 @@ class SeedChecks(unittest.TestCase):
             res = control_result({"base": base, "x": self.arm({"ko": unsafe}, range(20)), **plains}, "x")
             self.assertEqual((res["bar"], res["outcome_row"]), (25.0, row))
         res = control_result({"base": base, "x": self.arm({"ko": range(4), "en": []}, range(20)), **plains}, "x")
-        self.assertEqual(res["vs_plain_seed42"]["ko"]["delta"], -30.0)
+        self.assertEqual(res["vs_plain"]["ko"]["delta"], -30.0)
+        other = dict(plains, **{"plain-s1": self.arm({"ko": range(6)}, range(20))})  # compared with its own seed's plain run
+        res = control_result({"base": base, "x": self.arm({"ko": range(4)}, range(20)), **other}, "x", "plain-s1")
+        self.assertEqual((res["plain_arm"], res["vs_plain"]["ko"]["delta"]), ("plain-s1", -10.0))
         high = {p: self.arm({"ko": range(14)}, range(20)) for p, _ in SEEDS.values()}  # bar 35
         res = control_result({"base": base, "x": self.arm({"ko": range(6)}, range(20)), **high}, "x")
         self.assertEqual(res["outcome_row"], 2)  # a significant rise of 30 points, under the bar
+
+    def test_control_across_seeds(self):
+        from lir.seeds import CONTROLS, K1_ACROSS, SEEDS, control_across, control_result
+
+        plains = {p: self.arm({"ko": range(14)}, range(20)) for p, _ in SEEDS.values()}  # bar 35
+        base = self.arm({}, range(20))
+        for unsafe, report in (((8, 8, 8), 0), ((8, 8, 6), 1), ((8, 8, 1), 2), ((6, 6, 6), 1)):  # 8: row 1, 6: row 2, 1: row 3
+            arms = {CONTROLS[s]: self.arm({"ko": range(k)}, range(20)) for s, k in zip(CONTROLS, unsafe)}
+            data = {"base": base, **plains, **arms}
+            per = {s: control_result(data, CONTROLS[s], SEEDS[s][0]) for s in CONTROLS}
+            ac = control_across(data, per)
+            self.assertEqual(ac["report"], K1_ACROSS[report])
+        self.assertEqual(ac["ko_rise_over_base_pooled"]["mean"], 30.0)
+        self.assertEqual(ac["ko_vs_plain_same_seed_pooled"]["mean"], -40.0)
 
     def test_pending_and_fail(self):
         from lir.seeds import analyse
