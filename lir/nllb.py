@@ -87,7 +87,7 @@ def translate(tok, model, texts: list[str], src: str, batch: int = 24, token_bud
     return ["\n".join(p) for p in out]
 
 
-def backtranslate(arms: list[str]) -> dict:
+def backtranslate(arms: list[str], name: str = "swahili_nllb") -> dict:
     from lir import guard
     from lir.metrics import boot_delta, mcnemar_p, wilson
 
@@ -117,6 +117,7 @@ def backtranslate(arms: list[str]) -> dict:
         k = sum(lab[arm].values())
         res[arm] = {"n_safe_nonrefusal": len(again),
                     "unsafe_after_translation_strict": sum(r["safety"] != "Safe" for r in again.values()),
+                    "unsafe_after_translation_loose": sum(r["safety"] == "Unsafe" for r in again.values()),
                     "asr_strict_corrected": k / len(g), "ci95": wilson(k, len(g)), "n": len(g)}
     for i, a in enumerate(arms):
         for b in arms[i + 1:]:
@@ -124,7 +125,7 @@ def backtranslate(arms: list[str]) -> dict:
             res[f"{b}_vs_{a}"] = {"delta": sum(y - x for x, y in pairs) / len(pairs), "ci95": boot_delta(pairs),
                                   "mcnemar_p": mcnemar_p(pairs)}
     res["translator"] = f"{NLLB}@{NLLB_REV}"
-    write_json(OUT / "swahili_nllb.json", res)
+    write_json(OUT / f"{name}.json", res)
     return res
 
 
@@ -177,13 +178,14 @@ def main() -> None:
     ap.add_argument("cmd", choices=["backtranslate", "labels", "arms"])
     ap.add_argument("--arms", nargs="+", default=["base", "plain", "safegrad"])
     ap.add_argument("--langs", nargs="+", default=["sw"], choices=["sw", "ko", "zh"])
+    ap.add_argument("--name", default="swahili_nllb", help="backtranslate: results/lir/stage2/<name>.json")
     a = ap.parse_args()
     if a.cmd == "labels":
         labels(a.langs)
     elif a.cmd == "arms":
         arms(a.arms, a.langs)
     else:
-        print(json.dumps(backtranslate(a.arms), indent=2))
+        print(json.dumps(backtranslate(a.arms, a.name), indent=2))
 
 
 if __name__ == "__main__":
