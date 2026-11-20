@@ -21,7 +21,7 @@ from pathlib import Path
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainerCallback, TrainingArguments
 
-from lir.common import DATA, MODEL, MODEL_REV, SEED, device, read_jsonl, sha256_file, write_json
+from lir.common import DATA, MODEL, MODEL_REV, SEED, device, git_commit, read_jsonl, sha256_file, write_json
 
 LORA = dict(r=16, lora_alpha=32, lora_dropout=0.0,
             target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"])
@@ -178,10 +178,12 @@ def main() -> None:
     ap.add_argument("--max-steps", type=int, default=-1)
     ap.add_argument("--train-file", default=str(DATA / "bactrian_train.jsonl"))
     ap.add_argument("--align-file", default=str(DATA / "alignment_sft.jsonl"))
+    ap.add_argument("--seed", type=int, default=SEED,
+                    help="LoRA init, data order and alignment batch order; the training rows do not change")
     a = ap.parse_args()
     out = Path(a.output)
     out.mkdir(parents=True, exist_ok=False)
-    torch.manual_seed(SEED)
+    torch.manual_seed(a.seed)
 
     tok = AutoTokenizer.from_pretrained(MODEL, revision=MODEL_REV)
     rows = read_jsonl(Path(a.train_file))
@@ -204,7 +206,7 @@ def main() -> None:
         output_dir=str(out / "hf"), per_device_train_batch_size=a.micro_batch, gradient_accumulation_steps=accum,
         num_train_epochs=a.epochs, max_steps=a.max_steps, learning_rate=a.lr, lr_scheduler_type="cosine",
         warmup_steps=0.03, weight_decay=0.0, max_grad_norm=1.0, logging_steps=1, save_strategy="no",
-        report_to=[], seed=SEED, data_seed=SEED, remove_unused_columns=False, dataloader_num_workers=0,
+        report_to=[], seed=a.seed, data_seed=a.seed, remove_unused_columns=False, dataloader_num_workers=0,
         bf16=False, fp16=False, use_cpu=False, train_sampling_strategy="group_by_length")
     log_cb = LogCallback(out / "train_log.jsonl")
     common = dict(model=model, args=args, train_dataset=train_ds, data_collator=collate(tok.pad_token_id),
@@ -217,7 +219,7 @@ def main() -> None:
         arows = read_jsonl(Path(a.align_file))
         aenc = [encode(tok, r["prompt"], r["response"]) for r in arows]
         aenc = [e for e in aenc if e is not None]
-        g = torch.Generator().manual_seed(SEED)
+        g = torch.Generator().manual_seed(a.seed)
         loader = torch.utils.data.DataLoader(aenc, batch_size=a.align_batch, shuffle=True, generator=g,
                                              collate_fn=collate(tok.pad_token_id))
         trainer = make_safegrad_trainer()(**common, safety_dataset=loader, rho=a.rho, kl_norm=a.kl_norm,
@@ -236,7 +238,7 @@ def main() -> None:
         "train_file": a.train_file, "train_sha256": sha256_file(Path(a.train_file)), "train_rows": len(train_ds),
         "dropped_over_max_len": dropped, "epochs": a.epochs, "lr": a.lr, "micro_batch": a.micro_batch,
         "grad_accum": accum, "effective_batch": a.batch, "optimizer_steps": steps,
-        "scheduler": "cosine, 3% warmup", "seed": SEED, "alignment": align_info,
+        "scheduler": "cosine, 3% warmup", "seed": a.seed, "commit": git_commit(), "alignment": align_info,
         "surgery_steps": len(getattr(trainer, "surgery_log", [])),
         "projected_steps": sum(r["projected"] for r in getattr(trainer, "surgery_log", [])),
         "train_loss": result.training_loss, "train_runtime_s": round(elapsed, 1),

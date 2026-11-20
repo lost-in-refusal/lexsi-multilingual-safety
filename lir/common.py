@@ -60,6 +60,20 @@ def write_json(path: Path, obj) -> None:
     os.replace(tmp, path)
 
 
+def git_commit() -> str | None:
+    """Current commit of the repo, with -dirty if tracked files have changes."""
+    import subprocess
+
+    try:
+        rev = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True,
+                             check=True).stdout.strip()
+        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=ROOT,
+                               capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return rev + ("-dirty" if dirty else "")
+
+
 def device() -> str:
     import torch
 
