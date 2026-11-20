@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 20, 4:10 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 20, 4:00 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -50,11 +50,11 @@ Intervals are 95%. Results marked 1 seed are single runs.
 
 **Base Earth.** Evaluated Nov 20, before the Saturday gate. It refuses fewer Swahili attack prompts than base Global (43.3% against 50.9%), which is row C of the Earth outcome table. Its refusal set keeps 44 of the 72 held-out prompts; Global's kept 47.
 
-**K1.** Plain fine-tuning at seed 42 on English and Chinese rows only (1,747 rows, no Korean), judged on the attack set.
-- Korean strict attack success rises to 18.2% from 5.2% for base: +13.1 points, p < 0.001, against a bar of 6.36. Plain on the usual set, which has 600 Korean rows, is 19.2%. The difference is -1.0 points (p = 0.74), so the two runs cannot be told apart on Korean.
-- The registered sentence is "Korean training rows are not needed for a drift of this size". Write that, not "Korean data quality plays no role". English and Chinese each got 46% more rows here, so drift spreading from them may be larger than in the original runs.
-- What it does settle: the Korean drift is not a product of bad Korean rows alone, because it appears at the same size with no Korean rows. This is the answer we have to the question H4 could not test.
-- It changes one sentence of the story. Korean was a trained language in the headline runs, but its drift does not need the training. Korean behaves like Swahili here: safety erodes in a language the fine-tuning never showed.
+**K1.** Plain fine-tuning at seed 42 on English and Chinese rows only (1,747 rows), judged on the attack set. No row of the training file contains a Korean character.
+- Korean strict attack success rises to 18.2% from 5.2% for base: +13.1 points, p < 0.001, against a bar of 6.36. Plain on the usual set, which has 600 Korean rows, is 19.2%; the difference is -1.0 points (p = 0.74). 18.2% sits inside the range of the three plain seeds (15.5% to 19.2%).
+- The registered sentence is "Korean training rows are not needed for a drift of this size". Write that, not "Korean data quality plays no role". English and Chinese each got 46% more rows here, so drift spreading from them may be larger than in the original runs, and no outcome row rules out that data quality contributed there.
+- What it shows, in one run: Korean drifts whether or not it is in the training data. H4 stays untested; K1 is the nearest evidence we have on the question behind it.
+- After K2, the size of this rise is the guard's size. A person counted a smaller Korean rise than the guard on the usual plain run, and nobody has read this run's answers.
 - Other languages in this run: English +2.7 points (not significant), Chinese +5.5 (significant), Swahili strict attack success +4.5 (p = 0.035), Swahili refusals -14.8 points (p < 0.001). The Swahili strict rise is one run, on a language where the guard missed our agreement bar, and the usual plain runs do not show it. Do not build on it.
 - Counting only the guard's Unsafe class (not part of the rule): Korean 13.4% against 2.7% for base and 14.1% for plain on the usual set.
 - One seed. Training took 80 minutes.
