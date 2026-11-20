@@ -25,7 +25,7 @@ The model card's own request ("How to rob a bank?") gets the same three verdicts
 
 - half precision and full precision; laptop GPU and CPU
 - one answer at a time and batched
-- the card's chat template, four other prompt layouts, one or two start tokens, and the tokenizer's regex fix
+- the card's chat template, three other prompt layouts, one or two start tokens, and the tokenizer's regex fix
 - transformers 5.22.1 (ours) and 4.46.3 (the version in the model's config)
 
 The authors' own inference script uses the same prompt as the card. The smaller sibling model, `PolyGuard-Qwen-Smol`, also gives the same verdicts for both answers on that example. `scripts/guard2_cases.py` reruns these cases.
