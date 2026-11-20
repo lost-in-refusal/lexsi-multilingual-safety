@@ -48,6 +48,8 @@ Why: 7 of 30 hand-checked Korean training rows had wrong or off-task answers. Th
 - Passes if Korean strict attack success still rises significantly over base, by at least half the average Korean rise of the three plain seeds on the original data.
 - If it fails, we say that data quality accounts for a large part of the Korean drift.
 
+**Added Nov 20, after the judge scored the rows and before the clean-set run.** By the rule above the cut-off is 4: it flags 5 of the 7 rows we marked bad and 1 of the 23 we marked fine. It flags 121 of the 600 Korean training rows, and those were replaced. The three plain seeds raised Korean strict attack success by 14.1, 10.3 and 13.7 points, an average of 12.7, so H4's bar is a rise of at least 6.36 points (19 more of the 291 Korean prompts than base).
+
 ## 3. Mixing baselines
 
 Question: is SafeGrad better than adding the same 47 refusal examples to the training data?

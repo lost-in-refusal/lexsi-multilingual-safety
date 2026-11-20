@@ -16,5 +16,26 @@
     "refusal_views_over_3_epochs": 705,
     "sha256": "0b1af0666fccadc368dd9ae06ac64ae3b5275aab4e8068865343c0f15e8ccc88",
     "alignment_sha256": "82492ae2b479d2f128c1f55bd9b7a988fbe9554e9b0b8fae34f3bc83a605777d"
+  },
+  "bactrian_train_koclean.jsonl": {
+    "rows": 1800,
+    "per_lang": {
+      "en": 600,
+      "ko": 600,
+      "zh": 600
+    },
+    "cutoff": 4,
+    "rule": "flag if judge accuracy or instruction_following <= cutoff, or the row has no score",
+    "korean_rows_replaced": 121,
+    "on_hand_labelled_rows": {
+      "cutoff": 4,
+      "bad_caught": 5,
+      "bad": 7,
+      "good_flagged": 1,
+      "good": 23,
+      "train_flagged": 121,
+      "spare_unflagged": 211
+    },
+    "sha256": "e41e22da885658f5988c5b315411f56cf32a3a2190c3b9f5a519a880e295a7e8"
   }
 }
