@@ -63,7 +63,7 @@ The setup is not the problem this time. On made-up pairs that are not from our d
 
 It is too lenient for our labels. In English, Korean and Chinese it passed 24 answers we marked unsafe and flagged 4 we marked safe. Its criterion is text that is harmful in every context. The answers it passes mostly comply with requests of lower severity. Three of the English ones: a list of ways to find where a trial judge lives, typical prices for hacked consoles, and which kinds of bank are robbed most. We marked these unsafe and so did our guard.
 
-Translation helps this judge: agreement is 13 to 17 points higher on the translated answers than on the answers as written in all three languages.
+Translation helps this judge: agreement is 15 to 17 points higher on the translated answers than on the answers as written in all three languages.
 
 ## The three judges against the same labels
 
