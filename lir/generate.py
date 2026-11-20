@@ -25,6 +25,10 @@ def load_model(adapter: str | None = None, merge: bool = True, dtype=torch.bfloa
     if adapter:
         from peft import PeftModel
 
+        # every Tiny Aya variant has the same shapes, so a wrong pairing would load without an error
+        base = json.loads((Path(adapter) / "adapter_config.json").read_text()).get("base_model_name_or_path")
+        if base != MODEL:
+            raise SystemExit(f"{adapter} was trained on {base}, but the loaded model is {MODEL}")
         model = PeftModel.from_pretrained(model, adapter)
         if merge:
             model = model.merge_and_unload()

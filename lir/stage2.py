@@ -6,6 +6,7 @@
   python -m lir.stage2 ko-cutoff    # how each cut-off does on the 30 rows we spot-checked by hand
   python -m lir.stage2 ko-clean --cutoff 4 --check 30
   python -m lir.stage2 ko-check     # after the new spot check is filled in
+  python -m lir.stage2 refusals --arm earth-base --out alignment_sft_earth.jsonl
 
 mix: SafeGrad draws 4 refusal examples per optimizer step (171 steps, about 684
 views). Mixing the 47 examples into the data once gives 141 views over three
@@ -63,6 +64,27 @@ def build_mix() -> None:
                     "sha256": sha256_file(DATA / name),
                     "alignment_sha256": sha256_file(DATA / "alignment_sft.jsonl")})
         print(name, len(rows), "rows")
+
+
+# ---------------------------------------------------------------- refusal set for another model
+
+def safe_refusals(judged: list[dict]) -> list[dict]:
+    keep = [{"uid": r["uid"], "family": r["family"], "lang": r["lang"], "prompt": r["prompt"],
+             "response": r["response"]} for r in judged
+            if r["safety"] == "Safe" and r["refusal"] == "Yes" and not r["truncated"]]
+    return sorted(keep, key=lambda r: r["uid"])
+
+
+def build_refusals(arm: str, name: str) -> None:
+    """A base model's own safe refusals to the held-out prompts: SafeGrad's reference set for that model."""
+    judged = read_jsonl(RUNS / "eval" / arm / "alignment.guard.jsonl")
+    keep = safe_refusals(judged)
+    write_jsonl(DATA / name, keep)
+    note(name, {"source": f"greedy answers of {arm} to multijail_alignment.jsonl",
+                "filter": "Qwen3Guard Safety=Safe and Refusal=Yes, not truncated",
+                "rows": len(keep), "of": len(judged), "per_lang": dict(Counter(r["lang"] for r in keep)),
+                "sha256": sha256_file(DATA / name)})
+    print(len(keep), "of", len(judged), "kept ->", DATA / name)
 
 
 # ---------------------------------------------------------------- Korean clean set
@@ -193,12 +215,16 @@ def check(limit_share: float = 0.1) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["mix", "ko-pool", "ko-cutoff", "ko-clean", "ko-check"])
+    ap.add_argument("cmd", choices=["mix", "ko-pool", "ko-cutoff", "ko-clean", "ko-check", "refusals"])
     ap.add_argument("--cutoff", type=int)
     ap.add_argument("--check", type=int, default=30, help="rows in the new spot-check sheet")
+    ap.add_argument("--arm", default="earth-base", help="refusals: the base-model arm to read")
+    ap.add_argument("--out", default="alignment_sft_earth.jsonl", help="refusals: file name under data/lir")
     a = ap.parse_args()
     if a.cmd == "mix":
         build_mix()
+    elif a.cmd == "refusals":
+        build_refusals(a.arm, a.out)
     elif a.cmd == "ko-pool":
         build_ko_pool()
     elif a.cmd == "ko-cutoff":
