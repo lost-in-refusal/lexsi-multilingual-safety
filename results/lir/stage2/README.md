@@ -51,10 +51,12 @@ Intervals are 95%. Results marked 1 seed are single runs.
 **Base Earth.** Evaluated Nov 20, before the Saturday gate. It refuses fewer Swahili attack prompts than base Global (43.3% against 50.9%), which is row C of the Earth outcome table. Its refusal set keeps 44 of the 72 held-out prompts; Global's kept 47.
 
 **K2.** Mingyu read 200 Korean answers (100 prompts, base and plain at seed 42, arm hidden) and marked 8 unsafe, 186 safe and 6 unsure. Every label is his own reading.
-- The registered test fails: 1 base answer against 5 plain answers on the 94 prompts with two clear labels, p = 0.22. Unsure counted as safe: 1 against 7, p = 0.070. Unsure counted as unsafe: 3 against 11, p = 0.021.
-- So do not write that a person confirmed the Korean rise. What holds: the direction is the same in all three readings, and the count is too small for 100 prompts to settle it.
-- On the same 100 prompts the guard's strict count is 2 for base and 17 for plain. The guard agrees with the labels on 187 of 194 answers and passed no answer that Mingyu marked unsafe. All 7 disagreements are guard flags he marked safe.
-- By the guard's class (not registered): of the 13 answers it called Unsafe he marked 8 unsafe, 3 safe and 2 unsure; of the 6 it called Controversial he marked none unsafe (4 safe, 2 unsure). The strict rule counts Controversial answers, so the size of the Korean rise in the headline is the guard's size. A person reading the same answers counts about half as many.
+- The registered test fails: 1 base answer against 5 plain answers on the 94 prompts with two clear labels, p = 0.22. The two side readings: unsure counted as safe, 1 against 7 (p = 0.070); unsure counted as unsafe, 3 against 11 (p = 0.021).
+- So do not write that a person confirmed the Korean rise. H1 stays a claim measured by the guard. The direction is the same in all three readings.
+- It did not fail for lack of prompts. On the same 100 prompts the guard's strict count is 2 for base and 17 for plain, a rise of 15 answers, which would pass easily. Mingyu's rise is 4 answers on 94 prompts (6 on 100 with unsure counted as safe). K2 says the rise a person sees is smaller than the guard's.
+- Of the guard's 19 flags he marked 8 unsafe, 7 safe and 4 unsure. Of the 15 flags with a clear label he confirmed 8: 8 of 11 in the guard's Unsafe class and 0 of 4 in its Controversial class. The guard passed no answer he marked unsafe. Agreement over all answers is 187 of 194, but 179 of those are answers both called safe.
+- Already in `results.md` as "loose" (the guard's Unsafe class only, all 291 Korean prompts): 2.7% for base; 14.1%, 11.0% and 13.1% for plain at seeds 42, 1 and 2; 6.2%, 5.5% and 6.5% for SafeGrad. Pointing to it here is a choice made after K2, so it is not a registered check. It shows the Korean rise and the repair without the Controversial class.
 - One labeller, who knows the expected direction and can often guess the arm from the answer's length.
+- The first scoring matched both answers to a prompt to one guard verdict. That is fixed and did not touch the test. The joins for the 120-label set were checked for the same error: every id appears once there, so Check A stands.
 
 **Still to come.** K1, the Earth training runs, and the repair-vector evaluations.
