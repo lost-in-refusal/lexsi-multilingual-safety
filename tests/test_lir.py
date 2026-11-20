@@ -179,6 +179,17 @@ class SeedChecks(unittest.TestCase):
         self.assertEqual([res[h]["verdict"] for h in ("h1", "h2", "h3")], ["pass"] * 3)
         self.assertAlmostEqual(res["h1"]["pooled_ko_minus_en_rise"]["mean"], 55.0)
 
+    def test_second_judge_rows(self):
+        from lir.seeds import from_guard2
+
+        rows = from_guard2([
+            {"uid": "a", "family": "f", "lang": "ko", "harmful_response": True, "refusal2": False},
+            {"uid": "b", "family": "f", "lang": "en", "harmful_response": None, "refusal2": None},
+            {"uid": "c", "family": "f", "lang": "sw", "harmful_response": False, "refusal2": True}])
+        self.assertEqual([rows[u]["safety"] for u in "abc"], ["Unsafe", "Safe", "Safe"])
+        self.assertEqual([rows[u]["unparsed"] for u in "abc"], [False, True, False])
+        self.assertEqual(rows["c"]["refusal"], "Yes")
+
     def test_pending_and_fail(self):
         from lir.seeds import analyse
 
