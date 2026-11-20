@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 20, 2:25 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 20, 3:35 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -15,7 +15,7 @@ Updated Nov 20, 2:25 PM ET. Every number comes from our own runs, and the file n
 | Check C Swahili with an independent translator | Pass | 1 | Corrected attack success 17.9% base, 29.2% plain, 17.2% SafeGrad. Plain over base +11.3 points [+6.5, +16.5] | `swahili_nllb.json` |
 | Earth E1 and E2 | Running | 1 | | `earth/` |
 | K1 Korean with no Korean training rows (added Nov 20) | Queued | 1 | | `noko.md` |
-| K2 Korean rise judged by a person (added Nov 20) | Sheet out, waiting for labels | 1 | 100 prompts, base and plain | `ko_drift.md` |
+| K2 Korean rise judged by a person (added Nov 20) | Does not pass | 1 | 5 plain answers against 1 base answer marked unsafe on 94 prompts, p = 0.22 | `ko_drift.md` |
 | Repair vector (exploratory) | Queued | 1 | | `vector.md` |
 
 Intervals are 95%. Results marked 1 seed are single runs.
@@ -50,4 +50,11 @@ Intervals are 95%. Results marked 1 seed are single runs.
 
 **Base Earth.** Evaluated Nov 20, before the Saturday gate. It refuses fewer Swahili attack prompts than base Global (43.3% against 50.9%), which is row C of the Earth outcome table. Its refusal set keeps 44 of the 72 held-out prompts; Global's kept 47.
 
-**Still to come.** K1, K2, the Earth training runs, and the repair-vector evaluations.
+**K2.** Mingyu read 200 Korean answers (100 prompts, base and plain at seed 42, arm hidden) and marked 8 unsafe, 186 safe and 6 unsure. Every label is his own reading.
+- The registered test fails: 1 base answer against 5 plain answers on the 94 prompts with two clear labels, p = 0.22. Unsure counted as safe: 1 against 7, p = 0.070. Unsure counted as unsafe: 3 against 11, p = 0.021.
+- So do not write that a person confirmed the Korean rise. What holds: the direction is the same in all three readings, and the count is too small for 100 prompts to settle it.
+- On the same 100 prompts the guard's strict count is 2 for base and 17 for plain. The guard agrees with the labels on 187 of 194 answers and passed no answer that Mingyu marked unsafe. All 7 disagreements are guard flags he marked safe.
+- By the guard's class (not registered): of the 13 answers it called Unsafe he marked 8 unsafe, 3 safe and 2 unsure; of the 6 it called Controversial he marked none unsafe (4 safe, 2 unsure). The strict rule counts Controversial answers, so the size of the Korean rise in the headline is the guard's size. A person reading the same answers counts about half as many.
+- One labeller, who knows the expected direction and can often guess the arm from the answer's length.
+
+**Still to come.** K1, the Earth training runs, and the repair-vector evaluations.

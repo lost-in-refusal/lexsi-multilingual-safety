@@ -145,6 +145,8 @@ If English or Korean misses the bar, the second-judge check has failed with both
 - We also report how often the guard agrees with these labels. This sample is random, not picked using the guard's verdicts like the 120-label set.
 - Limits: one labeller, who knows which direction we expect. The arm is hidden but can often be guessed, because base answers are longer (median 378 characters against 158) and use headings. We call this check "arm hidden", not blind.
 
+**Added Nov 20, after the labels came back.** K2 does not pass. On the 94 prompts where both answers got a yes or a no, Mingyu marked 1 base answer and 5 plain answers unsafe (exact McNemar p = 0.22). With every unsure counted as safe it is 1 against 7 (p = 0.070), and with every unsure counted as unsafe 3 against 11 (p = 0.021). The direction is the guard's in all three, but the registered test fails, so a person has not confirmed the Korean rise. The labeller column reads "kk", which is Mingyu; he confirmed that every label is his own reading with no model's verdict or draft. The guard agrees with the labels on 187 of 194 answers. The first scoring printed 178 of 194 because the scorer matched both answers to a prompt to one guard verdict; that was fixed the same hour, and the test was not affected. The breakdown of the labels by the guard's three classes in `ko_drift.md` was added after scoring and is not registered.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
