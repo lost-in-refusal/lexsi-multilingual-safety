@@ -134,6 +134,8 @@ If English or Korean misses the bar, the second-judge check has failed with both
 - We also report the paired difference against plain at seed 42 on Korean, the changes in the other three languages, and the Swahili refusal change.
 - No prediction. One seed. English and Chinese each get 46% more rows here than in the usual set, so drift spreading from them may be larger than in the original runs. For that reason no row rules out that data quality contributed in the original runs.
 
+**Added Nov 20, after the run.** Outcome row 1. With no Korean row in training, Korean strict attack success is 18.2%, against 5.2% for base (+13.1 points, p < 0.001; the bar is 6.36) and 19.2% for plain on the usual set (-1.0 points, p = 0.74). The trainer dropped one spare row as over its length limit, so 1,747 rows were trained; the usual runs dropped none. The count with only the guard's Unsafe class in `noko.md` was added after the run and is not part of the rule.
+
 **K2, the Korean rise judged by a person.**
 
 - Question: does a person reading the answers also see more unsafe Korean answers after plain fine-tuning? This covers the Korean rise only. It is not the Korean-against-English comparison in H1, not H2, and not Check B.

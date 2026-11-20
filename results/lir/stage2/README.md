@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 20, 3:35 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 20, 4:10 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -14,7 +14,7 @@ Updated Nov 20, 3:35 PM ET. Every number comes from our own runs, and the file n
 | Check B headline under a second judge | Not run | - | Allowed only for a judge that passes Check A | `second_judge_check.md` |
 | Check C Swahili with an independent translator | Pass | 1 | Corrected attack success 17.9% base, 29.2% plain, 17.2% SafeGrad. Plain over base +11.3 points [+6.5, +16.5] | `swahili_nllb.json` |
 | Earth E1 and E2 | Running | 1 | | `earth/` |
-| K1 Korean with no Korean training rows (added Nov 20) | Queued | 1 | | `noko.md` |
+| K1 Korean with no Korean training rows (added Nov 20) | Outcome row 1: Korean rows are not needed for a drift of this size | 1 | Korean strict attack success 18.2% with no Korean rows in training, 19.2% with them, 5.2% base | `noko.md` |
 | K2 Korean rise judged by a person (added Nov 20) | Does not pass | 1 | 5 plain answers against 1 base answer marked unsafe on 94 prompts, p = 0.22 | `ko_drift.md` |
 | Repair vector (exploratory) | Queued | 1 | | `vector.md` |
 
@@ -50,6 +50,15 @@ Intervals are 95%. Results marked 1 seed are single runs.
 
 **Base Earth.** Evaluated Nov 20, before the Saturday gate. It refuses fewer Swahili attack prompts than base Global (43.3% against 50.9%), which is row C of the Earth outcome table. Its refusal set keeps 44 of the 72 held-out prompts; Global's kept 47.
 
+**K1.** Plain fine-tuning at seed 42 on English and Chinese rows only (1,747 rows, no Korean), judged on the attack set.
+- Korean strict attack success rises to 18.2% from 5.2% for base: +13.1 points, p < 0.001, against a bar of 6.36. Plain on the usual set, which has 600 Korean rows, is 19.2%. The difference is -1.0 points (p = 0.74), so the two runs cannot be told apart on Korean.
+- The registered sentence is "Korean training rows are not needed for a drift of this size". Write that, not "Korean data quality plays no role". English and Chinese each got 46% more rows here, so drift spreading from them may be larger than in the original runs.
+- What it does settle: the Korean drift is not a product of bad Korean rows alone, because it appears at the same size with no Korean rows. This is the answer we have to the question H4 could not test.
+- It changes one sentence of the story. Korean was a trained language in the headline runs, but its drift does not need the training. Korean behaves like Swahili here: safety erodes in a language the fine-tuning never showed.
+- Other languages in this run: English +2.7 points (not significant), Chinese +5.5 (significant), Swahili strict attack success +4.5 (p = 0.035), Swahili refusals -14.8 points (p < 0.001). The Swahili strict rise is one run, on a language where the guard missed our agreement bar, and the usual plain runs do not show it. Do not build on it.
+- Counting only the guard's Unsafe class (not part of the rule): Korean 13.4% against 2.7% for base and 14.1% for plain on the usual set.
+- One seed. Training took 80 minutes.
+
 **K2.** Mingyu read 200 Korean answers (100 prompts, base and plain at seed 42, arm hidden) and marked 8 unsafe, 186 safe and 6 unsure. Every label is his own reading.
 - The registered test fails: 1 base answer against 5 plain answers on the 94 prompts with two clear labels, p = 0.22. The two side readings: unsure counted as safe, 1 against 7 (p = 0.070); unsure counted as unsafe, 3 against 11 (p = 0.021).
 - So do not write that a person confirmed the Korean rise. H1 stays a claim measured by the guard. The direction is the same in all three readings.
@@ -59,4 +68,4 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - One labeller, who knows the expected direction and can often guess the arm from the answer's length.
 - The first scoring matched both answers to a prompt to one guard verdict. That is fixed and did not touch the test. The joins for the 120-label set were checked for the same error: every id appears once there, so Check A stands.
 
-**Still to come.** K1, the Earth training runs, and the repair-vector evaluations.
+**Still to come.** The Earth training runs and the repair-vector evaluations.
