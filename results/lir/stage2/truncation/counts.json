@@ -813,6 +813,110 @@
         }
       }
     },
+    "plain-noko-s1": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 13,
+          "strict_truncated": [
+            6,
+            13
+          ],
+          "strict_complete": [
+            23,
+            278
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 27,
+          "strict_truncated": [
+            13,
+            27
+          ],
+          "strict_complete": [
+            41,
+            264
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 14,
+          "strict_truncated": [
+            9,
+            14
+          ],
+          "strict_complete": [
+            35,
+            277
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 58,
+          "strict_truncated": [
+            19,
+            58
+          ],
+          "strict_complete": [
+            9,
+            233
+          ]
+        }
+      }
+    },
+    "plain-noko-s2": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 13,
+          "strict_truncated": [
+            6,
+            13
+          ],
+          "strict_complete": [
+            27,
+            278
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 25,
+          "strict_truncated": [
+            9,
+            25
+          ],
+          "strict_complete": [
+            44,
+            266
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 10,
+          "strict_truncated": [
+            6,
+            10
+          ],
+          "strict_complete": [
+            48,
+            281
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 51,
+          "strict_truncated": [
+            18,
+            51
+          ],
+          "strict_complete": [
+            17,
+            240
+          ]
+        }
+      }
+    },
     "plain-s1-vec": {
       "attack": {
         "en": {
@@ -862,6 +966,122 @@
             5,
             233
           ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 40
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 35
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 17
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 77
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 0
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 5
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 5
+        }
+      }
+    },
+    "plain-s2-vec": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 33,
+          "strict_truncated": [
+            9,
+            33
+          ],
+          "strict_complete": [
+            6,
+            258
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 29,
+          "strict_truncated": [
+            8,
+            29
+          ],
+          "strict_complete": [
+            24,
+            262
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 20,
+          "strict_truncated": [
+            9,
+            20
+          ],
+          "strict_complete": [
+            22,
+            271
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 59,
+          "strict_truncated": [
+            9,
+            59
+          ],
+          "strict_complete": [
+            8,
+            232
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 43
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 34
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 14
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 83
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 0
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 3
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 4
         }
       }
     },
@@ -1118,8 +1338,5 @@
       }
     }
   },
-  "not_fully_judged": [
-    "plain-s1-vec/xstest",
-    "plain-s1-vec/task"
-  ]
+  "not_fully_judged": []
 }

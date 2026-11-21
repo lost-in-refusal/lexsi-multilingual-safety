@@ -38,6 +38,14 @@ Only prompts where every arm's answer was complete or its re-generation starts w
 - Size of the Korean rise, after minus before: +0.0 points [+0.0, +0.0]: unchanged within noise.
 - SafeGrad against plain on Korean, after minus before: +0.0 points [+0.0, +0.0]: the repair is unchanged within noise.
 
+### Three seeds, by the rules of section 1
+
+- Before: H1 pass (gap +11.8 points [+6.8, +16.7]), H2 pass (-8.4 points [-11.3, -5.5]), H3 pass (-9.3 points [-13.7, -5.2]).
+- After: H1 pass (gap +10.9 points [+6.0, +15.9]), H2 pass (-8.6 points [-11.5, -5.7]), H3 pass (-10.0 points [-14.2, -5.8]).
+- Seed 42: Korean rise after minus before +0.7 points [+0.0, +1.7]: unchanged within noise.
+- Seed 1: Korean rise after minus before +0.3 points [-0.7, +1.4]: unchanged within noise.
+- Seed 2: Korean rise after minus before +0.3 points [-0.7, +1.4]: unchanged within noise.
+
 ### What was generated again
 
 | Arm | Set | Answers | Start with the original | Still cut at the new cap |
@@ -48,6 +56,14 @@ Only prompts where every arm's answer was complete or its re-generation starts w
 | plain | xstest | 153 | 60 | 15 |
 | safegrad | attack | 139 | 23 | 8 |
 | safegrad | xstest | 160 | 97 | 9 |
+| plain-s1 | attack | 81 | 22 | 8 |
+| plain-s1 | xstest | 124 | 32 | 7 |
+| safegrad-s1 | attack | 111 | 41 | 3 |
+| safegrad-s1 | xstest | 170 | 61 | 12 |
+| plain-s2 | attack | 94 | 24 | 11 |
+| plain-s2 | xstest | 131 | 44 | 4 |
+| safegrad-s2 | attack | 121 | 46 | 5 |
+| safegrad-s2 | xstest | 165 | 84 | 11 |
 
 ### Over-refusal on XSTest (%), before -> after
 
@@ -56,3 +72,7 @@ Only prompts where every arm's answer was complete or its re-generation starts w
 | base | 9.6 -> 8.8 | 7.6 -> 7.6 | 8.8 -> 8.0 | 7.6 -> 7.6 |
 | plain | 7.2 -> 7.2 | 5.6 -> 5.6 | 5.6 -> 5.6 | 2.8 -> 3.2 |
 | safegrad | 7.6 -> 7.6 | 6.8 -> 6.8 | 5.6 -> 5.6 | 5.6 -> 5.6 |
+| plain-s1 | 6.0 -> 6.0 | 5.6 -> 5.2 | 4.8 -> 4.8 | 4.0 -> 4.0 |
+| safegrad-s1 | 8.8 -> 8.8 | 7.2 -> 7.2 | 6.4 -> 6.4 | 6.0 -> 6.0 |
+| plain-s2 | 6.0 -> 6.0 | 5.6 -> 5.2 | 5.6 -> 5.6 | 3.6 -> 3.6 |
+| safegrad-s2 | 10.8 -> 10.8 | 7.2 -> 7.2 | 6.4 -> 6.4 | 6.0 -> 6.0 |
