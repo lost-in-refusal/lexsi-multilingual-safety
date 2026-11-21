@@ -229,7 +229,7 @@ def report(a) -> None:
     res["train"] = {}
     for arm in ("aya-plain", "aya-safegrad", "plain-ayasize", "plain"):
         run = json.loads((RUNS / arm / "run.json").read_text())
-        res["train"][arm] = {k: run[k] for k in ("train_file", "train_sha256", "train_rows", "dropped_over_max_len",
+        res["train"][arm] = {k: run.get(k) for k in ("train_file", "train_sha256", "train_rows", "dropped_over_max_len",
                                                  "optimizer_steps", "seed", "commit", "train_runtime_s")}
     OUT.mkdir(parents=True, exist_ok=True)
     write_json(OUT / "checks.json", res)
