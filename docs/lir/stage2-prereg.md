@@ -290,6 +290,10 @@ Each check is read at one seed, as in section 8.
 - Known limits. One seed. Tiny Aya's model card names no training data; Cohere built both the model and the Aya Dataset, so the model may have seen these rows, and we say so. Korean has 309 usable rows in all, so the Korean rows are close to everything Aya has. No person has checked the Aya rows by hand.
 - Cost: about 6 hours of laptop time.
 
+**Added Nov 21, after the guard screen and the split.** The plain Aya run had started by itself when the split was written, and no Aya result was known. The screen kept 974 English, 304 Korean, 978 Chinese and 256 Swahili rows. It dropped 7, 2, 10 and 16 as not safe and 19, 3, 12 and 4 as refusals; no verdict was unreadable. After the 100 held-out rows per language, and after training rows that are near-duplicates of a held-out prompt were removed (56, 31 and 37), Korean has 173 rows left. By the rule above training uses 173 rows per language, 519 in all. That is 29% of the Bactrian-X set and a little under the 190 we expected. The size control is the first 173 IDs of our Bactrian-X training set, also 519 rows.
+
+A limit we can now put a number on: the two sets match in rows, not in text. Aya answers are shorter. The median answer has 298, 160 and 43 characters in English, Korean and Chinese, against 602, 320 and 212 in the size control. So the Aya runs see less text than the control, and "the same size" in the table above means the same number of rows. Where the table says "a third of the size", the figure is 173 rows per language against 600. The dataset card is `docs/lir/cards/aya.md`.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

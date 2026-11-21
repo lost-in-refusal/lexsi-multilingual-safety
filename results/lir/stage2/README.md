@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 21, 5:50 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 21, 6:00 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -20,7 +20,7 @@ Updated Nov 21, 5:50 AM ET. Every number comes from our own runs, and the file n
 | Circuit comparison at five node counts (added Nov 20) | Holds at 100, 200 and 300 nodes, not at 50 or 400 | 1 | Korean keeps the fewest base nodes under plain at three of five sizes. At 200 nodes the top nodes recover 65% of the contrast in English, 91% in Korean, 26% in Chinese, 40% in Swahili | `circuit_nodes.md` |
 | Truncation audit (added Nov 20) | The headline does not depend on the 256-token cap: outcome row 1 at seed 42, and H1 to H3 pass on three seeds before and after. Earth still to run | 3 of 3 | Three seeds, before and after every capped answer was generated again at 1,024 tokens: Korean rise +12.7 and +13.2 points; SafeGrad against plain -8.4 and -8.6; Swahili refusals -9.3 and -10.0 | `truncation/report.md` |
 | Harm categories (added Nov 20) | Korean rises in all 8 categories with 20 or more prompts, on capped and on re-generated answers | 3 | Rises from +3.7 to +21.0 points on both | `harm_categories.md`, `harm_categories_regenerated.md`, `harm_categories.png` |
-| Aya as a second training dataset (added Nov 20) | Registered and queued | 1 | About 190 rows per language, because Aya has 309 usable Korean rows | section 10 of the preregistration |
+| Aya as a second training dataset (added Nov 20) | Set built, runs under way | 1 | 173 training rows per language (519 in all), because Aya has 304 usable Korean rows after the guard screen; 100 more per language held out | `docs/lir/cards/aya.md`, section 10 of the preregistration |
 
 Intervals are 95%. Results marked 1 seed are single runs.
 
@@ -115,7 +115,12 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - This is a description. Do not write that one category drifts more than another: cells are small and no test was run between categories. The ten categories with fewer than 20 prompts are listed in the table and not interpreted.
 - The figure shows the change against base under plain and under SafeGrad, for Korean and for the four languages together.
 
-**Aya.** Not run yet. The Aya Dataset has 361 Korean rows, 309 after the filters, so the plan's 600 rows per language cannot be met. The registered rule: 100 rows per language held out as the Aya task set, and the same number of training rows in English, Korean and Chinese, about 190 each. A plain run on Bactrian-X cut to the same size is the control, so a weaker drift on Aya can be told apart from a smaller fine-tune. Tiny Aya's model card names no training data, and Cohere built both the model and the dataset, so the model may have seen these rows.
+**Aya.** The set is built and the runs are under way; no result yet. Three runs at seed 42: plain and SafeGrad on the Aya set, and plain on Bactrian-X cut to the same number of rows.
+- Size: 173 training rows each in English, Korean and Chinese, 519 in all, which is 29% of the Bactrian-X set. Korean sets the size: Aya has 361 Korean rows, 304 pass the filters and the guard, 100 are held out as the task set and 31 near-duplicates of held-out prompts are removed. The plan's 600 rows per language could not be met.
+- The held-out Aya task set has 100 rows each in English, Korean, Chinese and Swahili. It is never trained on.
+- The size control matches rows, not text. Aya answers are much shorter than Bactrian-X ones (median 43 characters in Chinese against 212), so the Aya runs see less text than the control. Keep that next to any comparison of the two.
+- Whatever comes out is one seed. The registered sentences are in section 10: if the drift appears, "the Korean drift appears on a second dataset, written by people"; say 173 rows per language, not "a third of the size".
+- Cohere built both Tiny Aya and the Aya Dataset, and the model card names no training data, so the model may have seen these rows. Say so wherever Aya is used. The dataset card is `docs/lir/cards/aya.md`.
 
 **Repair vector (exploratory, not registered).** The difference between the seed 42 SafeGrad and plain adapters, added to the plain adapters of seeds 1 and 2. No training, and nothing was tuned on the test prompts. Single runs.
 - Korean strict attack success falls from 15.5% to 10.3% at seed 1 (-5.2 points, p = 0.008) and from 18.9% to 11.0% at seed 2 (-7.9, p < 0.001). SafeGrad trained at those seeds reaches 8.2% and 9.6%, so the edit gives 71% and 85% of the drop that training gave.
@@ -126,4 +131,4 @@ Intervals are 95%. Results marked 1 seed are single runs.
 
 **On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. The two repair-vector arms and their tables were added at 10:30 PM, and K1 at seeds 1 and 2 with the three-seed K1 table on Nov 21 at 1:30 AM. The answers generated again at 1,024 tokens went up under `truncation-regenerated/` with the truncation report: seed 42 at 4:40 AM, seeds 1 and 2 at 5:50 AM, with the second harm-category table. Not uploaded yet: the re-generated Earth answers and the Aya runs, which are still running or queued.
 
-**Still to come, in queue order.** Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints; the Earth arms generated again at 1,024 tokens. The queue should be through by about noon Saturday.
+**Still to come, in queue order.** The two Aya runs and the size control (about 9:45 AM); the Aya task set for five checkpoints; the Earth arms generated again at 1,024 tokens. The queue should be through by about noon Saturday.
