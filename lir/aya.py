@@ -213,6 +213,31 @@ def checks(data: dict[str, dict], plain: str = "aya-plain", safegrad: str = "aya
             "sw_refusal_change": res["h3"]["pooled_sw_refusal_change"], "size_control": ctl, "outcome_rows": rows}
 
 
+def beside(data: dict[str, dict]) -> dict:
+    """Comparisons section 10 did not register. They are kept beside the checks and decide no outcome row."""
+    from lir.seeds import REFUSAL, STRICT, by_family, change, diff, pooled
+
+    strict = {arm: by_family(d, STRICT) for arm, d in data.items()}
+    refusal = {arm: by_family(d, REFUSAL) for arm, d in data.items()}
+    sw = lambda arm: dict(change(refusal["base"], refusal[arm], "sw"), **pooled([diff(refusal["base"], refusal[arm], "sw")]))
+    ko = lambda d: [r for r in d.values() if r["lang"] == "ko"]
+    cap = {arm: {"answers": len(ko(d)), "cut": sum(bool(r.get("truncated")) for r in ko(d)),
+                 "flagged": sum(int(STRICT(r)) for r in ko(d)),
+                 "flagged_complete": sum(int(STRICT(r)) for r in ko(d) if not r.get("truncated"))} for arm, d in data.items()}
+    return {"safegrad_vs_base": {l: change(strict["base"], strict["aya-safegrad"], l) for l in EVAL_LANGS},
+            "aya_vs_same_size": {l: change(strict["plain-ayasize"], strict["aya-plain"], l) for l in EVAL_LANGS},
+            "sw_refusal_vs_base": {arm: sw(arm) for arm in ("aya-plain", "plain-ayasize", "plain") if arm in data},
+            "ko_cap": cap}
+
+
+def _in_repo(path):
+    """A training file as a path inside the repository, when it is one."""
+    try:
+        return str(Path(path).resolve().relative_to(ROOT))
+    except (TypeError, ValueError):
+        return path
+
+
 def report(a) -> None:
     import json
 
@@ -231,6 +256,8 @@ def report(a) -> None:
         run = json.loads((RUNS / arm / "run.json").read_text())
         res["train"][arm] = {k: run.get(k) for k in ("train_file", "train_sha256", "train_rows", "dropped_over_max_len",
                                                  "optimizer_steps", "seed", "commit", "train_runtime_s")}
+        res["train"][arm]["train_file"] = _in_repo(res["train"][arm]["train_file"])
+    res["not_registered"] = beside(data)
     OUT.mkdir(parents=True, exist_ok=True)
     write_json(OUT / "checks.json", res)
     ci = lambda c: f"{c['mean']:+.1f} points [{c['ci95'][0]:+.1f}, {c['ci95'][1]:+.1f}]"
@@ -265,6 +292,26 @@ def report(a) -> None:
               f"({pv(c['rise']['ko']['p'])}), English {c['rise']['en']['delta']:+.1f}, gap {ci(c['ko_minus_en'])}. "
               f"It {'passes' if c['passes'] else 'does not pass'} Y1's test.",
               "", "Rows of the outcome table that apply:", ""] + [f"- {t}" for t in res["outcome_rows"]]
+    x, t = res["not_registered"], res["train"]
+    name = {"en": "English", "ko": "Korean", "zh": "Chinese", "sw": "Swahili"}
+    per = lambda d: ", ".join(f"{name[l]} {d[l]['delta']:+.1f} ({pv(d[l]['p'])})" for l in ("ko", "en", "zh", "sw"))
+    label = {"base": "base", "aya-plain": "Aya plain", "aya-safegrad": "Aya SafeGrad",
+             "plain-ayasize": "Bactrian-X of the same size", "plain": "Bactrian-X at full size"}
+    k = x["ko_cap"]
+    lines += ["", f"\"A third of the size\" in the outcome table is {t['aya-plain']['train_rows'] // len(TRAIN_LANGS)} training rows "
+              f"per language against {t['plain']['train_rows'] // len(TRAIN_LANGS)}. The same size means the same number of rows, "
+              "not the same amount of text.", "",
+              "### Beside the checks, not registered", "",
+              "Section 10 did not register these comparisons, so they decide nothing. Single runs, strict attack success "
+              "unless stated, change in points with the exact McNemar p-value.", "",
+              f"- Aya SafeGrad against base: {per(x['safegrad_vs_base'])}.",
+              f"- Aya plain against Bactrian-X plain of the same size: {per(x['aya_vs_same_size'])}.",
+              "- Swahili refusal rate against base: " + "; ".join(
+                  f"{label[arm]} {ci(c)}" for arm, c in x["sw_refusal_vs_base"].items()) + ".",
+              f"- Korean answers that reached the 256-token cap, of {k['base']['answers']}: " + ", ".join(
+                  f"{label[arm]} {c['cut']}" for arm, c in k.items()) + ". The Aya arms are not in the truncation audit.",
+              "- Korean strict flags on answers that were complete: " + ", ".join(
+                  f"{label[arm]} {c['flagged_complete']} of {c['flagged']}" for arm, c in k.items()) + "."]
     (OUT / "checks.md").write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
 

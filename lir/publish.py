@@ -102,9 +102,10 @@ def unfinished(arm_dir: Path) -> list[str]:
     return bad
 
 
-def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool) -> None:
-    """Add stage 2 outputs to the outputs repo: arm folders, re-generated answers, Aya task answers, the NLLB
-    re-translations and the committed stage 2 tables.
+def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool, aya_task: bool = False) -> None:
+    """Add stage 2 outputs to the outputs repo: arm folders, re-generated answers, the NLLB re-translations and
+    the committed stage 2 tables. The answers to the held-out Aya prompts go up only with aya_task, because
+    each row quotes an Aya prompt and its reference answer.
 
     Nothing already in the repo is removed, and only the README card and files whose content changed are
     replaced. The repo is public, so the files are public as soon as they are uploaded. With no arms given, every
@@ -135,7 +136,7 @@ def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool) -> None:
         again = [arm for arm in TRUNC_ARMS if all(trunc.after(arm, name) is not None for name in trunc.SETS)]
         for arm in again:
             shutil.copytree(trunc.REGEN / arm, t / "truncation-regenerated" / arm)
-        aya = [d.name for d in sorted((RUNS / "ayatask").glob("*")) if (d / "gen.jsonl").exists()
+        aya = [d.name for d in sorted((RUNS / "ayatask").glob("*")) if aya_task and (d / "gen.jsonl").exists()
                and (d / "judge.jsonl").exists() and rows(d / "judge.jsonl") == rows(d / "gen.jsonl")]
         for arm in aya:
             shutil.copytree(RUNS / "ayatask" / arm, t / "aya-task" / arm)
@@ -156,7 +157,8 @@ def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool) -> None:
         size = sum(p.stat().st_size for p in files)
         print(f"{len(files)} files, {size / 1e6:.1f} MB -> {EVAL_REPO}")
         print("arms:", ", ".join(arms))
-        print("re-generated answers:", ", ".join(again) or "none yet", "| Aya task answers:", ", ".join(aya) or "none yet")
+        print("re-generated answers:", ", ".join(again) or "none yet", "| Aya task answers:",
+              (", ".join(aya) or "none yet") if aya_task else "left out (--aya-task adds them)")
         if waiting:
             print("not finished, left out:", ", ".join(waiting))
         if dry_run:
@@ -211,10 +213,12 @@ def main() -> None:
     ap.add_argument("--arms", nargs="+")
     ap.add_argument("--public", action="store_true")
     ap.add_argument("--dry-run", action="store_true", help="stage2 only: list the files and upload nothing")
+    ap.add_argument("--aya-task", action="store_true",
+                    help="stage2 only: also upload the answers to the held-out Aya prompts (they quote the Aya rows)")
     a = ap.parse_args()
     api = HfApi()
     if a.what == "stage2":
-        push_stage2(api, a.arms, a.dry_run)
+        push_stage2(api, a.arms, a.dry_run, a.aya_task)
     elif a.what == "data":
         push_data(api, a.public)
     elif a.what == "evals":

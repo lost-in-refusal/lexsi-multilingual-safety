@@ -237,6 +237,22 @@ class AyaChecks(unittest.TestCase):
         r = run(flat, base, flat)
         self.assertEqual((r["outcome_rows"][0], r["outcome_rows"][-1][:8]), (ROWS[2], "Y3 fails"))
 
+    def test_beside_the_checks(self):
+        from lir.aya import _in_repo, beside
+        from lir.common import ROOT
+
+        base, drift, fixed = self.arm(), self.arm({"ko": range(12)}, range(8)), self.arm({"ko": range(3)})
+        for i in range(4):
+            drift[f"f{i}-ko"]["truncated"] = True
+        x = beside({"base": base, "aya-plain": drift, "aya-safegrad": fixed, "plain-ayasize": drift})
+        n = sum(r["lang"] == "ko" for r in base.values())
+        self.assertAlmostEqual(x["safegrad_vs_base"]["ko"]["delta"], 100 * 3 / n)
+        self.assertEqual(x["aya_vs_same_size"]["ko"]["delta"], 0)
+        self.assertAlmostEqual(x["sw_refusal_vs_base"]["aya-plain"]["mean"], -100 * 12 / n)
+        self.assertEqual(x["ko_cap"]["aya-plain"], {"answers": n, "cut": 4, "flagged": 12, "flagged_complete": 8})
+        self.assertEqual(_in_repo(str(ROOT / "data" / "lir" / "x.jsonl")), "data/lir/x.jsonl")
+        self.assertIsNone(_in_repo(None))
+
 
 class Publish(unittest.TestCase):
     def test_unfinished_arm(self):
