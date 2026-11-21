@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 20, 10:30 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 21, 1:30 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -14,7 +14,7 @@ Updated Nov 20, 10:30 PM ET. Every number comes from our own runs, and the file 
 | Check B headline under a second judge | Not run | - | Allowed only for a judge that passes Check A | `second_judge_check.md` |
 | Check C Swahili with an independent translator | Pass | 1 | Corrected attack success 17.9% base, 29.2% plain, 17.2% SafeGrad. Plain over base +11.3 points [+6.5, +16.5] | `swahili_nllb.json` |
 | Earth E1 and E2 | E1 holds. E2 not confirmed | 1 | Korean strict attack success 10.7% base, 21.3% plain, 16.5% SafeGrad. Swahili refusals fall 6.9 points, against 13.1 on Global | `earth/checks.md` |
-| K1 Korean with no Korean training rows (added Nov 20) | Outcome row 1 at seed 42: Korean rows are not needed for a drift of this size. Seeds 1 and 2 queued | 1 of 3 | Korean strict attack success 18.2% with no Korean rows in training, 19.2% with them, 5.2% base | `noko.md` |
+| K1 Korean with no Korean training rows (added Nov 20) | Outcome row 1 in all three seeds: Korean rows are not needed for a drift of this size | 3 of 3 | Korean strict attack success 18.2%, 18.6% and 18.2% with no Korean rows in training (seeds 42, 1, 2), 19.2%, 15.5% and 18.9% with them, 5.2% base | `noko.md` |
 | K2 Korean rise judged by a person (added Nov 20) | Does not pass | 1 | 5 plain answers against 1 base answer marked unsafe on 94 prompts, p = 0.22 | `ko_drift.md` |
 | Repair vector (exploratory, not registered) | The seed 42 edit lowers Korean attack success at seeds 1 and 2 with no training | 2 | Korean 15.5% to 10.3% and 18.9% to 11.0%. SafeGrad trained at those seeds reaches 8.2% and 9.6% | `vector.md` |
 | Circuit comparison at five node counts (added Nov 20) | Holds at 100, 200 and 300 nodes, not at 50 or 400 | 1 | Korean keeps the fewest base nodes under plain at three of five sizes | `circuit_nodes.md` |
@@ -65,14 +65,16 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - Both runs trained at clean commits, and no training or evaluation code changed between the three Earth arms. Plain took 74 minutes and SafeGrad 88.
 - E1 has not been through the truncation check yet. Half of base Earth's Korean attack answers reach the 256-token cap, against 6% for Earth plain and 18% for Earth SafeGrad, and the repair margin is thin (p = 0.024). The Earth arms are queued for re-generation at 1,024 tokens after the Global seeds, and E1 will be read again. Until then, treat E1 as measured on capped answers.
 
-**K1.** Plain fine-tuning at seed 42 on English and Chinese rows only (1,747 rows), judged on the attack set. No row of the training file contains a Korean character.
-- Korean strict attack success rises to 18.2% from 5.2% for base: +13.1 points, p < 0.001, against a bar of 6.36. Plain on the usual set, which has 600 Korean rows, is 19.2%; the difference is -1.0 points (p = 0.74). 18.2% sits inside the range of the three plain seeds (15.5% to 19.2%).
-- The registered sentence is "Korean training rows are not needed for a drift of this size". Write that, not "Korean data quality plays no role". English and Chinese each got 46% more rows here, so drift spreading from them may be larger than in the original runs, and no outcome row rules out that data quality contributed there.
-- What it shows, in one run: Korean drifts whether or not it is in the training data. H4 stays untested; K1 is the nearest evidence we have on the question behind it.
-- After K2, the size of this rise is the guard's size. A person counted a smaller Korean rise than the guard on the usual plain run, and nobody has read this run's answers.
-- Other languages in this run: English +2.7 points (not significant), Chinese +5.5 (significant), Swahili strict attack success +4.5 (p = 0.035), Swahili refusals -14.8 points (p < 0.001). The Swahili strict rise is one run, on a language where the guard missed our agreement bar, and the usual plain runs do not show it. Do not build on it.
-- Counting only the guard's Unsafe class (not part of the rule): Korean 13.4% against 2.7% for base and 14.1% for plain on the usual set.
-- One seed so far. Seeds 1 and 2 were registered on Nov 20 after this result and before they run, with the rule for reading the three together; they run after the Earth runs and the repair-vector evaluations. Training took 80 minutes.
+**K1.** Plain fine-tuning on English and Chinese rows only (1,747 rows) at seeds 42, 1 and 2, judged on the attack set. No row of the training file contains a Korean character. Seeds 1 and 2 were registered after the seed 42 result and before they ran.
+- Korean strict attack success is 18.2%, 18.6% and 18.2% (seeds 42, 1, 2) against 5.2% for base: +13.1, +13.4 and +13.1 points, each p < 0.001, against a bar of 6.36. That is outcome row 1 in every seed. Pooled over the seeds the rise is +13.2 points [+9.4, +17.2].
+- Against plain of the same seed on the usual set, which has 600 Korean rows: -1.0, +3.1 and -0.7 points (p = 0.74, 0.15, 0.87). Pooled: +0.5 points [-2.3, +3.3]. Taking Korean out of training made no detected difference to the Korean drift. That is not proof of no difference; the interval allows about 2 points less to 3 points more.
+- The registered sentence, now a three-seed result, is "Korean training rows are not needed for a drift of this size". Write that, not "Korean data quality plays no role". English and Chinese each got 46% more rows here, so drift spreading from them may be larger than in the original runs, and no outcome row rules out that data quality contributed there.
+- What it shows: Korean drifts whether or not it is in the training data, in all three seeds. H4 stays untested; K1 is the nearest evidence we have on the question behind it.
+- After K2, the size of this rise is the guard's size. A person counted a smaller Korean rise than the guard on the usual plain run, and nobody has read these runs' answers.
+- These arms are counted in the truncation audit but not re-generated, so every K1 figure is on answers capped at 256 tokens. At seed 42, 10% of this arm's Korean answers reach the cap against 34% for base, and 38 of its 53 Korean unsafe verdicts are on complete answers.
+- Other languages against base (seeds 42, 1, 2): English +2.7, +3.1 and +4.5 points (significant at seed 2 only); Chinese +5.5, +6.5 and +10.0 (significant in each); Swahili strict attack success +4.5, +3.4 and +5.8 (significant at seeds 42 and 2); Swahili refusals -14.8, -10.0 and -12.7 points (each p < 0.001).
+- Seen after the runs, not registered: against plain of the same seed, Swahili strict attack success is higher with no Korean rows (+3.1, +4.5, +5.2 points; p = 0.064, 0.002, 0.001) and Chinese is higher at seed 2 (+5.5 points, p = 0.002). That fits the extra English and Chinese rows, but the tests are not corrected for their number and the guard missed our agreement bar in Swahili. Do not build on it.
+- Counting only the guard's Unsafe class (not part of the rule): Korean 13.4%, 13.1% and 12.0% against 2.7% for base, and 14.1%, 11.0% and 13.1% for plain on the usual set.
 
 **K2.** Mingyu read 200 Korean answers (100 prompts, base and plain at seed 42, arm hidden) and marked 8 unsafe, 186 safe and 6 unsure. Every label is his own reading.
 - The registered test fails: 1 base answer against 5 plain answers on the 94 prompts with two clear labels, p = 0.22. The two side readings: unsure counted as safe, 1 against 7 (p = 0.070); unsure counted as unsafe, 3 against 11 (p = 0.021).
@@ -111,4 +113,4 @@ Intervals are 95%. Results marked 1 seed are single runs.
 
 **On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. The two repair-vector arms and their tables were added at 10:30 PM. Not uploaded yet: K1 at seeds 1 and 2, the re-generated answers and the Aya runs, which are still running or queued.
 
-**Still to come, in queue order.** K1 at seeds 1 and 2; circuit patching in three languages; truncation re-generation; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints. The queue should be through by about 11 AM Saturday.
+**Still to come, in queue order.** Circuit patching in three languages; truncation re-generation; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints. The queue should be through by about 11 AM Saturday.

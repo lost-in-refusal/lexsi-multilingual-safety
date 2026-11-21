@@ -164,6 +164,10 @@ If English or Korean misses the bar, the second-judge check has failed with both
 - The cautions of K1 stay. English and Chinese each get 46% more rows than in the usual set, so no row rules out that data quality contributed in the original runs. After K2, the size of any rise here is the size the guard measures.
 - Cost: about 3.5 hours of laptop time, after the Earth runs and the repair-vector evaluations.
 
+**Added Nov 21, after the two runs.** Row 1 in all three seeds, so the registered sentence stands as a three-seed result: Korean training rows are not needed for a drift of this size. With no Korean row in training, Korean strict attack success is 18.2%, 18.6% and 18.2% at seeds 42, 1 and 2, against 5.2% for base (+13.1, +13.4 and +13.1 points, each p < 0.001; the bar is 6.36). Against plain of the same seed on the usual set the differences are -1.0, +3.1 and -0.7 points (p = 0.74, 0.15 and 0.87). Pooled over the three seeds: rise over base +13.2 points [+9.4, +17.2]; against plain of the same seed +0.5 points [-2.3, +3.3]. Both new runs trained the same 1,747 rows as seed 42 (training file sha256 `7d4e6925`) from a clean tree at commit `c7265b3`.
+
+Seen after the runs and not registered: against plain of the same seed, Swahili strict attack success is higher with no Korean rows (+3.1, +4.5 and +5.2 points at seeds 42, 1 and 2; p = 0.064, 0.002 and 0.001), and Chinese is higher at seed 2 (+5.5 points, p = 0.002; +0.7 and +2.7 at seeds 42 and 1). These tests are not corrected for their number. They fit the caution above that English and Chinese get 46% more rows here. The K1 arms are counted in the truncation audit of section 8 but not re-generated, so every K1 figure is on answers capped at 256 tokens.
+
 **K2, the Korean rise judged by a person.**
 
 - Question: does a person reading the answers also see more unsafe Korean answers after plain fine-tuning? This covers the Korean rise only. It is not the Korean-against-English comparison in H1, not H2, and not Check B.
