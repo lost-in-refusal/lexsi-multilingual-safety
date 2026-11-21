@@ -17,12 +17,14 @@ How many of the base model's top nodes are still in the top set, plain / SafeGra
 
 | Nodes | en | ko | zh | sw |
 |---:|---:|---:|---:|---:|
-| 50 | 3% | not run | not run | not run |
-| 100 | 18% | not run | not run | not run |
-| 200 | 65% | not run | not run | not run |
-| 300 | 89% | not run | not run | not run |
-| 400 | 97% | not run | not run | not run |
+| 50 | 3% | 0% | 0% | 8% |
+| 100 | 18% | 24% | 6% | 7% |
+| 200 | 65% | 91% | 26% | 40% |
+| 300 | 89% | 100% | 60% | 100% |
+| 400 | 97% | 100% | 88% | 100% |
 
 CircuitKIT's rounding: 200 keeps 199 nodes.
+
+CircuitKIT reports the share clipped to the range 0% to 100%. Before clipping: ko -3% at 50; ko 111% at 300; ko 110% at 400; zh -1% at 50; sw 107% at 300; sw 116% at 400. The share is (top nodes - corrupted run) / (whole model - corrupted run): over 100% means the top nodes alone score above the whole model, below 0% means they score below the corrupted run.
 
 No pass rule. A circuit that recovers little of the contrast holds little of the mechanism, so the comparison above says less at that size.

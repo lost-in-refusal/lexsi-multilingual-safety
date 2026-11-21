@@ -588,6 +588,13 @@ def node_md(res: dict) -> str:
         short = sorted({f"{k} keeps {v['kept']}" for d in p.values() for k, v in d.items() if v["kept"] != k})
         if short:
             lines += ["", "CircuitKIT's rounding: " + "; ".join(short) + " nodes."]
+        clipped = [f"{l} {100 * v['raw']:.0f}% at {k}" for l in EVAL_LANGS for k, v in sorted(p.get(l, {}).items())
+                   if v.get("raw") is not None and abs(v["raw"] - v["score"]) > 1e-9]
+        if clipped:
+            lines += ["", "CircuitKIT reports the share clipped to the range 0% to 100%. Before clipping: "
+                      + "; ".join(clipped) + ". The share is (top nodes - corrupted run) / (whole model - corrupted "
+                      "run): over 100% means the top nodes alone score above the whole model, below 0% means they "
+                      "score below the corrupted run."]
         lines += ["", "No pass rule. A circuit that recovers little of the contrast holds little of the mechanism, "
                   "so the comparison above says less at that size."]
     return "\n".join(lines)
@@ -602,8 +609,9 @@ def nodes(a) -> None:
     patching = {}
     for lang in EVAL_LANGS:
         held = (json.loads((out / f"base_{lang}.json").read_text()).get("faithfulness") or {}).get("held_out_by_k", {})
-        patching[lang] = {int(k): {"score": v["patching_score"], "kept": v["n_nodes_kept"]} for k, v in held.items()
-                          if int(k) in a.ks and v.get("patching_score") is not None}
+        patching[lang] = {int(k): {"score": v["patching_score"], "kept": v["n_nodes_kept"],
+                                   "raw": (v.get("metadata") or {}).get("patching_raw_ratio")}
+                          for k, v in held.items() if int(k) in a.ks and v.get("patching_score") is not None}
     res = node_table({k: json.loads(f.read_text()) for k, f in files.items()}, patching)
     rep = Path(a.report)
     write_json(rep / "circuit_nodes.json", res)

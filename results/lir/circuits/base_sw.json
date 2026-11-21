@@ -75,7 +75,216 @@
     "harmful": 0.7509765625,
     "benign": -3.59130859375
   },
-  "faithfulness": null,
+  "faithfulness": {
+    "held_out_families": [
+      "mj-72",
+      "mj-135",
+      "mj-195",
+      "mj-255",
+      "mj-130",
+      "mj-19",
+      "mj-157",
+      "mj-274",
+      "mj-243",
+      "mj-268",
+      "mj-227",
+      "mj-132",
+      "mj-201",
+      "mj-94",
+      "mj-98",
+      "mj-29",
+      "mj-89",
+      "mj-239",
+      "mj-270",
+      "mj-81",
+      "mj-287",
+      "mj-91",
+      "mj-120",
+      "mj-165",
+      "mj-116",
+      "mj-223",
+      "mj-293",
+      "mj-43",
+      "mj-8",
+      "mj-261",
+      "mj-60",
+      "mj-16",
+      "mj-105",
+      "mj-205",
+      "mj-283",
+      "mj-212",
+      "mj-31",
+      "mj-40",
+      "mj-97",
+      "mj-140",
+      "mj-166",
+      "mj-266",
+      "mj-137",
+      "mj-9",
+      "mj-207",
+      "mj-61",
+      "mj-292",
+      "mj-142",
+      "mj-189",
+      "mj-149",
+      "mj-233",
+      "mj-184",
+      "mj-197",
+      "mj-36",
+      "mj-248",
+      "mj-99",
+      "mj-77",
+      "mj-208",
+      "mj-265",
+      "mj-144",
+      "mj-218",
+      "mj-222",
+      "mj-177",
+      "mj-46"
+    ],
+    "held_out_by_k": {
+      "50": {
+        "patching_score": 0.08157894736842106,
+        "ablation_score": null,
+        "stability": null,
+        "robustness": null,
+        "baseline_comparison": null,
+        "generalization": null,
+        "intervention_reliability": null,
+        "metadata": {
+          "patching_raw_ratio": 0.08157894736842106,
+          "algorithm": "eap-ig",
+          "model": "af89d219b53ed9b13b8a4645f9c8028973510324",
+          "task": "lir_refusal_base_sw_heldout",
+          "level": "node",
+          "scope": "unknown",
+          "sparsity": 0.9183006535947712,
+          "pillars_computed": [
+            "patching"
+          ],
+          "timestamp": 1795246217.251092,
+          "total_duration_seconds": 316.8283257484436,
+          "per_pillar_duration_seconds": {
+            "patching": 316.65469002723694
+          }
+        },
+        "n_nodes_kept": 50,
+        "seconds": 318.7
+      },
+      "100": {
+        "patching_score": 0.06578947368421052,
+        "ablation_score": null,
+        "stability": null,
+        "robustness": null,
+        "baseline_comparison": null,
+        "generalization": null,
+        "intervention_reliability": null,
+        "metadata": {
+          "patching_raw_ratio": 0.06578947368421052,
+          "algorithm": "eap-ig",
+          "model": "af89d219b53ed9b13b8a4645f9c8028973510324",
+          "task": "lir_refusal_base_sw_heldout",
+          "level": "node",
+          "scope": "unknown",
+          "sparsity": 0.8349673202614379,
+          "pillars_computed": [
+            "patching"
+          ],
+          "timestamp": 1795246570.556742,
+          "total_duration_seconds": 351.43285608291626,
+          "per_pillar_duration_seconds": {
+            "patching": 351.181499004364
+          }
+        },
+        "n_nodes_kept": 100,
+        "seconds": 353.3
+      },
+      "200": {
+        "patching_score": 0.40131578947368424,
+        "ablation_score": null,
+        "stability": null,
+        "robustness": null,
+        "baseline_comparison": null,
+        "generalization": null,
+        "intervention_reliability": null,
+        "metadata": {
+          "patching_raw_ratio": 0.40131578947368424,
+          "algorithm": "eap-ig",
+          "model": "af89d219b53ed9b13b8a4645f9c8028973510324",
+          "task": "lir_refusal_base_sw_heldout",
+          "level": "node",
+          "scope": "unknown",
+          "sparsity": 0.673202614379085,
+          "pillars_computed": [
+            "patching"
+          ],
+          "timestamp": 1795246950.896121,
+          "total_duration_seconds": 378.4377751350403,
+          "per_pillar_duration_seconds": {
+            "patching": 378.2669949531555
+          }
+        },
+        "n_nodes_kept": 199,
+        "seconds": 380.3
+      },
+      "300": {
+        "patching_score": 1.0,
+        "ablation_score": null,
+        "stability": null,
+        "robustness": null,
+        "baseline_comparison": null,
+        "generalization": null,
+        "intervention_reliability": null,
+        "metadata": {
+          "patching_raw_ratio": 1.0736842105263158,
+          "algorithm": "eap-ig",
+          "model": "af89d219b53ed9b13b8a4645f9c8028973510324",
+          "task": "lir_refusal_base_sw_heldout",
+          "level": "node",
+          "scope": "unknown",
+          "sparsity": 0.5098039215686274,
+          "pillars_computed": [
+            "patching"
+          ],
+          "timestamp": 1795247337.2395468,
+          "total_duration_seconds": 384.47678804397583,
+          "per_pillar_duration_seconds": {
+            "patching": 384.303946018219
+          }
+        },
+        "n_nodes_kept": 300,
+        "seconds": 386.3
+      },
+      "400": {
+        "patching_score": 1.0,
+        "ablation_score": null,
+        "stability": null,
+        "robustness": null,
+        "baseline_comparison": null,
+        "generalization": null,
+        "intervention_reliability": null,
+        "metadata": {
+          "patching_raw_ratio": 1.1578947368421053,
+          "algorithm": "eap-ig",
+          "model": "af89d219b53ed9b13b8a4645f9c8028973510324",
+          "task": "lir_refusal_base_sw_heldout",
+          "level": "node",
+          "scope": "unknown",
+          "sparsity": 0.3464052287581699,
+          "pillars_computed": [
+            "patching"
+          ],
+          "timestamp": 1795247723.797342,
+          "total_duration_seconds": 384.6912751197815,
+          "per_pillar_duration_seconds": {
+            "patching": 384.453360080719
+          }
+        },
+        "n_nodes_kept": 400,
+        "seconds": 386.6
+      }
+    }
+  },
   "seconds": 888.6,
   "memory": {
     "max_rss_gb": 17.64,

@@ -256,7 +256,7 @@ class CircuitSizes(unittest.TestCase):
     def test_checks_per_size(self):
         res = node_table({20: self.compare([18, 12, 12, 15], [17, 14, 14, 16]),   # Korean ties, SafeGrad one short in en
                           40: self.compare([36, 30, 33, 32], [37, 34, 33, 36])},
-                         {"en": {20: {"score": 0.25, "kept": 19}}})
+                         {"en": {20: {"score": 0.25, "kept": 19}}, "ko": {40: {"score": 1.0, "kept": 40, "raw": 1.114}}})
         self.assertEqual([(k, r["n1"], r["n2"]) for k, r in res["sizes"].items()], [(20, False, False), (40, True, True)])
         self.assertEqual((res["n1_fails_at"], res["n2_fails_at"], res["sizes"][20]["chance"]), ([20], [20], 4.0))
         self.assertEqual(res["sizes"][40]["kept"]["ko"], {"plain": 30, "safegrad": 34})
@@ -264,6 +264,8 @@ class CircuitSizes(unittest.TestCase):
         self.assertIn("| 20 | 18 / 17 | 12 / 14 | 12 / 14 | 15 / 16 | 4 | no | no |", md)
         self.assertIn("| 20 | 25% | not run | not run | not run |", md)
         self.assertIn("20 keeps 19 nodes", md)
+        self.assertIn("| 40 | not run | 100% | not run | not run |", md)
+        self.assertIn("Before clipping: ko 111% at 40.", md)
 
 
 class KoreanRiseByHand(unittest.TestCase):

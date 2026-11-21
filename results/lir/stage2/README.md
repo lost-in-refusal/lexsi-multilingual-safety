@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 21, 1:30 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 21, 3:00 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -17,7 +17,7 @@ Updated Nov 21, 1:30 AM ET. Every number comes from our own runs, and the file n
 | K1 Korean with no Korean training rows (added Nov 20) | Outcome row 1 in all three seeds: Korean rows are not needed for a drift of this size | 3 of 3 | Korean strict attack success 18.2%, 18.6% and 18.2% with no Korean rows in training (seeds 42, 1, 2), 19.2%, 15.5% and 18.9% with them, 5.2% base | `noko.md` |
 | K2 Korean rise judged by a person (added Nov 20) | Does not pass | 1 | 5 plain answers against 1 base answer marked unsafe on 94 prompts, p = 0.22 | `ko_drift.md` |
 | Repair vector (exploratory, not registered) | The seed 42 edit lowers Korean attack success at seeds 1 and 2 with no training | 2 | Korean 15.5% to 10.3% and 18.9% to 11.0%. SafeGrad trained at those seeds reaches 8.2% and 9.6% | `vector.md` |
-| Circuit comparison at five node counts (added Nov 20) | Holds at 100, 200 and 300 nodes, not at 50 or 400 | 1 | Korean keeps the fewest base nodes under plain at three of five sizes | `circuit_nodes.md` |
+| Circuit comparison at five node counts (added Nov 20) | Holds at 100, 200 and 300 nodes, not at 50 or 400 | 1 | Korean keeps the fewest base nodes under plain at three of five sizes. At 200 nodes the top nodes recover 65% of the contrast in English, 91% in Korean, 26% in Chinese, 40% in Swahili | `circuit_nodes.md` |
 | Truncation audit (added Nov 20) | Counted. Re-generation queued | 1 to 3 | Base answers reach the 256-token cap far more often than fine-tuned ones: Korean attack 34%, against 8% plain and 8% SafeGrad | `truncation/counts.md` |
 | Harm categories (added Nov 20) | Korean rises in all 8 categories with 20 or more prompts | 3 | Rises from +3.7 to +21.0 points | `harm_categories.md`, `harm_categories.png` |
 | Aya as a second training dataset (added Nov 20) | Registered and queued | 1 | About 190 rows per language, because Aya has 309 usable Korean rows | section 10 of the preregistration |
@@ -88,8 +88,12 @@ Intervals are 95%. Results marked 1 seed are single runs.
 **Circuit node counts.** The stage 1 comparison at 200 nodes, repeated at 50, 100, 200, 300 and 400 of the 612 nodes (seed 42). The sizes 50, 200 and 300 were already known; 100 and 400 are new.
 - "Under plain, Korean keeps the fewest base nodes" holds at 100, 200 and 300. It fails at 50, where Korean and Chinese both keep 39, and at 400, where Korean keeps 344 and Chinese and Swahili 340.
 - "SafeGrad keeps at least as many base nodes as plain in every language" holds at 100, 200, 300 and 400. It fails at 50, where English keeps 45 under SafeGrad and 46 under plain.
-- So do not write "at every circuit size". Write the sizes. At 50 nodes the English circuit recovers 3% of the contrast, and at 400 two random sets would already share 261 nodes, so both ends say little.
-- The patching test for the base model in Korean, Chinese and Swahili is queued; stage 1 ran it for English only.
+- So do not write "at every circuit size". Write the sizes. A sentence that is safe: "At 100, 200 and 300 nodes Korean keeps the fewest of the base model's top nodes after plain fine-tuning; at 50 it ties with Chinese, and at 400 Chinese and Swahili keep slightly fewer."
+- Patching test, now run in all four languages on the base model: the share of the harmful-minus-harmless contrast that the top nodes recover on 64 held-out pairs, at 50 / 100 / 200 / 300 / 400 nodes. English 3 / 18 / 65 / 89 / 97%. Korean 0 / 24 / 91 / 100 / 100%. Chinese 0 / 6 / 26 / 60 / 88%. Swahili 8 / 7 / 40 / 100 / 100%. No pass rule.
+- The tool clips the share to 0% to 100%. Before clipping, Korean is 111% at 300 and Swahili 116% at 400: the top nodes alone score above the whole model there. The table gives every unclipped figure.
+- How to weigh the sizes: at 50 nodes the top set recovers 8% or less in every language, so the two failures at 50 are at a size that holds almost none of the mechanism. At 100 it is under a quarter. The failure of the Korean finding at 400 is different. That size recovers 88% to 100%, so it is a real exception; what limits it is that two random sets would already share 261 of 400 nodes.
+- One node count is not the same share of the mechanism in each language: at 200 nodes it is 91% in Korean and 26% in Chinese. So the Chinese column of the 200-node comparison rests on a quarter of the contrast. Do not write "Korean refusal is more concentrated"; each language has its own pair of first tokens, and that may be what differs.
+- Limits of the patching test: base model only, seed 42, 64 pairs, one token pair per language.
 
 **Truncation.** Counts only so far; nothing has been generated again yet, so draw no conclusion about the headline.
 - Share of attack answers that reach the 256-token cap at seed 42: base 24% English, 34% Korean, 29% Chinese, 36% Swahili; plain 2%, 8%, 5%, 19%; SafeGrad 9%, 8%, 9%, 21%. XSTest is higher for every arm (base 41 to 52%).
@@ -113,4 +117,4 @@ Intervals are 95%. Results marked 1 seed are single runs.
 
 **On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. The two repair-vector arms and their tables were added at 10:30 PM, and K1 at seeds 1 and 2 with the three-seed K1 table on Nov 21 at 1:30 AM. Not uploaded yet: the re-generated answers and the Aya runs, which are still running or queued.
 
-**Still to come, in queue order.** Circuit patching in three languages; truncation re-generation; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints. The queue should be through by about 11 AM Saturday.
+**Still to come, in queue order.** Truncation re-generation; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints. The queue should be through by about 11 AM Saturday.
