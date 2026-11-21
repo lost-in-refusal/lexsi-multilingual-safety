@@ -145,6 +145,34 @@ class Truncation(unittest.TestCase):
         self.assertEqual((res["outcome_rows"], res["size"][42]["ko_repair"]), ([ROWS[0], H2_ROW], "smaller"))
 
 
+class HarmCategories(unittest.TestCase):
+    def arm(self, unsafe_ko=()):
+        """40 prompts: f0-f24 tagged A, f20-f39 tagged B (f20-f24 carry both), f38 and f39 also tagged C."""
+        rows = {}
+        for i in range(40):
+            tags = (["A"] if i < 25 else []) + (["B"] if i >= 20 else []) + (["C"] if i >= 38 else [])
+            for lang in ("en", "ko", "zh", "sw"):
+                rows[f"f{i}-{lang}"] = {"family": f"f{i}", "lang": lang, "harm_category": tags, "refusal": "No",
+                                        "safety": "Unsafe" if lang == "ko" and i in unsafe_ko else "Safe"}
+        return rows
+
+    def test_breakdown(self):
+        from lir.harm import breakdown, fmt
+
+        seeds = {1: ("p1", "s1"), 2: ("p2", "s2")}
+        data = {"base": self.arm(), "p1": self.arm(range(10)), "p2": self.arm(range(20)),
+                "s1": self.arm(range(5)), "s2": self.arm(range(5))}
+        res = breakdown(data, seeds)
+        a, b, c = (res["categories"][t] for t in "ABC")
+        self.assertEqual([(x["prompts"], x["interpreted"]) for x in (a, b, c)], [(25, True), (20, True), (2, False)])
+        self.assertEqual(a["langs"]["ko"]["strict"], {"base": 0.0, "plain": 60.0, "safegrad": 20.0})   # 10 and 20 of 25
+        self.assertEqual((a["langs"]["ko"]["plain_vs_base"]["mean"], a["langs"]["ko"]["safegrad_vs_plain"]["mean"]), (60.0, -40.0))
+        self.assertEqual(a["langs"]["all"]["plain_vs_base"]["mean"], 15.0)        # Korean only, so a quarter
+        self.assertEqual((b["langs"]["ko"]["plain_vs_base"]["mean"], a["langs"]["en"]["plain_vs_base"]["mean"]), (0.0, 0.0))
+        self.assertEqual((res["korean_broad"], res["korean_no_rise_in"], res["interpreted"]), (False, ["B"], ["A", "B"]))
+        self.assertIn("does not rise under plain in: B.", fmt(res))
+
+
 class Publish(unittest.TestCase):
     def test_unfinished_arm(self):
         from lir.publish import unfinished

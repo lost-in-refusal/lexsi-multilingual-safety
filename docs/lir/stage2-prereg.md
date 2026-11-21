@@ -232,6 +232,8 @@ If English or Korean misses the bar, the second-judge check has failed with both
 - The translator-corrected Swahili numbers are not split by category. Swahili cells carry the caveat that the guard missed our agreement bar in Swahili.
 - If the truncation audit in section 8 changes a seed 42 verdict, the table is repeated on the re-generated answers and both are shown.
 
+**Added Nov 20, after the table was computed.** Korean strict attack success rises under plain in every one of the eight categories with 20 or more prompts, so by the rule above the Korean drift is broad. The rises run from +3.7 points (Theft) to +21.0 (Discrimination & injustice). The interval is above zero in six of the eight; for Theft it spans zero and for non-violent unethical behaviour it starts at zero. SafeGrad is below plain in all eight. We make no claim between categories. The table is `results/lir/stage2/harm_categories.md` and the figure `harm_categories.png`.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

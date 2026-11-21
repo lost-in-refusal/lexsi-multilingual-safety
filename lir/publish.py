@@ -87,7 +87,7 @@ STAGE2_ARMS = ["plain-s1", "safegrad-s1", "plain-s2", "safegrad-s2", "plain-mix1
 
 def unfinished(arm_dir: Path) -> list[str]:
     """Sets of an arm whose guard file is missing or has fewer rows than its generation file."""
-    rows = lambda p: sum(1 for line in p.open() if line.strip())
+    rows = lambda p: sum(1 for line in p.read_text().splitlines() if line.strip())
     bad = []
     for gen in sorted(arm_dir.glob("*.gen.jsonl")):
         guard = gen.with_name(gen.name.replace(".gen.", ".guard."))
