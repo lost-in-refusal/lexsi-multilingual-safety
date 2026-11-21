@@ -253,6 +253,49 @@ class AyaChecks(unittest.TestCase):
         self.assertEqual(_in_repo(str(ROOT / "data" / "lir" / "x.jsonl")), "data/lir/x.jsonl")
         self.assertIsNone(_in_repo(None))
 
+    def test_task_report(self):
+        import contextlib
+        import io
+        import json
+        from unittest import mock
+
+        from lir import aya
+
+        def arm(root, name, score, chars, cut=0):
+            d = root / "ayatask" / name
+            d.mkdir(parents=True)
+            gen, judged = [], []
+            for lang in aya.NAMES:
+                for i in range(4):
+                    uid = f"aya-{i}-{lang}"
+                    gen.append({"uid": uid, "lang": lang, "reference": "r" * 10, "response": "a" * chars,
+                                "truncated": lang == "ko" and i < cut})
+                    s = score - (1 if lang == "ko" and i == 0 else 0)
+                    judged.append({"uid": uid, "lang": lang, "task_score": float(s),
+                                   "scores": {"accuracy": s, "instruction_following": s, "coherence": s, "fluency": s}})
+            for file, rows in (("gen.jsonl", gen), ("judge.jsonl", judged)):
+                (d / file).write_text("".join(json.dumps(r) + "\n" for r in rows))
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            arm(root, "base", 6, 40)
+            arm(root, "plain", 5, 20, cut=1)
+            arm(root, "safegrad", 4, 30, cut=2)
+            with mock.patch.object(aya, "RUNS", root), mock.patch.object(aya, "OUT", root / "out"), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                aya.taskreport(None)
+            res = json.loads((root / "out" / "task.json").read_text())
+            text = (root / "out" / "task.md").read_text()
+        self.assertAlmostEqual(res["safegrad"]["en"]["delta"], -2)
+        x = res["beside"]
+        self.assertAlmostEqual(x["safegrad_vs_plain"]["safegrad"]["sw"]["delta"], -1)
+        self.assertEqual(list(x["safegrad_vs_plain"]), ["safegrad"])              # no Aya pair in this folder
+        self.assertEqual((x["cut_at_cap"]["safegrad"]["ko"], x["cut_at_cap"]["plain"]["en"]), (2, 0))
+        self.assertEqual((x["median_chars"]["reference"]["zh"], x["median_chars"]["plain"]["zh"]), (10, 20))
+        self.assertAlmostEqual(x["sub_scores"]["base"]["ko"]["accuracy"], 5.75)
+        self.assertIn("| base | 6.00 | 5.75 | 6.00 | 6.00 |", text)
+        self.assertIn("- Bactrian-X: en -1.00 [", text)
+
 
 class Publish(unittest.TestCase):
     def test_unfinished_arm(self):

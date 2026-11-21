@@ -340,10 +340,32 @@ def taskreport(a) -> None:
                 lo, hi = boot_delta(pairs)
                 cell.update(delta=sum(y - x for x, y in pairs) / len(pairs), ci95=[lo, hi], p=centered_boot_p(pairs))
             res[arm][lang] = cell
-    OUT.mkdir(parents=True, exist_ok=True)
-    write_json(OUT / "task.json", res)
     order = [x for x in ("base", "plain", "safegrad", "aya-plain", "aya-safegrad") if x in res] + \
             sorted(x for x in res if x not in ("base", "plain", "safegrad", "aya-plain", "aya-safegrad"))
+    # description beside the table: section 10 registers no test on this set
+    gens = {arm: {r["uid"]: r for r in read_jsonl(RUNS / "ayatask" / arm / "gen.jsonl")} for arm in scores}
+    median = lambda xs: sorted(xs)[len(xs) // 2] if len(xs) % 2 else sum(sorted(xs)[len(xs) // 2 - 1:len(xs) // 2 + 1]) / 2
+    per = lambda arm, fn: {l: fn([g for g in gens[arm].values() if g["lang"] == l]) for l in NAMES}
+    extra = {"safegrad_vs_plain": {}, "sub_scores": {},
+             "cut_at_cap": {arm: per(arm, lambda gs: sum(bool(g["truncated"]) for g in gs)) for arm in order},
+             "median_chars": {"reference": per("base", lambda gs: median([len(g["reference"]) for g in gs])),
+                              **{arm: per(arm, lambda gs: median([len(g["response"]) for g in gs])) for arm in order}}}
+    for arm in order:
+        extra["sub_scores"][arm] = {}
+        for lang in NAMES:
+            got = [r["scores"] for r in scores[arm].values() if r["lang"] == lang and r.get("scores")]
+            extra["sub_scores"][arm][lang] = {k: sum(x[k] for x in got) / len(got) for k in got[0]} if got else {}
+    for p_arm, s_arm in (("plain", "safegrad"), ("aya-plain", "aya-safegrad")):
+        if p_arm in scores and s_arm in scores:
+            extra["safegrad_vs_plain"][s_arm] = {}
+            for lang in NAMES:
+                pairs = [(scores[p_arm][u]["task_score"], r["task_score"]) for u, r in scores[s_arm].items()
+                         if r["lang"] == lang and r["task_score"] is not None and scores[p_arm][u]["task_score"] is not None]
+                lo, hi = boot_delta(pairs)
+                extra["safegrad_vs_plain"][s_arm][lang] = {"n": len(pairs), "delta": sum(y - x for x, y in pairs) / len(pairs),
+                                                           "ci95": [lo, hi], "p": centered_boot_p(pairs)}
+    OUT.mkdir(parents=True, exist_ok=True)
+    write_json(OUT / "task.json", {**res, "beside": extra})
     lines = ["### Task score (1-7) on the held-out Aya prompts", "",
              "| Arm | " + " | ".join(NAMES) + " |", "|---|" + "---:|" * len(NAMES)]
     for arm in order:
@@ -351,6 +373,24 @@ def taskreport(a) -> None:
         lines.append(f"| {arm} | " + " | ".join(cell(res[arm][l]) for l in NAMES) + " |")
     lines += ["", "100 prompts per language, never trained on; Swahili is in no training set. Brackets: change against base on "
               "the same prompts, * = p < 0.05 (centred paired bootstrap). Scored by the same task judge as the Bactrian-X task set."]
+    head = "| " + " | ".join(NAMES) + " |"
+    rule = "|---|" + "---:|" * len(NAMES)
+    table = lambda title, rows, fmt: ["", title, "", "| Arm " + head, rule] + [
+        f"| {name} | " + " | ".join(fmt(row[l]) for l in NAMES) + " |" for name, row in rows.items()]
+    lines += ["", "### Beside the table, not registered", "",
+              "Section 10 registers no test on this set, so everything here is description. Single runs at seed 42. The judge "
+              "sees one reference answer per prompt, and no person has checked its scores on Aya prompts or in Swahili."]
+    if extra["safegrad_vs_plain"]:
+        lines += ["", "SafeGrad against plain trained on the same set: change in task score with its 95% interval, * = p < 0.05.", ""]
+        for s_arm, row in extra["safegrad_vs_plain"].items():
+            lines.append(f"- {'Aya' if s_arm.startswith('aya') else 'Bactrian-X'}: " + ", ".join(
+                f"{l} {c['delta']:+.2f} [{c['ci95'][0]:+.2f}, {c['ci95'][1]:+.2f}]{'*' if c['p'] < 0.05 else ''}"
+                for l, c in row.items()))
+    lines += table("Accuracy, the sub-score that moves most (1-7). The other three are in `task.json`.",
+                   {arm: {l: extra["sub_scores"][arm][l].get("accuracy") for l in NAMES} for arm in order},
+                   lambda v: "-" if v is None else f"{v:.2f}")
+    lines += table("Median answer length in characters.", extra["median_chars"], lambda v: f"{v:.0f}")
+    lines += table("Answers that reached the 1,024-token cap, of 100 per language.", extra["cut_at_cap"], str)
     (OUT / "task.md").write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
 
