@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -80,9 +81,11 @@ def push_adapter(api: HfApi, arm: str, public: bool) -> None:
     print("pushed", repo_id)
 
 
-# Finished stage 2 arms. Arms still being generated or judged are added by name once they are complete.
+# Stage 2 arms. The second list was still running when the first went up; each joins an upload once it is fully judged.
 STAGE2_ARMS = ["plain-s1", "safegrad-s1", "plain-s2", "safegrad-s2", "plain-mix1", "plain-mix5", "plain-noko",
                "earth-base", "earth-plain", "earth-safegrad"]
+STAGE2_LATER = ["plain-s1-vec", "plain-s2-vec", "plain-noko-s1", "plain-noko-s2", "aya-plain", "aya-safegrad", "plain-ayasize"]
+TRUNC_ARMS = ["base", "plain", "safegrad"] + STAGE2_ARMS  # arms whose capped answers may have been generated again
 
 
 def unfinished(arm_dir: Path) -> list[str]:
@@ -93,34 +96,69 @@ def unfinished(arm_dir: Path) -> list[str]:
         guard = gen.with_name(gen.name.replace(".gen.", ".guard."))
         if not guard.exists() or rows(guard) < rows(gen):
             bad.append(gen.name.split(".")[0])
+    task, scores = arm_dir / "task.gen.jsonl", arm_dir / "task.judge.jsonl"   # the task judge runs as its own step
+    if task.exists() and "task" not in bad and (not scores.exists() or rows(scores) < rows(task)):
+        bad.append("task scores")
     return bad
 
 
-def push_stage2(api: HfApi, arms: list[str], dry_run: bool) -> None:
-    """Add stage 2 arm folders, the NLLB re-translations and the stage 2 tables to the outputs repo.
+def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool) -> None:
+    """Add stage 2 outputs to the outputs repo: arm folders, re-generated answers, Aya task answers, the NLLB
+    re-translations and the committed stage 2 tables.
 
-    Nothing already in the repo is removed or replaced except the README card. The repo is public, so the files
-    are public as soon as they are uploaded.
+    Nothing already in the repo is removed, and only the README card and files whose content changed are
+    replaced. The repo is public, so the files are public as soon as they are uploaded. With no arms given, every
+    finished stage 2 arm goes up and the ones still running are named and left out.
     """
+    from lir import trunc
+
+    waiting = []
+    if arms is None:
+        arms = list(STAGE2_ARMS)
+        for arm in STAGE2_LATER:
+            d = RUNS / "eval" / arm
+            if d.is_dir() and not unfinished(d):
+                arms.append(arm)
+            else:
+                waiting.append(arm)
     for arm in arms:
         d = RUNS / "eval" / arm
         if not d.is_dir():
             sys.exit(f"{arm}: no outputs at {d}")
         if bad := unfinished(d):
             sys.exit(f"{arm}: not fully judged yet ({', '.join(bad)}); nothing uploaded")
+    rows = lambda p: sum(1 for line in p.read_text().splitlines() if line.strip())
     with tempfile.TemporaryDirectory() as tmp:
         t = Path(tmp)
         for arm in arms:
             shutil.copytree(RUNS / "eval" / arm, t / arm)
+        again = [arm for arm in TRUNC_ARMS if all(trunc.after(arm, name) is not None for name in trunc.SETS)]
+        for arm in again:
+            shutil.copytree(trunc.REGEN / arm, t / "truncation-regenerated" / arm)
+        aya = [d.name for d in sorted((RUNS / "ayatask").glob("*")) if (d / "gen.jsonl").exists()
+               and (d / "judge.jsonl").exists() and rows(d / "judge.jsonl") == rows(d / "gen.jsonl")]
+        for arm in aya:
+            shutil.copytree(RUNS / "ayatask" / arm, t / "aya-task" / arm)
         bt = t / "judge-check-backtranslations"
         bt.mkdir()
         for p in sorted((RUNS / "swcheck").glob("*.nllb.bt*.jsonl")):
             shutil.copy(p, bt / p.name)
-        shutil.copytree(ROOT / "results" / "lir" / "stage2", t / "stage2", ignore=shutil.ignore_patterns("README.md"))
+        # only tables that are committed: a result file a queue step has just written has not been read yet
+        res = Path("results") / "lir" / "stage2"
+        tracked = subprocess.run(["git", "ls-files", str(res)], cwd=ROOT, capture_output=True, text=True, check=True)
+        for rel in tracked.stdout.splitlines():
+            if Path(rel).name != "README.md":
+                dest = t / "stage2" / Path(rel).relative_to(res)
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(ROOT / rel, dest)
         shutil.copy(CARDS / "evals.md", t / "README.md")
         files = sorted(p for p in t.rglob("*") if p.is_file())
         size = sum(p.stat().st_size for p in files)
         print(f"{len(files)} files, {size / 1e6:.1f} MB -> {EVAL_REPO}")
+        print("arms:", ", ".join(arms))
+        print("re-generated answers:", ", ".join(again) or "none yet", "| Aya task answers:", ", ".join(aya) or "none yet")
+        if waiting:
+            print("not finished, left out:", ", ".join(waiting))
         if dry_run:
             for p in files:
                 print(" ", p.relative_to(t))
@@ -170,17 +208,17 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("what", choices=["data", "evals", "adapter", "space", "stage2"])
     ap.add_argument("--arm")
-    ap.add_argument("--arms", nargs="+", default=["base", "plain", "safegrad"])
+    ap.add_argument("--arms", nargs="+")
     ap.add_argument("--public", action="store_true")
     ap.add_argument("--dry-run", action="store_true", help="stage2 only: list the files and upload nothing")
     a = ap.parse_args()
     api = HfApi()
     if a.what == "stage2":
-        push_stage2(api, STAGE2_ARMS if a.arms == ap.get_default("arms") else a.arms, a.dry_run)
+        push_stage2(api, a.arms, a.dry_run)
     elif a.what == "data":
         push_data(api, a.public)
     elif a.what == "evals":
-        push_evals(api, a.arms, a.public)
+        push_evals(api, a.arms or ["base", "plain", "safegrad"], a.public)
     elif a.what == "space":
         push_space(api, a.public)
     else:

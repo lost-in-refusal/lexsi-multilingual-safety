@@ -238,6 +238,8 @@ class Publish(unittest.TestCase):
             self.assertEqual(unfinished(d), ["task", "xstest"])
             (d / "xstest.guard.jsonl").write_text("{}\n{}\n")
             (d / "task.guard.jsonl").write_text("{}\n")
+            self.assertEqual(unfinished(d), ["task scores"])           # guard done, task judge not run yet
+            (d / "task.judge.jsonl").write_text("{}\n")
             self.assertEqual(unfinished(d), [])
 
 
