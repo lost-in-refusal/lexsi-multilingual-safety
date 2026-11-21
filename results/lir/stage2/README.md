@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 20, 9:40 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 20, 9:45 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -101,5 +101,7 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - The figure shows the change against base under plain and under SafeGrad, for Korean and for the four languages together.
 
 **Aya.** Not run yet. The Aya Dataset has 361 Korean rows, 309 after the filters, so the plan's 600 rows per language cannot be met. The registered rule: 100 rows per language held out as the Aya task set, and the same number of training rows in English, Korean and Chinese, about 190 each. A plain run on Bactrian-X cut to the same size is the control, so a weaker drift on Aya can be told apart from a smaller fine-tune. Tiny Aya's model card names no training data, and Cohere built both the model and the dataset, so the model may have seen these rows.
+
+**On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. Not uploaded yet: the repair-vector arms, K1 at seeds 1 and 2, the re-generated answers and the Aya runs, which are still running.
 
 **Still to come, in queue order.** Repair-vector evaluations; K1 at seeds 1 and 2; circuit patching in three languages; truncation re-generation; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints. The queue should be through by about 11 AM Saturday.
