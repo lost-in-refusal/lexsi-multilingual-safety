@@ -46,6 +46,24 @@ Only prompts where every arm's answer was complete or its re-generation starts w
 - Seed 1: Korean rise after minus before +0.3 points [-0.7, +1.4]: unchanged within noise.
 - Seed 2: Korean rise after minus before +0.3 points [-0.7, +1.4]: unchanged within noise.
 
+### Tiny Aya Earth, seed 42
+
+| | en | ko | zh | sw | macro |
+|---|---:|---:|---:|---:|---:|
+| base, before | 7.9 | 10.7 | 11.0 | 7.6 | 9.3 |
+| plain, before | 8.9 | 21.3 | 13.4 | 6.5 | 12.5 |
+| safegrad, before | 5.8 | 16.5 | 8.9 | 5.5 | 9.2 |
+| base, after | 7.2 | 7.9 | 10.0 | 4.5 | 7.4 |
+| plain, after | 8.9 | 21.0 | 12.7 | 5.8 | 12.1 |
+| safegrad, after | 5.8 | 15.5 | 9.3 | 6.2 | 9.2 |
+
+- Before: Korean rise +10.7 points (p = 5.54e-06), English rise +1.0; gap +9.6 points [+4.5, +14.8]. SafeGrad against plain on Korean -4.8 points [-8.9, -1.0]. Swahili refusals -6.9 points [-11.3, -2.4]. H1 pass, H2 pass, H3 pass.
+- After: Korean rise +13.1 points (p = 1.37e-08), English rise +1.7; gap +11.3 points [+6.2, +16.8]. SafeGrad against plain on Korean -5.5 points [-9.6, -1.7]. Swahili refusals -8.2 points [-13.1, -3.8]. H1 pass, H2 pass, H3 pass.
+- Size of the Korean rise, after minus before: +2.4 points [+0.3, +4.5]: larger.
+- SafeGrad against plain on Korean, after minus before: -0.7 points [-2.1, +0.7]: the repair is unchanged within noise.
+- E1 before: holds.
+- E1 after: holds.
+
 ### What was generated again
 
 | Arm | Set | Answers | Start with the original | Still cut at the new cap |
@@ -64,6 +82,12 @@ Only prompts where every arm's answer was complete or its re-generation starts w
 | plain-s2 | xstest | 131 | 44 | 4 |
 | safegrad-s2 | attack | 121 | 46 | 5 |
 | safegrad-s2 | xstest | 165 | 84 | 11 |
+| earth-base | attack | 426 | 150 | 7 |
+| earth-base | xstest | 557 | 294 | 22 |
+| earth-plain | attack | 95 | 30 | 12 |
+| earth-plain | xstest | 139 | 56 | 14 |
+| earth-safegrad | attack | 183 | 66 | 8 |
+| earth-safegrad | xstest | 170 | 66 | 12 |
 
 ### Over-refusal on XSTest (%), before -> after
 
@@ -76,3 +100,6 @@ Only prompts where every arm's answer was complete or its re-generation starts w
 | safegrad-s1 | 8.8 -> 8.8 | 7.2 -> 7.2 | 6.4 -> 6.4 | 6.0 -> 6.0 |
 | plain-s2 | 6.0 -> 6.0 | 5.6 -> 5.2 | 5.6 -> 5.6 | 3.6 -> 3.6 |
 | safegrad-s2 | 10.8 -> 10.8 | 7.2 -> 7.2 | 6.4 -> 6.4 | 6.0 -> 6.0 |
+| earth-base | 9.2 -> 9.2 | 8.0 -> 8.0 | 6.4 -> 6.4 | 6.8 -> 6.4 |
+| earth-plain | 6.0 -> 6.0 | 4.8 -> 4.8 | 4.8 -> 5.2 | 4.0 -> 4.8 |
+| earth-safegrad | 9.6 -> 9.6 | 8.4 -> 8.4 | 6.0 -> 6.0 | 4.8 -> 4.8 |

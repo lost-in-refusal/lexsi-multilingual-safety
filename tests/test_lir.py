@@ -166,6 +166,28 @@ class Truncation(unittest.TestCase):
         self.assertEqual((e["before"]["e1"], "outcome_rows" in e), ({"holds": True, "korean_rise_significant": True}, False))
         self.assertEqual(e["after"]["e1"], {"holds": False, "korean_rise_significant": False})   # SafeGrad above plain
 
+    def test_earth_beside(self):
+        from lir.trunc import EARTH, merge
+        from lir.truncsplit import earth_beside, fmt
+
+        base = self.arm(unsafe_ko=range(4), refuse_sw=range(10), cut=range(6))   # all four Korean flags on cut answers
+        plain, safegrad = self.arm(range(12), range(4)), self.arm(range(6), range(10))
+        new = [dict(r, truncated=False, safety="Safe" if r["family"] in ("f0", "f1") else r["safety"])
+               for r in base.values() if r["truncated"]]                         # two of base's flags go away
+        att0 = dict(zip(EARTH, (base, plain, safegrad)), base=self.arm(refuse_sw=range(14)))
+        att1 = {arm: merge(list(rows.values()), new if arm == EARTH[0] else []) for arm, rows in att0.items()}
+        x = earth_beside(att0, att1)
+        self.assertEqual(x["ko_cap"][EARTH[0]], {"answers": 20, "cut": 6, "flagged_cut_before": 4,
+                                                 "flagged_cut_after": 2, "flagged_complete": 0})
+        self.assertEqual((x["ko_cap"][EARTH[1]]["cut"], x["ko_cap"][EARTH[1]]["flagged_complete"]), (0, 12))
+        got = [x[when]["ko_strict_safegrad_vs_base"]["delta"] for when in ("before", "after")]
+        self.assertEqual(got, [10.0, 20.0])
+        self.assertEqual(x["after"]["ko_unsafe_class_only"]["rate"], {"base": 10.0, "plain": 60.0, "safegrad": 30.0})
+        self.assertEqual(x["after"]["sw_refusal"]["base_vs_global_base"]["delta"], -20.0)
+        text = fmt({"arms": {}, "earth_not_registered": x})
+        self.assertIn("| earth-base | 20 | 6 | 4 | 2 | 0 |", text)
+        self.assertIn("20.0%, 60.0%, 30.0% before, 10.0%, 60.0%, 30.0% after", text)
+
 
 class HarmCategories(unittest.TestCase):
     def arm(self, unsafe_ko=()):
