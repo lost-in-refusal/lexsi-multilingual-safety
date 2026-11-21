@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from lir import guard, judge, labelpack, metrics
-from lir.circuits import pruned_for_top_k
+from lir.circuits import node_md, node_table, pruned_for_top_k
 from lir.common import rank_key
 
 
@@ -98,6 +98,29 @@ class Labels(unittest.TestCase):
             b = self.write(d, "b.csv", [("L000", "no")])
             with self.assertRaises(SystemExit):
                 labelpack.merge([a, b])
+
+
+class CircuitSizes(unittest.TestCase):
+    def compare(self, plain, safegrad, n=100):
+        """Overlap matrix with the given base-vs-arm counts per language (en, ko, zh, sw)."""
+        langs = ("en", "ko", "zh", "sw")
+        runs = [f"{t}/{l}" for t in ("base", "plain", "safegrad") for l in langs]
+        o = [[0] * len(runs) for _ in runs]
+        for i, l in enumerate(langs):
+            o[i][4 + i], o[i][8 + i] = plain[i], safegrad[i]
+        return {"runs": runs, "overlap": o, "n_nodes": n}
+
+    def test_checks_per_size(self):
+        res = node_table({20: self.compare([18, 12, 12, 15], [17, 14, 14, 16]),   # Korean ties, SafeGrad one short in en
+                          40: self.compare([36, 30, 33, 32], [37, 34, 33, 36])},
+                         {"en": {20: {"score": 0.25, "kept": 19}}})
+        self.assertEqual([(k, r["n1"], r["n2"]) for k, r in res["sizes"].items()], [(20, False, False), (40, True, True)])
+        self.assertEqual((res["n1_fails_at"], res["n2_fails_at"], res["sizes"][20]["chance"]), ([20], [20], 4.0))
+        self.assertEqual(res["sizes"][40]["kept"]["ko"], {"plain": 30, "safegrad": 34})
+        md = node_md(res)
+        self.assertIn("| 20 | 18 / 17 | 12 / 14 | 12 / 14 | 15 / 16 | 4 | no | no |", md)
+        self.assertIn("| 20 | 25% | not run | not run | not run |", md)
+        self.assertIn("20 keeps 19 nodes", md)
 
 
 class KoreanRiseByHand(unittest.TestCase):

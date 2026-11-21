@@ -190,6 +190,8 @@ If English or Korean misses the bar, the second-judge check has failed with both
 - Cost: about 100 minutes of laptop time, after the runs already queued.
 - The stage 1 limits carry over: one pair of first tokens per language, unsigned node scores, 64 pairs, 5 integration steps, seed 42 only. The rank correlation over all 612 nodes does not depend on a size and stays as reported in stage 1.
 
+**Added Nov 20, after the table was computed.** N1 holds at 100, 200 and 300 nodes. It fails at 50, where Korean and Chinese both keep 39, and at 400, where Korean keeps 344 and Chinese and Swahili keep 340. N2 holds at 100, 200, 300 and 400 and fails at 50, where English keeps 45 under SafeGrad and 46 under plain. By the rule above neither finding holds across all five node counts, so we name the sizes. The table is `results/lir/stage2/circuit_nodes.md`. The patching runs for Korean, Chinese and Swahili had not started.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

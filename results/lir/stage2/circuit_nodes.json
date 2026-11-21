@@ -1,0 +1,154 @@
+{
+  "n_nodes": 612,
+  "sizes": {
+    "50": {
+      "kept": {
+        "en": {
+          "plain": 46,
+          "safegrad": 45
+        },
+        "ko": {
+          "plain": 39,
+          "safegrad": 43
+        },
+        "zh": {
+          "plain": 39,
+          "safegrad": 44
+        },
+        "sw": {
+          "plain": 42,
+          "safegrad": 45
+        }
+      },
+      "chance": 4.084967320261438,
+      "n1": false,
+      "n2": false
+    },
+    "100": {
+      "kept": {
+        "en": {
+          "plain": 89,
+          "safegrad": 94
+        },
+        "ko": {
+          "plain": 74,
+          "safegrad": 80
+        },
+        "zh": {
+          "plain": 80,
+          "safegrad": 87
+        },
+        "sw": {
+          "plain": 83,
+          "safegrad": 89
+        }
+      },
+      "chance": 16.33986928104575,
+      "n1": true,
+      "n2": true
+    },
+    "200": {
+      "kept": {
+        "en": {
+          "plain": 181,
+          "safegrad": 185
+        },
+        "ko": {
+          "plain": 156,
+          "safegrad": 170
+        },
+        "zh": {
+          "plain": 164,
+          "safegrad": 175
+        },
+        "sw": {
+          "plain": 161,
+          "safegrad": 178
+        }
+      },
+      "chance": 65.359477124183,
+      "n1": true,
+      "n2": true
+    },
+    "300": {
+      "kept": {
+        "en": {
+          "plain": 265,
+          "safegrad": 280
+        },
+        "ko": {
+          "plain": 240,
+          "safegrad": 260
+        },
+        "zh": {
+          "plain": 250,
+          "safegrad": 260
+        },
+        "sw": {
+          "plain": 253,
+          "safegrad": 272
+        }
+      },
+      "chance": 147.05882352941177,
+      "n1": true,
+      "n2": true
+    },
+    "400": {
+      "kept": {
+        "en": {
+          "plain": 357,
+          "safegrad": 370
+        },
+        "ko": {
+          "plain": 344,
+          "safegrad": 349
+        },
+        "zh": {
+          "plain": 340,
+          "safegrad": 345
+        },
+        "sw": {
+          "plain": 340,
+          "safegrad": 361
+        }
+      },
+      "chance": 261.437908496732,
+      "n1": false,
+      "n2": true
+    }
+  },
+  "n1_fails_at": [
+    50,
+    400
+  ],
+  "n2_fails_at": [
+    50
+  ],
+  "patching": {
+    "en": {
+      "50": {
+        "score": 0.025621816002397362,
+        "kept": 50
+      },
+      "100": {
+        "score": 0.18010188792328438,
+        "kept": 100
+      },
+      "200": {
+        "score": 0.6547797422834881,
+        "kept": 199
+      },
+      "300": {
+        "score": 0.8945160323643991,
+        "kept": 300
+      },
+      "400": {
+        "score": 0.9712316451902907,
+        "kept": 400
+      }
+    },
+    "ko": {},
+    "zh": {},
+    "sw": {}
+  }
+}

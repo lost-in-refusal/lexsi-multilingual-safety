@@ -6,6 +6,7 @@
   python -m lir.circuits compare --tags base plain safegrad
   python -m lir.circuits faithfulness --tag base --ks 612 300 100 50 --device mps   # held-out pairs
   python -m lir.circuits margin --device mps        # the metric with the top-5 opening tokens per side
+  python -m lir.circuits nodes                      # stage 2: the comparison at five circuit sizes (no model run)
 
 Run with .venv-circuit/bin/python. Every language gets the same MultiJail
 families. Clean = harmful prompt, corrupt = a same-language XSTest prompt with
@@ -542,6 +543,75 @@ def compare(a) -> None:
     log(f"\n-> {path}")
 
 
+NODE_KS = (50, 100, 200, 300, 400)
+
+
+def node_table(compares: dict[int, dict], patching: dict[str, dict[int, dict]] | None = None) -> dict:
+    """Base top-k nodes still in the top k under plain and SafeGrad, per circuit size, with the two registered checks.
+
+    N1: under plain, Korean keeps the fewest base nodes of the four languages (a tie for fewest does not count).
+    N2: SafeGrad keeps at least as many base nodes as plain in every language.
+    """
+    sizes = {}
+    for k, d in sorted(compares.items()):
+        at = {r: i for i, r in enumerate(d["runs"])}
+        kept = {l: {arm: d["overlap"][at[f"base/{l}"]][at[f"{arm}/{l}"]] for arm in ("plain", "safegrad")}
+                for l in EVAL_LANGS}
+        sizes[k] = {"kept": kept, "chance": k * k / d["n_nodes"],
+                    "n1": all(kept["ko"]["plain"] < kept[l]["plain"] for l in EVAL_LANGS if l != "ko"),
+                    "n2": all(v["safegrad"] >= v["plain"] for v in kept.values())}
+    res = {"n_nodes": next(iter(compares.values()))["n_nodes"], "sizes": sizes,
+           "n1_fails_at": [k for k, r in sizes.items() if not r["n1"]],
+           "n2_fails_at": [k for k, r in sizes.items() if not r["n2"]]}
+    if patching:
+        res["patching"] = patching
+    return res
+
+
+def node_md(res: dict) -> str:
+    yn = lambda b: "yes" if b else "no"
+    where = lambda ks: "holds at all sizes" if not ks else "fails at " + ", ".join(str(k) for k in ks)
+    lines = ["### Refusal circuit at five node counts (seed 42)", "",
+             f"How many of the base model's top nodes are still in the top set, plain / SafeGrad, out of {res['n_nodes']} nodes.",
+             "", "| Nodes | " + " | ".join(EVAL_LANGS) + " | By chance | N1 | N2 |", "|---:|" + "---|" * len(EVAL_LANGS) + "---:|---|---|"]
+    for k, r in res["sizes"].items():
+        lines.append(f"| {k} | " + " | ".join(f"{r['kept'][l]['plain']} / {r['kept'][l]['safegrad']}" for l in EVAL_LANGS)
+                     + f" | {r['chance']:.0f} | {yn(r['n1'])} | {yn(r['n2'])} |")
+    lines += ["", "- N1, under plain Korean keeps the fewest base nodes (a tie does not count): " + where(res["n1_fails_at"]) + ".",
+              "- N2, SafeGrad keeps at least as many base nodes as plain in every language: " + where(res["n2_fails_at"]) + "."]
+    if "patching" in res:
+        p = res["patching"]
+        cell = lambda l, k: f"{100 * p[l][k]['score']:.0f}%" if k in p.get(l, {}) else "not run"
+        lines += ["", "### Share of the contrast the top nodes recover (base model, 64 held-out pairs)", "",
+                  "| Nodes | " + " | ".join(EVAL_LANGS) + " |", "|---:|" + "---:|" * len(EVAL_LANGS)]
+        lines += [f"| {k} | " + " | ".join(cell(l, k) for l in EVAL_LANGS) + " |" for k in res["sizes"]]
+        short = sorted({f"{k} keeps {v['kept']}" for d in p.values() for k, v in d.items() if v["kept"] != k})
+        if short:
+            lines += ["", "CircuitKIT's rounding: " + "; ".join(short) + " nodes."]
+        lines += ["", "No pass rule. A circuit that recovers little of the contrast holds little of the mechanism, "
+                  "so the comparison above says less at that size."]
+    return "\n".join(lines)
+
+
+def nodes(a) -> None:
+    out, tags = Path(a.out), "base-plain-safegrad"
+    files = {k: out / f"compare_{tags}{'' if k == 50 else f'_k{k}'}.json" for k in a.ks}
+    missing = [f.name for f in files.values() if not f.exists()]
+    if missing:
+        sys.exit("run compare first, missing: " + ", ".join(missing))
+    patching = {}
+    for lang in EVAL_LANGS:
+        held = (json.loads((out / f"base_{lang}.json").read_text()).get("faithfulness") or {}).get("held_out_by_k", {})
+        patching[lang] = {int(k): {"score": v["patching_score"], "kept": v["n_nodes_kept"]} for k, v in held.items()
+                          if int(k) in a.ks and v.get("patching_score") is not None}
+    res = node_table({k: json.loads(f.read_text()) for k, f in files.items()}, patching)
+    rep = Path(a.report)
+    write_json(rep / "circuit_nodes.json", res)
+    md = node_md(res)
+    (rep / "circuit_nodes.md").write_text(md + "\n")
+    log(md)
+
+
 def kv(s: str):
     lang, _, tok = s.partition("=")
     if not tok:
@@ -606,12 +676,16 @@ def main() -> None:
     c.add_argument("--langs", nargs="+", default=EVAL_LANGS)
     c.add_argument("--k", type=int, default=50)
     c.add_argument("--out", default=str(OUT))
+    t = sub.add_parser("nodes", help="stage 2: base nodes kept under plain and SafeGrad at several circuit sizes")
+    t.add_argument("--ks", type=int, nargs="+", default=list(NODE_KS))
+    t.add_argument("--out", default=str(OUT))
+    t.add_argument("--report", default=str(ROOT / "results" / "lir" / "stage2"))
     a = ap.parse_args()
     # CircuitKIT's opt-in TransformerLens patch drops per-forward weight copies
     # (W_U, gated MLP); same scores to ~1e-6 here, ~30% lower peak memory.
     # Read when circuitkit is first imported, so set it before that.
     os.environ.setdefault("CIRCUITKIT_TL_MEMORY_PATCH", "1")
-    {"discover": discover, "faithfulness": faithful, "margin": margin, "compare": compare}[a.cmd](a)
+    {"discover": discover, "faithfulness": faithful, "margin": margin, "compare": compare, "nodes": nodes}[a.cmd](a)
 
 
 if __name__ == "__main__":
