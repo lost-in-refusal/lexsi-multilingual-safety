@@ -177,6 +177,19 @@ If English or Korean misses the bar, the second-judge check has failed with both
 
 **Added Nov 20, after the labels came back.** K2 does not pass. On the 94 prompts where both answers got a yes or a no, Mingyu marked 1 base answer and 5 plain answers unsafe (exact McNemar p = 0.22). With every unsure counted as safe it is 1 against 7 (p = 0.070), and with every unsure counted as unsafe 3 against 11 (p = 0.021). The direction is the guard's in all three, but the registered test fails, so a person has not confirmed the Korean rise. The labeller column reads "kk", which is Mingyu; he confirmed that every label is his own reading with no model's verdict or draft. The guard agrees with the labels on 187 of 194 answers. The first scoring printed 178 of 194 because the scorer matched both answers to a prompt to one guard verdict; that was fixed the same hour, and the test was not affected. The breakdown of the labels by the guard's three classes in `ko_drift.md` was added after scoring and is not registered.
 
+## 7. CircuitKIT across node counts
+
+**Added Nov 20, before the comparisons at 100 and 400 nodes were computed and before any new patching run.** Ram asked for the circuit result at more than one circuit size. Stage 1 compared the three models at the 200 highest-scoring of Tiny Aya's 612 nodes. Three sizes were already computed in stage 1 and we know them: 200, 300 (same ordering as 200) and 50 (Korean ties with Chinese, and SafeGrad keeps one English node fewer than plain). The sizes 100 and 400 are new. They need no model run, because they are read from the node scores saved in stage 1 (seed 42).
+
+- Table: at 50, 100, 200, 300 and 400 nodes, for each language, how many of the base model's top nodes are still in the top set under plain and under SafeGrad, next to the number expected by chance.
+- Two stage 1 findings are checked at each size.
+  - N1. Under plain, Korean keeps the fewest base nodes of the four languages. A tie for fewest counts as not holding.
+  - N2. SafeGrad keeps at least as many base nodes as plain in every language.
+- We write that a finding holds across node counts only if it holds at all five sizes. Otherwise we name the sizes where it fails. From the three sizes we already know, N1 and N2 both fail at 50 and hold at 200 and 300.
+- Patching test. Stage 1 measured how much of the harmful-minus-harmless contrast the top nodes recover on 64 held-out pairs, for the English base model only: 3%, 18%, 65%, 89% and 97% at the five sizes. We run the same test for the base model in Korean, Chinese and Swahili at the same sizes and print it beside the table. No prediction and no pass rule. It shows how much of the mechanism a circuit of each size holds in each language, which is how a reader should weigh the small sizes.
+- Cost: about 100 minutes of laptop time, after the runs already queued.
+- The stage 1 limits carry over: one pair of first tokens per language, unsigned node scores, 64 pairs, 5 integration steps, seed 42 only. The rank correlation over all 612 nodes does not depend on a size and stays as reported in stage 1.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
