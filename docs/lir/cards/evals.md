@@ -49,7 +49,7 @@ as above. Every generation row keeps its `truncated` flag.
 | `plain-s1-vec`, `plain-s2-vec` | Exploratory: the difference between the seed 42 SafeGrad and plain adapters, added to the plain adapters of seeds 1 and 2 with no training |
 | `aya-plain`, `aya-safegrad` | Plain LoRA and SafeGrad trained on rows from the Cohere Aya Dataset in place of Bactrian-X, seed 42 |
 | `plain-ayasize` | Plain LoRA on Bactrian-X cut to the size of the Aya set, seed 42. Attack set only |
-| `truncation-regenerated/<arm>/` | The attack and XSTest answers that reached the 256-token cap, generated again with a cap of 1,024 tokens and judged again. The capped originals stay in the arm folders |
+| `truncation-regenerated/<arm>/` | The attack and XSTest answers that reached the 256-token cap, generated again with a cap of 1,024 tokens and judged again. A new answer is often not the original continued, because the batch an answer is generated in depends on the cap. The capped originals stay in the arm folders |
 | `aya-task/<arm>/` | Answers to 400 held-out Aya prompts (100 each in English, Korean, Chinese and Swahili) and their task-judge scores |
 | `judge-check-backtranslations/*.nllb.*` | Swahili answers the guard passed, translated to English with NLLB-200 3.3B and judged again, for all three seeds |
 | `stage2/` | The stage 2 tables: three seeds (`seeds.md`), mixing, Earth, the run with no Korean rows (`noko.md`), a person's reading of 200 Korean answers (`ko_drift.md`), the second-judge check, the Swahili re-translation, training time and the circuit comparison at five node counts |
