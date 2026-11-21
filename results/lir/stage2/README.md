@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 21, 4:45 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 21, 4:40 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -120,6 +120,6 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - It carries SafeGrad's other effects too. The Swahili refusal rate goes from 44.7% to 56.7% and from 42.3% to 57.0%, above base (50.9%). English over-refusal of safe prompts is 12.0% and 11.6%, against 9.6% for base and 6.0% for plain; the difference from base is not significant. Task score is level with plain (5.81 and 5.82 against 5.85 and 5.88).
 - What it suggests: the repair SafeGrad learned at one seed is a change to the weights that carries over to a model trained at another seed. That is one model, one dataset, one vector and two seeds, and it was added after we had seen the seed results. Treat it as a lead for future work, not as a finding to rest a claim on.
 
-**On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. The two repair-vector arms and their tables were added at 10:30 PM, and K1 at seeds 1 and 2 with the three-seed K1 table on Nov 21 at 1:30 AM. Not uploaded yet: the re-generated answers and the Aya runs, which are still running or queued.
+**On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. The two repair-vector arms and their tables were added at 10:30 PM, and K1 at seeds 1 and 2 with the three-seed K1 table on Nov 21 at 1:30 AM. The seed 42 answers generated again at 1,024 tokens went up at 4:40 AM under `truncation-regenerated/`, with the truncation report. Not uploaded yet: the re-generated answers of seeds 1 and 2 and of Earth, and the Aya runs, which are still running or queued.
 
 **Still to come, in queue order.** Truncation re-generation at seeds 1 and 2; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints; the Earth arms generated again at 1,024 tokens. The queue should be through by about noon Saturday.
