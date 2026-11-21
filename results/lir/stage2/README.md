@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 20, 8:45 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 20, 9:40 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -16,7 +16,11 @@ Updated Nov 20, 8:45 PM ET. Every number comes from our own runs, and the file n
 | Earth E1 and E2 | E1 holds. E2 not confirmed | 1 | Korean strict attack success 10.7% base, 21.3% plain, 16.5% SafeGrad. Swahili refusals fall 6.9 points, against 13.1 on Global | `earth/checks.md` |
 | K1 Korean with no Korean training rows (added Nov 20) | Outcome row 1 at seed 42: Korean rows are not needed for a drift of this size. Seeds 1 and 2 queued | 1 of 3 | Korean strict attack success 18.2% with no Korean rows in training, 19.2% with them, 5.2% base | `noko.md` |
 | K2 Korean rise judged by a person (added Nov 20) | Does not pass | 1 | 5 plain answers against 1 base answer marked unsafe on 94 prompts, p = 0.22 | `ko_drift.md` |
-| Repair vector (exploratory) | Queued | 1 | | `vector.md` |
+| Repair vector (exploratory) | Running | 1 | | `vector.md` |
+| Circuit comparison at five node counts (added Nov 20) | Holds at 100, 200 and 300 nodes, not at 50 or 400 | 1 | Korean keeps the fewest base nodes under plain at three of five sizes | `circuit_nodes.md` |
+| Truncation audit (added Nov 20) | Counted. Re-generation queued | 1 to 3 | Base answers reach the 256-token cap far more often than fine-tuned ones: Korean attack 34%, against 8% plain and 8% SafeGrad | `truncation/counts.md` |
+| Harm categories (added Nov 20) | Korean rises in all 8 categories with 20 or more prompts | 3 | Rises from +3.7 to +21.0 points | `harm_categories.md`, `harm_categories.png` |
+| Aya as a second training dataset (added Nov 20) | Registered and queued | 1 | About 190 rows per language, because Aya has 309 usable Korean rows | section 10 of the preregistration |
 
 Intervals are 95%. Results marked 1 seed are single runs.
 
@@ -78,4 +82,23 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - One labeller, who knows the expected direction and can often guess the arm from the answer's length.
 - The first scoring matched both answers to a prompt to one guard verdict. That is fixed and did not touch the test. The joins for the 120-label set were checked for the same error: every id appears once there, so Check A stands.
 
-**Still to come.** The repair-vector evaluations and K1 at seeds 1 and 2.
+**Circuit node counts.** The stage 1 comparison at 200 nodes, repeated at 50, 100, 200, 300 and 400 of the 612 nodes (seed 42). The sizes 50, 200 and 300 were already known; 100 and 400 are new.
+- "Under plain, Korean keeps the fewest base nodes" holds at 100, 200 and 300. It fails at 50, where Korean and Chinese both keep 39, and at 400, where Korean keeps 344 and Chinese and Swahili 340.
+- "SafeGrad keeps at least as many base nodes as plain in every language" holds at 100, 200, 300 and 400. It fails at 50, where English keeps 45 under SafeGrad and 46 under plain.
+- So do not write "at every circuit size". Write the sizes. At 50 nodes the English circuit recovers 3% of the contrast, and at 400 two random sets would already share 261 nodes, so both ends say little.
+- The patching test for the base model in Korean, Chinese and Swahili is queued; stage 1 ran it for English only.
+
+**Truncation.** Counts only so far; nothing has been generated again yet, so draw no conclusion about the headline.
+- Share of attack answers that reach the 256-token cap at seed 42: base 24% English, 34% Korean, 29% Chinese, 36% Swahili; plain 2%, 8%, 5%, 19%; SafeGrad 9%, 8%, 9%, 21%. XSTest is higher for every arm (base 41 to 52%).
+- In the base model most answers the guard calls unsafe are cut ones (12 of 15 in Korean). Under plain most are complete (40 of 56 in Korean). So the open question is about base: whether its cut answers turn unsafe when they finish, which would shrink the measured rise.
+- The comparison of verdicts on cut and complete answers is a description, not a test. Refusals are short and finish, so the two groups differ in more than the cap.
+- Queued: every cut attack and XSTest answer of base, plain and SafeGrad generated again at 1,024 tokens and judged again, at seed 42 and then seeds 1 and 2, with H1 to H3 recomputed. What counts as "the drift shrinks" is fixed in section 8 of the preregistration.
+
+**Harm categories.** Strict attack success by MultiJail category, averaged over the three seeds. A prompt with several tags counts in each.
+- Korean rises under plain in all eight categories with 20 or more prompts, from +3.7 points (Theft) to +21.0 (Discrimination & injustice). The interval is above zero in six of the eight. SafeGrad is below plain in all eight.
+- This is a description. Do not write that one category drifts more than another: cells are small and no test was run between categories. The ten categories with fewer than 20 prompts are listed in the table and not interpreted.
+- The figure shows the change against base under plain and under SafeGrad, for Korean and for the four languages together.
+
+**Aya.** Not run yet. The Aya Dataset has 361 Korean rows, 309 after the filters, so the plan's 600 rows per language cannot be met. The registered rule: 100 rows per language held out as the Aya task set, and the same number of training rows in English, Korean and Chinese, about 190 each. A plain run on Bactrian-X cut to the same size is the control, so a weaker drift on Aya can be told apart from a smaller fine-tune. Tiny Aya's model card names no training data, and Cohere built both the model and the dataset, so the model may have seen these rows.
+
+**Still to come, in queue order.** Repair-vector evaluations; K1 at seeds 1 and 2; circuit patching in three languages; truncation re-generation; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints. The queue should be through by about 11 AM Saturday.
