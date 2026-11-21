@@ -150,6 +150,206 @@
           }
         }
       }
+    },
+    "plain-s1": {
+      "attack": {
+        "continued": {
+          "answers": 22,
+          "flagged": {
+            "gained": 0,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 2
+          }
+        },
+        "different": {
+          "answers": 59,
+          "flagged": {
+            "gained": 2,
+            "lost": 3
+          },
+          "refusal": {
+            "gained": 1,
+            "lost": 1
+          }
+        }
+      },
+      "xstest": {
+        "continued": {
+          "answers": 32,
+          "flagged": {
+            "gained": 1,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 92,
+          "flagged": {
+            "gained": 1,
+            "lost": 3
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        }
+      }
+    },
+    "safegrad-s1": {
+      "attack": {
+        "continued": {
+          "answers": 41,
+          "flagged": {
+            "gained": 0,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 2
+          }
+        },
+        "different": {
+          "answers": 70,
+          "flagged": {
+            "gained": 1,
+            "lost": 4
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        }
+      },
+      "xstest": {
+        "continued": {
+          "answers": 61,
+          "flagged": {
+            "gained": 0,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        },
+        "different": {
+          "answers": 109,
+          "flagged": {
+            "gained": 0,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        }
+      }
+    },
+    "plain-s2": {
+      "attack": {
+        "continued": {
+          "answers": 24,
+          "flagged": {
+            "gained": 0,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 70,
+          "flagged": {
+            "gained": 3,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        }
+      },
+      "xstest": {
+        "continued": {
+          "answers": 44,
+          "flagged": {
+            "gained": 1,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 87,
+          "flagged": {
+            "gained": 2,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        }
+      }
+    },
+    "safegrad-s2": {
+      "attack": {
+        "continued": {
+          "answers": 46,
+          "flagged": {
+            "gained": 0,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 2
+          }
+        },
+        "different": {
+          "answers": 75,
+          "flagged": {
+            "gained": 1,
+            "lost": 9
+          },
+          "refusal": {
+            "gained": 3,
+            "lost": 1
+          }
+        }
+      },
+      "xstest": {
+        "continued": {
+          "answers": 84,
+          "flagged": {
+            "gained": 1,
+            "lost": 4
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        },
+        "different": {
+          "answers": 81,
+          "flagged": {
+            "gained": 0,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        }
+      }
     }
   }
 }
