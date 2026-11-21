@@ -125,6 +125,8 @@ def harm_figure(res: dict, path) -> None:
 
 
 LANG2 = {"en": "English", "ko": "Korean", "zh": "Chinese", "sw": "Swahili\n(not trained on)"}
+# H1: Korean against English under plain. H2: Korean, SafeGrad against plain. H3: Swahili refusals under plain.
+READ = {("strict", "ko", "plain"), ("strict", "en", "plain"), ("strict", "ko", "safegrad"), ("refusal", "sw", "plain")}
 
 
 def drift_figure(res: dict, path) -> None:
@@ -137,12 +139,12 @@ def drift_figure(res: dict, path) -> None:
     from matplotlib.lines import Line2D
     from matplotlib.ticker import MultipleLocator
 
-    panels = (("strict", "Strict attack success", "more attacks succeed  \u2192", "ko"),
-              ("refusal", "Refusal rate on attack prompts", "\u2190  fewer refusals", "sw"))
+    panels = (("strict", "Strict attack success", "more attacks succeed  \u2192"),
+              ("refusal", "Refusal rate on attack prompts", "\u2190  fewer refusals"))
     series = (("plain", "Plain LoRA", STAGE2["plain"], -0.17), ("safegrad", "SafeGrad LoRA", STAGE2["safegrad"], 0.17))
     langs = list(LANG2)
     fig, axes = plt.subplots(1, 2, figsize=(10.6, 5.0), sharey=True, facecolor=SURFACE)
-    for ax, (metric, title, hint, read) in zip(axes, panels):
+    for ax, (metric, title, hint) in zip(axes, panels):
         ax.set_facecolor(SURFACE)
         ax.grid(axis="x", color=GRID, lw=1)
         ax.set_axisbelow(True)
@@ -153,7 +155,7 @@ def drift_figure(res: dict, path) -> None:
                 ax.plot(c["ci95"], [y + dy] * 2, color=color, lw=1.6, solid_capstyle="round", zorder=2)
                 ax.plot(list(c["seeds"].values()), [y + dy] * len(c["seeds"]), "|", ms=12, mew=1.4, color=color, zorder=3)
                 ax.plot(c["mean"], y + dy, "o", ms=8.5, mfc=color, mec=SURFACE, mew=1.6, zorder=4)
-                if lang == read and (metric, key) != ("refusal", "safegrad"):   # the marks H1 to H3 compare
+                if (metric, lang, key) in READ:   # the marks H1 to H3 compare
                     right = c["mean"] >= 0
                     ax.annotate(f"{c['mean']:+.1f}".replace("-", "\u2212"), (c["ci95"][1] if right else c["ci95"][0], y + dy),
                                 xytext=(7 if right else -7, 0), textcoords="offset points", fontsize=9, color=INK,
@@ -183,7 +185,7 @@ def drift_figure(res: dict, path) -> None:
 
 
 def settings_figure(rows: list[dict], path) -> None:
-    """Korean strict attack success against the setting's own base model, for every training setting."""
+    """Korean strict attack success against the setting's own base model, one row per training setting."""
     import matplotlib
 
     matplotlib.use("Agg")

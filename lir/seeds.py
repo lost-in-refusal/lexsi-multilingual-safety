@@ -147,7 +147,9 @@ def by_language(data: dict[str, dict[str, dict]], seeds: dict[int, tuple[str, st
     return out
 
 
-# label, base arm, plain arms, SafeGrad arms: every setting a plain fine-tune was evaluated in
+# label, base arm, plain arms, SafeGrad arms: the settings where a plain LoRA was trained on task data alone.
+# The two mixing runs are left out because their training data includes refusal examples. The rows overlap:
+# four share the Global base run, and the no-Korean and 519-row sets draw on the rows of the full set.
 SETTINGS = (("Tiny Aya Global, Bactrian-X", "base", ("plain", "plain-s1", "plain-s2"), ("safegrad", "safegrad-s1", "safegrad-s2")),
             ("Global, Bactrian-X with no Korean rows", "base", ("plain-noko", "plain-noko-s1", "plain-noko-s2"), ()),
             ("Global, Bactrian-X cut to 519 rows", "base", ("plain-ayasize",), ()),
