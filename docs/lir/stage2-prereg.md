@@ -234,6 +234,34 @@ If English or Korean misses the bar, the second-judge check has failed with both
 
 **Added Nov 20, after the table was computed.** Korean strict attack success rises under plain in every one of the eight categories with 20 or more prompts, so by the rule above the Korean drift is broad. The rises run from +3.7 points (Theft) to +21.0 (Discrimination & injustice). The interval is above zero in six of the eight; for Theft it spans zero and for non-violent unethical behaviour it starts at zero. SafeGrad is below plain in all eight. We make no claim between categories. The table is `results/lir/stage2/harm_categories.md` and the figure `harm_categories.png`.
 
+## 10. A second training dataset: Aya
+
+**Added Nov 20, before the guard screened any candidate row and before any run on them.** Ram asked for a second training dataset. We use the Cohere Aya Dataset (`CohereLabs/aya_dataset`, revision `f9ea0458`, Apache 2.0, train split): prompts and answers written or edited by people in each language. Like Bactrian-X it stands in for a company's own harmless data. Mingyu builds the set in place of Hannah. When we wrote this we knew every result above and the row counts below. No Aya row had been screened by the guard or trained on.
+
+- Aya is not parallel across languages, so the stage 1 pipeline runs per language: the same text filters, CuratorKIT cleaning and duplicate removal, the trainer's 1,024-token limit, and the same guard screen (a row is kept when the guard says Safe and not a refusal). Prompts that also appear in our Bactrian-X files are dropped. Chinese is Simplified Chinese only.
+- After the text filters there are 2,849 English, 2,130 Chinese, 309 Korean and 276 Swahili rows. The plan asked for 600 training rows per language, and Korean cannot supply that.
+- Rule for the shortfall, fixed now. 100 rows per language (English, Korean, Chinese and Swahili) are held out as the Aya task set, in hash order, and never trained on. Training uses the same number of rows in English, Korean and Chinese: as many as the scarcest of the three has left after the screen and the hold-out, and at most 600. We expect about 190 per language, a third of the Bactrian-X set. Swahili is never trained on.
+- Runs: plain LoRA and SafeGrad on Tiny Aya Global at seed 42, with the same settings and 3 epochs, on the Aya set. SafeGrad uses the same 47 refusal examples as before.
+- Size control: plain LoRA at seed 42 on the first rows of our Bactrian-X set, cut to the same number per language, judged on the attack set. Without it, a weaker drift on Aya could come from the dataset or from the smaller size.
+- Evaluation: the same attack, XSTest and Bactrian-X task sets and the same judges. The Aya task set is scored by the same task judge for the two Aya runs and for base, plain and SafeGrad at seed 42, and for other checkpoints if time allows.
+
+Each check is read at one seed, as in section 8.
+
+- **Y1, the drift.** On Aya, plain raises Korean strict attack success significantly and by more than English, and the gap has a 95% interval above zero.
+- **Y2, the repair.** SafeGrad is below plain on Korean and on the four-language average, and the Korean difference has a 95% interval below zero.
+- **Y3, Swahili.** The Swahili refusal rate falls under plain, with a 95% interval below zero.
+
+| Aya shows | What we report |
+| --- | --- |
+| Y1 holds | The Korean drift appears on a second dataset, written by people, at a third of the size |
+| Y1 fails and the Bactrian-X run of the same size passes Y1's test | The Korean drift did not carry over to Aya, so it depends on the training data |
+| Y1 fails and the Bactrian-X run of the same size fails it too | A fine-tune this small does not show the drift on either dataset, and the second-dataset question stays open |
+| Y2 fails while Y1 holds | The repair did not carry over to the second dataset |
+| Y3 holds or fails | Reported beside H3 with no further claim |
+
+- Known limits. One seed. Tiny Aya's model card names no training data; Cohere built both the model and the Aya Dataset, so the model may have seen these rows, and we say so. Korean has 309 usable rows in all, so the Korean rows are close to everything Aya has. No person has checked the Aya rows by hand.
+- Cost: about 6 hours of laptop time.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

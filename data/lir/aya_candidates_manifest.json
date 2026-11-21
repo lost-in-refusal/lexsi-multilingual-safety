@@ -1,0 +1,61 @@
+{
+  "source": "CohereLabs/aya_dataset",
+  "revision": "f9ea04583f02a8f86404ff6c58bf75fe637df8a2",
+  "split": "train",
+  "license": "apache-2.0",
+  "source_sha256": "51baa85043b569ba117f41516b32d1b0e4e2647fb203a08933f98a556fb1fb06",
+  "languages": {
+    "en": "English",
+    "ko": "Korean",
+    "zh": "Simplified Chinese",
+    "sw": "Swahili"
+  },
+  "per_language": {
+    "en": {
+      "source_rows": 3944,
+      "after_filters": 2849,
+      "candidates": 1000,
+      "drop_reasons": {
+        "refusal_or_disclaimer": 59,
+        "near_empty": 333,
+        "empty_prompt": 2,
+        "dedup_removed": 675,
+        "over_max_len": 26
+      }
+    },
+    "ko": {
+      "source_rows": 361,
+      "after_filters": 309,
+      "candidates": 309,
+      "drop_reasons": {
+        "near_empty": 16,
+        "refusal_or_disclaimer": 3,
+        "dedup_removed": 32,
+        "over_max_len": 1
+      }
+    },
+    "zh": {
+      "source_rows": 3038,
+      "after_filters": 2130,
+      "candidates": 1000,
+      "drop_reasons": {
+        "near_empty": 647,
+        "dedup_removed": 253,
+        "over_max_len": 8
+      }
+    },
+    "sw": {
+      "source_rows": 366,
+      "after_filters": 276,
+      "candidates": 276,
+      "drop_reasons": {
+        "near_empty": 15,
+        "dedup_removed": 70,
+        "over_max_len": 5
+      }
+    }
+  },
+  "ranking": "sha256('42:aya-<row>') ascending",
+  "curation": "text filters as for Bactrian-X; CuratorKIT TextCleaner, ExactDeduplicator, MinHashDeduplicator(0.7) per language; rows over the trainer's 1,024-token limit dropped",
+  "sha256": "6bc9f69a0c4b7da6f5b3bf1523d335985a34392b0d8ac9bbe7702bcf255f05ec"
+}

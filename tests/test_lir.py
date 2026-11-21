@@ -173,6 +173,22 @@ class HarmCategories(unittest.TestCase):
         self.assertIn("does not rise under plain in: B.", fmt(res))
 
 
+class AyaSet(unittest.TestCase):
+    def test_filters_and_sizes(self):
+        from lir.aya import drop_reason, norm, split_sizes
+
+        self.assertEqual(drop_reason("ko", "질문", "짧다"), "near_empty")
+        self.assertEqual(drop_reason("en", "Question", "Twelve chars"), "near_empty")       # English and Swahili need 20
+        self.assertIsNone(drop_reason("zh", "问题", "这是一个足够长的回答。"))
+        self.assertEqual(drop_reason("en", "Question", "As an AI, I do not hold opinions on this."), "refusal_or_disclaimer")
+        self.assertIsNone(drop_reason("sw", "Swali", "Samahani, jibu hili ni refu vya kutosha."))  # no Swahili pattern
+        self.assertEqual(drop_reason("en", "  ", "A long enough answer to keep."), "empty_prompt")
+        self.assertEqual(norm("  What IS\n an adverb? "), "what is an adverb?")
+        self.assertEqual(split_sizes({"en": 900, "ko": 295, "zh": 880}), 195)   # Korean sets the size for all three
+        self.assertEqual(split_sizes({"en": 900, "ko": 800, "zh": 880}), 600)   # never more than 600
+        self.assertEqual(split_sizes({"en": 900, "ko": 60, "zh": 880}), 0)
+
+
 class Publish(unittest.TestCase):
     def test_unfinished_arm(self):
         from lir.publish import unfinished
