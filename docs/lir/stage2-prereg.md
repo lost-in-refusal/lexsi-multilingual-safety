@@ -35,6 +35,8 @@ Runs: plain and SafeGrad at seeds 1 and 2, added to seed 42. The seed changes th
 
 **Costs, no pass rule.** Task score, over-refusal on XSTest and training time, for every seed and both arms.
 
+**Added Nov 21, after every run in this document had been read: two figures.** `results/lir/stage2/drift_by_language.png` and `results/lir/stage2/korean_by_setting.png` are drawn from the same verdict files as the tables, on the capped answers. They show pooled changes against base for cells that no check reads: every language under both arms, for strict attack success and for the refusal rate, and the Korean change in each training setting. Those cells are description. They were computed after all results were known, and no claim rests on one of them. The checks stay H1 to H3 and each setting's own test.
+
 ## 2. Korean clean set
 
 Why: 7 of 30 hand-checked Korean training rows had wrong or off-task answers. This run asks whether those rows cause the Korean drift.
