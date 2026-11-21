@@ -1,0 +1,70 @@
+{
+  "source": "CohereLabs/aya_dataset",
+  "revision": "f9ea04583f02a8f86404ff6c58bf75fe637df8a2",
+  "license": "apache-2.0",
+  "train_rows_per_language": 173,
+  "train_languages": [
+    "en",
+    "ko",
+    "zh"
+  ],
+  "eval_task_rows_per_language": 100,
+  "eval_languages": [
+    "en",
+    "ko",
+    "zh",
+    "sw"
+  ],
+  "passed_screen": {
+    "en": 974,
+    "ko": 304,
+    "zh": 978,
+    "sw": 256
+  },
+  "screening": {
+    "en": {
+      "guard_not_safe": 7,
+      "guard_refusal": 19,
+      "train_near_dup_of_eval": 56
+    },
+    "ko": {
+      "guard_not_safe": 2,
+      "guard_refusal": 3,
+      "train_near_dup_of_eval": 31
+    },
+    "zh": {
+      "guard_refusal": 12,
+      "guard_not_safe": 10,
+      "train_near_dup_of_eval": 37
+    },
+    "sw": {
+      "guard_not_safe": 16,
+      "guard_refusal": 4,
+      "train_near_dup_of_eval": 10
+    }
+  },
+  "annotation_types_train": {
+    "en": {
+      "re-annotations": 76,
+      "original-annotations": 97
+    },
+    "ko": {
+      "re-annotations": 75,
+      "original-annotations": 98
+    },
+    "zh": {
+      "re-annotations": 31,
+      "original-annotations": 142
+    }
+  },
+  "guard": "Qwen3Guard-Gen-4B response moderation on (prompt, answer); kept when Safe and not a refusal",
+  "size_matched_bactrian": {
+    "file": "bactrian_train_ayasize.jsonl",
+    "ids": 173
+  },
+  "files": {
+    "aya_train.jsonl": "5e88476e8ba789237d4d4e606de2025a4ae72be497a7ffbfcf70f1f5f58d38d9",
+    "aya_eval_task.jsonl": "4e0fcc782270d6facb9db075eb16f283fa0d8bbc4641a119aec7e5c194dc1d8b",
+    "bactrian_train_ayasize.jsonl": "7ac613cf327d6df9a0589ed3c1b29af51f4a2c2388c88fe2cd9ff81d1f0b5fb2"
+  }
+}
