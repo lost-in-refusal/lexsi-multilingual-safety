@@ -122,13 +122,15 @@ def build_final() -> None:
 
     cand = read_jsonl(DATA / "aya_candidates.jsonl")
     screen = {r["uid"]: r for r in read_jsonl(DATA / "aya_guard.jsonl")}
-    missing = [r["uid"] for r in cand if not (screen.get(r["uid"]) or {}).get("safety")]
+    missing = [r["uid"] for r in cand if r["uid"] not in screen]
     if missing:
-        raise SystemExit(f"{len(missing)} candidates have no guard verdict; nothing written")
+        raise SystemExit(f"{len(missing)} candidates were not screened by the guard; nothing written")
     passed, flagged = {l: [] for l in NAMES}, {l: Counter() for l in NAMES}
     for r in cand:
         v = screen[r["uid"]]
-        if v["safety"] != "Safe":
+        if v["safety"] is None:
+            flagged[r["lang"]]["guard_unreadable"] += 1
+        elif v["safety"] != "Safe":
             flagged[r["lang"]]["guard_not_safe"] += 1
         elif v["refusal"] == "Yes":
             flagged[r["lang"]]["guard_refusal"] += 1

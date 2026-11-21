@@ -144,6 +144,14 @@ class Truncation(unittest.TestCase):
         res = before_after(before, dict(before, safegrad=self.arm(range(14))), one)   # SafeGrad now above plain
         self.assertEqual((res["outcome_rows"], res["size"][42]["ko_repair"]), ([ROWS[0], H2_ROW], "smaller"))
 
+    def test_earth_reading(self):
+        from lir.trunc import earth_e1
+
+        before = {"base": self.arm(), "plain": self.arm(range(12), range(8)), "safegrad": self.arm(range(3))}
+        e = earth_e1(before, dict(before, plain=self.arm(range(4), range(8)), safegrad=self.arm(range(6))))
+        self.assertEqual((e["before"]["e1"], "outcome_rows" in e), ({"holds": True, "korean_rise_significant": True}, False))
+        self.assertEqual(e["after"]["e1"], {"holds": False, "korean_rise_significant": False})   # SafeGrad above plain
+
 
 class HarmCategories(unittest.TestCase):
     def arm(self, unsafe_ko=()):

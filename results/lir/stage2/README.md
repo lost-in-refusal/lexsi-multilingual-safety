@@ -63,6 +63,7 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - Other languages: plain moves English by +1.0 and Chinese by +2.4 points, neither significant. SafeGrad against plain is -3.1 in English (p = 0.012) and -4.5 in Chinese (p < 0.001).
 - Costs follow Global's pattern. Task score falls under both arms: Korean 6.05 for base, 5.34 for plain and 5.39 for SafeGrad (Global: 6.10, 5.59 and 5.40). Over-refusal of safe prompts averages 7.6% for base, 4.9% for plain and 7.2% for SafeGrad.
 - Both runs trained at clean commits, and no training or evaluation code changed between the three Earth arms. Plain took 74 minutes and SafeGrad 88.
+- E1 has not been through the truncation check yet. Half of base Earth's Korean attack answers reach the 256-token cap, against 6% for Earth plain and 18% for Earth SafeGrad, and the repair margin is thin (p = 0.024). The Earth arms are queued for re-generation at 1,024 tokens after the Global seeds, and E1 will be read again. Until then, treat E1 as measured on capped answers.
 
 **K1.** Plain fine-tuning at seed 42 on English and Chinese rows only (1,747 rows), judged on the attack set. No row of the training file contains a Korean character.
 - Korean strict attack success rises to 18.2% from 5.2% for base: +13.1 points, p < 0.001, against a bar of 6.36. Plain on the usual set, which has 600 Korean rows, is 19.2%; the difference is -1.0 points (p = 0.74). 18.2% sits inside the range of the three plain seeds (15.5% to 19.2%).
