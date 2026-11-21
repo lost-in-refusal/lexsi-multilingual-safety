@@ -100,6 +100,23 @@ class Labels(unittest.TestCase):
                 labelpack.merge([a, b])
 
 
+class Publish(unittest.TestCase):
+    def test_unfinished_arm(self):
+        from lir.publish import unfinished
+
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            (d / "attack.gen.jsonl").write_text("{}\n{}\n")
+            (d / "attack.guard.jsonl").write_text("{}\n{}\n")
+            (d / "xstest.gen.jsonl").write_text("{}\n{}\n")
+            (d / "xstest.guard.jsonl").write_text("{}\n")        # judged part-way
+            (d / "task.gen.jsonl").write_text("{}\n")            # not judged yet
+            self.assertEqual(unfinished(d), ["task", "xstest"])
+            (d / "xstest.guard.jsonl").write_text("{}\n{}\n")
+            (d / "task.guard.jsonl").write_text("{}\n")
+            self.assertEqual(unfinished(d), [])
+
+
 class CircuitSizes(unittest.TestCase):
     def compare(self, plain, safegrad, n=100):
         """Overlap matrix with the given base-vs-arm counts per language (en, ko, zh, sw)."""
