@@ -1,0 +1,1125 @@
+{
+  "cap": {
+    "attack": 256,
+    "xstest": 256,
+    "task": 1024
+  },
+  "arms": {
+    "base": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 69,
+          "strict_truncated": [
+            17,
+            69
+          ],
+          "strict_complete": [
+            3,
+            222
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 98,
+          "strict_truncated": [
+            12,
+            98
+          ],
+          "strict_complete": [
+            3,
+            193
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 84,
+          "strict_truncated": [
+            20,
+            84
+          ],
+          "strict_complete": [
+            5,
+            207
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 104,
+          "strict_truncated": [
+            17,
+            104
+          ],
+          "strict_complete": [
+            1,
+            187
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 102
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 130
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 127
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 125
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 2
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 3
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 4
+        }
+      }
+    },
+    "plain": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 6,
+          "strict_truncated": [
+            1,
+            6
+          ],
+          "strict_complete": [
+            19,
+            285
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 24,
+          "strict_truncated": [
+            16,
+            24
+          ],
+          "strict_complete": [
+            40,
+            267
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 15,
+          "strict_truncated": [
+            7,
+            15
+          ],
+          "strict_complete": [
+            32,
+            276
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 54,
+          "strict_truncated": [
+            10,
+            54
+          ],
+          "strict_complete": [
+            12,
+            237
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 27
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 32
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 20
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 74
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 0
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 4
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 2
+        }
+      }
+    },
+    "safegrad": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 27,
+          "strict_truncated": [
+            5,
+            27
+          ],
+          "strict_complete": [
+            8,
+            264
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 24,
+          "strict_truncated": [
+            9,
+            24
+          ],
+          "strict_complete": [
+            22,
+            267
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 27,
+          "strict_truncated": [
+            10,
+            27
+          ],
+          "strict_complete": [
+            16,
+            264
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 61,
+          "strict_truncated": [
+            8,
+            61
+          ],
+          "strict_complete": [
+            8,
+            230
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 34
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 27
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 22
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 77
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 1
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 7
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 2
+        }
+      }
+    },
+    "plain-s1": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 7,
+          "strict_truncated": [
+            2,
+            7
+          ],
+          "strict_complete": [
+            20,
+            284
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 15,
+          "strict_truncated": [
+            9,
+            15
+          ],
+          "strict_complete": [
+            36,
+            276
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 10,
+          "strict_truncated": [
+            6,
+            10
+          ],
+          "strict_complete": [
+            30,
+            281
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 49,
+          "strict_truncated": [
+            9,
+            49
+          ],
+          "strict_complete": [
+            6,
+            242
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 19
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 26
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 19
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 60
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 2
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 4
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 4
+        }
+      }
+    },
+    "safegrad-s1": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 23,
+          "strict_truncated": [
+            4,
+            23
+          ],
+          "strict_complete": [
+            6,
+            268
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 17,
+          "strict_truncated": [
+            6,
+            17
+          ],
+          "strict_complete": [
+            18,
+            274
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 19,
+          "strict_truncated": [
+            5,
+            19
+          ],
+          "strict_complete": [
+            17,
+            272
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 52,
+          "strict_truncated": [
+            6,
+            52
+          ],
+          "strict_complete": [
+            4,
+            239
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 36
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 39
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 19
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 76
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 3
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 3
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 4
+        }
+      }
+    },
+    "plain-s2": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 13,
+          "strict_truncated": [
+            6,
+            13
+          ],
+          "strict_complete": [
+            20,
+            278
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 23,
+          "strict_truncated": [
+            12,
+            23
+          ],
+          "strict_complete": [
+            43,
+            268
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 13,
+          "strict_truncated": [
+            8,
+            13
+          ],
+          "strict_complete": [
+            30,
+            278
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 45,
+          "strict_truncated": [
+            5,
+            45
+          ],
+          "strict_complete": [
+            15,
+            246
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 25
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 31
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 13
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 62
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 1
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 2
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 2
+        }
+      }
+    },
+    "safegrad-s2": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 21,
+          "strict_truncated": [
+            5,
+            21
+          ],
+          "strict_complete": [
+            7,
+            270
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 23,
+          "strict_truncated": [
+            8,
+            23
+          ],
+          "strict_complete": [
+            20,
+            268
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 23,
+          "strict_truncated": [
+            10,
+            23
+          ],
+          "strict_complete": [
+            16,
+            268
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 54,
+          "strict_truncated": [
+            13,
+            54
+          ],
+          "strict_complete": [
+            6,
+            237
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 27
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 38
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 24
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 76
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 1
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 4
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 2
+        }
+      }
+    },
+    "plain-mix1": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 11,
+          "strict_truncated": [
+            2,
+            11
+          ],
+          "strict_complete": [
+            9,
+            280
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 13,
+          "strict_truncated": [
+            3,
+            13
+          ],
+          "strict_complete": [
+            24,
+            278
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 9,
+          "strict_truncated": [
+            5,
+            9
+          ],
+          "strict_complete": [
+            14,
+            282
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 46,
+          "strict_truncated": [
+            7,
+            46
+          ],
+          "strict_complete": [
+            7,
+            245
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 25
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 24
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 15
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 69
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 1
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 3
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 2
+        }
+      }
+    },
+    "plain-mix5": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 11,
+          "strict_truncated": [
+            2,
+            11
+          ],
+          "strict_complete": [
+            8,
+            280
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 18,
+          "strict_truncated": [
+            4,
+            18
+          ],
+          "strict_complete": [
+            22,
+            273
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 12,
+          "strict_truncated": [
+            6,
+            12
+          ],
+          "strict_complete": [
+            17,
+            279
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 50,
+          "strict_truncated": [
+            7,
+            50
+          ],
+          "strict_complete": [
+            7,
+            241
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 26
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 30
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 19
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 71
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 1
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 2
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 4
+        }
+      }
+    },
+    "plain-noko": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 12,
+          "strict_truncated": [
+            5,
+            12
+          ],
+          "strict_complete": [
+            23,
+            279
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 30,
+          "strict_truncated": [
+            15,
+            30
+          ],
+          "strict_complete": [
+            38,
+            261
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 11,
+          "strict_truncated": [
+            6,
+            11
+          ],
+          "strict_complete": [
+            35,
+            280
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 55,
+          "strict_truncated": [
+            15,
+            55
+          ],
+          "strict_complete": [
+            16,
+            236
+          ]
+        }
+      }
+    },
+    "plain-s1-vec": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 26,
+          "strict_truncated": [
+            5,
+            26
+          ],
+          "strict_complete": [
+            10,
+            265
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 23,
+          "strict_truncated": [
+            8,
+            23
+          ],
+          "strict_complete": [
+            22,
+            268
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 15,
+          "strict_truncated": [
+            5,
+            15
+          ],
+          "strict_complete": [
+            23,
+            276
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 58,
+          "strict_truncated": [
+            10,
+            58
+          ],
+          "strict_complete": [
+            5,
+            233
+          ]
+        }
+      }
+    },
+    "earth-base": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 74,
+          "strict_truncated": [
+            19,
+            74
+          ],
+          "strict_complete": [
+            4,
+            217
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 146,
+          "strict_truncated": [
+            29,
+            146
+          ],
+          "strict_complete": [
+            2,
+            145
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 92,
+          "strict_truncated": [
+            25,
+            92
+          ],
+          "strict_complete": [
+            7,
+            199
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 114,
+          "strict_truncated": [
+            20,
+            114
+          ],
+          "strict_complete": [
+            2,
+            177
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 112
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 165
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 145
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 135
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 2
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 4
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 2
+        }
+      }
+    },
+    "earth-plain": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 13,
+          "strict_truncated": [
+            4,
+            13
+          ],
+          "strict_complete": [
+            22,
+            278
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 17,
+          "strict_truncated": [
+            9,
+            17
+          ],
+          "strict_complete": [
+            53,
+            274
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 16,
+          "strict_truncated": [
+            10,
+            16
+          ],
+          "strict_complete": [
+            29,
+            275
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 49,
+          "strict_truncated": [
+            10,
+            49
+          ],
+          "strict_complete": [
+            9,
+            242
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 26
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 26
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 18
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 69
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 2
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 6
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 4
+        }
+      }
+    },
+    "earth-safegrad": {
+      "attack": {
+        "en": {
+          "n": 291,
+          "truncated": 27,
+          "strict_truncated": [
+            5,
+            27
+          ],
+          "strict_complete": [
+            12,
+            264
+          ]
+        },
+        "ko": {
+          "n": 291,
+          "truncated": 52,
+          "strict_truncated": [
+            16,
+            52
+          ],
+          "strict_complete": [
+            32,
+            239
+          ]
+        },
+        "zh": {
+          "n": 291,
+          "truncated": 29,
+          "strict_truncated": [
+            7,
+            29
+          ],
+          "strict_complete": [
+            19,
+            262
+          ]
+        },
+        "sw": {
+          "n": 291,
+          "truncated": 75,
+          "strict_truncated": [
+            9,
+            75
+          ],
+          "strict_complete": [
+            7,
+            216
+          ]
+        }
+      },
+      "xstest": {
+        "en": {
+          "n": 250,
+          "truncated": 39
+        },
+        "ko": {
+          "n": 250,
+          "truncated": 32
+        },
+        "zh": {
+          "n": 250,
+          "truncated": 25
+        },
+        "sw": {
+          "n": 249,
+          "truncated": 74
+        }
+      },
+      "task": {
+        "en": {
+          "n": 100,
+          "truncated": 1
+        },
+        "ko": {
+          "n": 100,
+          "truncated": 6
+        },
+        "zh": {
+          "n": 100,
+          "truncated": 2
+        }
+      }
+    }
+  },
+  "not_fully_judged": [
+    "plain-s1-vec/xstest",
+    "plain-s1-vec/task"
+  ]
+}

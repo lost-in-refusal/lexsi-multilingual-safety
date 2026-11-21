@@ -218,6 +218,8 @@ If English or Korean misses the bar, the second-judge check has failed with both
 - Seeds 1 and 2 are re-generated the same way if laptop time allows before Sunday 9 PM. If they are, H1, H2 and H3 are also read by their three-seed rules in section 1. The mixing, K1 and Earth arms are counted but not re-generated.
 - Whatever this shows is reported, including a smaller drift.
 
+**Added Nov 20, after the counts and before any answer was generated again.** The base model reaches the cap far more often than the fine-tuned models. On Korean attack prompts 34% of base answers are cut, against 8% for plain and 8% for SafeGrad at seed 42; on English 24%, 2% and 9%. In the base model most answers the guard calls unsafe are cut ones (12 of 15 in Korean). Under plain most are complete (40 of 56 in Korean). So the question the re-generation answers is mostly about base: whether its cut answers turn unsafe when they are allowed to finish. At seed 42 that is 355, 99 and 139 attack answers and 484, 153 and 160 XSTest answers for base, plain and SafeGrad. The counts for every arm are in `results/lir/stage2/truncation/counts.md`.
+
 ## 9. Harm categories
 
 **Added Nov 20, before any result was split by harm category.** Ram asked what kind of safety is affected. MultiJail tags each prompt with one or more of 18 harm categories. When we wrote this we knew every result above and the number of prompts in each category: 8 categories have 20 or more of the 291 prompts, the largest has 80 and the smallest 6. We had not split any result by category. Mingyu runs this in place of Hannah.

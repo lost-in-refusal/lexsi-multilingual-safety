@@ -100,6 +100,51 @@ class Labels(unittest.TestCase):
                 labelpack.merge([a, b])
 
 
+class Truncation(unittest.TestCase):
+    def arm(self, unsafe_ko=(), refuse_sw=range(20), cut=()):
+        rows = {}
+        for i in range(20):
+            for lang in ("en", "ko", "zh", "sw"):
+                rows[f"f{i}-{lang}"] = {"uid": f"f{i}-{lang}", "family": f"f{i}", "lang": lang, "truncated": i in cut,
+                                        "response": f"answer {i} in {lang}, cut off at the cap",
+                                        "safety": "Unsafe" if lang == "ko" and i in unsafe_ko else "Safe",
+                                        "refusal": "Yes" if lang == "sw" and i in refuse_sw else "No"}
+        return rows
+
+    def test_counts_and_merge(self):
+        from lir.trunc import count_rows, keep_matching, merge, same_start
+
+        orig = list(self.arm(unsafe_ko=range(3, 8), cut=range(5)).values())
+        c = count_rows(orig)["ko"]
+        self.assertEqual((c["n"], c["truncated"], c["strict_truncated"], c["strict_complete"]), (20, 5, [2, 5], [3, 15]))
+        self.assertNotIn("strict_truncated", count_rows(orig, verdicts=False)["ko"])
+        self.assertTrue(same_start("the plan is to st", "the plan is to start with a list"))
+        self.assertFalse(same_start("the plan is to start", "I cannot help with that request"))
+        new = [dict(r, response=r["response"] + " and then it goes on", truncated=False, safety="Unsafe")
+               for r in orig if r["truncated"] and r["lang"] == "ko"]
+        new[0]["response"] = "a different answer"
+        m = merge(orig, new)
+        self.assertEqual([m[f"f{i}-ko"]["safety"] for i in (0, 3, 9)], ["Unsafe", "Unsafe", "Safe"])
+        self.assertEqual([(m[u]["regenerated"], m[u]["same_start"]) for u in ("f0-ko", "f1-ko", "f9-ko", "f0-en")],
+                         [(True, False), (True, True), (False, True), (False, True)])  # f0-en: no new answer yet
+        kept = keep_matching({"base": m})["base"]
+        self.assertEqual((len(m) - len(kept), "f0-ko" in kept, "f0-en" in kept), (1, False, True))
+
+    def test_before_after_rows(self):
+        from lir.trunc import H2_ROW, ROWS, before_after
+
+        one = {42: ("plain", "safegrad")}
+        before = {"base": self.arm(), "plain": self.arm(range(12), range(8)), "safegrad": self.arm(range(3))}
+        for ko, row in ((range(12), 0), (range(8), 1), (range(4), 2)):   # Korean rise 60 -> 60, 40, 20 points
+            after = dict(before, plain=self.arm(ko, range(8)), safegrad=self.arm())   # SafeGrad stays well below plain
+            res = before_after(before, after, one)
+            self.assertEqual(res["outcome_rows"], [ROWS[row]])
+            self.assertEqual(res["size"][42]["ko_rise_change"]["mean"], 5.0 * (len(ko) - 12))
+        self.assertEqual(res["before"]["h1"]["verdict"], "pass")
+        res = before_after(before, dict(before, safegrad=self.arm(range(14))), one)   # SafeGrad now above plain
+        self.assertEqual((res["outcome_rows"], res["size"][42]["ko_repair"]), ([ROWS[0], H2_ROW], "smaller"))
+
+
 class Publish(unittest.TestCase):
     def test_unfinished_arm(self):
         from lir.publish import unfinished
