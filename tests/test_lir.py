@@ -337,6 +337,42 @@ class Publish(unittest.TestCase):
             (d / "task.judge.jsonl").write_text("{}\n")
             self.assertEqual(unfinished(d), [])
 
+    def test_stage_adapters(self):
+        import json
+        from unittest import mock
+
+        from lir import publish
+
+        def run(root, arm, record, surgery=False, extra=()):
+            d = root / "runs" / arm / "adapter"
+            d.mkdir(parents=True)
+            (d / "adapter_config.json").write_text("{}")
+            (d / "adapter_model.safetensors").write_bytes((2).to_bytes(8, "little") + b"{}" + b"\0" * 8)
+            for name in extra:
+                (d / name).write_text("x")
+            (d.parent / "run.json").write_text(json.dumps(record))
+            (d.parent / "train_log.jsonl").write_text("{}\n")
+            if surgery:
+                (d.parent / "surgery_log.jsonl").write_text("{}\n")
+
+        inside = str(publish.ROOT / "data" / "lir" / "x.jsonl")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            run(root, "a", {"train_file": inside, "alignment": None}, extra=("tokenizer.json", "README.md"))
+            run(root, "b", {"train_file": "data/lir/y.jsonl", "alignment": {"file": inside, "rows": 3}}, surgery=True)
+            run(root, "c", {"train_file": str(Path.home() / "elsewhere" / "z.jsonl")})
+            with mock.patch.object(publish, "RUNS", root / "runs"):
+                files = publish.stage_adapters(root / "out", ["a", "b"])
+                with self.assertRaises(SystemExit):
+                    publish.stage_adapters(root / "out2", ["c"])
+            names = [str(p.relative_to(root / "out")) for p in files]
+            a, b = (json.loads((root / "out" / x / "run.json").read_text()) for x in "ab")
+        self.assertEqual(names, ["a/adapter_config.json", "a/adapter_model.safetensors", "a/run.json", "a/train_log.jsonl",
+                                 "b/adapter_config.json", "b/adapter_model.safetensors", "b/run.json",
+                                 "b/surgery_log.jsonl", "b/train_log.jsonl"])
+        self.assertEqual((a["train_file"], b["train_file"], b["alignment"]),
+                         ("data/lir/x.jsonl", "data/lir/y.jsonl", {"file": "data/lir/x.jsonl", "rows": 3}))
+
 
 class CircuitSizes(unittest.TestCase):
     def compare(self, plain, safegrad, n=100):

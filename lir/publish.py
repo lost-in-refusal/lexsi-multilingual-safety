@@ -7,6 +7,7 @@ Repos are created private; making them public is a separate, deliberate step
   python -m lir.publish evals --arms base plain safegrad
   python -m lir.publish adapter --arm plain
   python -m lir.publish stage2 --dry-run      # stage 2 arm folders and tables; lists the files, uploads nothing
+  python -m lir.publish adapters --dry-run    # stage 2 adapters, one folder each in a single model repo
 """
 from __future__ import annotations
 
@@ -79,6 +80,74 @@ def push_adapter(api: HfApi, arm: str, public: bool) -> None:
         shutil.copy(CARDS / f"adapter-{arm}.md", t / "README.md")
         api.upload_folder(folder_path=t, repo_id=repo_id, commit_message=f"{arm} LoRA adapter")
     print("pushed", repo_id)
+
+
+ADAPTER_REPO = f"{HF_ORG}/tiny-aya-lora-stage2"
+# One folder each. The seed 42 plain and SafeGrad runs on Tiny Aya Global are the two stage 1 repos.
+STAGE2_ADAPTERS = ["plain-s1", "safegrad-s1", "plain-s2", "safegrad-s2", "plain-mix1", "plain-mix5", "plain-noko",
+                   "plain-noko-s1", "plain-noko-s2", "plain-ayasize", "aya-plain", "aya-safegrad", "earth-plain",
+                   "earth-safegrad", "plain-s1-vec", "plain-s2-vec"]
+
+
+def _relative(x):
+    """A run record with every path under the repository written relative to it."""
+    if isinstance(x, dict):
+        return {k: _relative(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [_relative(v) for v in x]
+    if isinstance(x, str) and x.startswith(f"{ROOT}/"):
+        return x[len(f"{ROOT}/"):]
+    return x
+
+
+def _text(p: Path) -> str:
+    """What a staged file says in text: the whole file, or the header of a safetensors file."""
+    if p.suffix != ".safetensors":
+        return p.read_text()
+    with p.open("rb") as f:
+        return f.read(int.from_bytes(f.read(8), "little")).decode("utf-8", "replace")
+
+
+def stage_adapters(t: Path, arms: list[str]) -> list[Path]:
+    """Copy each arm's adapter weights and config, run record and logs to t/<arm>/. The tokenizer files are the
+    base model's and are left out. Stops if anything staged names the home directory."""
+    import json
+
+    for arm in arms:
+        run, dest = RUNS / arm, t / arm
+        dest.mkdir(parents=True)
+        for name in ["adapter_config.json", "adapter_model.safetensors"]:
+            shutil.copy(run / "adapter" / name, dest / name)
+        record = _relative(json.loads((run / "run.json").read_text()))
+        (dest / "run.json").write_text(json.dumps(record, indent=2) + "\n")
+        for name in ["train_log.jsonl", "surgery_log.jsonl"]:
+            if (run / name).exists():
+                shutil.copy(run / name, dest / name)
+    files = sorted(p for p in t.rglob("*") if p.is_file())
+    for p in files:
+        if str(Path.home()) in _text(p):
+            raise SystemExit(f"{p.relative_to(t)} names the home directory")
+    return files
+
+
+def push_adapters(api: HfApi, arms: list[str] | None, public: bool, dry_run: bool) -> None:
+    """The stage 2 adapters as folders of one model repo, with the card as its README."""
+    arms = arms or STAGE2_ADAPTERS
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        files = stage_adapters(t, arms)
+        shutil.copy(CARDS / "adapters-stage2.md", t / "README.md")
+        files = [t / "README.md"] + files
+        print(f"{len(files)} files, {sum(p.stat().st_size for p in files) / 1e9:.2f} GB -> {ADAPTER_REPO}")
+        if dry_run:
+            for p in files:
+                print(" ", p.relative_to(t))
+            print("dry run: nothing uploaded")
+            return
+        _repo(api, ADAPTER_REPO, "model", public)
+        api.upload_folder(folder_path=t, repo_id=ADAPTER_REPO,
+                          commit_message=f"Stage 2 LoRA adapters: {', '.join(arms)}")
+    print("pushed", ADAPTER_REPO)
 
 
 # Stage 2 arms. The second list was still running when the first went up; each joins an upload once it is fully judged.
@@ -208,11 +277,11 @@ def push_space(api: HfApi, public: bool) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["data", "evals", "adapter", "space", "stage2"])
+    ap.add_argument("what", choices=["data", "evals", "adapter", "adapters", "space", "stage2"])
     ap.add_argument("--arm")
     ap.add_argument("--arms", nargs="+")
     ap.add_argument("--public", action="store_true")
-    ap.add_argument("--dry-run", action="store_true", help="stage2 only: list the files and upload nothing")
+    ap.add_argument("--dry-run", action="store_true", help="stage2 and adapters: list the files and upload nothing")
     ap.add_argument("--aya-task", action="store_true",
                     help="stage2 only: also upload the answers to the held-out Aya prompts (they quote the Aya rows)")
     a = ap.parse_args()
@@ -225,6 +294,8 @@ def main() -> None:
         push_evals(api, a.arms or ["base", "plain", "safegrad"], a.public)
     elif a.what == "space":
         push_space(api, a.public)
+    elif a.what == "adapters":
+        push_adapters(api, a.arms, a.public, a.dry_run)
     else:
         push_adapter(api, a.arm, a.public)
 
