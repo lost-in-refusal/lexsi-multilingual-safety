@@ -50,9 +50,10 @@ as above. Every generation row keeps its `truncated` flag.
 | `aya-plain`, `aya-safegrad` | Plain LoRA and SafeGrad trained on 519 rows from the Cohere Aya Dataset (173 each in English, Korean and Chinese) in place of Bactrian-X, seed 42. Cohere built both Tiny Aya and the Aya Dataset, so the model may have seen these rows before. Tables in `stage2/aya/` |
 | `plain-ayasize` | Plain LoRA on the first 173 rows per language of our Bactrian-X set, the same number of rows as the Aya set, seed 42. Attack set only |
 | `truncation-regenerated/<arm>/` | The attack and XSTest answers that reached the 256-token cap, generated again with a cap of 1,024 tokens and judged again. A new answer is often not the original continued, because the batch an answer is generated in depends on the cap. The capped originals stay in the arm folders. Arms: the Global base model, plain and SafeGrad at seeds 42, 1 and 2, and the three Earth arms |
-| `aya-task/<arm>/` | Not in the repository. Answers to 400 held-out Aya prompts (100 each in English, Korean, Chinese and Swahili) and their task-judge scores. The score table is `stage2/aya/task.md` |
 | `judge-check-backtranslations/*.nllb.*` | Swahili answers the guard passed, translated to English with NLLB-200 3.3B and judged again, for all three seeds |
 | `stage2/` | The stage 2 tables: three seeds (`seeds.md`), mixing, Earth, the run with no Korean rows (`noko.md`), a person's reading of 200 Korean answers (`ko_drift.md`), the second-judge check, the Swahili re-translation, training time, the circuit comparison at five node counts, the checks on the Aya runs (`aya/checks.md`) the task scores on the held-out Aya prompts (`aya/task.md`), and two figures with their numbers (`drift_by_language.png`, `korean_by_setting.png`) |
+
+The answers to the 400 held-out Aya prompts are not published here, because each row quotes an Aya prompt and its reference answer. Their scores are in `stage2/aya/task.md`.
 
 Folders are added as their runs finish, so a row of this table may not be in the repository yet. What each check means was fixed before the runs in `docs/lir/stage2-prereg.md` in the code repository. Results from
 one seed are single runs and are marked that way in the tables.
