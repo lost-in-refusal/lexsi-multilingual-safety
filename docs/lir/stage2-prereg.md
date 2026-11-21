@@ -246,6 +246,21 @@ Section 9 says the harm-category table is repeated if this audit changes a seed 
 
 The split added after seed 42 (`results/lir/stage2/truncation/split.md`), over all seven arms on the attack set: of 281 answers that are the original continued, none went from safe to flagged and 7 went from flagged to safe; of 719 that came out different, 14 went to flagged and 35 to safe.
 
+**Added Nov 21, after the Earth answers were generated again.** E1 holds before and after, so the sentence for a failed E1 does not apply. Korean strict attack success before and after is 10.7% and 7.9% for base Earth, 21.3% and 21.0% for plain, 16.5% and 15.5% for SafeGrad. Plain against base is +10.7 points before and +13.1 after (p < 0.001 both). SafeGrad against plain is -4.8 points [-8.9, -1.0] (p = 0.024) before and -5.5 [-9.6, -1.7] (p = 0.009) after. 426, 95 and 183 attack answers of base, plain and SafeGrad were generated again, and 7, 12 and 8 still reach the cap at 1,024 tokens. The original answer files of the three Earth arms were checked against the uploaded copies before this was read and had not changed.
+
+The report prints "larger" for the Korean rise: after minus before is +2.4 points [+0.3, +4.5]. That is base Earth's Korean figure going from 10.7% to 7.9% while plain stays where it was. No Earth check is about the size of the rise, so we give both base figures and do not claim a larger drift. We give no cause for base's fall.
+
+The reading registered beside E1, from `results/lir/stage2/truncation/split.md`. Of base Earth's 426 re-generated attack answers, 150 are the original continued and 276 came out different. Among the continued, 1 went from safe to flagged and 4 from flagged to safe; among the different, 3 and 22. For plain the counts are 30 continued (0 and 2) and 65 different (1 and 4); for SafeGrad 66 continued (0 and 1) and 117 different (4 and 3). On the prompts where every Earth arm's answer was complete or continued (234 English, 182 Korean, 220 Chinese, 192 Swahili of 291) E1 holds before and after as well. Those prompts are a selected set, so we do not quote its sizes as effects.
+
+H1 to H3 are printed for Earth by the same report and decide nothing. E2 and row C of section 4 were not registered for a second reading and keep their Nov 20 readings. The report shows Earth's Swahili refusal change under plain as -6.9 points [-11.3, -2.4] before and -8.2 [-13.1, -3.8] after. XSTest over-refusal moves by under one point for every Earth arm and language.
+
+Added after this result was read, in commit `327a481`, and not registered: `split.md` repeats the readings listed in section 4 as added after the runs, now on the re-generated answers, and counts where each Earth arm's Korean flags sit.
+
+- SafeGrad stays above base on Korean: +5.8 points (p = 0.008) before, +7.6 (p < 0.001) after. It takes back 5.5 of the 13.1 points, under half, as before.
+- Counting only the guard's Unsafe class, SafeGrad against base on Korean is +2.4 points (p = 0.189) before and +4.8 (p = 0.004) after. So after re-generation SafeGrad is above base under that reading too.
+- Row C. SafeGrad's Swahili refusal rate on Earth is 45.0% before and 44.3% after: against Earth's base +1.7 points (p = 0.500) and +0.3 (p = 1.000), against base Global -5.8 (p = 0.008) and -6.9 (p < 0.001).
+- 146 of base Earth's 291 Korean attack answers reached the 256-token cap, and 29 of its 31 Korean flags were on those answers. 21 of the 146 are flagged after re-generation. Under plain 17 answers reached the cap and 53 of the 62 flags were on complete answers.
+
 ## 9. Harm categories
 
 **Added Nov 20, before any result was split by harm category.** Ram asked what kind of safety is affected. MultiJail tags each prompt with one or more of 18 harm categories. When we wrote this we knew every result above and the number of prompts in each category: 8 categories have 20 or more of the 291 prompts, the largest has 80 and the smallest 6. We had not split any result by category. Mingyu runs this in place of Hannah.
