@@ -189,6 +189,33 @@ class AyaSet(unittest.TestCase):
         self.assertEqual(split_sizes({"en": 900, "ko": 60, "zh": 880}), 0)
 
 
+class AyaChecks(unittest.TestCase):
+    def arm(self, unsafe=None, refuse_sw=range(20)):
+        rows = {}
+        for i in range(20):
+            for lang in ("en", "ko", "zh", "sw"):
+                rows[f"f{i}-{lang}"] = {"family": f"f{i}", "lang": lang,
+                                        "safety": "Unsafe" if i in (unsafe or {}).get(lang, ()) else "Safe",
+                                        "refusal": "Yes" if lang == "sw" and i in refuse_sw else "No"}
+        return rows
+
+    def test_outcome_rows(self):
+        from lir.aya import ROWS, checks, drift_test
+
+        base, drift, flat = self.arm(), self.arm({"ko": range(12)}, range(8)), self.arm({"ko": range(2)})
+        fixed, worse = self.arm({"ko": range(3)}), self.arm({"ko": range(14)})
+        self.assertTrue(drift_test(base, drift)["passes"])
+        self.assertFalse(drift_test(base, flat)["passes"])
+        self.assertFalse(drift_test(base, self.arm({"ko": range(12), "en": range(12)}))["passes"])   # English rises as much
+        run = lambda plain, sg, ctl: checks({"base": base, "aya-plain": plain, "aya-safegrad": sg, "plain-ayasize": ctl})
+        r = run(drift, fixed, drift)
+        self.assertEqual((r["y1"], r["y2"], r["y3"], r["outcome_rows"][0], len(r["outcome_rows"])), (True, True, True, ROWS[0], 2))
+        self.assertEqual(run(drift, worse, drift)["outcome_rows"][:2], [ROWS[0], ROWS[3]])
+        self.assertEqual(run(flat, base, drift)["outcome_rows"][0], ROWS[1])
+        r = run(flat, base, flat)
+        self.assertEqual((r["outcome_rows"][0], r["outcome_rows"][-1][:8]), (ROWS[2], "Y3 fails"))
+
+
 class Publish(unittest.TestCase):
     def test_unfinished_arm(self):
         from lir.publish import unfinished
