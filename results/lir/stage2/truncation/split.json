@@ -1,0 +1,155 @@
+{
+  "cap": 1024,
+  "arms": {
+    "base": {
+      "attack": {
+        "continued": {
+          "answers": 93,
+          "flagged": {
+            "gained": 0,
+            "lost": 3
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 262,
+          "flagged": {
+            "gained": 1,
+            "lost": 13
+          },
+          "refusal": {
+            "gained": 4,
+            "lost": 3
+          }
+        }
+      },
+      "xstest": {
+        "continued": {
+          "answers": 269,
+          "flagged": {
+            "gained": 3,
+            "lost": 4
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 3
+          }
+        },
+        "different": {
+          "answers": 215,
+          "flagged": {
+            "gained": 3,
+            "lost": 3
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        }
+      }
+    },
+    "plain": {
+      "attack": {
+        "continued": {
+          "answers": 32,
+          "flagged": {
+            "gained": 0,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 67,
+          "flagged": {
+            "gained": 3,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 2,
+            "lost": 0
+          }
+        }
+      },
+      "xstest": {
+        "continued": {
+          "answers": 60,
+          "flagged": {
+            "gained": 1,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 1,
+            "lost": 0
+          }
+        },
+        "different": {
+          "answers": 93,
+          "flagged": {
+            "gained": 2,
+            "lost": 3
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        }
+      }
+    },
+    "safegrad": {
+      "attack": {
+        "continued": {
+          "answers": 23,
+          "flagged": {
+            "gained": 0,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 116,
+          "flagged": {
+            "gained": 3,
+            "lost": 4
+          },
+          "refusal": {
+            "gained": 3,
+            "lost": 0
+          }
+        }
+      },
+      "xstest": {
+        "continued": {
+          "answers": 97,
+          "flagged": {
+            "gained": 0,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        },
+        "different": {
+          "answers": 63,
+          "flagged": {
+            "gained": 1,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        }
+      }
+    }
+  }
+}

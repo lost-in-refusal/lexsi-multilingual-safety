@@ -130,6 +130,20 @@ class Truncation(unittest.TestCase):
         kept = keep_matching({"base": m})["base"]
         self.assertEqual((len(m) - len(kept), "f0-ko" in kept, "f0-en" in kept), (1, False, True))
 
+    def test_continued_and_different(self):
+        from lir.trunc import merge
+        from lir.truncsplit import fmt, split
+
+        orig = list(self.arm(unsafe_ko=range(3, 8), cut=range(5)).values())   # f3 and f4 flagged and cut in Korean
+        new = [dict(r, response=r["response"] + " and then it goes on", truncated=False,
+                    safety="Unsafe" if r["family"] == "f1" else "Safe") for r in orig if r["truncated"] and r["lang"] == "ko"]
+        new[0]["response"], new[3]["response"] = "a different answer", "another different answer"   # f0 and f3
+        s = split({r["uid"]: r for r in orig}, merge(orig, new))
+        self.assertEqual((s["continued"]["answers"], s["continued"]["flagged"]), (3, {"gained": 1, "lost": 1}))   # f1 up, f4 down
+        self.assertEqual((s["different"]["answers"], s["different"]["flagged"]), (2, {"gained": 0, "lost": 1}))   # f3 down
+        self.assertEqual(s["different"]["refusal"], {"gained": 0, "lost": 0})
+        self.assertIn("| base | attack | 3 | 1 | 1 | 2 | 0 | 1 |", fmt({"arms": {"base": {"attack": s}}}))
+
     def test_before_after_rows(self):
         from lir.trunc import H2_ROW, ROWS, before_after
 

@@ -2,6 +2,8 @@
 
   python -m lir.harm             # results/lir/stage2/harm_categories.{json,md}
   python -m lir.harm --figure    # and harm_categories.png
+  python -m lir.harm --regenerated   # the same table on the answers after the truncation audit's re-generation,
+                                     # written to harm_categories_regenerated.{json,md}
 
 MultiJail tags each prompt with one or more harm categories, so a prompt counts in each of its categories.
 Rates are averaged over the three seeds; intervals are a bootstrap over the category's prompts. A description:
@@ -92,21 +94,37 @@ def fmt(res: dict) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--figure", action="store_true")
+    ap.add_argument("--regenerated", action="store_true",
+                    help="use the answers after the truncation audit's re-generation at 1,024 tokens")
     a = ap.parse_args()
     arms = ["base"] + [arm for pair in SEEDS.values() for arm in pair]
-    data = {arm: load(arm, "attack") for arm in arms}
+    name = "harm_categories"
+    if a.regenerated:
+        from lir import trunc
+
+        data = {arm: trunc.after(arm, "attack") for arm in arms}
+        waiting = [arm for arm, d in data.items() if d is None]
+        if waiting:
+            raise SystemExit("re-generation unfinished, nothing written: " + ", ".join(waiting))
+        name += "_regenerated"
+    else:
+        data = {arm: load(arm, "attack") for arm in arms}
     short = [arm for arm, d in data.items() if len(d) != len(data["base"]) or any(r["safety"] is None for r in d.values())]
     if short:
         raise SystemExit("attack verdicts incomplete, nothing written: " + ", ".join(short))
     res = breakdown(data)
-    write_json(OUT / "harm_categories.json", res)
     md = fmt(res)
-    (OUT / "harm_categories.md").write_text(md + "\n")
+    if a.regenerated:
+        res["answers"] = f"truncated answers generated again with a cap of {trunc.CAP} tokens"
+        md = (f"Answers that reached the 256-token cap were generated again with a cap of {trunc.CAP} tokens and judged "
+              "again (preregistration section 8). The table on the capped answers is `harm_categories.md`.\n\n" + md)
+    write_json(OUT / f"{name}.json", res)
+    (OUT / f"{name}.md").write_text(md + "\n")
     print(md)
     if a.figure:
         from lir.figures import harm_figure
 
-        harm_figure(res, OUT / "harm_categories.png")
+        harm_figure(res, OUT / f"{name}.png")
 
 
 if __name__ == "__main__":
