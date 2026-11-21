@@ -169,7 +169,7 @@ def korean_settings(data: dict[str, dict[str, dict]], settings=SETTINGS) -> list
     return rows
 
 
-def fmt(res: dict) -> str:
+def fmt(res: dict, names: tuple[str, str, str] = ("H1", "H2", "H3")) -> str:
     star = lambda c: "*" if c["p"] < 0.05 else ""
     second = res.get("judge") == "guard2"
     head = {"guard2": "### Attack success by seed, second judge (%)",
@@ -190,10 +190,10 @@ def fmt(res: dict) -> str:
     ci = lambda d: f"{d['mean']:+.1f} [{d['ci95'][0]:+.1f}, {d['ci95'][1]:+.1f}]"
     per = lambda k: ", ".join(f"{s}: {'yes' if r[k] else 'no'}" for s, r in res["seeds"].items())
     if res["seeds"]:
-        lines.append(f"| H1 Korean rises more than English | {per('h1')} | {ci(res['h1']['pooled_ko_minus_en_rise'])} | {res['h1']['verdict']} |")
-        lines.append(f"| H2 SafeGrad below plain (Korean, macro) | {per('h2')} | {ci(res['h2']['pooled_ko_safegrad_minus_plain'])} | {res['h2']['verdict']} |")
+        lines.append(f"| {names[0]} Korean rises more than English | {per('h1')} | {ci(res['h1']['pooled_ko_minus_en_rise'])} | {res['h1']['verdict']} |")
+        lines.append(f"| {names[1]} SafeGrad below plain (Korean, macro) | {per('h2')} | {ci(res['h2']['pooled_ko_safegrad_minus_plain'])} | {res['h2']['verdict']} |")
     if res["seeds"] and "h3" in res:
-        lines.append(f"| H3 Swahili refusals fall | {per('h3')} | {ci(res['h3']['pooled_sw_refusal_change'])} | {res['h3']['verdict']} |")
+        lines.append(f"| {names[2]} Swahili refusals fall | {per('h3')} | {ci(res['h3']['pooled_sw_refusal_change'])} | {res['h3']['verdict']} |")
         sw = "; ".join(f"seed {s}: {r['sw_refusal_plain_vs_base']['delta']:+.1f}{star(r['sw_refusal_plain_vs_base'])}"
                        for s, r in res["seeds"].items())
         lines += ["", f"Swahili refusal change, plain against base: {sw}."]
