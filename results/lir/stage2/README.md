@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 21, 3:00 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 21, 4:45 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -18,7 +18,7 @@ Updated Nov 21, 3:00 AM ET. Every number comes from our own runs, and the file n
 | K2 Korean rise judged by a person (added Nov 20) | Does not pass | 1 | 5 plain answers against 1 base answer marked unsafe on 94 prompts, p = 0.22 | `ko_drift.md` |
 | Repair vector (exploratory, not registered) | The seed 42 edit lowers Korean attack success at seeds 1 and 2 with no training | 2 | Korean 15.5% to 10.3% and 18.9% to 11.0%. SafeGrad trained at those seeds reaches 8.2% and 9.6% | `vector.md` |
 | Circuit comparison at five node counts (added Nov 20) | Holds at 100, 200 and 300 nodes, not at 50 or 400 | 1 | Korean keeps the fewest base nodes under plain at three of five sizes. At 200 nodes the top nodes recover 65% of the contrast in English, 91% in Korean, 26% in Chinese, 40% in Swahili | `circuit_nodes.md` |
-| Truncation audit (added Nov 20) | Counted. Re-generation queued | 1 to 3 | Base answers reach the 256-token cap far more often than fine-tuned ones: Korean attack 34%, against 8% plain and 8% SafeGrad | `truncation/counts.md` |
+| Truncation audit (added Nov 20) | Seed 42: the headline does not depend on the 256-token cap. Seeds 1 and 2 and Earth still running | 1 of 3 | Korean rise +14.1 points on capped answers, +14.8 after every capped answer was generated again at 1,024 tokens. SafeGrad against plain -8.6 and -8.9 | `truncation/report.md` |
 | Harm categories (added Nov 20) | Korean rises in all 8 categories with 20 or more prompts | 3 | Rises from +3.7 to +21.0 points | `harm_categories.md`, `harm_categories.png` |
 | Aya as a second training dataset (added Nov 20) | Registered and queued | 1 | About 190 rows per language, because Aya has 309 usable Korean rows | section 10 of the preregistration |
 
@@ -95,11 +95,16 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - One node count is not the same share of the mechanism in each language: at 200 nodes it is 91% in Korean and 26% in Chinese. So the Chinese column of the 200-node comparison rests on a quarter of the contrast. Do not write "Korean refusal is more concentrated"; each language has its own pair of first tokens, and that may be what differs.
 - Limits of the patching test: base model only, seed 42, the same 64 held-out pairs in every language, one token pair per language. The shares have no interval. Swahili goes from 8% at 50 nodes to 7% at 100, which shows that a difference of a few points is noise.
 
-**Truncation.** Counts only so far; nothing has been generated again yet, so draw no conclusion about the headline.
-- Share of attack answers that reach the 256-token cap at seed 42: base 24% English, 34% Korean, 29% Chinese, 36% Swahili; plain 2%, 8%, 5%, 19%; SafeGrad 9%, 8%, 9%, 21%. XSTest is higher for every arm (base 41 to 52%).
-- In the base model most answers the guard calls unsafe are cut ones (12 of 15 in Korean). Under plain most are complete (40 of 56 in Korean). So the open question is about base: whether its cut answers turn unsafe when they finish, which would shrink the measured rise.
-- The comparison of verdicts on cut and complete answers is a description, not a test. Refusals are short and finish, so the two groups differ in more than the cap.
-- Queued: every cut attack and XSTest answer of base, plain and SafeGrad generated again at 1,024 tokens and judged again, at seed 42 and then seeds 1 and 2, with H1 to H3 recomputed. What counts as "the drift shrinks" is fixed in section 8 of the preregistration.
+**Truncation.** Every attack and XSTest answer of base, plain and SafeGrad at seed 42 that reached the 256-token cap was generated again with a cap of 1,024 tokens and judged again by the same guard. Seeds 1 and 2 are running now and the Earth arms follow.
+- Result at seed 42: outcome row 1, "the headline does not depend on the 256-token cap". Korean strict attack success before and after: base 5.2% and 4.5%, plain 19.2% and 19.2%, SafeGrad 10.7% and 10.3%. The Korean rise is +14.1 points before and +14.8 after. The change is +0.7 points [+0.0, +1.7], unchanged within noise. H1, H2 and H3 pass at this seed both ways.
+- The worry was that base's cut answers would turn unsafe once they finished, which would shrink the rise. They did not. Base falls a little in every language: English 6.9% to 5.5%, Korean 5.2% to 4.5%, Chinese 8.6% to 7.9%, Swahili 6.2% to 3.8%.
+- The repair is unchanged: SafeGrad against plain on Korean -8.6 points before and -8.9 after. Swahili refusals under plain fall 13.1 and 13.4 points. XSTest over-refusal moves by under one point everywhere.
+- A sentence that is safe: "Generating every capped answer again at 1,024 tokens left the Korean rise at seed 42 unchanged (+14.1 and +14.8 points)." Say seed 42 until seeds 1 and 2 are in. The three-seed numbers in `seeds.md` are still on capped answers; this audit says the cap did not produce them at seed 42.
+- Caveat to keep with it: most new answers are not the old answer continued. The batch an answer is generated in depends on the cap, and in about three quarters of cases the model gave a different answer to the same prompt (for base, 93 of 355 start with the original). So "after" mixes a cut answer finishing with a different answer to the same prompt.
+- Both parts point the same way. Where the new answer is the old one continued (148 attack answers over the three arms), no verdict went from safe to flagged and 4 went from flagged to safe. Where it came out different (445), 7 went to flagged and 19 to safe. On the prompts where every arm's answer was complete or continued (210 of the 291 Korean prompts) the Korean rise is +11.4 points before and after. These two counts of verdict changes were made after the run.
+- Share of attack answers that reach the 256-token cap at seed 42: base 24% English, 34% Korean, 29% Chinese, 36% Swahili; plain 2%, 8%, 5%, 19%; SafeGrad 9%, 8%, 9%, 21%. XSTest is higher for every arm (base 41 to 52%). At 1,024 tokens, 6, 9 and 8 attack answers of base, plain and SafeGrad still reach the cap.
+- The comparison of verdicts on cut and complete answers in `truncation/counts.md` is a description, not a test. Refusals are short and finish, so the two groups differ in more than the cap.
+- Not generated again: the mixing, K1 and repair-vector arms. They are counted only.
 
 **Harm categories.** Strict attack success by MultiJail category, averaged over the three seeds. A prompt with several tags counts in each.
 - Korean rises under plain in all eight categories with 20 or more prompts, from +3.7 points (Theft) to +21.0 (Discrimination & injustice). The interval is above zero in six of the eight. SafeGrad is below plain in all eight.
@@ -117,4 +122,4 @@ Intervals are 95%. Results marked 1 seed are single runs.
 
 **On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. The two repair-vector arms and their tables were added at 10:30 PM, and K1 at seeds 1 and 2 with the three-seed K1 table on Nov 21 at 1:30 AM. Not uploaded yet: the re-generated answers and the Aya runs, which are still running or queued.
 
-**Still to come, in queue order.** Truncation re-generation; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints. The queue should be through by about 11 AM Saturday.
+**Still to come, in queue order.** Truncation re-generation at seeds 1 and 2; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints; the Earth arms generated again at 1,024 tokens. The queue should be through by about noon Saturday.
