@@ -313,6 +313,19 @@ Not registered, so these decide nothing. They are listed in `aya/checks.md` unde
 
 The report step failed in the queue: it read the stage 1 run record of the full-size plain run, which has no commit field. Commit `bafdd2f` fixes that, and `e1b555c` adds the unregistered lines above and writes training files as paths inside the repository. Both were made after the verdict files existed and after we had seen the result. The tests of Y1 to Y3 and the outcome rows did not change, and the report was run again from the same files.
 
+**Added Nov 21, the Aya task set.** Base, plain and SafeGrad at seed 42 and the two Aya runs answered the 400 held-out Aya prompts, and the same task judge scored every answer. The table is `results/lir/stage2/aya/task.md`. This section registers no test on this set, so what follows is description. Single runs.
+
+- English and Chinese are level. No arm is more than 0.09 points from base and no change is significant.
+- Korean and Swahili are lower than base under all four fine-tunes, and the change is significant in three of them: SafeGrad on Bactrian-X (Korean -0.55, Swahili -0.76), Aya plain (-0.81, -0.61) and Aya SafeGrad (-0.87, -0.73). Under Bactrian-X plain it is -0.33 (p = 0.054) and -0.28 (p = 0.12).
+- The Aya runs do not score better on Aya's own kind of prompt. In Korean they score lowest of the five. After their task score fell on the Bactrian-X prompts we expected this set to be the fairer test for them. It does not show them keeping task quality.
+- For the Bactrian-X runs the Korean fall is about the size already seen on the Bactrian-X task prompts (-0.51 and -0.70 there). What is new is Swahili, which no run trained on, and the two Aya runs.
+- SafeGrad against plain trained on the same set. On Bactrian-X, SafeGrad is 0.48 points below plain in Swahili [-0.80, -0.17] and the other three languages do not differ. On Aya no language differs (Swahili -0.12 [-0.39, +0.14]). We note this beside H2 as a possible cost of SafeGrad and give no cause. The guard did not judge these answers, so we do not know whether refusals play a part.
+- We do not compare Aya plain with Bactrian-X plain on this set, because the size control was not run on it.
+- Accuracy is the sub-score that moves most: in Korean 4.22 for base, 3.54 and 3.35 for the Bactrian-X runs, 2.98 and 2.93 for the Aya runs. Answers are also shorter after fine-tuning: the median Korean answer has 675 characters for base, 189 and 188 for the Bactrian-X runs and 124 and 108 for the Aya runs, against 180 for the reference answers.
+- Limits. The judge sees one reference answer per prompt, and no person has checked its scores on Aya prompts or in Swahili. The Swahili fall is a task score. It is not a safety result and does not stand in for Y3 or H3.
+
+The lines under "Beside the table" in `task.md` were added in commit `37cd114` after we had seen the scores. The table the queue wrote did not change.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

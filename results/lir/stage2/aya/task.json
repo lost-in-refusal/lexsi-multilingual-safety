@@ -1,0 +1,490 @@
+{
+  "aya-plain": {
+    "en": {
+      "n": 100,
+      "mean": 6.16,
+      "unparsed": 0,
+      "delta": -0.0775,
+      "ci95": [
+        -0.2375,
+        0.0875
+      ],
+      "p": 0.34833033393321333
+    },
+    "ko": {
+      "n": 100,
+      "mean": 4.565,
+      "unparsed": 0,
+      "delta": -0.8125,
+      "ci95": [
+        -1.1925,
+        -0.425
+      ],
+      "p": 0.0001999600079984003
+    },
+    "zh": {
+      "n": 100,
+      "mean": 6.075,
+      "unparsed": 0,
+      "delta": -0.0125,
+      "ci95": [
+        -0.21,
+        0.195
+      ],
+      "p": 0.9058188362327535
+    },
+    "sw": {
+      "n": 100,
+      "mean": 4.62,
+      "unparsed": 0,
+      "delta": -0.6075,
+      "ci95": [
+        -1.0175,
+        -0.235
+      ],
+      "p": 0.0021995600879824036
+    }
+  },
+  "aya-safegrad": {
+    "en": {
+      "n": 100,
+      "mean": 6.175,
+      "unparsed": 0,
+      "delta": -0.0625,
+      "ci95": [
+        -0.2125,
+        0.0925
+      ],
+      "p": 0.42491501699660067
+    },
+    "ko": {
+      "n": 100,
+      "mean": 4.5075,
+      "unparsed": 0,
+      "delta": -0.87,
+      "ci95": [
+        -1.2675,
+        -0.4675
+      ],
+      "p": 0.0003999200159968006
+    },
+    "zh": {
+      "n": 100,
+      "mean": 6.0875,
+      "unparsed": 0,
+      "delta": 0.0,
+      "ci95": [
+        -0.17,
+        0.1875
+      ],
+      "p": 1.0
+    },
+    "sw": {
+      "n": 100,
+      "mean": 4.4975,
+      "unparsed": 0,
+      "delta": -0.73,
+      "ci95": [
+        -1.11,
+        -0.3625
+      ],
+      "p": 0.0003999200159968006
+    }
+  },
+  "base": {
+    "en": {
+      "n": 100,
+      "mean": 6.2375,
+      "unparsed": 0
+    },
+    "ko": {
+      "n": 100,
+      "mean": 5.3775,
+      "unparsed": 0
+    },
+    "zh": {
+      "n": 100,
+      "mean": 6.0875,
+      "unparsed": 0
+    },
+    "sw": {
+      "n": 100,
+      "mean": 5.2275,
+      "unparsed": 0
+    }
+  },
+  "plain": {
+    "en": {
+      "n": 100,
+      "mean": 6.33,
+      "unparsed": 0,
+      "delta": 0.0925,
+      "ci95": [
+        -0.0875,
+        0.29
+      ],
+      "p": 0.3323335332933413
+    },
+    "ko": {
+      "n": 100,
+      "mean": 5.0475,
+      "unparsed": 0,
+      "delta": -0.33,
+      "ci95": [
+        -0.665,
+        0.0025
+      ],
+      "p": 0.05378924215156969
+    },
+    "zh": {
+      "n": 100,
+      "mean": 6.0075,
+      "unparsed": 0,
+      "delta": -0.08,
+      "ci95": [
+        -0.2975,
+        0.14
+      ],
+      "p": 0.4809038192361528
+    },
+    "sw": {
+      "n": 100,
+      "mean": 4.945,
+      "unparsed": 0,
+      "delta": -0.2825,
+      "ci95": [
+        -0.635,
+        0.075
+      ],
+      "p": 0.12117576484703059
+    }
+  },
+  "safegrad": {
+    "en": {
+      "n": 100,
+      "mean": 6.23,
+      "unparsed": 0,
+      "delta": -0.0075,
+      "ci95": [
+        -0.1725,
+        0.165
+      ],
+      "p": 0.9332133573285343
+    },
+    "ko": {
+      "n": 100,
+      "mean": 4.8275,
+      "unparsed": 0,
+      "delta": -0.55,
+      "ci95": [
+        -0.8425,
+        -0.2575
+      ],
+      "p": 0.0005998800239952009
+    },
+    "zh": {
+      "n": 100,
+      "mean": 6.0375,
+      "unparsed": 0,
+      "delta": -0.05,
+      "ci95": [
+        -0.2625,
+        0.1575
+      ],
+      "p": 0.6576684663067387
+    },
+    "sw": {
+      "n": 100,
+      "mean": 4.4675,
+      "unparsed": 0,
+      "delta": -0.76,
+      "ci95": [
+        -1.1375,
+        -0.4
+      ],
+      "p": 0.0003999200159968006
+    }
+  },
+  "beside": {
+    "safegrad_vs_plain": {
+      "safegrad": {
+        "en": {
+          "n": 100,
+          "delta": -0.1,
+          "ci95": [
+            -0.25,
+            0.0225
+          ],
+          "p": 0.15556888622275544
+        },
+        "ko": {
+          "n": 100,
+          "delta": -0.22,
+          "ci95": [
+            -0.52,
+            0.06
+          ],
+          "p": 0.13997200559888023
+        },
+        "zh": {
+          "n": 100,
+          "delta": 0.03,
+          "ci95": [
+            -0.1425,
+            0.1925
+          ],
+          "p": 0.7240551889622076
+        },
+        "sw": {
+          "n": 100,
+          "delta": -0.4775,
+          "ci95": [
+            -0.8025,
+            -0.1675
+          ],
+          "p": 0.003599280143971206
+        }
+      },
+      "aya-safegrad": {
+        "en": {
+          "n": 100,
+          "delta": 0.015,
+          "ci95": [
+            -0.06,
+            0.0875
+          ],
+          "p": 0.6868626274745051
+        },
+        "ko": {
+          "n": 100,
+          "delta": -0.0575,
+          "ci95": [
+            -0.2575,
+            0.14
+          ],
+          "p": 0.5706858628274345
+        },
+        "zh": {
+          "n": 100,
+          "delta": 0.0125,
+          "ci95": [
+            -0.1275,
+            0.14
+          ],
+          "p": 0.8514297140571886
+        },
+        "sw": {
+          "n": 100,
+          "delta": -0.1225,
+          "ci95": [
+            -0.3925,
+            0.145
+          ],
+          "p": 0.3577284543091382
+        }
+      }
+    },
+    "sub_scores": {
+      "base": {
+        "en": {
+          "accuracy": 5.55,
+          "instruction_following": 6.12,
+          "coherence": 6.38,
+          "fluency": 6.9
+        },
+        "ko": {
+          "accuracy": 4.22,
+          "instruction_following": 5.35,
+          "coherence": 5.48,
+          "fluency": 6.46
+        },
+        "zh": {
+          "accuracy": 4.88,
+          "instruction_following": 6.28,
+          "coherence": 6.36,
+          "fluency": 6.83
+        },
+        "sw": {
+          "accuracy": 4.57,
+          "instruction_following": 5.13,
+          "coherence": 5.33,
+          "fluency": 5.88
+        }
+      },
+      "plain": {
+        "en": {
+          "accuracy": 5.44,
+          "instruction_following": 6.34,
+          "coherence": 6.55,
+          "fluency": 6.99
+        },
+        "ko": {
+          "accuracy": 3.54,
+          "instruction_following": 5.09,
+          "coherence": 5.18,
+          "fluency": 6.38
+        },
+        "zh": {
+          "accuracy": 4.66,
+          "instruction_following": 6.28,
+          "coherence": 6.26,
+          "fluency": 6.83
+        },
+        "sw": {
+          "accuracy": 3.8,
+          "instruction_following": 4.97,
+          "coherence": 5.09,
+          "fluency": 5.92
+        }
+      },
+      "safegrad": {
+        "en": {
+          "accuracy": 5.35,
+          "instruction_following": 6.2,
+          "coherence": 6.46,
+          "fluency": 6.91
+        },
+        "ko": {
+          "accuracy": 3.35,
+          "instruction_following": 4.95,
+          "coherence": 4.86,
+          "fluency": 6.15
+        },
+        "zh": {
+          "accuracy": 4.67,
+          "instruction_following": 6.32,
+          "coherence": 6.3,
+          "fluency": 6.86
+        },
+        "sw": {
+          "accuracy": 3.53,
+          "instruction_following": 4.56,
+          "coherence": 4.53,
+          "fluency": 5.25
+        }
+      },
+      "aya-plain": {
+        "en": {
+          "accuracy": 5.19,
+          "instruction_following": 6.07,
+          "coherence": 6.44,
+          "fluency": 6.94
+        },
+        "ko": {
+          "accuracy": 2.98,
+          "instruction_following": 4.56,
+          "coherence": 4.66,
+          "fluency": 6.06
+        },
+        "zh": {
+          "accuracy": 4.61,
+          "instruction_following": 6.43,
+          "coherence": 6.43,
+          "fluency": 6.83
+        },
+        "sw": {
+          "accuracy": 3.22,
+          "instruction_following": 4.65,
+          "coherence": 4.9,
+          "fluency": 5.71
+        }
+      },
+      "aya-safegrad": {
+        "en": {
+          "accuracy": 5.2,
+          "instruction_following": 6.1,
+          "coherence": 6.46,
+          "fluency": 6.94
+        },
+        "ko": {
+          "accuracy": 2.93,
+          "instruction_following": 4.43,
+          "coherence": 4.69,
+          "fluency": 5.98
+        },
+        "zh": {
+          "accuracy": 4.66,
+          "instruction_following": 6.36,
+          "coherence": 6.48,
+          "fluency": 6.85
+        },
+        "sw": {
+          "accuracy": 3.19,
+          "instruction_following": 4.52,
+          "coherence": 4.75,
+          "fluency": 5.53
+        }
+      }
+    },
+    "cut_at_cap": {
+      "base": {
+        "en": 1,
+        "ko": 6,
+        "zh": 1,
+        "sw": 4
+      },
+      "plain": {
+        "en": 0,
+        "ko": 6,
+        "zh": 0,
+        "sw": 2
+      },
+      "safegrad": {
+        "en": 0,
+        "ko": 8,
+        "zh": 1,
+        "sw": 6
+      },
+      "aya-plain": {
+        "en": 0,
+        "ko": 10,
+        "zh": 2,
+        "sw": 4
+      },
+      "aya-safegrad": {
+        "en": 1,
+        "ko": 9,
+        "zh": 1,
+        "sw": 6
+      }
+    },
+    "median_chars": {
+      "reference": {
+        "en": 224.0,
+        "ko": 180.5,
+        "zh": 43.5,
+        "sw": 202.5
+      },
+      "base": {
+        "en": 994.0,
+        "ko": 675.0,
+        "zh": 42.5,
+        "sw": 1051.5
+      },
+      "plain": {
+        "en": 388.5,
+        "ko": 189.0,
+        "zh": 63.0,
+        "sw": 287.5
+      },
+      "safegrad": {
+        "en": 398.5,
+        "ko": 187.5,
+        "zh": 43.0,
+        "sw": 408.5
+      },
+      "aya-plain": {
+        "en": 208.5,
+        "ko": 123.5,
+        "zh": 34.5,
+        "sw": 99.0
+      },
+      "aya-safegrad": {
+        "en": 178.5,
+        "ko": 107.5,
+        "zh": 34.5,
+        "sw": 114.5
+      }
+    }
+  }
+}
