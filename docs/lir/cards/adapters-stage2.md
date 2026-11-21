@@ -14,7 +14,7 @@ The adapters behind the stage 2 results of Lost in Refusal, one folder per run. 
 data. They exist to measure how much refusal behaviour benign fine-tuning removes in each language, and how much of
 it SafeTune's SafeGrad keeps.
 
-**Do not deploy these adapters.** They are research artifacts, and most of them make the model less safe.
+**Do not deploy these adapters.** They are research artifacts whose purpose is to show safety drift.
 
 The seed 42 runs on Tiny Aya Global are in their own repositories from stage 1:
 [plain](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-plain) and
@@ -62,8 +62,9 @@ not on Hugging Face.
 ## Results
 
 Each folder name is also an arm name in the
-[evaluation outputs](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-eval-outputs), where every
-answer and every judge verdict is published. The tables are under `stage2/` there. The
+[evaluation outputs](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-eval-outputs), which has that
+arm's answers and judge verdicts on the sets it was run on. The card there says which sets each arm has and what is
+not published. The tables are under `stage2/`. The
 [status page](https://github.com/lost-in-refusal/lexsi-multilingual-safety/blob/main/results/lir/stage2/README.md)
 says which claims each run supports and which it does not, and the
 [preregistration](https://github.com/lost-in-refusal/lexsi-multilingual-safety/blob/main/docs/lir/stage2-prereg.md)
