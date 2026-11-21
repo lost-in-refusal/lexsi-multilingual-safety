@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 21, 6:00 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 21, 9:20 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -20,7 +20,7 @@ Updated Nov 21, 6:00 AM ET. Every number comes from our own runs, and the file n
 | Circuit comparison at five node counts (added Nov 20) | Holds at 100, 200 and 300 nodes, not at 50 or 400 | 1 | Korean keeps the fewest base nodes under plain at three of five sizes. At 200 nodes the top nodes recover 65% of the contrast in English, 91% in Korean, 26% in Chinese, 40% in Swahili | `circuit_nodes.md` |
 | Truncation audit (added Nov 20) | The headline does not depend on the 256-token cap: outcome row 1 at seed 42, and H1 to H3 pass on three seeds before and after. Earth still to run | 3 of 3 | Three seeds, before and after every capped answer was generated again at 1,024 tokens: Korean rise +12.7 and +13.2 points; SafeGrad against plain -8.4 and -8.6; Swahili refusals -9.3 and -10.0 | `truncation/report.md` |
 | Harm categories (added Nov 20) | Korean rises in all 8 categories with 20 or more prompts, on capped and on re-generated answers | 3 | Rises from +3.7 to +21.0 points on both | `harm_categories.md`, `harm_categories_regenerated.md`, `harm_categories.png` |
-| Aya as a second training dataset (added Nov 20) | Set built, runs under way | 1 | 173 training rows per language (519 in all), because Aya has 304 usable Korean rows after the guard screen; 100 more per language held out | `docs/lir/cards/aya.md`, section 10 of the preregistration |
+| Aya as a second training dataset (added Nov 20) | Drift (Y1) and repair (Y2) hold; Swahili refusals (Y3) do not | 1 | Korean rises 10.0 points under Aya plain (p < 0.001), English 0.0; gap +10.0 [+5.5, +14.8]. SafeGrad against plain on Korean -6.5 [-10.0, -3.4]. Swahili refusals -3.4 [-7.9, +1.0]. 173 training rows per language | `aya/checks.md`, `aya/results.md`, `docs/lir/cards/aya.md` |
 
 Intervals are 95%. Results marked 1 seed are single runs.
 
@@ -28,7 +28,7 @@ Intervals are 95%. Results marked 1 seed are single runs.
 
 **H2.** SafeGrad does not return Korean to base. It stays 5.5, 3.1 and 4.5 points above base, so it repairs roughly 60 to 70% of the rise.
 
-**H3.** The Swahili refusal rate falls, but raw Swahili attack success does not rise (+1.4, -1.0 and +0.7 points, none significant). The guard missed our agreement bar in Swahili, which is why the corrected figure exists.
+**H3.** The Swahili refusal rate falls, but raw Swahili attack success does not rise (+1.4, -1.0 and +0.7 points, none significant). The guard missed our agreement bar in Swahili, which is why the corrected figure exists. With Aya as the training set the Swahili refusal rate does not fall significantly (-3.4 points [-7.9, +1.0], one seed), so the Swahili finding rests on Bactrian-X.
 
 **H4.** Mingyu marked 12 of 30 rows of the filtered set bad on a stricter reading than stage 1, and 6 of 30 counting only wrong or off-task answers. The limit is 3. Raising the cut-off cannot work: it would flag 346 of the 600 Korean training rows with 108 spare rows to replace them. So we cannot rule out that Korean data quality contributes to the Korean drift.
 
@@ -115,12 +115,21 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - This is a description. Do not write that one category drifts more than another: cells are small and no test was run between categories. The ten categories with fewer than 20 prompts are listed in the table and not interpreted.
 - The figure shows the change against base under plain and under SafeGrad, for Korean and for the four languages together.
 
-**Aya.** The set is built and the runs are under way; no result yet. Three runs at seed 42: plain and SafeGrad on the Aya set, and plain on Bactrian-X cut to the same number of rows.
-- Size: 173 training rows each in English, Korean and Chinese, 519 in all, which is 29% of the Bactrian-X set. Korean sets the size: Aya has 361 Korean rows, 304 pass the filters and the guard, 100 are held out as the task set and 31 near-duplicates of held-out prompts are removed. The plan's 600 rows per language could not be met.
-- The held-out Aya task set has 100 rows each in English, Korean, Chinese and Swahili. It is never trained on.
+**Aya.** Three runs at seed 42, one each: plain and SafeGrad on the Aya set, and plain on Bactrian-X cut to the same number of rows. Korean strict attack success: base 5.2%, Aya plain 15.1%, Aya SafeGrad 8.6%, Bactrian-X at the same size 17.5%, Bactrian-X at full size 19.2%.
+- Y1 holds. Korean rises 10.0 points under Aya plain (p < 0.001) and English does not move. The gap is +10.0 points [+5.5, +14.8].
+- Y2 holds. SafeGrad against plain on Korean is -6.5 points [-10.0, -3.4], and the four-language average is 7.6% against 10.1%.
+- Y3 does not hold. The Swahili refusal rate goes from 50.9% to 47.4% (-3.4 points [-7.9, +1.0]), and Swahili strict attack success is level (+0.7 points, p = 0.85).
+- What to say: "the Korean drift and SafeGrad's repair appear on a second dataset, written or edited by people, at 173 training rows per language". Two of the three stage 1 findings carried over. Do not write that the results replicate on a second dataset without that limit, and do not write that the drift reaches Swahili on Aya.
+- The size control passes the same test: Korean +12.4 points (p < 0.001), gap +10.7 [+6.2, +15.5]. So 519 rows are enough to show the Korean drift on Bactrian-X too.
+- SafeGrad does not return Korean to base here either: 8.6% against 5.2% (+3.4 points, p = 0.021, not registered). It removes 6.5 of the 10.0 points.
+- Aya against the size control on Korean: 15.1% against 17.5% (-2.4 points, p = 0.34, not registered). Do not write that the drift is weaker on Aya, and do not write that it is the same. Do not read a trend with size from 12.4 against 14.1 either: each is one run.
+- Swahili differs between the two small runs (not registered). Under the size control the refusal rate falls 9.6 points [-14.1, -5.2] and strict attack success rises 4.1 points (p = 0.029). Under Aya neither moves significantly. Give the numbers and no reason: one run each, and the two sets differ in answer length as well as source.
+- Over-refusal and task score, which the plan asks for. XSTest over-refusal averages 8.0% under Aya plain and 9.8% under Aya SafeGrad, against 8.4% for base; no language's change is significant. Task score on the Bactrian-X task prompts falls under both Aya runs, from 6.32 to 6.02 and 6.03 on average (English -0.20 and -0.20, Korean -0.26 and -0.28, Chinese -0.46 and -0.40; five of the six are significant). Those are Bactrian-X prompts. The held-out Aya task set tests Aya's own kind of prompt and is still running.
+- The Aya arms are not in the truncation audit. Under Aya plain 53 of 291 Korean answers (18%) reached the 256-token cap, and 29 of the 44 Korean flags are on complete answers.
+- Size: 173 training rows each in English, Korean and Chinese, 519 in all, which is 29% of the Bactrian-X set. Korean sets the size: Aya has 361 Korean rows, 304 pass the filters and the guard, 100 are held out as the task set and 31 near-duplicates of held-out prompts are removed. The plan's 600 rows per language could not be met. Say 173 rows per language, not "a third of the size".
+- "Written or edited by people": Aya labels 76 of the 173 English training rows and 75 of the 173 Korean ones as `re-annotations`, which are existing prompt and answer pairs that a person edited, not ones written from scratch.
 - The plan asks for "the D1 to D3 metrics" on these runs. We know of no written definition, so they are read by the three checks registered in section 10 (drift, repair, Swahili refusals), which mirror H1 to H3, with over-refusal and task score beside them.
 - The size control matches rows, not text. Aya answers are much shorter than Bactrian-X ones (median 43 characters in Chinese against 212), so the Aya runs see less text than the control. Keep that next to any comparison of the two.
-- Whatever comes out is one seed. The registered sentences are in section 10: if the drift appears, "the Korean drift appears on a second dataset, written by people"; say 173 rows per language, not "a third of the size".
 - Cohere built both Tiny Aya and the Aya Dataset, and the model card names no training data, so the model may have seen these rows. Say so wherever Aya is used. The dataset card is `docs/lir/cards/aya.md`.
 
 **Repair vector (exploratory, not registered).** The difference between the seed 42 SafeGrad and plain adapters, added to the plain adapters of seeds 1 and 2. No training, and nothing was tuned on the test prompts. Single runs.
@@ -130,6 +139,6 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - It carries SafeGrad's other effects too. The Swahili refusal rate goes from 44.7% to 56.7% and from 42.3% to 57.0%, above base (50.9%). English over-refusal of safe prompts is 12.0% and 11.6%, against 9.6% for base and 6.0% for plain; the difference from base is not significant. Task score is level with plain (5.81 and 5.82 against 5.85 and 5.88).
 - What it suggests: the repair SafeGrad learned at one seed is a change to the weights that carries over to a model trained at another seed. That is one model, one dataset, one vector and two seeds, and it was added after we had seen the seed results. Treat it as a lead for future work, not as a finding to rest a claim on.
 
-**On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. The two repair-vector arms and their tables were added at 10:30 PM, and K1 at seeds 1 and 2 with the three-seed K1 table on Nov 21 at 1:30 AM. The answers generated again at 1,024 tokens went up under `truncation-regenerated/` with the truncation report: seed 42 at 4:40 AM, seeds 1 and 2 at 5:50 AM, with the second harm-category table. Not uploaded yet: the re-generated Earth answers and the Aya runs, which are still running or queued.
+**On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. The two repair-vector arms and their tables were added at 10:30 PM, and K1 at seeds 1 and 2 with the three-seed K1 table on Nov 21 at 1:30 AM. The answers generated again at 1,024 tokens went up under `truncation-regenerated/` with the truncation report: seed 42 at 4:40 AM, seeds 1 and 2 at 5:50 AM, with the second harm-category table. Not uploaded yet: the three Aya arms, the re-generated Earth answers, and the answers to the held-out Aya prompts. Those answers quote the Aya rows, and the Aya data files are not on Hugging Face.
 
-**Still to come, in queue order.** The two Aya runs and the size control (about 9:45 AM); the Aya task set for five checkpoints; the Earth arms generated again at 1,024 tokens. The queue should be through by about noon Saturday.
+**Still to come, in queue order.** The Aya task set for five checkpoints (about 10:45 AM); the Earth arms generated again at 1,024 tokens. The queue should be through by about noon Saturday.

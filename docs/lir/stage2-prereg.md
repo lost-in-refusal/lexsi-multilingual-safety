@@ -294,6 +294,25 @@ Each check is read at one seed, as in section 8.
 
 A limit we can now put a number on: the two sets match in rows, not in text. Aya answers are shorter. The median answer has 298, 160 and 43 characters in English, Korean and Chinese, against 602, 320 and 212 in the size control. So the Aya runs see less text than the control, and "the same size" in the table above means the same number of rows. Where the table says "a third of the size", the figure is 173 rows per language against 600. The dataset card is `docs/lir/cards/aya.md`.
 
+**Added Nov 21, the result.** The three runs finished at seed 42 on 519 rows each. No row was dropped, each run record names a clean commit (`88129a6`), and the training-file hashes match the committed files. The tables are in `results/lir/stage2/aya/`.
+
+- Y1 holds. Under Aya plain, Korean strict attack success goes from 5.2% to 15.1% (+10.0 points, p < 0.001) and English stays at 6.9%. The gap is +10.0 points [+5.5, +14.8].
+- Y2 holds. SafeGrad against plain on Korean is -6.5 points [-10.0, -3.4] (p < 0.001), and the four-language average is 7.6% against 10.1%.
+- Y3 does not hold. The Swahili refusal rate goes from 50.9% to 47.4%: -3.4 points [-7.9, +1.0].
+- Size control. Bactrian-X plain on 519 rows raises Korean by 12.4 points (p < 0.001) and English by 1.7; the gap is +10.7 points [+6.2, +15.5]. It passes Y1's test. Y1 holds, so the control decides no row.
+- Rows that apply: "Y1 holds" and "Y3 holds or fails". We report that the Korean drift appears on a second dataset, written or edited by people, at 173 training rows per language, and that SafeGrad's repair appears there too. We report Y3 beside H3 with no further claim. All of it is one seed.
+
+Not registered, so these decide nothing. They are listed in `aya/checks.md` under "Beside the checks".
+
+- Aya SafeGrad stays above base on Korean: 8.6% against 5.2% (+3.4 points, p = 0.021). It removes 6.5 of the 10.0 points.
+- Aya plain against Bactrian-X of the same size on Korean: 15.1% against 17.5% (-2.4 points, p = 0.34). We do not say the drift is weaker on Aya, and we do not say it is the same. The two sets match in rows and not in text.
+- Swahili under the size control: the refusal rate falls 9.6 points [-14.1, -5.2] and strict attack success rises 4.1 points (p = 0.029). Under Aya plain neither moves significantly (strict +0.7 points, p = 0.85). We give the numbers and no reason: each is one run, and the two sets differ in answer length as well as source.
+- Over-refusal on XSTest averages 8.0% under Aya plain and 9.8% under Aya SafeGrad, against 8.4% for base. No language's change is significant.
+- Task score on the Bactrian-X task prompts falls under both Aya runs, from 6.32 to 6.02 and 6.03 on average. Five of the six per-language changes are significant. Those are Bactrian-X prompts; the held-out Aya task set was still running when this was written.
+- The Aya arms are not in the truncation audit of section 8. Under Aya plain 53 of 291 Korean answers reached the 256-token cap, and 29 of the 44 Korean flags are on complete answers.
+
+The report step failed in the queue: it read the stage 1 run record of the full-size plain run, which has no commit field. Commit `bafdd2f` fixes that, and `e1b555c` adds the unregistered lines above and writes training files as paths inside the repository. Both were made after the verdict files existed and after we had seen the result. The tests of Y1 to Y3 and the outcome rows did not change, and the report was run again from the same files.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
