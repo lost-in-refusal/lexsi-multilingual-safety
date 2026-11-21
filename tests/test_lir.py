@@ -189,6 +189,41 @@ class Truncation(unittest.TestCase):
         self.assertIn("20.0%, 60.0%, 30.0% before, 10.0%, 60.0%, 30.0% after", text)
 
 
+class Regeneration(unittest.TestCase):
+    def test_to_regen_leaves_out_sets_never_run(self):
+        import contextlib
+        import io
+        import json
+        from unittest import mock
+
+        from lir import trunc
+
+        def write(d, name, rows, judged=True):
+            d.mkdir(parents=True, exist_ok=True)
+            (d / f"{name}.gen.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+            if judged:
+                (d / f"{name}.guard.jsonl").write_text("".join(json.dumps(dict(r, safety="Safe", refusal="Yes")) + "\n" for r in rows))
+
+        rows = [{"uid": f"u{i}", "lang": "ko", "prompt": "p", "response": "r", "n_tokens": 5, "truncated": i < 2} for i in range(5)]
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):
+            root = Path(tmp)
+            write(root / "eval" / "attack-only", "attack", rows)
+            write(root / "eval" / "both", "attack", rows)
+            write(root / "eval" / "both", "xstest", rows[:3])
+            write(root / "eval" / "half", "attack", rows)
+            write(root / "eval" / "half", "xstest", rows, judged=False)
+            (root / "eval" / "none").mkdir()
+            with mock.patch.object(trunc, "RUNS", root):
+                one, two = trunc.to_regen("attack-only"), trunc.to_regen("both")
+                for arm in ("half", "none"):               # run but not judged, and never run at all
+                    with self.assertRaises(SystemExit):
+                        trunc.to_regen(arm)
+        self.assertEqual(list(one), ["attack"])
+        self.assertEqual([r["uid"] for r in one["attack"]], ["u0", "u1"])
+        self.assertEqual(one["attack"][0], {"uid": "u0", "lang": "ko", "prompt": "p"})
+        self.assertEqual({k: len(v) for k, v in two.items()}, {"attack": 2, "xstest": 2})
+
+
 class HarmCategories(unittest.TestCase):
     def arm(self, unsafe_ko=()):
         """40 prompts: f0-f24 tagged A, f20-f39 tagged B (f20-f24 carry both), f38 and f39 also tagged C."""

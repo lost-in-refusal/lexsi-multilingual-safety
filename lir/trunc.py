@@ -164,18 +164,30 @@ def count(a) -> None:
     print("\n".join(lines))
 
 
-def regen(a) -> None:
-    if a.arm.startswith("earth-") != (MODEL_KEY == "earth"):
-        raise SystemExit(f"arm {a.arm} does not match the loaded model {MODEL} (set LIR_MODEL)")
+def to_regen(arm: str) -> dict[str, list[dict]]:
+    """The truncated answers of an arm, per set, as prompts to generate again. A set the arm was never run on is
+    left out (the K1 arms have the attack set only). A set that was run and is not fully judged stops everything."""
     todo = {}
     for name in SETS:
-        rows = judged(a.arm, name)
+        if not (RUNS / "eval" / arm / f"{name}.gen.jsonl").exists():
+            print(f"{arm}/{name}: not evaluated on this set, left out", flush=True)
+            continue
+        rows = judged(arm, name)
         if rows is None:
-            raise SystemExit(f"{a.arm}/{name} is not fully judged; nothing generated")
+            raise SystemExit(f"{arm}/{name} is not fully judged; nothing generated")
         keep = lambda r: {k: v for k, v in r.items() if k not in
                           ("response", "n_tokens", "truncated", "safety", "categories", "refusal", "guard_raw")}
         todo[name] = [keep(r) for r in rows if r["truncated"]]
-        print(f"{a.arm}/{name}: {len(todo[name])} of {len(rows)} answers to generate again at {CAP} tokens", flush=True)
+        print(f"{arm}/{name}: {len(todo[name])} of {len(rows)} answers to generate again at {CAP} tokens", flush=True)
+    if not todo:
+        raise SystemExit(f"{arm} has no evaluated set; nothing generated")
+    return todo
+
+
+def regen(a) -> None:
+    if a.arm.startswith("earth-") != (MODEL_KEY == "earth"):
+        raise SystemExit(f"arm {a.arm} does not match the loaded model {MODEL} (set LIR_MODEL)")
+    todo = to_regen(a.arm)
     if a.dry_run:
         return
     out = REGEN / a.arm
@@ -185,7 +197,7 @@ def regen(a) -> None:
     from lir.common import empty_cache
 
     tok, model = generate.load_model(a.adapter)
-    for name in SETS:
+    for name in todo:
         generate.generate(tok, model, todo[name], out / f"{name}.gen.jsonl", CAP, tag=f"trunc/{a.arm}/{name}")
     del model
     empty_cache()
@@ -193,7 +205,7 @@ def regen(a) -> None:
     from lir import guard
 
     gtok, gmodel = guard.load()
-    for name in SETS:
+    for name in todo:
         guard.judge(gtok, gmodel, read_jsonl(out / f"{name}.gen.jsonl"), out / f"{name}.guard.jsonl")
 
 

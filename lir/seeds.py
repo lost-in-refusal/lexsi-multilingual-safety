@@ -263,11 +263,12 @@ def control_bar(data: dict[str, dict[str, dict]]) -> float:
     return sum(rises) / len(rises) / 2
 
 
-def control_result(data: dict[str, dict[str, dict]], arm: str, plain: str = "plain") -> dict:
+def control_result(data: dict[str, dict[str, dict]], arm: str, plain: str = "plain", bar: float | None = None) -> dict:
     """K1 for one seed. data holds base, the control arm and the three plain seeds, attack set, all rows judged.
-    plain is the plain run of the same seed on the usual set."""
+    plain is the plain run of the same seed on the usual set. With a bar given, that bar is used as it is and data
+    needs only base, plain and the control arm (section 11b fixes the bar on the capped answers)."""
     strict = {a: by_family(data[a], STRICT) for a in ("base", plain, arm)}
-    bar = control_bar(data)
+    bar = control_bar(data) if bar is None else bar
     vs_base = {l: change(strict["base"], strict[arm], l) for l in EVAL_LANGS}
     ko = vs_base["ko"]
     rose = ko["delta"] > 0 and ko["p"] < 0.05
