@@ -527,6 +527,35 @@ class SeedChecks(unittest.TestCase):
         self.assertEqual(a["ko_unsafe_class_only"]["rate"], {"base": 10.0, "plain": 60.0, "safegrad": 30.0})
         self.assertEqual(a["ko_unsafe_class_only"]["safegrad_vs_plain"]["delta"], -30.0)
 
+    def test_by_language(self):
+        from lir.seeds import by_language
+
+        base = self.arm({"ko": range(2)}, range(10))
+        data = {"base": base, "p1": self.arm({"ko": range(12)}, range(4)), "s1": self.arm({"ko": range(6)}, range(10)),
+                "p2": self.arm({"ko": range(8)}, range(6)), "s2": self.arm({"ko": range(2)}, range(12))}
+        res = by_language(data, {1: ("p1", "s1"), 2: ("p2", "s2"), 3: ("p3", "s3")})   # seed 3 has no files
+        n = sum(r["lang"] == "ko" for r in base.values())
+        self.assertEqual(res["seeds"], [1, 2])
+        ko = res["strict"]["plain"]["ko"]
+        self.assertEqual(ko["seeds"], {1: 100 * 10 / n, 2: 100 * 6 / n})
+        self.assertAlmostEqual(ko["mean"], 100 * 8 / n)
+        self.assertTrue(ko["ci95"][0] < ko["mean"] < ko["ci95"][1])
+        self.assertEqual(res["strict"]["plain"]["en"]["mean"], 0)
+        self.assertAlmostEqual(res["refusal"]["plain"]["sw"]["mean"], -100 * 5 / n)
+        self.assertAlmostEqual(res["refusal"]["safegrad"]["sw"]["seeds"][2], 100 * 2 / n)
+        self.assertEqual(res["strict"]["base"]["ko"], 100 * 2 / n)
+
+    def test_korean_settings(self):
+        from lir.seeds import korean_settings
+
+        data = {"base": self.arm({"ko": range(2)}, range(10)), "p1": self.arm({"ko": range(12)}, range(4)),
+                "p2": self.arm({"ko": range(8)}, range(6)), "s1": self.arm({"ko": range(6)}, range(10)),
+                "other": self.arm({"ko": range(4)}, range(10)), "q": self.arm({"ko": range(9)}, range(10))}
+        rows = korean_settings(data, (("two seeds", "base", ("p1", "p2"), ("s1",)), ("own base", "other", ("q",), ())))
+        self.assertEqual((rows[0]["base"], rows[0]["plain"]["runs"], rows[0]["safegrad"]["runs"]), (10.0, [50.0, 30.0], [20.0]))
+        self.assertAlmostEqual(rows[0]["plain"]["mean"], 40.0)
+        self.assertEqual((rows[1]["base"], rows[1]["plain"]["mean"], rows[1]["safegrad"]), (20.0, 25.0, None))
+
     def test_control_across_seeds(self):
         from lir.seeds import CONTROLS, K1_ACROSS, SEEDS, control_across, control_result
 

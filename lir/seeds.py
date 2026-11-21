@@ -132,6 +132,41 @@ def analyse(data: dict[str, dict[str, dict]], seeds: dict[int, tuple[str, str]] 
     return out
 
 
+def by_language(data: dict[str, dict[str, dict]], seeds: dict[int, tuple[str, str]] = SEEDS) -> dict:
+    """Change against base in every language, per seed and pooled, for strict attack success and the refusal rate.
+    The numbers behind the drift figure. H1 to H3 read three of these cells; the rest is description."""
+    out = {"seeds": [seed for seed, pair in seeds.items() if all(arm in data for arm in pair)]}
+    for name, fn in (("strict", STRICT), ("refusal", REFUSAL)):
+        base = by_family(data["base"], fn)
+        out[name] = {"base": {l: rate(base, l) for l in EVAL_LANGS}}
+        for i, key in enumerate(("plain", "safegrad")):
+            arms = {seed: by_family(data[seeds[seed][i]], fn) for seed in out["seeds"]}
+            out[name][key] = {l: dict(pooled([diff(base, v, l) for v in arms.values()]),
+                                      seeds={seed: change(base, v, l)["delta"] for seed, v in arms.items()})
+                              for l in EVAL_LANGS}
+    return out
+
+
+# label, base arm, plain arms, SafeGrad arms: every setting a plain fine-tune was evaluated in
+SETTINGS = (("Tiny Aya Global, Bactrian-X", "base", ("plain", "plain-s1", "plain-s2"), ("safegrad", "safegrad-s1", "safegrad-s2")),
+            ("Global, Bactrian-X with no Korean rows", "base", ("plain-noko", "plain-noko-s1", "plain-noko-s2"), ()),
+            ("Global, Bactrian-X cut to 519 rows", "base", ("plain-ayasize",), ()),
+            ("Global, Aya Dataset, 519 rows", "base", ("aya-plain",), ("aya-safegrad",)),
+            ("Tiny Aya Earth, Bactrian-X", "earth-base", ("earth-plain",), ("earth-safegrad",)))
+
+
+def korean_settings(data: dict[str, dict[str, dict]], settings=SETTINGS) -> list[dict]:
+    """Korean strict attack success against the setting's own base model, per run and pooled over the setting's runs.
+    The numbers behind the settings figure. Description: the registered tests of each setting are in its own table."""
+    rows = []
+    for label, base, plains, safegrads in settings:
+        b = by_family(data[base], STRICT)
+        cell = lambda arms: dict(pooled([diff(b, by_family(data[a], STRICT), "ko") for a in arms]),
+                                 runs=[change(b, by_family(data[a], STRICT), "ko")["delta"] for a in arms]) if arms else None
+        rows.append({"setting": label, "base": rate(b, "ko"), "plain": cell(plains), "safegrad": cell(safegrads)})
+    return rows
+
+
 def fmt(res: dict) -> str:
     star = lambda c: "*" if c["p"] < 0.05 else ""
     second = res.get("judge") == "guard2"
@@ -336,6 +371,7 @@ def main() -> None:
     ap.add_argument("--out", default=str(ROOT / "results" / "lir" / "stage2"))
     ap.add_argument("--times", action="store_true", help="write the training-time table and stop")
     ap.add_argument("--control", nargs="+", help="arms trained with no Korean rows (one per seed): write check K1 and stop")
+    ap.add_argument("--figure", action="store_true", help="write the two stage 2 figures with their numbers and stop")
     ap.add_argument("--judge", choices=["guard", "guard2", "granite"], default="guard",
                     help="guard2: the second judge's labels, from lir.guard2 arms; granite: from lir.granite arms")
     a = ap.parse_args()
@@ -344,6 +380,17 @@ def main() -> None:
         return
     if a.control:
         control(a.control, Path(a.out))
+        return
+    if a.figure:
+        from lir.figures import drift_figure, settings_figure
+
+        res = by_language({arm: read_arm(arm, "guard") for arm in ["base"] + [x for pair in SEEDS.values() for x in pair]})
+        write_json(Path(a.out) / "drift_by_language.json", res)
+        drift_figure(res, Path(a.out) / "drift_by_language.png")
+        arms = {arm for _, base, plains, safegrads in SETTINGS for arm in (base, *plains, *safegrads)}
+        rows = korean_settings({arm: read_arm(arm, "guard") for arm in sorted(arms)})
+        write_json(Path(a.out) / "korean_by_setting.json", rows)
+        settings_figure(rows, Path(a.out) / "korean_by_setting.png")
         return
     n_attack = len(read_jsonl(DATA / "multijail_attack.jsonl"))
     data, counts = {}, {}

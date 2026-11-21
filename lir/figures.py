@@ -122,3 +122,113 @@ def harm_figure(res: dict, path) -> None:
     fig.tight_layout(rect=(0, 0.01, 1, 0.965))
     fig.savefig(path, dpi=170, facecolor=SURFACE)
     print("wrote", path)
+
+
+LANG2 = {"en": "English", "ko": "Korean", "zh": "Chinese", "sw": "Swahili\n(not trained on)"}
+
+
+def drift_figure(res: dict, path) -> None:
+    """Change against base by language under plain and under SafeGrad: the mean of the seeds with its interval, and
+    each seed as a tick. Left panel strict attack success, right panel the refusal rate on the same prompts."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from matplotlib.ticker import MultipleLocator
+
+    panels = (("strict", "Strict attack success", "more attacks succeed  \u2192", "ko"),
+              ("refusal", "Refusal rate on attack prompts", "\u2190  fewer refusals", "sw"))
+    series = (("plain", "Plain LoRA", STAGE2["plain"], -0.17), ("safegrad", "SafeGrad LoRA", STAGE2["safegrad"], 0.17))
+    langs = list(LANG2)
+    fig, axes = plt.subplots(1, 2, figsize=(10.6, 5.0), sharey=True, facecolor=SURFACE)
+    for ax, (metric, title, hint, read) in zip(axes, panels):
+        ax.set_facecolor(SURFACE)
+        ax.grid(axis="x", color=GRID, lw=1)
+        ax.set_axisbelow(True)
+        ax.axvline(0, color=INK2, lw=1, zorder=1)
+        for key, _, color, dy in series:
+            for y, lang in enumerate(langs):
+                c = res[metric][key][lang]
+                ax.plot(c["ci95"], [y + dy] * 2, color=color, lw=1.6, solid_capstyle="round", zorder=2)
+                ax.plot(list(c["seeds"].values()), [y + dy] * len(c["seeds"]), "|", ms=12, mew=1.4, color=color, zorder=3)
+                ax.plot(c["mean"], y + dy, "o", ms=8.5, mfc=color, mec=SURFACE, mew=1.6, zorder=4)
+                if lang == read and (metric, key) != ("refusal", "safegrad"):   # the marks H1 to H3 compare
+                    right = c["mean"] >= 0
+                    ax.annotate(f"{c['mean']:+.1f}".replace("-", "\u2212"), (c["ci95"][1] if right else c["ci95"][0], y + dy),
+                                xytext=(7 if right else -7, 0), textcoords="offset points", fontsize=9, color=INK,
+                                va="center", ha="left" if right else "right")
+        ax.set_title(title, fontsize=11, color=INK, loc="left", pad=8)
+        ax.set_xlabel(hint, fontsize=8.5, color=INK2)
+        ax.xaxis.set_major_locator(MultipleLocator(5))
+        ax.margins(x=0.12)
+        ax.tick_params(colors=INK2, length=0, labelsize=9)
+        for edge in ("top", "right", "left", "bottom"):
+            ax.spines[edge].set_visible(False)
+    axes[0].set_yticks(range(len(langs)), [LANG2[l] for l in langs])
+    axes[0].tick_params(axis="y", labelsize=10, labelcolor=INK)
+    axes[0].set_ylim(len(langs) - 0.45, -0.55)
+    n = len(res["seeds"])
+    fig.supxlabel("Change against the base model, in points. Tiny Aya Global, 291 MultiJail prompts per language, answers "
+                  f"capped at 256 tokens.\nDots: mean of seeds {', '.join(map(str, res['seeds']))}. Lines: 95% intervals over "
+                  "prompts. Ticks: single seeds. The numbered marks are the ones H1 to H3 compare.", fontsize=8.5, color=INK2)
+    handles = [Line2D([], [], marker="o", ms=8.5, mfc=c, mec=SURFACE, mew=1.6, color=c, lw=1.6, label=lab)
+               for _, lab, c, _ in series]
+    handles.append(Line2D([], [], marker="|", ms=12, mew=1.4, color=INK2, lw=0, label=f"one seed ({n} per arm)"))
+    fig.legend(handles=handles, loc="upper right", ncol=3, frameon=False, fontsize=9, labelcolor=INK,
+               bbox_to_anchor=(0.985, 0.995))
+    fig.tight_layout(rect=(0, 0.01, 1, 0.95))
+    fig.savefig(path, dpi=170, facecolor=SURFACE)
+    print("wrote", path)
+
+
+def settings_figure(rows: list[dict], path) -> None:
+    """Korean strict attack success against the setting's own base model, for every training setting."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from matplotlib.ticker import MultipleLocator
+
+    series = (("plain", "Plain LoRA", STAGE2["plain"], -0.17), ("safegrad", "SafeGrad LoRA", STAGE2["safegrad"], 0.17))
+    fig, ax = plt.subplots(figsize=(10.6, 4.9), facecolor=SURFACE)
+    ax.set_facecolor(SURFACE)
+    ax.grid(axis="x", color=GRID, lw=1)
+    ax.set_axisbelow(True)
+    ax.axvline(0, color=INK2, lw=1, zorder=1)
+    for key, _, color, dy in series:
+        for y, row in enumerate(rows):
+            c = row[key]
+            if c is None:
+                continue
+            ax.plot(c["ci95"], [y + dy] * 2, color=color, lw=1.6, solid_capstyle="round", zorder=2)
+            if len(c["runs"]) > 1:
+                ax.plot(c["runs"], [y + dy] * len(c["runs"]), "|", ms=12, mew=1.4, color=color, zorder=3)
+            ax.plot(c["mean"], y + dy, "o", ms=8.5, mfc=color, mec=SURFACE, mew=1.6, zorder=4)
+            ax.annotate(f"{c['mean']:+.1f}".replace("-", "\u2212"), (c["ci95"][1], y + dy), xytext=(7, 0),
+                        textcoords="offset points", fontsize=9, color=INK, va="center", ha="left")
+    runs = lambda row: len(row["plain"]["runs"])
+    ax.set_yticks(range(len(rows)), [f"{row['setting']}\n{runs(row)} seed{'s' if runs(row) > 1 else ''}, base "
+                                     f"{row['base']:.1f}%" for row in rows])
+    ax.tick_params(colors=INK2, length=0, labelsize=9)
+    ax.tick_params(axis="y", labelsize=9.5, labelcolor=INK)
+    ax.set_ylim(len(rows) - 0.45, -0.55)
+    ax.xaxis.set_major_locator(MultipleLocator(5))
+    ax.margins(x=0.1)
+    ax.set_xlim(left=min(-2.5, ax.get_xlim()[0]))
+    for edge in ("top", "right", "left", "bottom"):
+        ax.spines[edge].set_visible(False)
+    ax.set_title("Korean strict attack success after fine-tuning, against the same model before it", fontsize=11,
+                 color=INK, loc="left", pad=8)
+    fig.supxlabel("Change in points on 291 Korean MultiJail prompts, answers capped at 256 tokens. Dots: mean of the "
+                  "setting's seeds. Lines: 95% intervals over prompts.\nTicks: single seeds. Rows without a blue mark had "
+                  "no SafeGrad run. Each row's own registered test is in its table.", fontsize=8.5, color=INK2)
+    handles = [Line2D([], [], marker="o", ms=8.5, mfc=c, mec=SURFACE, mew=1.6, color=c, lw=1.6, label=lab)
+               for _, lab, c, _ in series]
+    handles.append(Line2D([], [], marker="|", ms=12, mew=1.4, color=INK2, lw=0, label="one seed"))
+    fig.legend(handles=handles, loc="upper right", ncol=3, frameon=False, fontsize=9, labelcolor=INK,
+               bbox_to_anchor=(0.985, 0.995))
+    fig.tight_layout(rect=(0, 0.01, 1, 0.95))
+    fig.savefig(path, dpi=170, facecolor=SURFACE)
+    print("wrote", path)
