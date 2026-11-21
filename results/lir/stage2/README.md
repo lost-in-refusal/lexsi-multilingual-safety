@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 20, 9:45 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 20, 10:30 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -16,7 +16,7 @@ Updated Nov 20, 9:45 PM ET. Every number comes from our own runs, and the file n
 | Earth E1 and E2 | E1 holds. E2 not confirmed | 1 | Korean strict attack success 10.7% base, 21.3% plain, 16.5% SafeGrad. Swahili refusals fall 6.9 points, against 13.1 on Global | `earth/checks.md` |
 | K1 Korean with no Korean training rows (added Nov 20) | Outcome row 1 at seed 42: Korean rows are not needed for a drift of this size. Seeds 1 and 2 queued | 1 of 3 | Korean strict attack success 18.2% with no Korean rows in training, 19.2% with them, 5.2% base | `noko.md` |
 | K2 Korean rise judged by a person (added Nov 20) | Does not pass | 1 | 5 plain answers against 1 base answer marked unsafe on 94 prompts, p = 0.22 | `ko_drift.md` |
-| Repair vector (exploratory) | Running | 1 | | `vector.md` |
+| Repair vector (exploratory, not registered) | The seed 42 edit lowers Korean attack success at seeds 1 and 2 with no training | 2 | Korean 15.5% to 10.3% and 18.9% to 11.0%. SafeGrad trained at those seeds reaches 8.2% and 9.6% | `vector.md` |
 | Circuit comparison at five node counts (added Nov 20) | Holds at 100, 200 and 300 nodes, not at 50 or 400 | 1 | Korean keeps the fewest base nodes under plain at three of five sizes | `circuit_nodes.md` |
 | Truncation audit (added Nov 20) | Counted. Re-generation queued | 1 to 3 | Base answers reach the 256-token cap far more often than fine-tuned ones: Korean attack 34%, against 8% plain and 8% SafeGrad | `truncation/counts.md` |
 | Harm categories (added Nov 20) | Korean rises in all 8 categories with 20 or more prompts | 3 | Rises from +3.7 to +21.0 points | `harm_categories.md`, `harm_categories.png` |
@@ -102,6 +102,13 @@ Intervals are 95%. Results marked 1 seed are single runs.
 
 **Aya.** Not run yet. The Aya Dataset has 361 Korean rows, 309 after the filters, so the plan's 600 rows per language cannot be met. The registered rule: 100 rows per language held out as the Aya task set, and the same number of training rows in English, Korean and Chinese, about 190 each. A plain run on Bactrian-X cut to the same size is the control, so a weaker drift on Aya can be told apart from a smaller fine-tune. Tiny Aya's model card names no training data, and Cohere built both the model and the dataset, so the model may have seen these rows.
 
+**Repair vector (exploratory, not registered).** The difference between the seed 42 SafeGrad and plain adapters, added to the plain adapters of seeds 1 and 2. No training, and nothing was tuned on the test prompts. Single runs.
+- Korean strict attack success falls from 15.5% to 10.3% at seed 1 (-5.2 points, p = 0.008) and from 18.9% to 11.0% at seed 2 (-7.9, p < 0.001). SafeGrad trained at those seeds reaches 8.2% and 9.6%, so the edit gives 71% and 85% of the drop that training gave.
+- Edited against SafeGrad: +2.1 points (p = 0.15) and +1.4 (p = 0.39). That is no detected difference, not proof that the two are equal. Do not write that the edit matches SafeGrad.
+- Like SafeGrad, it does not return Korean to base: it stays 5.2 and 5.8 points above base, both significant.
+- It carries SafeGrad's other effects too. The Swahili refusal rate goes from 44.7% to 56.7% and from 42.3% to 57.0%, above base (50.9%). English over-refusal of safe prompts is 12.0% and 11.6%, against 9.6% for base and 6.0% for plain; the difference from base is not significant. Task score is level with plain (5.81 and 5.82 against 5.85 and 5.88).
+- What it suggests: the repair SafeGrad learned at one seed is a change to the weights that carries over to a model trained at another seed. That is one model, one dataset, one vector and two seeds, and it was added after we had seen the seed results. Treat it as a lead for future work, not as a finding to rest a claim on.
+
 **On Hugging Face.** Uploaded Nov 20, 9:42 PM ET to `lost-in-refusal/lost-in-refusal-eval-outputs` (public): the outputs of seeds 1 and 2, the two mixing runs, the run with no Korean rows at seed 42 and the three Earth arms, the Swahili re-translations, and the tables in this folder. Every generation row has its `truncated` flag. The seed 42 outputs were already there. Not uploaded yet: the repair-vector arms, K1 at seeds 1 and 2, the re-generated answers and the Aya runs, which are still running.
 
-**Still to come, in queue order.** Repair-vector evaluations; K1 at seeds 1 and 2; circuit patching in three languages; truncation re-generation; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints. The queue should be through by about 11 AM Saturday.
+**Still to come, in queue order.** K1 at seeds 1 and 2; circuit patching in three languages; truncation re-generation; Aya screening, two Aya runs and the size control; the Aya task set for five checkpoints. The queue should be through by about 11 AM Saturday.
