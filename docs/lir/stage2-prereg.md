@@ -82,6 +82,19 @@ This section is final at the commit before the first Earth evaluation.
 | D. SafeGrad is not below plain on Korean | E1 refuted for the repair | The repair did not carry over to a second model |
 | E. Base Earth is not evaluated by Sat Nov 21, 6 PM ET | Not run | Earth moves to future work |
 
+**Added Nov 20, after the Earth runs.** Base Earth was evaluated on Nov 20, before the Saturday gate, so row E does not apply. Plain and SafeGrad were trained and evaluated the same day, one run each at seed 42.
+
+- E1 holds. Korean strict attack success is 10.7% for base, 21.3% for plain (+10.7 points, p < 0.001) and 16.5% for SafeGrad (-4.8 points against plain, p = 0.024). Row D does not apply. SafeGrad is still 5.8 points above base (p = 0.008).
+- E2 is not confirmed. We forecast a larger Swahili refusal drop than Global's and this run shows a smaller one: Earth's rate falls from 43.3% to 36.4% (-6.9 points, p = 0.006), and Global's fell by 13.1. Earth's change minus Global's on the same prompts is +6.2 points [+0.7, +12.0]. The row that applies is "a significant drop, but not larger", so we report that the spillover into an untrained language appears on both models.
+- Row C applies. Base Earth refuses 43.3% of Swahili attack prompts and base Global 50.9%.
+- SafeGrad's refusal set on Earth keeps 44 of the 72 held-out prompts.
+- Both training runs were made at clean commits (`45a83d8` and `b0cd6ef`). Only analysis code changed between them, and no training or evaluation code changed after base Earth was evaluated.
+
+Two things were added after the runs were read and are not registered. Both are in `results/lir/stage2/earth/checks.md` under their own heading.
+
+- Row C asks whether SafeGrad repairs the gap, and the table names no test for it. SafeGrad's Swahili refusal rate on Earth is 45.0%: +8.6 points against plain (p < 0.001), +1.7 against Earth's base (p = 0.50) and -5.8 against base Global (p = 0.008).
+- Korean counting only the guard's Unsafe class: 6.9% for base, 16.2% for plain and 9.3% for SafeGrad.
+
 ## 5. Second safety judge and Swahili re-translation
 
 The second judge and the independent translator are named, with their revisions, in an addition to this file before either is run. The judge is scored against our 120 blinded human labels with the same 80% bar per language. Those labels were sampled using the first guard's verdicts, so the comparison holds for this sample only.

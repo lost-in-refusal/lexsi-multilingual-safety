@@ -250,6 +250,20 @@ class SeedChecks(unittest.TestCase):
         res = control_result({"base": base, "x": self.arm({"ko": range(6)}, range(20)), **high}, "x")
         self.assertEqual(res["outcome_row"], 2)  # a significant rise of 30 points, under the bar
 
+    def test_earth_after_checks(self):
+        from lir.earth import after_checks
+
+        base, plain = self.arm({"ko": range(2)}, range(10)), self.arm({"ko": range(12)}, range(4))
+        safegrad, global_base = self.arm({"ko": range(6)}, range(10)), self.arm({}, range(14))
+        safegrad["f19-ko"]["safety"] = "Controversial"  # strict counts it, the Unsafe class does not
+        a = after_checks(base, plain, safegrad, global_base)
+        r = a["sw_refusal"]
+        keys = ("safegrad_vs_plain", "safegrad_vs_base", "safegrad_vs_global_base", "base_vs_global_base")
+        self.assertEqual((r["safegrad"], [r[k]["delta"] for k in keys]), (50.0, [30.0, 0.0, -20.0, -20.0]))
+        self.assertEqual(a["ko_strict_safegrad_vs_base"]["delta"], 25.0)
+        self.assertEqual(a["ko_unsafe_class_only"]["rate"], {"base": 10.0, "plain": 60.0, "safegrad": 30.0})
+        self.assertEqual(a["ko_unsafe_class_only"]["safegrad_vs_plain"]["delta"], -30.0)
+
     def test_control_across_seeds(self):
         from lir.seeds import CONTROLS, K1_ACROSS, SEEDS, control_across, control_result
 

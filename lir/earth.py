@@ -6,15 +6,34 @@ E1: plain fine-tuning raises Korean strict attack success on Earth, and SafeGrad
 E2: the same fine-tune lowers Earth's Swahili refusal rate on attack prompts by more than it
     lowered Global's at seed 42.
 One seed per arm, so every number here is a single run.
+The last block of the report (after_checks) was added once the runs had been read. It is not registered.
 """
 from __future__ import annotations
 
 from lir.common import DATA, EVAL_LANGS, ROOT, read_jsonl, write_json
 from lir.metrics import load
-from lir.seeds import REFUSAL, analyse, by_family, change, diff, pooled, rate
+from lir.seeds import REFUSAL, STRICT, UNSAFE, analyse, by_family, change, diff, pooled, rate
 
 ARMS = ("earth-base", "earth-plain", "earth-safegrad")
 GLOBAL = ("base", "plain")  # seed 42
+
+
+def after_checks(base: dict, plain: dict, safegrad: dict, global_base: dict) -> dict:
+    """Figures added after the runs were read: row C's question and two side readings of Korean. Not registered."""
+    ref = {k: by_family(v, REFUSAL) for k, v in
+           (("base", base), ("plain", plain), ("safegrad", safegrad), ("global_base", global_base))}
+    strict = {k: by_family(v, STRICT) for k, v in (("base", base), ("safegrad", safegrad))}
+    unsafe = {k: by_family(v, UNSAFE) for k, v in (("base", base), ("plain", plain), ("safegrad", safegrad))}
+    return {"sw_refusal": {"safegrad": rate(ref["safegrad"], "sw"),
+                           "safegrad_vs_plain": change(ref["plain"], ref["safegrad"], "sw"),
+                           "safegrad_vs_base": change(ref["base"], ref["safegrad"], "sw"),
+                           "safegrad_vs_global_base": change(ref["global_base"], ref["safegrad"], "sw"),
+                           "base_vs_global_base": change(ref["global_base"], ref["base"], "sw")},
+            "ko_strict_safegrad_vs_base": change(strict["base"], strict["safegrad"], "ko"),
+            "ko_unsafe_class_only": {"rate": {k: rate(v, "ko") for k, v in unsafe.items()},
+                                     "plain_vs_base": change(unsafe["base"], unsafe["plain"], "ko"),
+                                     "safegrad_vs_plain": change(unsafe["plain"], unsafe["safegrad"], "ko"),
+                                     "safegrad_vs_base": change(unsafe["base"], unsafe["safegrad"], "ko")}}
 
 
 def checks(arms: tuple[str, str, str] = ARMS) -> dict:
@@ -57,6 +76,7 @@ def checks(arms: tuple[str, str, str] = ARMS) -> dict:
     align = DATA / "alignment_sft_earth.jsonl"
     if align.exists():
         res["refusal_examples"] = {"earth": len(read_jsonl(align)), "global": len(read_jsonl(DATA / "alignment_sft.jsonl"))}
+    res["after_checks"] = after_checks(data["base"], data[plain], data[safegrad], ref["base"])
     return res
 
 
@@ -90,6 +110,20 @@ def fmt(res: dict) -> str:
     if "refusal_examples" in res:
         n = res["refusal_examples"]
         lines += ["", f"SafeGrad's refusal set on Earth keeps {n['earth']} examples; Global's kept {n['global']}."]
+    if "after_checks" in res:
+        a = res["after_checks"]
+        r, u = a["sw_refusal"], a["ko_unsafe_class_only"]
+        d = lambda c: f"{c['delta']:+.1f} points ({pv(c['p'])})"
+        lines += ["", "### Added after the runs were read, not registered", "",
+                  f"- Row C, whether SafeGrad repairs it: SafeGrad's Swahili refusal rate on Earth is {r['safegrad']:.1f}%. "
+                  f"Against Earth plain {d(r['safegrad_vs_plain'])}, against Earth base {d(r['safegrad_vs_base'])}, "
+                  f"against Global base {d(r['safegrad_vs_global_base'])}. Earth base against Global base: "
+                  f"{d(r['base_vs_global_base'])}.",
+                  f"- Korean strict attack success, SafeGrad against base: {d(a['ko_strict_safegrad_vs_base'])}.",
+                  f"- Korean counting only the guard's Unsafe class: {u['rate']['base']:.1f}% base, "
+                  f"{u['rate']['plain']:.1f}% plain, {u['rate']['safegrad']:.1f}% SafeGrad. Plain against base "
+                  f"{d(u['plain_vs_base'])}, SafeGrad against plain {d(u['safegrad_vs_plain'])}, SafeGrad against base "
+                  f"{d(u['safegrad_vs_base'])}."]
     return "\n".join(lines)
 
 

@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 20, 5:35 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 20, 8:45 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
@@ -13,7 +13,7 @@ Updated Nov 20, 5:35 PM ET. Every number comes from our own runs, and the file n
 | Check A second judge against our labels | Failed with both judges | - | See below | `second_judge_check.md` |
 | Check B headline under a second judge | Not run | - | Allowed only for a judge that passes Check A | `second_judge_check.md` |
 | Check C Swahili with an independent translator | Pass | 1 | Corrected attack success 17.9% base, 29.2% plain, 17.2% SafeGrad. Plain over base +11.3 points [+6.5, +16.5] | `swahili_nllb.json` |
-| Earth E1 and E2 | Running | 1 | | `earth/` |
+| Earth E1 and E2 | E1 holds. E2 not confirmed | 1 | Korean strict attack success 10.7% base, 21.3% plain, 16.5% SafeGrad. Swahili refusals fall 6.9 points, against 13.1 on Global | `earth/checks.md` |
 | K1 Korean with no Korean training rows (added Nov 20) | Outcome row 1 at seed 42: Korean rows are not needed for a drift of this size. Seeds 1 and 2 queued | 1 of 3 | Korean strict attack success 18.2% with no Korean rows in training, 19.2% with them, 5.2% base | `noko.md` |
 | K2 Korean rise judged by a person (added Nov 20) | Does not pass | 1 | 5 plain answers against 1 base answer marked unsafe on 94 prompts, p = 0.22 | `ko_drift.md` |
 | Repair vector (exploratory) | Queued | 1 | | `vector.md` |
@@ -48,7 +48,17 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - SafeGrad: 17.2%, 17.5% and 17.5%, level with base and 12.0, 7.6 and 7.9 points below plain of the same seed, each significant.
 - The cautions under Check C apply to these numbers too. The answers of seeds 1 and 2 were translated after a change to how the translator batches its input (long pieces go in smaller batches, and output length is capped by input length); the seed 42 translations are reused as they were.
 
-**Base Earth.** Evaluated Nov 20, before the Saturday gate. It refuses fewer Swahili attack prompts than base Global (43.3% against 50.9%), which is row C of the Earth outcome table. Its refusal set keeps 44 of the 72 held-out prompts; Global's kept 47.
+**Earth.** Base, plain and SafeGrad on Tiny Aya Earth at seed 42, one run each, with the same data and settings as Global. SafeGrad used Earth's own refusal set, which keeps 44 of the 72 held-out prompts (Global's kept 47). No person has read Earth's answers, so every number here is the guard's.
+- E1 holds. Korean strict attack success is 10.7% for base, 21.3% for plain (+10.7 points, p < 0.001) and 16.5% for SafeGrad (-4.8 against plain, p = 0.024).
+- SafeGrad is below plain and still above base, by 5.8 points (p = 0.008). It takes back 4.8 of the 10.7 points, under half; on Global it took back roughly 60 to 70%. Do not write that SafeGrad repairs most of the rise on Earth. `earth/results.md` shows SafeGrad's change against base and `earth/checks.md` shows it against plain, so the two files print different numbers in that row.
+- E2 is not confirmed. We forecast a larger Swahili refusal drop than Global's and this run shows a smaller one: Earth's rate falls from 43.3% to 36.4% (-6.9 points, p = 0.006), and Global's fell 13.1 points. The registered sentence is "the spillover into an untrained language appears on both models".
+- Do not write "refuted": that row is for no significant drop. Do not write that Earth drifts less in Swahili either. It is one run per model, and the interval for the difference, +6.2 points [+0.7, +12.0], counts variation over prompts, not over seeds, and barely clears zero.
+- Row C applies: base Earth refuses fewer Swahili attack prompts than base Global (43.3% against 50.9%), and the table says to lead with whether SafeGrad repairs it. The tests for that were added after the runs and are not registered. SafeGrad brings Earth's Swahili refusal rate to 45.0%: 8.6 points above plain (p < 0.001), level with Earth's own base (+1.7, p = 0.50), and still 5.8 points below base Global (p = 0.008). So SafeGrad takes back what fine-tuning cost. It does not close the gap Earth starts with.
+- Do not cite Earth's Swahili attack success (7.6%, 6.5% and 5.5%). The guard missed our agreement bar in Swahili, and Check C's translation step was not run on Earth.
+- Counting only the guard's Unsafe class (not registered): Korean 6.9% base, 16.2% plain, 9.3% SafeGrad. This reading makes the repair look larger, so give it beside the strict numbers and not in their place. K2 was a reading of Global's answers and says nothing about Earth's.
+- Other languages: plain moves English by +1.0 and Chinese by +2.4 points, neither significant. SafeGrad against plain is -3.1 in English (p = 0.012) and -4.5 in Chinese (p < 0.001).
+- Costs follow Global's pattern. Task score falls under both arms: Korean 6.05 for base, 5.34 for plain and 5.39 for SafeGrad (Global: 6.10, 5.59 and 5.40). Over-refusal of safe prompts averages 7.6% for base, 4.9% for plain and 7.2% for SafeGrad.
+- Both runs trained at clean commits, and no training or evaluation code changed between the three Earth arms. Plain took 74 minutes and SafeGrad 88.
 
 **K1.** Plain fine-tuning at seed 42 on English and Chinese rows only (1,747 rows), judged on the attack set. No row of the training file contains a Korean character.
 - Korean strict attack success rises to 18.2% from 5.2% for base: +13.1 points, p < 0.001, against a bar of 6.36. Plain on the usual set, which has 600 Korean rows, is 19.2%; the difference is -1.0 points (p = 0.74). 18.2% sits inside the range of the three plain seeds (15.5% to 19.2%).
@@ -68,4 +78,4 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - One labeller, who knows the expected direction and can often guess the arm from the answer's length.
 - The first scoring matched both answers to a prompt to one guard verdict. That is fixed and did not touch the test. The joins for the 120-label set were checked for the same error: every id appears once there, so Check A stands.
 
-**Still to come.** The Earth training runs, the repair-vector evaluations, and K1 at seeds 1 and 2.
+**Still to come.** The repair-vector evaluations and K1 at seeds 1 and 2.
