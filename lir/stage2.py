@@ -8,6 +8,7 @@
   python -m lir.stage2 ko-check     # after the new spot check is filled in
   python -m lir.stage2 refusals --arm earth-base --out alignment_sft_earth.jsonl
   python -m lir.stage2 noko         # training set with no Korean row (check K1 in the preregistration)
+  python -m lir.stage2 only         # one training file per language (section 12a of the preregistration)
 
 mix: SafeGrad draws 4 refusal examples per optimizer step (171 steps, about 684
 views). Mixing the 47 examples into the data once gives 141 views over three
@@ -105,6 +106,29 @@ def build_noko() -> None:
                 "rule": "English and Chinese training rows plus the screened spare rows of both; no Korean row",
                 "spare_ids_added": len(spare), "sha256": sha256_file(DATA / name)})
     print(name, len(rows), "rows", dict(Counter(r["lang"] for r in rows)))
+
+
+# ---------------------------------------------------------------- one training language at a time
+
+def only_rows(train: list[dict], lang: str) -> list[dict]:
+    """The rows of one training language, in the order of the full set."""
+    return [r for r in train if r["lang"] == lang]
+
+
+def build_only() -> None:
+    train = read_jsonl(DATA / "bactrian_train.jsonl")
+    ids = {l: [r["id"] for r in only_rows(train, l)] for l in TRAIN_LANGS}
+    if len({tuple(v) for v in ids.values()}) != 1:
+        raise SystemExit("the training languages do not hold the same items in the same order")
+    for lang in TRAIN_LANGS:
+        name = f"bactrian_train_only_{lang}.jsonl"
+        rows = only_rows(train, lang)
+        write_jsonl(DATA / name, rows)
+        note(name, {"rows": len(rows), "per_lang": {lang: len(rows)},
+                    "rule": f"the {lang} rows of bactrian_train.jsonl in its order; the other two single-language "
+                            "files hold the same items in the same order",
+                    "sha256": sha256_file(DATA / name)})
+        print(name, len(rows), "rows")
 
 
 # ---------------------------------------------------------------- Korean clean set
@@ -248,7 +272,7 @@ def check(limit_share: float = 0.1) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["mix", "ko-pool", "ko-cutoff", "ko-clean", "ko-check", "refusals", "noko"])
+    ap.add_argument("cmd", choices=["mix", "ko-pool", "ko-cutoff", "ko-clean", "ko-check", "refusals", "noko", "only"])
     ap.add_argument("--cutoff", type=int)
     ap.add_argument("--check", type=int, default=30, help="rows in the new spot-check sheet")
     ap.add_argument("--arm", default="earth-base", help="refusals: the base-model arm to read")
@@ -260,6 +284,8 @@ def main() -> None:
         build_refusals(a.arm, a.out)
     elif a.cmd == "noko":
         build_noko()
+    elif a.cmd == "only":
+        build_only()
     elif a.cmd == "ko-pool":
         build_ko_pool()
     elif a.cmd == "ko-cutoff":

@@ -59,5 +59,29 @@
       "zh": 14
     },
     "sha256": "642d2045688f55062ba4c389913e0500b145c175b16f4e7a257ce1c6b1aa077c"
+  },
+  "bactrian_train_only_en.jsonl": {
+    "rows": 600,
+    "per_lang": {
+      "en": 600
+    },
+    "rule": "the en rows of bactrian_train.jsonl in its order; the other two single-language files hold the same items in the same order",
+    "sha256": "8e11f97ede02ffed929a7728d6c46fa1eb7292e22a1a3e974a65e778967f42c7"
+  },
+  "bactrian_train_only_ko.jsonl": {
+    "rows": 600,
+    "per_lang": {
+      "ko": 600
+    },
+    "rule": "the ko rows of bactrian_train.jsonl in its order; the other two single-language files hold the same items in the same order",
+    "sha256": "de63e7feba30548d2c8f126d602410beab766d2855177a3f626b223886e23974"
+  },
+  "bactrian_train_only_zh.jsonl": {
+    "rows": 600,
+    "per_lang": {
+      "zh": 600
+    },
+    "rule": "the zh rows of bactrian_train.jsonl in its order; the other two single-language files hold the same items in the same order",
+    "sha256": "8a487c1c009d57b3178e903189901eb6cf2c2dc0e839d7070189d81c05ca714a"
   }
 }

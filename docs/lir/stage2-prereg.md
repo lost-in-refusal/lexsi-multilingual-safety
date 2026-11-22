@@ -422,6 +422,57 @@ Each report below refuses to write unless every run record names the right model
 - Shown with no pass rule: at each new seed, SafeGrad against base Earth on Korean, and the Swahili refusal change under plain beside Global's change at the same seed. E2 and row C keep their Nov 20 readings.
 - Cost: about 6.5 hours of laptop time.
 
+## 12. Two blocks added on Nov 22
+
+**Added Nov 22, 12:27 AM ET, after every result above had been read and before any run below was started.** The Earth runs of section 11c were still going and none of their answers had been read. Both blocks finish before the Sunday 9 PM stop on new experiments. Each report refuses to write unless the run records match what is registered here and every arm has all 1,164 attack verdicts.
+
+### 12a. One training language at a time
+
+- Why. At office hours on Nov 20 Ram asked for a fine-tune per language and then mixed. We read that as three plain runs, each on the rows of one training language, beside the mixed run we already have (plain on all three). K1 answered one part of the question: Korean drifts with no Korean row in training.
+- Runs: plain LoRA at seed 42, with the settings of every other run, on the 600 English rows, the 600 Korean rows and the 600 Chinese rows of `data/lir/bactrian_train.jsonl`. Bactrian-X is parallel, and the three files hold the same 600 items in the same order, each in one language: `bactrian_train_only_en.jsonl` (sha256 `8e11f97e`), `bactrian_train_only_ko.jsonl` (`de63e7fe`) and `bactrian_train_only_zh.jsonl` (`8a487c1c`). The arms are `plain-only-en`, `plain-only-ko` and `plain-only-zh`.
+- Evaluation: the attack set only, same guard, answers capped at 256 tokens.
+- What we know. Every result above. In K1 at seed 42, with English and Chinese rows only, Korean rose 13.1 points, English 2.7 and Chinese 5.5. The mixed run cut to 519 rows raised Korean by 12.4 points.
+
+**L1, does Korean drift.** Each arm is read with K1's table and K1's bar of 6.36 points (6.357), where X is the language trained on:
+
+| Korean strict attack success in the run | What we report |
+| --- | --- |
+| Rises significantly over base, by at least 6.36 points | Training on X alone is enough for a Korean drift of this size |
+| Rises significantly, by less than 6.36 points | Training on X alone raises Korean attack success, by less than half of the mixed runs' rise |
+| Does not rise significantly | Training on X alone gave no detected Korean drift |
+
+**L2, which language drifts most.** This is the part that can go against our headline. H1 says Korean drifts more than English in the mixed run. That could mean Korean is the weak language, or only that Korean was one of the trained languages. The Korean-only run cannot tell the two apart. The English-only and Chinese-only runs can. For each of those two arms we take the Korean rise over base minus the rise in the language trained on, on the same 291 prompt families, with a bootstrap 95% interval (5,000 draws), as for the gap in H1.
+
+| The two intervals | What we report |
+| --- | --- |
+| Above zero in both arms | Trained on English alone or on Chinese alone, the model drifted more in Korean than in the language it was trained on. That supports reading H1 as a weakness of Korean |
+| Below zero in either arm | In that run the drift followed the training language. We then write H1 as "Korean drifted most in the mixed run", and we do not write that Korean is the most fragile language whatever the training data |
+| Anything else | We give both intervals and make no claim about which language drifts most under single-language training |
+
+- The Korean-only arm is read by L1 only. Its rises in the four languages are shown.
+- Shown with no pass rule: for each arm the change against base in all four languages, the Swahili refusal change, and Korean against plain at seed 42 and against the 519-row mixed run.
+- Limits. One seed. Each run has 600 rows where the mixed run has 1,800, so the nearest comparison is the mixed run cut to 519 rows, and no test compares the arms with each other. The answers are capped at 256 tokens. After K2, the size of any rise is the size the guard measures.
+- If the deadline extension is confirmed. Ram said on Nov 22 that an extension is likely and would be announced on Monday. If it is confirmed, the three runs are repeated at seeds 1 and 2. L1 is then read per seed and across seeds like K1's three-seed table. L2 is then read per arm on three seeds: "above zero" needs a positive gap in each seed and a pooled interval above zero, and "below zero" needs a negative gap in each seed and a pooled interval below zero. These runs are not queued until the extension is confirmed.
+- Cost: about 2.5 hours of laptop time.
+
+### 12b. The repair vector on the Aya adapters
+
+- What is run. The repair vector of the exploratory check is the SafeGrad adapter minus the plain adapter, both trained on Bactrian-X at seed 42. It is added at full size to the plain adapters trained on the Aya set, with no training and nothing tuned. The arms are `aya-plain-s1-vec`, `aya-plain-s2-vec` and `aya-plain-vec`.
+- Evaluation: the attack set only, same guard, answers capped at 256 tokens.
+- What we know. On Bactrian-X the same vector lowered Korean strict attack success by 5.2 and 7.9 points at seeds 1 and 2. That check was not registered. SafeGrad trained on Aya is 6.5, 3.1 and 4.8 points below plain on Korean (section 11a). On Bactrian-X the edit also pushed the Swahili refusal rate above base and raised English over-refusal to about 12%.
+- Which runs decide: seeds 1 and 2. Those adapters share neither the seed nor the training data of the two adapters the vector comes from. The Aya adapter of seed 42 starts from the same LoRA initialisation as both source adapters, so it is run and shown beside the rule with no rule of its own.
+- Rule. T1 has the form of H2. It passes if, at each of seeds 1 and 2, the edited adapter is below Aya plain of the same seed on Korean and on the four-language average, and the Korean difference pooled over the two seeds has a 95% interval below zero.
+
+| T1 | What we report |
+| --- | --- |
+| Passes | Added to adapters trained on a second dataset at other seeds, the seed 42 repair vector lowered Korean strict attack success with no training. Over-refusal and task score of the edited models were not measured |
+| Fails | We say which part failed, and we do not write that the edit carries over to a second dataset. The Bactrian-X result stays an exploratory lead |
+
+- Shown beside, deciding nothing: the edited adapter against SafeGrad trained on Aya at the same seed, and against base, on Korean; the four languages; the refusal rate on attack prompts in each language against base and against plain; and the seed 42 row.
+- Not measured: XSTest and the task sets are not run, so the over-refusal and the task cost of the edit on Aya are unknown. Any sentence about this result says so.
+- Limits. One vector from one seed, one base model, and a rule written after the Bactrian-X vector result was known.
+- Cost: about 1 hour of laptop time.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
