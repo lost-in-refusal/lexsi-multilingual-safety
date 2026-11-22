@@ -1,7 +1,7 @@
 # Running the section 12 jobs on a Hugging Face GPU
 
-`python -m lir.hfjob` starts one Hugging Face Job per block of section 12 of the preregistration (the one on the branch
-`aish/prereg-a2-a4-paper`). Each job clones this repository at the commit you are on, installs `requirements-gpu.txt`,
+`python -m lir.hfjob` starts one Hugging Face Job per block of section 12 of the preregistration (Aish's section,
+parts 12.0 to 12.4). Each job clones this repository at the commit you are on, installs `requirements-gpu.txt`,
 runs the same `lir.train` and `lir.evaluate` as the laptop, and uploads everything to a private staging dataset.
 
 ## Before the first job
