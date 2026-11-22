@@ -194,7 +194,7 @@ def settings_figure(rows: list[dict], path) -> None:
     from matplotlib.ticker import MultipleLocator
 
     series = (("plain", "Plain LoRA", STAGE2["plain"], -0.17), ("safegrad", "SafeGrad LoRA", STAGE2["safegrad"], 0.17))
-    fig, ax = plt.subplots(figsize=(10.6, 4.9), facecolor=SURFACE)
+    fig, ax = plt.subplots(figsize=(10.6, 1.6 + 0.66 * len(rows)), facecolor=SURFACE)   # 4.9 high for five rows
     ax.set_facecolor(SURFACE)
     ax.grid(axis="x", color=GRID, lw=1)
     ax.set_axisbelow(True)

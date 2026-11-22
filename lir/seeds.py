@@ -149,12 +149,17 @@ def by_language(data: dict[str, dict[str, dict]], seeds: dict[int, tuple[str, st
 
 # label, base arm, plain arms, SafeGrad arms: the settings where a plain LoRA was trained on task data alone.
 # The two mixing runs are left out because their training data includes refusal examples. The rows overlap:
-# four share the Global base run, and the no-Korean and 519-row sets draw on the rows of the full set.
+# seven share the Global base run, and the no-Korean, 519-row and single-language sets draw on the rows of the full set.
 SETTINGS = (("Tiny Aya Global, Bactrian-X", "base", ("plain", "plain-s1", "plain-s2"), ("safegrad", "safegrad-s1", "safegrad-s2")),
             ("Global, Bactrian-X with no Korean rows", "base", ("plain-noko", "plain-noko-s1", "plain-noko-s2"), ()),
             ("Global, Bactrian-X cut to 519 rows", "base", ("plain-ayasize",), ()),
-            ("Global, Aya Dataset, 519 rows", "base", ("aya-plain",), ("aya-safegrad",)),
-            ("Tiny Aya Earth, Bactrian-X", "earth-base", ("earth-plain",), ("earth-safegrad",)))
+            ("Global, Bactrian-X English rows only, 600 rows", "base", ("plain-only-en",), ()),
+            ("Global, Bactrian-X Korean rows only, 600 rows", "base", ("plain-only-ko",), ()),
+            ("Global, Bactrian-X Chinese rows only, 600 rows", "base", ("plain-only-zh",), ()),
+            ("Global, Aya Dataset, 519 rows", "base", ("aya-plain", "aya-plain-s1", "aya-plain-s2"),
+             ("aya-safegrad", "aya-safegrad-s1", "aya-safegrad-s2")),
+            ("Tiny Aya Earth, Bactrian-X", "earth-base", ("earth-plain", "earth-plain-s1", "earth-plain-s2"),
+             ("earth-safegrad", "earth-safegrad-s1", "earth-safegrad-s2")))
 
 
 def korean_settings(data: dict[str, dict[str, dict]], settings=SETTINGS) -> list[dict]:
