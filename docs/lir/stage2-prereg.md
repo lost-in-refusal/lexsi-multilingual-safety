@@ -500,6 +500,50 @@ Each report below refuses to write unless every run record names the right model
 - Limits. One vector from one seed, one base model, and a rule written after the Bactrian-X vector result was known.
 - Cost: about 1 hour of laptop time.
 
+**Added Nov 22, 6:10 AM ET, after the runs.** The three edited adapters were built and evaluated by 6:03 AM with no failed queue line. `python -m lir.section12 vector` checked the records of the edited adapters and of their sources and wrote `results/lir/stage2/vector_aya.md`.
+
+- T1 passes by its rule. At seeds 1 and 2 the edited adapter is below Aya plain of the same seed on Korean (10.7% against 14.1%, -3.4 points, p = 0.14; 8.9% against 14.4%, -5.5 points, p = 0.009) and on the four-language average (10.0% against 10.2%; 8.3% against 9.6%). The pooled Korean difference is -4.5 points [-8.2, -0.9].
+- By the table: added to adapters trained on a second dataset at other seeds, the seed 42 repair vector lowered Korean strict attack success with no training. Over-refusal and task score of the edited models were not measured.
+- The pass is thin. At seed 1 the four-language average passes by 3 flagged answers of 1,164 (116 against 119), and the Korean difference at seed 1 is not significant on its own.
+
+Seen after the run, and not covered by the rule:
+
+- The edit makes answers much longer. The edited adapters average 192, 203 and 197 tokens per answer (seeds 1, 2, 42) against 92, 96 and 98 for Aya plain, and 676, 709 and 687 of their 1,164 answers reach the 256-token cap against 143, 152 and 169. In Korean that is 173, 180 and 177 of 291 against 47, 52 and 53. So T1 compares answers that are mostly cut with answers that are mostly complete. The few we read are coherent, structured answers and not broken text; they are longer than the base model's, which average 141 tokens with 355 answers at the cap. On the Bactrian-X adapters the same edit lengthened answers far less (122 and 141 capped answers of 1,164 at seeds 1 and 2, against 81 and 94 for plain).
+- The edited adapters' flags sit on the cut answers. At seed 1, 27 of 179 cut English answers are flagged against 2 of 112 complete ones, and 25 of 173 cut Korean answers against 6 of 118. At seed 2 it is 25 of 196 against 1 of 95 in English and 23 of 180 against 3 of 111 in Korean.
+- English strict attack success rises under the edit: +3.8 points at seed 1 (p = 0.019) and +3.1 at seed 2 (p = 0.049), to 10.0% and 8.9%. Base is at 6.9%, and the difference from base is not significant (p = 0.078 and 0.24).
+- The refusal rate on attack prompts falls below base in English, Chinese and Swahili at each seed (English -6.9, -5.8 and -5.2 points; Chinese -5.8, -4.8 and -4.5; Swahili -6.9, -7.2 and -7.2; each p < 0.05) and does not move in Korean. On the Bactrian-X adapters the edit raised refusals.
+- On the Korean prompts where the plain and the edited answer are both complete (114 and 105 prompts at seeds 1 and 2), 9 and 8 plain answers are flagged against 5 and 3 edited ones. That is a selected set.
+
+So the pass sentence is not used, and the shares of the trained repair printed in the report (111% and 114%) are not quoted, until the second reading of section 12c is in.
+
+Not uploaded to Hugging Face when this was written: the answers, verdicts and adapters of the three edited arms, and the table.
+
+### 12c. A second reading after re-generation: T1, and Y1 to Y3 on Aya
+
+**Added Nov 22, 6:10 AM ET, after T1 was read on the capped answers and before any answer below was generated again.** When we wrote this we knew everything in the note above, including how the flags split between cut and complete answers and the result on the prompts where both answers are complete.
+
+- What is run. Every attack answer that reached the 256-token cap is generated again with a cap of 1,024 new tokens, with the code, greedy decoding and laptop of section 8, and judged by the same guard: the three edited arms (676, 709 and 687 answers), the three Aya plain arms (143, 152 and 169) and the three Aya SafeGrad arms (196, 194 and 195). Base was generated again for section 8. The same command also generates again the capped XSTest answers of the two seed 42 Aya arms, which have them; no reading of those is registered.
+- Order: `aya-plain-s1-vec`, `aya-plain-s2-vec`, `aya-plain-s1` and `aya-plain-s2`, which T1 needs; then `aya-plain-vec` and `aya-plain`; then the three SafeGrad arms.
+- T1 again. The rule of 12b is applied to the answers after re-generation at seeds 1 and 2. One condition is added now, because these answers are long: if 30 or more of the 291 Korean answers of an edited arm at seed 1 or 2 (more than 10%) still reach the cap at 1,024 tokens, T1 is not read from them.
+
+| After re-generation | What we report |
+| --- | --- |
+| T1 passes, and fewer than 30 Korean answers of each of the two edited arms are still cut | T1 holds on the original answers and after re-generation. We say that the edit made answers much longer |
+| T1 fails, and fewer than 30 are still cut | T1 as first read depended on the 256-token cap. We give both readings, lead with the re-generated one, and do not write that the edit lowered Korean attack success on a second dataset |
+| 30 or more Korean answers of one of the two edited arms are still cut | The edited models answer at too great a length to be judged at 1,024 tokens. We give T1 on the capped answers with that caveat and the re-generated figures beside it, and make no claim from them |
+
+- English. This is on the same prompts and adapters where we saw the rise, so it is not independent of what we saw. The statistic is the English difference between the edited adapter and Aya plain of the same seed, pooled over seeds 1 and 2 on the answers after re-generation, with a 95% interval.
+
+| Pooled English difference after re-generation | What we report |
+| --- | --- |
+| Interval above zero | On the Aya adapters the edit raised English strict attack success. It is reported next to T1 as a cost of the edit |
+| Anything else | The English rise was seen on the capped answers only |
+
+- Shown beside, deciding nothing: for each arm how many answers were generated again, how many are the original continued, how many came out different and how many still reach the cap; the refusal rates; the seed 42 row; and the comparison with SafeGrad trained on Aya once its arms have been generated again.
+- Y1 to Y3 on Aya again. Sections 10 and 11a were read on capped answers, and the Aya arms were never in the truncation audit. Once the three Aya plain arms and the three Aya SafeGrad arms are generated again, Y1, Y2 and Y3 are read on those answers by the three-seed rules of 11a. This reading decides nothing, and the capped reading of 11a stands. For each of Y1 and Y2 that passes again we report that it holds on the original answers and after re-generation. For one that does not, we give both readings and say so. Y3 failed on the capped answers and is shown.
+- If it is not finished by Sunday Nov 22, 9 PM ET. T1's second reading needs the four arms named first, and the Aya reading needs all six Aya arms. A reading whose arms are not all done is not reported. For T1 the capped result then stands with the caveats above, and no sentence is built on it.
+- Cost: about 4 to 6 hours of laptop time.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
