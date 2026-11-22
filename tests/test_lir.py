@@ -372,6 +372,31 @@ class Publish(unittest.TestCase):
             (d / "task.judge.jsonl").write_text("{}\n")
             self.assertEqual(unfinished(d), [])
 
+    def test_regenerated_arms(self):
+        import json
+        from unittest import mock
+
+        from lir import publish, trunc
+
+        with tempfile.TemporaryDirectory() as tmp:
+            runs = Path(tmp)
+            row = lambda uid, cut: {"uid": uid, "truncated": cut, "response": "a", "safety": "Safe", "refusal": "No"}
+            def write(path, rows):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+            for arm in ("attack-only", "both-sets", "half-done", "never"):
+                for name in (("attack",) if arm == "attack-only" else ("attack", "xstest")):
+                    for kind in ("gen", "guard"):
+                        write(runs / "eval" / arm / f"{name}.{kind}.jsonl", [row("u1", True), row("u2", False)])
+            write(runs / "trunc" / "attack-only" / "attack.guard.jsonl", [row("u1", False)])
+            for name in ("attack", "xstest"):
+                write(runs / "trunc" / "both-sets" / f"{name}.guard.jsonl", [row("u1", False)])
+            write(runs / "trunc" / "half-done" / "attack.guard.jsonl", [row("u1", False)])   # its XSTest answers are missing
+            with mock.patch.object(publish, "RUNS", runs), mock.patch.object(trunc, "RUNS", runs), \
+                    mock.patch.object(trunc, "REGEN", runs / "trunc"):
+                got = [arm for arm in ("attack-only", "both-sets", "half-done", "never") if publish.regenerated(arm)]
+        self.assertEqual(got, ["attack-only", "both-sets"])
+
     def test_stage_adapters(self):
         import json
         from unittest import mock

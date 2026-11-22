@@ -35,6 +35,12 @@ The seed 42 runs on Tiny Aya Global are in their own repositories from stage 1:
 | `earth-plain` | Earth | `bactrian_train.jsonl` | 1,800 | 42 | Plain LoRA |
 | `earth-safegrad` | Earth | The same file | 1,800 | 42 | SafeGrad, with 44 refusals by Earth itself as its alignment set |
 | `plain-s1-vec`, `plain-s2-vec` | Global | None | | | No training. The seed 42 SafeGrad adapter minus the seed 42 plain adapter, added to the plain adapter of seed 1 or 2. Rank 48. Exploratory |
+| `aya-plain-s1`, `aya-plain-s2` | Global | `aya_train.jsonl` | 519 | 1, 2 | Plain LoRA |
+| `aya-safegrad-s1`, `aya-safegrad-s2` | Global | The same file | 519 | 1, 2 | SafeGrad, with the same 47 refusals |
+| `earth-plain-s1`, `earth-plain-s2` | Earth | `bactrian_train.jsonl` | 1,800 | 1, 2 | Plain LoRA |
+| `earth-safegrad-s1`, `earth-safegrad-s2` | Earth | The same file | 1,800 | 1, 2 | SafeGrad, with Earth's own 44 refusals |
+| `plain-only-en`, `plain-only-ko`, `plain-only-zh` | Global | `bactrian_train_only_en.jsonl`, `_ko`, `_zh`: the 600 rows of one language from the 1,800-row file, the same 600 items in each | 600 | 42 | Plain LoRA |
+| `aya-plain-s1-vec`, `aya-plain-s2-vec`, `aya-plain-vec` | Global | None | | | No training. The same seed 42 difference (from the Bactrian-X adapters), added to the Aya plain adapter of seed 1, 2 or 42. Rank 48. Registered before it was run. These models write answers about twice as long as the plain ones |
 
 The file with no Korean rows has 1,748 rows. One was over the length limit and was dropped, so those runs trained
 on 1,747.
@@ -52,7 +58,7 @@ Pro with PyTorch MPS.
 - `surgery_log.jsonl` (SafeGrad runs): for each step, the KL to the base model, the cosine between the task and
   alignment gradients, and whether the gradient was projected.
 
-The two `-vec` folders have the config, the weights and a `run.json` that names the three source adapters by hash.
+The five `-vec` folders have the config, the weights and a `run.json` that names the three source adapters by hash.
 The tokenizer is the base model's and is not repeated here.
 
 The training files are in `data/lir/` of the
@@ -75,7 +81,7 @@ has the tests that were fixed before the runs.
 - A row with one seed is one run.
 - Cohere built both Tiny Aya and the Aya Dataset, and the model card names no training data, so the model may have
   seen the Aya rows before.
-- The `-vec` adapters were not registered. They are an exploratory check and nothing was tuned on the test prompts.
+- The two `plain-s*-vec` adapters were not registered. They are an exploratory check and nothing was tuned on the test prompts. The three `aya-plain*-vec` adapters were registered before they were run; their over-refusal and task score were not measured.
 - Safety was scored by an automatic guard. The status page says what people checked by hand.
 
 ## Use
@@ -88,5 +94,5 @@ base = AutoModelForCausalLM.from_pretrained("CohereLabs/tiny-aya-global", revisi
 model = PeftModel.from_pretrained(base, "lost-in-refusal/tiny-aya-lora-stage2", subfolder="plain-s1")
 ```
 
-For the two Earth folders the base model is `CohereLabs/tiny-aya-earth` at revision
+For the six Earth folders the base model is `CohereLabs/tiny-aya-earth` at revision
 `0624fafbe200f930b89566fc4ec4da314ba48d89`.

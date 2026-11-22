@@ -86,7 +86,11 @@ ADAPTER_REPO = f"{HF_ORG}/tiny-aya-lora-stage2"
 # One folder each. The seed 42 plain and SafeGrad runs on Tiny Aya Global are the two stage 1 repos.
 STAGE2_ADAPTERS = ["plain-s1", "safegrad-s1", "plain-s2", "safegrad-s2", "plain-mix1", "plain-mix5", "plain-noko",
                    "plain-noko-s1", "plain-noko-s2", "plain-ayasize", "aya-plain", "aya-safegrad", "earth-plain",
-                   "earth-safegrad", "plain-s1-vec", "plain-s2-vec"]
+                   "earth-safegrad", "plain-s1-vec", "plain-s2-vec",
+                   # sections 11 and 12 of the preregistration, Nov 21 and 22
+                   "aya-plain-s1", "aya-safegrad-s1", "aya-plain-s2", "aya-safegrad-s2", "earth-plain-s1", "earth-safegrad-s1",
+                   "earth-plain-s2", "earth-safegrad-s2", "plain-only-en", "plain-only-ko", "plain-only-zh",
+                   "aya-plain-s1-vec", "aya-plain-s2-vec", "aya-plain-vec"]
 
 
 def _relative(x):
@@ -153,8 +157,20 @@ def push_adapters(api: HfApi, arms: list[str] | None, public: bool, dry_run: boo
 # Stage 2 arms. The second list was still running when the first went up; each joins an upload once it is fully judged.
 STAGE2_ARMS = ["plain-s1", "safegrad-s1", "plain-s2", "safegrad-s2", "plain-mix1", "plain-mix5", "plain-noko",
                "earth-base", "earth-plain", "earth-safegrad"]
-STAGE2_LATER = ["plain-s1-vec", "plain-s2-vec", "plain-noko-s1", "plain-noko-s2", "aya-plain", "aya-safegrad", "plain-ayasize"]
-TRUNC_ARMS = ["base", "plain", "safegrad"] + STAGE2_ARMS  # arms whose capped answers may have been generated again
+STAGE2_LATER = ["plain-s1-vec", "plain-s2-vec", "plain-noko-s1", "plain-noko-s2", "aya-plain", "aya-safegrad", "plain-ayasize",
+                # sections 11 and 12 of the preregistration, Nov 21 and 22. Attack set only
+                "aya-plain-s1", "aya-safegrad-s1", "aya-plain-s2", "aya-safegrad-s2", "earth-plain-s1", "earth-safegrad-s1",
+                "earth-plain-s2", "earth-safegrad-s2", "plain-only-en", "plain-only-ko", "plain-only-zh",
+                "aya-plain-s1-vec", "aya-plain-s2-vec", "aya-plain-vec"]
+STAGE1_ARMS = ["base", "plain", "safegrad"]  # already in the repo; their capped answers were generated again too
+
+
+def regenerated(arm: str) -> bool:
+    """Every capped answer of the arm was generated again and judged, on each set the arm was evaluated on."""
+    from lir import trunc
+
+    sets = [name for name in trunc.SETS if (RUNS / "eval" / arm / f"{name}.gen.jsonl").exists()]
+    return bool(sets) and (trunc.REGEN / arm).is_dir() and all(trunc.after(arm, name) is not None for name in sets)
 
 
 def unfinished(arm_dir: Path) -> list[str]:
@@ -202,7 +218,7 @@ def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool, aya_task: boo
         t = Path(tmp)
         for arm in arms:
             shutil.copytree(RUNS / "eval" / arm, t / arm)
-        again = [arm for arm in TRUNC_ARMS if all(trunc.after(arm, name) is not None for name in trunc.SETS)]
+        again = [arm for arm in STAGE1_ARMS + arms if regenerated(arm)]
         for arm in again:
             shutil.copytree(trunc.REGEN / arm, t / "truncation-regenerated" / arm)
         aya = [d.name for d in sorted((RUNS / "ayatask").glob("*")) if aya_task and (d / "gen.jsonl").exists()
