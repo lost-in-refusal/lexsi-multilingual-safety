@@ -555,6 +555,24 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 - Shown with no pass rule: for each arm the change against base in all four languages, the Swahili refusal change, and Korean against plain at seed 42 and against the 519-row mixed run.
 - Limits. One seed. Each run has 600 rows where the mixed run has 1,800, so the nearest comparison is the mixed run cut to 519 rows, and no test compares the arms with each other. The answers are capped at 256 tokens. After K2, the size of any rise is the size the guard measures.
 - If the deadline extension is confirmed. Ram said on Nov 22 that an extension is likely and would be announced on Monday. If it is confirmed, the three runs are repeated at seeds 1 and 2. L1 is then read per seed and across seeds like K1's three-seed table. L2 is then read per arm on three seeds: "above zero" needs a positive gap in each seed and a pooled interval above zero, and "below zero" needs a negative gap in each seed and a pooled interval below zero. These runs are not queued until the extension is confirmed.
+
+**Added Nov 22, 3:36 PM ET, before seeds 1 and 2 were started.** The three single-language runs are repeated at seeds 1 and 2 now, on the laptop, at Mingyu's request. For these laptop runs this lifts the condition in the bullet above, "only if the extension is confirmed". The team brief and Aish's 12.1 still list seeds 1 and 2 as extension only, and the extension is not confirmed. When we wrote this we knew the seed 42 result on both readings (the notes under 12a and 12d).
+
+- Runs: plain LoRA at seeds 1 and 2 on the same three training files (hashes above), same settings. The arms are `plain-only-en-s1`, `plain-only-ko-s1` and `plain-only-zh-s1`, then the same three with `-s2`. Seed 1 goes first, so that a cut leaves one whole seed.
+- Evaluation: the attack set only, answers capped at 256 tokens. The capped answers decide. No re-generation is registered for these runs.
+- The freeze. A run is launched only if its training starts before Sunday Nov 22, 9 PM ET. The queue checks the clock before each run; a run that would start later is not trained and is listed as not run.
+- L1 on three seeds, for each training language X, with K1's table per seed and the bar of 6.36 points:
+
+| Outcome rows at seeds 42, 1 and 2 | What we report |
+| --- | --- |
+| Row 1 in all three | Training on X alone is enough for a Korean drift of this size, in all three seeds |
+| Row 1 or row 2 in all three, but not row 1 in all | Training on X alone raises Korean attack success in every seed, but not always by 6.36 points |
+| Row 3 in any seed | The seed 42 result for X did not hold in every seed. We give each seed's row and make no claim across seeds |
+
+- L2 on three seeds, as the bullet above fixed it. For the English-only and the Chinese-only runs: "above zero" needs a positive gap (Korean rise minus the rise in the language trained on) in each seed and a pooled interval above zero; "below zero" needs a negative gap in each seed and a pooled interval below zero. The two are then read with the table of 12a: both above zero, either below zero, or anything else.
+- If a seed is not complete by Monday Nov 23, 3 AM ET, the finished seeds are reported by the one-seed rules and no three-seed claim is made.
+- The table goes to `results/lir/stage2/single_language_seeds.md`. `single_language.md` stays the seed 42 reading.
+- Cost: about 4.3 hours of laptop time.
 - Cost: about 2.5 hours of laptop time.
 
 **Added Nov 22, 5:09 AM ET, after the runs.** The three runs finished at 5:07 AM with no failed queue line. Each trained on 600 rows for 57 steps and dropped no row. `python -m lir.section12 only` checked the three run records and the three training files against the hashes above and wrote `results/lir/stage2/single_language.md`.
