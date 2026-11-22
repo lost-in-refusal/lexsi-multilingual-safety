@@ -879,6 +879,32 @@ class Section12(unittest.TestCase):
         self.assertEqual((g["second_report"], g["changed"]), (ONLY_AGAIN[1], ["L1 for Chinese only is row 3", "L2 is row 2"]))
         self.assertIn("What changed after re-generation: L1 for Chinese only is row 3; L2 is row 2.", only_md(dict(first, runs=runs, second_reading=g)))
 
+    def test_single_language_on_three_seeds(self):
+        from lir.section12 import AYA_PLAIN, C1_ROWS, C2_ROWS, L1_ACROSS, L2_ROWS, ONLY_SEEDS, SMALL_SEEDS, seeds_md, seeds_result
+
+        data = {"base": self.arm()}
+        for s in (42, 1, 2):
+            data[ONLY_SEEDS[s]["en"]] = self.arm({"ko": range(10), "en": range(1)})
+            data[ONLY_SEEDS[s]["zh"]] = self.arm({"ko": range(12), "zh": range(2)})
+            data[ONLY_SEEDS[s]["ko"]] = self.arm({"ko": range(14)})
+            data[SMALL_SEEDS[s]], data[AYA_PLAIN[s]] = self.arm({"ko": range(14)}), self.arm({"ko": range(13)})
+        res = seeds_result(data, bar=40.0)
+        self.assertEqual((res["complete"], res["missing"], res["l1"]["en"]["rows"], res["l1"]["en"]["report"]),
+                         (True, [], [1, 1, 1], L1_ACROSS[0].format(x="English")))
+        self.assertEqual((res["l2"]["en"]["side"], res["l2_row"], res["l2_report"]), ("above zero", 1, L2_ROWS[0]))
+        self.assertEqual((res["c1"]["side"], res["c1"]["report"]), ("includes zero", C1_ROWS["includes zero"]))
+        self.assertEqual((res["c2"]["en"]["side"], res["c2"]["ko"]["side"]), ("below zero", "includes zero"))
+        self.assertEqual(res["c2"]["en"]["report"], C2_ROWS["below zero"].format(x="English"))
+        runs = [{"arm": "plain-only-en-s1", "seed": 1, "commit": "abc1234", "train_rows": 600, "train_sha256": "8e11f97e", "refusal_examples": None}]
+        md = seeds_md(dict(res, runs=runs))
+        self.assertIn("**By the table in section 12a (row 1): Trained on English alone or on Chinese alone", md)
+        self.assertIn("This comparison was seen at seed 42 before it was registered", md)
+        weak = dict(data, **{ONLY_SEEDS[2]["en"]: self.arm({"ko": range(3), "en": range(1)})})   # no significant Korean rise at seed 2
+        self.assertEqual(seeds_result(weak, bar=40.0)["l1"]["en"]["report"], L1_ACROSS[2].format(x="English"))
+        part = seeds_result({k: v for k, v in data.items() if not k.endswith("-s2")}, bar=40.0)
+        self.assertEqual((part["complete"], "l1" in part, "c1" in part, len(part["missing"])), (False, False, False, 2))
+        self.assertIn("Not read, because runs are missing:", seeds_md(dict(part, runs=runs)))
+
     def test_vector_on_aya(self):
         from lir.section12 import T1_ROWS, VEC, vector_md, vector_result
 
