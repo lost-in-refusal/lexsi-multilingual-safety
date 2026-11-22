@@ -371,6 +371,16 @@ Each report below refuses to write unless every run record names the right model
 - The limits of section 10 stay: 173 rows per language, rows written or edited by people, near all of Aya's usable Korean rows, and a model that may have seen these rows.
 - Cost: about 3 hours of laptop time.
 
+**Added Nov 21, 7:21 PM ET, after the runs.** The four runs finished at 7:16 PM with no failed queue line. `python -m lir.repeat aya` checked the six run records and wrote `results/lir/stage2/aya/seeds.md`.
+
+- Y1 passes. Korean rises 10.0, 8.9 and 9.3 points under plain (seeds 42, 1, 2; each p < 0.001) and English moves 0.0, -0.7 and -1.0. The pooled gap is +10.0 points [+5.8, +14.4].
+- Y2 passes. SafeGrad is below plain on Korean by 6.5, 3.1 and 4.8 points and on the four-language average in each seed. The pooled Korean difference is -4.8 points [-7.2, -2.6]. At seed 1 the Korean difference is not significant on its own (p = 0.078). The rule asked for SafeGrad below plain in each seed and a pooled interval below zero, and did not ask for significance in each seed.
+- Y3 fails. The Swahili refusal rate changes by -3.4, -3.1 and -1.4 points (p = 0.19, 0.24 and 0.65). The pooled change is -2.6 points [-6.9, +1.5], and the interval reaches zero.
+- By the table: the Korean drift appears on a second dataset in each of three seeds, at 173 training rows per language; SafeGrad's repair appears on the second dataset in each of three seeds; the Swahili refusal drop did not carry over to Aya, and the Swahili finding rests on Bactrian-X.
+- With no pass rule: SafeGrad stays above base on Korean in each seed, by 3.4 (p = 0.021), 5.8 (p < 0.001) and 4.5 points (p = 0.007).
+- The run records. The record of `aya-plain-s1` names commit `d37e0cc`, made at 4:46 PM, although that run started at 4:39 PM on commit `2c15a10`: a record is written when training ends. The two commits in between changed the report code, the re-generation code and tests (`lir/repeat.py`, `lir/seeds.py`, `lir/trunc.py`, `tests/test_lir.py`). `lir/train.py`, `lir/evaluate.py` and `lir/common.py` are the same as at the seed 42 Aya runs (commit `88129a6`). The report code was committed before the first new answer was judged: evaluation of the first run started at 4:59 PM.
+- Not uploaded to Hugging Face when this was written: the answers, verdicts and adapters of the four new arms, and the three-seed table.
+
 ### 11b. The K1 arms generated again at 1,024 tokens
 
 - What is run. Every attack answer of `plain-noko`, `plain-noko-s1` and `plain-noko-s2` that reached the 256-token cap is generated again with a cap of 1,024 new tokens, with the same code, greedy decoding and laptop as in section 8, and judged by the same guard. These arms have no XSTest answers. Base and plain at seeds 42, 1 and 2 were generated again for section 8, and those answers are used as they are.
