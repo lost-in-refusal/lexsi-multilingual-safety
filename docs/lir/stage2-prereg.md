@@ -422,6 +422,16 @@ Each report below refuses to write unless every run record names the right model
 - Shown with no pass rule: at each new seed, SafeGrad against base Earth on Korean, and the Swahili refusal change under plain beside Global's change at the same seed. E2 and row C keep their Nov 20 readings.
 - Cost: about 6.5 hours of laptop time.
 
+**Added Nov 22, 2:23 AM ET, after the runs.** The four runs finished at 2:20 AM with no failed queue line. `python -m lir.repeat earth` checked the six run records and wrote `results/lir/stage2/earth/seeds.md`. This is the reading on the answers capped at 256 tokens, the one that decides.
+
+- Drift passes. Korean strict attack success rises from 10.7% for base Earth to 21.3%, 19.2% and 21.6% under plain (seeds 42, 1, 2): +10.7, +8.6 and +11.0 points, each p < 0.001. The pooled rise is +10.1 points [+6.4, +14.0].
+- Repair passes. SafeGrad is at 16.5%, 13.4% and 13.7%, which is 4.8 (p = 0.024), 5.8 (p = 0.002) and 7.9 points (p < 0.001) below plain of the same seed. The pooled difference is -6.2 points [-9.2, -3.4].
+- By the table: E1 holds on a second model in each of three seeds.
+- With no pass rule. SafeGrad against base Earth on Korean: +5.8 (p = 0.008), +2.7 (p = 0.20) and +3.1 points (p = 0.14). The Swahili refusal rate under plain changes by -6.9 (p = 0.006), -4.8 (p = 0.038) and -3.8 points (p = 0.135), beside -13.1, -6.2 and -8.6 on Global at the same seeds. E2 and row C keep their Nov 20 readings.
+- The run records. A record is written when training ends, so it can name a commit made during the run. `earth-plain-s1` started at 7:40 PM on commit `fe02701` and names `5743aef`; `earth-safegrad-s2` started at 12:32 AM on `fb10325` and names `a551f97`. The commits made while the four runs trained changed result notes, the registration of section 12 with its data files, report code and tests, the vector builder, the status page and a feedback document. `lir/train.py`, `lir/evaluate.py` and `lir/common.py` are the same as at the seed 42 Earth runs (commits `45a83d8` and `b0cd6ef`).
+- The second reading, on the answers generated again at 1,024 tokens, was still running when this was written. It is added below when it ends.
+- Not uploaded to Hugging Face when this was written: the answers, verdicts and adapters of the four new arms, and the three-seed table.
+
 ## 12. Two blocks added on Nov 22
 
 **Added Nov 22, 12:27 AM ET, after every result above had been read and before any run below was started.** The Earth runs of section 11c were still going and none of their answers had been read. Both blocks finish before the Sunday 9 PM stop on new experiments. Each report refuses to write unless the run records match what is registered here and every arm has all 1,164 attack verdicts.
