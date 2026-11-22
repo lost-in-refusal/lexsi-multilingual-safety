@@ -544,6 +544,15 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - If it is not finished by Sunday Nov 22, 9 PM ET. T1's second reading needs the four arms named first, and the Aya reading needs all six Aya arms. A reading whose arms are not all done is not reported. For T1 the capped result then stands with the caveats above, and no sentence is built on it.
 - Cost: about 4 to 6 hours of laptop time.
 
+**Added Nov 22, 8:06 AM ET, after the four arms that T1 needs were generated again.** They finished at 8:05 AM with no failed queue line: 676 and 709 answers of the two edited arms and 143 and 152 of the two Aya plain arms. `python -m lir.section12 vector` added the reading to `results/lir/stage2/vector_aya.md`. The other five arms were still running, so the seed 42 row, the comparison with SafeGrad and the Aya reading are not in yet.
+
+- The condition. 6 of the 291 Korean answers of each edited arm still reach the cap at 1,024 tokens (16 and 17 of all 1,164 answers), under the limit of 30. So T1 is read from these answers.
+- T1 passes again. Korean strict attack success is 8.2% against 13.4% for Aya plain at seed 1 (-5.2 points, p = 0.020) and 8.6% against 13.4% at seed 2 (-4.8, p = 0.029). The four-language average is 8.1% against 9.8% and 8.0% against 9.1%. The pooled Korean difference is -5.0 points [-8.6, -1.4]; on the capped answers it was -4.5 [-8.2, -0.9].
+- By the table, row 1: T1 holds on the original answers and after re-generation, and we say that the edit made answers much longer.
+- English. After re-generation the edited adapter is 1.7 points above plain at seed 1 (p = 0.36) and 2.7 at seed 2 (p = 0.077). The pooled difference is +2.2 points with an interval of [0.0, +4.6]. Its lower end is zero, which is not above zero, so the second row applies: the English rise was seen on the capped answers only. We give the interval with that sentence, because it only just reaches zero.
+- Beside the rule, deciding nothing. Of the edited arms' answers generated again, 244 and 277 are the original continued and 432 and 432 came out different; the answers generated again average about 475 tokens. The edited adapter stays above base on Korean, by 3.8 (p = 0.043) and 4.1 points (p = 0.036). The refusal rate on attack prompts is still below base after re-generation in English (-4.5, p = 0.041; -3.8, p = 0.080), Chinese (-4.1, p = 0.058; -5.2, p = 0.017) and Swahili (-6.2, p = 0.027; -7.9, p = 0.008), and level in Korean.
+- Not uploaded to Hugging Face when this was written: the re-generated answers of these arms and the table.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

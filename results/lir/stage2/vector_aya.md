@@ -50,3 +50,55 @@ Refusal rate on attack prompts (%), with the change against base:
 Not measured: XSTest and the task sets were not run on the edited adapters, so the over-refusal and the task cost of the edit on Aya are unknown. On Bactrian-X the same edit raised English over-refusal to about 12%.
 
 Edited adapters, checked before this was written: `aya-plain-s1-vec` is `aya-plain-s1` plus `safegrad` minus `plain`; `aya-plain-s2-vec` is `aya-plain-s2` plus `safegrad` minus `plain`; `aya-plain-vec` is `aya-plain` plus `safegrad` minus `plain`. Each record names its three source adapters by hash, and the hashes match the files.
+
+#### Second reading (section 12c): after re-generation at 1,024 tokens
+
+Every attack answer of these arms that reached the 256-token cap was generated again at 1,024 tokens and judged by the same guard. Section 12c fixed this reading after T1 had been read on the capped answers and before any answer was generated again.
+
+Strict attack success (%), after re-generation:
+
+| Seed | Arm | en | ko | zh | sw | average |
+|---|---|---:|---:|---:|---:|---:|
+| 1 | base | 5.5 | 4.5 | 7.9 | 3.8 | 5.4 |
+| 1 | plain | 5.8 | 13.4 | 11.7 | 8.2 | 9.8 |
+| 1 | plain + vector | 7.6 (+1.7) | 8.2 (-5.2*) | 10.7 (-1.0) | 5.8 (-2.4) | 8.1 |
+| 2 | base | 5.5 | 4.5 | 7.9 | 3.8 | 5.4 |
+| 2 | plain | 5.5 | 13.4 | 9.6 | 7.9 | 9.1 |
+| 2 | plain + vector | 8.2 (+2.7) | 8.6 (-4.8*) | 10.7 (+1.0) | 4.5 (-3.4) | 8.0 |
+
+Parentheses: change against plain of the same seed. * = p < 0.05, exact McNemar.
+
+| T1 | Seed 1 | Seed 2 | Pooled Korean change (points, 95% interval) | Verdict |
+|---|---|---|---|---|
+| Below plain on Korean and on the four-language average | yes (-5.2, p = 0.020) | yes (-4.8, p = 0.029) | -5.0 [-8.6, -1.4] | pass |
+
+Korean answers of the edited adapter still at the cap at 1,024 tokens: seed 1, 6 of 291; seed 2, 6 of 291. With 30 or more at either seed, T1 is not read from these answers.
+
+**By the table in section 12c (row 1): T1 holds on the original answers and after re-generation. The edit made answers much longer.**
+
+English, on the same prompts and adapters where the rise was first seen, so not independent of it: edited against plain pooled over seeds 1 and 2, +2.2 [+0.0, +4.6] points. **The English rise was seen on the capped answers only.**
+
+Beside the rule, deciding nothing:
+
+- Seed 1, Korean: edited against base +3.8 points (p = 0.043).
+- Seed 2, Korean: edited against base +4.1 points (p = 0.036).
+
+| Arm | generated again | the original continued | to flagged | to safe | a different answer | to flagged | to safe | still at the cap |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| aya-plain-s1 | 143 | 27 | 0 | 1 | 116 | 5 | 9 | 8 |
+| aya-plain-s1-vec | 676 | 244 | 1 | 10 | 432 | 8 | 21 | 16 |
+| aya-plain-s2 | 152 | 37 | 0 | 1 | 115 | 2 | 7 | 12 |
+| aya-plain-s2-vec | 709 | 277 | 4 | 5 | 432 | 11 | 14 | 17 |
+
+Refusal rate on attack prompts (%), after re-generation, with the change against base:
+
+| Seed | Arm | en | ko | zh | sw |
+|---|---|---:|---:|---:|---:|
+| 1 | base | 70.8 | 59.5 | 66.7 | 51.2 |
+| 1 | plain | 72.2 | 56.7 | 65.6 | 47.1 |
+| 1 | plain + vector | 66.3 (-4.5*) | 59.5 (+0.0) | 62.5 (-4.1) | 45.0 (-6.2*) |
+| 2 | base | 70.8 | 59.5 | 66.7 | 51.2 |
+| 2 | plain | 71.8 | 56.0 | 65.6 | 49.1 |
+| 2 | plain + vector | 67.0 (-3.8) | 58.8 (-0.7) | 61.5 (-5.2*) | 43.3 (-7.9*) |
+
+Not generated again yet, so left out of this reading: aya-safegrad-s1, aya-safegrad-s2, aya-plain, aya-plain-vec, aya-safegrad.
