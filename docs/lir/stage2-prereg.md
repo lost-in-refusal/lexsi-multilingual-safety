@@ -495,7 +495,7 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 ### 12.4 Order, cut order and cost
 
 - Order: hardware control → `plain-ko` → NF4 → `plain-en` and `plain-zh` → AlignTune.
-- Cut order: AlignTune → NF4 → `plain-en` and `plain-zh`. `plain-ko` and the hardware control are not cut. Anything not run by the freeze (Sun Nov 22, 9 PM ET) is listed as not run.
+- Cut order: AlignTune → NF4 → `plain-en` and `plain-zh`. `plain-ko` and the hardware control are not cut. Anything not launched by the freeze (Sun Nov 22, 9 PM ET) is listed as not run. A run launched before the freeze may finish overnight and is read by Mon Nov 23, 3 AM ET.
 - Cost: on the laptop a 1,800-row plain run took about 76 minutes and an evaluation about 35. Here that is four training runs (three of them a third of the size) and about ten evaluations. Time on a Hugging Face GPU has not been measured; we record it per job.
 
 ## Rules
