@@ -1,0 +1,127 @@
+# Results paragraphs for the paper (D15, draft for Aish to edit in)
+
+Written Nov 22. One paragraph per deliverable, D1 to D8 and D12, each with its confidence label and the file its
+numbers come from. Every number is from `results/lir/stage2/`; the status page there
+(`results/lir/stage2/README.md`) says what each result may and may not be used for. Intervals are 95%. Attack
+success is strict (guard says Unsafe or Controversial) unless a line says otherwise.
+
+Labels follow the brief: High = three seeds, preregistered, significant. Medium = consistent direction, limited
+seeds or sample. Low = single seed, small sample, or not significant.
+
+## D1. Korean drift. Confidence: High
+
+Plain LoRA fine-tuning on 1,800 harmless Bactrian-X rows raised Korean attack success from 5.2% to 19.2%, 15.5% and
+18.9% at seeds 42, 1 and 2 (+14.1, +10.3 and +13.7 points, each significant by an exact McNemar test). English did
+not move (+0.9 points on average, interval -1.8 to +3.8). The pooled Korean-minus-English gap is +11.8 points
+(+6.8 to +16.7), and the preregistered check passes in every seed. No harmful example was in the training data.
+
+Source: `seeds.md`, `drift_by_language.json`.
+
+## D2. SafeGrad repair. Confidence: High for the direction
+
+Training the same adapter with SafeGrad left Korean attack success 8.6, 7.2 and 9.3 points below plain fine-tuning
+at the three seeds (pooled -8.4 points, -11.3 to -5.5), and the check passes in every seed. The repair is partial:
+SafeGrad stays 5.5, 3.1 and 4.5 points above the base model, so it takes back roughly 60 to 70% of the rise. On
+the second dataset (D7) it takes back about half, and on the second model (D8) between half and 60% depending on
+whether capped answers are completed. SafeGrad added 13.7% to training time on average.
+
+Source: `seeds.md`, `train_time.md`, `aya/seeds.md`, `earth/seeds.md`.
+
+## D3. Swahili spillover. Confidence: High for refusals, Medium for corrected attack success
+
+Swahili appears nowhere in training, yet the refusal rate on Swahili attack prompts fell 13.1, 6.2 and 8.6 points
+under plain fine-tuning (pooled -9.3 points, -13.7 to -5.2); the check passes in every seed. The guard's own Swahili
+attack success did not rise (+1.4, -1.0 and +0.7 points, none significant), and the guard missed our 80% agreement
+bar in Swahili. When the answers the guard passed are translated to English with NLLB-200 and judged again,
+attack success is 17.9% for base against 29.2%, 25.1% and 25.4% for plain; we report that as a direction, not as
+a share of unsafe answers. Two limits belong with it. Refusals fall in all four languages under plain, so Swahili
+does not fall more than the trained languages; what the result shows is that the fall reaches a language with no
+training rows. And on the second dataset the Swahili refusal drop did not carry over (-2.6 points, -6.9 to +1.5),
+so this finding rests on Bactrian-X.
+
+Source: `seeds.md`, `swahili_nllb_seeds.json`, `aya/seeds.md`.
+
+## D4. Truncation audit. Confidence: High
+
+Attack and XSTest answers were capped at 256 new tokens, and base answers reach the cap more often than
+fine-tuned ones. We generated every capped answer of base, plain and SafeGrad again at 1,024 tokens, at all three
+seeds, and judged them again. The three main checks pass before and after: the Korean rise averages +12.7 points
+before and +13.2 after, SafeGrad against plain is -8.4 and -8.6, and the Swahili refusal change is -9.3 and -10.0.
+The same second reading was made for the runs with no Korean rows, for Tiny Aya Earth on three seeds, for the Aya
+runs and for the single-language runs, each registered before its answers were generated again, and each came out
+the same. The headline does not depend on the 256-token cap.
+
+Source: `truncation/report.md`, `truncation/k1.md`, `earth/seeds.md`, `aya/seeds.md`, `single_language.md`.
+
+## D5. Harm categories. Confidence: Medium (descriptive, no test between categories)
+
+The Korean rise is not confined to one kind of harm. Averaged over three seeds, Korean attack success rose in all
+eight MultiJail categories that have 20 or more prompts, by 3.7 to 21.0 points, on the capped answers and on the
+re-generated ones, and SafeGrad was below plain in all eight. A prompt with several tags counts in each, and no
+test compares one category with another, so we do not rank them.
+
+Source: `harm_categories.md`, `harm_categories_regenerated.md`.
+
+## D6. Training language and drift. Confidence: High without Korean rows (three seeds); Medium for one language at a time (seed 42; seeds 1 and 2 running)
+
+Korean drifts whether or not Korean is in the training data. With English and Chinese rows only, Korean attack
+success still rose 13.1, 13.4 and 13.1 points over three seeds, no different from training with Korean rows
+(+0.5 points, -2.3 to +3.3), also after capped answers were completed. Trained on one language at a time (600
+rows, seed 42), Korean rose 7.9 points with English rows only, 12.0 with Korean rows only and 11.3 with Chinese
+rows only, each significant. In the two runs that can tell a weak language from a trained one, Korean rose more
+than the language the model was trained on: by 7.2 points more than English in the English-only run (+3.1 to
++11.7) and 7.2 more than Chinese in the Chinese-only run (+2.1 to +12.7); both hold after re-generation. This
+supports reading D1 as a weakness of Korean in this model and not as a footprint of the training language. It is
+one seed with 600 rows per run, and no test ranks the three runs.
+
+Note for Aish: these are laptop runs (section 12a). The GPU runs of your section 12.1 are a separate check
+against a GPU base. Seeds 1 and 2 of the laptop runs are running tonight and their table will be
+`single_language_seeds.md`.
+
+Source: `noko.md`, `truncation/k1.md`, `single_language.md`.
+
+## D7. Second dataset: Aya. Confidence: High for drift and repair; the Swahili part fails
+
+On 519 rows of the Cohere Aya Dataset (173 per language, written or edited by people) in place of Bactrian-X,
+Korean attack success rose 10.0, 8.9 and 9.3 points at the three seeds (each significant) while English moved by
+0.0, -0.7 and -1.0; the pooled gap is +10.0 points (+5.8 to +14.4). SafeGrad was 6.5, 3.1 and 4.8 points below
+plain on Korean (pooled -4.8, -7.2 to -2.6); at seed 1 the difference is not significant alone. Both checks also
+pass after capped answers were completed. SafeGrad took back about half of the rise here and stayed above base
+in every seed. The Swahili refusal drop did not carry over (D3). Two limits: Cohere built both the model and
+this dataset, so the model may have seen these rows, and the set is 29% of the size of the Bactrian-X one.
+
+Source: `aya/seeds.md`, `aya/checks.md`, `docs/lir/cards/aya.md`.
+
+## D8. Second model: Tiny Aya Earth. Confidence: High for drift and repair (three seeds); the Swahili forecast was not confirmed
+
+On Tiny Aya Earth, with the same data and settings, plain fine-tuning raised Korean attack success from 10.7% to
+21.3%, 19.2% and 21.6% (+10.7, +8.6 and +11.0 points, each significant; pooled +10.1, +6.4 to +14.0), and
+SafeGrad was 4.8, 5.8 and 7.9 points below plain (pooled -6.2, -9.2 to -3.4, significant in each seed). Both
+hold after capped answers were completed. SafeGrad again stays above the base model. We had forecast a larger
+Swahili refusal drop on Earth than on Global and found a smaller one in every seed (6.9, 4.8 and 3.8 points
+against 13.1, 6.2 and 8.6), so that forecast is not confirmed. Tiny Aya Fire and Water were not tested, and
+Swahili is the only African language we evaluated.
+
+Source: `earth/seeds.md`, `earth/checks.md`.
+
+## D12. CircuitKIT across node counts. Confidence: Medium (holds at three of five sizes; seed 42; no intervals)
+
+The stage 1 circuit comparison was made at 200 of 612 nodes. Repeated at 50, 100, 200, 300 and 400 nodes, the
+finding that Korean keeps the fewest of the base model's top refusal nodes after plain fine-tuning holds at 100,
+200 and 300 nodes and not at 50 or 400. At 200 nodes the top nodes recover 65% of the harmful-minus-harmless
+contrast in English, 91% in Korean, 26% in Chinese and 40% in Swahili; at 50 and 100 nodes it is under a quarter
+everywhere. We name the sizes where it fails and do not claim it holds across node counts.
+
+Source: `circuit_nodes.md`.
+
+## What changed since the brief's table (Sat 9:45 PM)
+
+- D8 is no longer a single run: Earth holds on three seeds, on both readings.
+- D7 holds after re-generation as well.
+- D6: the three single-language runs exist on the laptop at seed 42, with a second reading after re-generation.
+- Not in the brief: the seed 42 repair vector, added with no training to the Aya adapters, lowered Korean attack
+  success by about 5 points on both readings (registered before it ran), but it made answers about twice as long,
+  and its over-refusal and task score were not measured. If it is used at all, it belongs in the appendix with
+  those limits (`vector_aya.md`).
+- The Korean rise judged by a person (5 plain against 1 base answer unsafe on 94 prompts, p = 0.22) still does
+  not pass, and both second judges missed the 80% bar. The size of every rise above is the size the guard measures.
