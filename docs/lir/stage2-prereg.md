@@ -492,6 +492,20 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 - If AlignTune cannot fine-tune Tiny Aya Global, the run is not made. We say so and the failure goes in the Lexsi feedback.
 - First item to cut if time runs short.
 
+**Added Nov 22, before the AlignTune run — configuration compatibility check.**
+
+The reference configuration from `lir/train.py` uses the following settings:
+
+- **LoRA:** rank 16, alpha 32, dropout 0.0, targeting `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, and `down_proj`.
+- **Learning rate:** 2e-4, with a cosine scheduler.
+- **Batch size:** micro-batch 4, gradient accumulation 8, effective batch size 32.
+- **Epochs:** 3.
+- **Sequence limit:** 1,024 tokens, dropping examples that exceed the limit.
+- **Chat template:** the Tiny Aya tokenizer's `apply_chat_template()` with assistant-response-only loss.
+- **Training:** plain supervised fine-tuning, seed 42, without a safety method.
+
+AlignTune compatibility must be verified against these settings before the experiment is launched. Any settings that cannot be matched will be documented here before running D13.
+
 ### 12.4 Order, cut order and cost
 
 - Order: hardware control → `plain-ko` → NF4 → `plain-en` and `plain-zh` → AlignTune.
