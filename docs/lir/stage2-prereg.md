@@ -472,6 +472,16 @@ Each report below refuses to write unless every run record names the right model
 - If the deadline extension is confirmed. Ram said on Nov 22 that an extension is likely and would be announced on Monday. If it is confirmed, the three runs are repeated at seeds 1 and 2. L1 is then read per seed and across seeds like K1's three-seed table. L2 is then read per arm on three seeds: "above zero" needs a positive gap in each seed and a pooled interval above zero, and "below zero" needs a negative gap in each seed and a pooled interval below zero. These runs are not queued until the extension is confirmed.
 - Cost: about 2.5 hours of laptop time.
 
+**Added Nov 22, 5:09 AM ET, after the runs.** The three runs finished at 5:07 AM with no failed queue line. Each trained on 600 rows for 57 steps and dropped no row. `python -m lir.section12 only` checked the three run records and the three training files against the hashes above and wrote `results/lir/stage2/single_language.md`.
+
+- L1. Korean strict attack success rises from 5.2% to 13.1% with English rows only (+7.9 points), to 17.2% with Korean rows only (+12.0) and to 16.5% with Chinese rows only (+11.3), each p < 0.001 and each above the bar of 6.36. That is row 1 for all three: training on any one of the three languages alone is enough for a Korean drift of this size.
+- L2. English only: Korean +7.9 against English +0.7, gap +7.2 points [+3.1, +11.7]. Chinese only: Korean +11.3 against Chinese +4.1, gap +7.2 points [+2.1, +12.7]. Both intervals are above zero, so row 1 applies: trained on English alone or on Chinese alone, the model drifted more in Korean than in the language it was trained on. That supports reading H1 as a weakness of Korean.
+- The Korean-only run is read by L1 only. Its other languages do not move (English +0.7, Chinese 0.0, Swahili -0.7).
+- With no pass rule. The Swahili refusal rate falls in each run: -5.2 (p = 0.040), -6.2 (p = 0.020) and -7.2 points (p = 0.003). Korean against the mixed run at seed 42: -6.2 (p = 0.008), -2.1 (p = 0.41) and -2.7 (p = 0.26). Korean against the mixed run cut to 519 rows: -4.5 (p = 0.041), -0.3 (p = 1.0) and -1.0 (p = 0.69). These tests are not corrected for their number, and no rule compares the arms.
+- The run records. All three name commit `39312df`. The English-only run started at 3:00 AM on `428e5df`, and `39312df`, made a minute later, changed two documents only.
+- One seed. Seeds 1 and 2 stay registered for the case that the extension is confirmed, and are not queued.
+- Not uploaded to Hugging Face when this was written: the answers, verdicts and adapters of the three arms, and the table.
+
 ### 12b. The repair vector on the Aya adapters
 
 - What is run. The repair vector of the exploratory check is the SafeGrad adapter minus the plain adapter, both trained on Bactrian-X at seed 42. It is added at full size to the plain adapters trained on the Aya set, with no training and nothing tuned. The arms are `aya-plain-s1-vec`, `aya-plain-s2-vec` and `aya-plain-vec`.
