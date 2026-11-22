@@ -492,19 +492,20 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 - If AlignTune cannot fine-tune Tiny Aya Global, the run is not made. We say so and the failure goes in the Lexsi feedback.
 - First item to cut if time runs short.
 
-**Added Nov 22, before the AlignTune run — configuration compatibility check.**
+**Added Nov 22, before the AlignTune run — configuration compatibility review.**
 
-The reference configuration from `lir/train.py` uses the following settings:
+The original plain LoRA configuration in `lir/train.py` was compared against the configuration parameters documented in Lexsi AlignTune.
 
-- **LoRA:** rank 16, alpha 32, dropout 0.0, targeting `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, and `down_proj`.
-- **Learning rate:** 2e-4, with a cosine scheduler.
-- **Batch size:** micro-batch 4, gradient accumulation 8, effective batch size 32.
-- **Epochs:** 3.
-- **Sequence limit:** 1,024 tokens, dropping examples that exceed the limit.
-- **Chat template:** the Tiny Aya tokenizer's `apply_chat_template()` with assistant-response-only loss.
-- **Training:** plain supervised fine-tuning, seed 42, without a safety method.
+- **LoRA rank and targets:** AlignTune exposes the required controls for rank 16, alpha 32, dropout 0.0, and the seven target modules (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`).
+- **Learning rate:** AlignTune exposes a learning-rate setting that can be configured to 2e-4.
+- **Batch size:** AlignTune exposes per-device batch size and gradient accumulation settings, allowing the intended configuration of micro-batch 4, accumulation 8, and effective batch size 32.
+- **Epochs:** AlignTune supports the intended 3 epochs.
+- **Sequence limit:** AlignTune exposes a maximum sequence length setting that can be set to 1,024 tokens. Exact handling of overlength examples remains unverified.
+- **Chat template:** Exact reproduction of Tiny Aya Global's `apply_chat_template()` formatting and assistant-response-only loss remains unverified.
 
-AlignTune compatibility must be verified against these settings before the experiment is launched. Any settings that cannot be matched will be documented here before running D13.
+The intended backend is TRL, with seed 42, the original 1,800 training rows, and no safety method enabled. Although the required numerical configuration controls are documented, successful fine-tuning of Tiny Aya Global has not yet been demonstrated. Any runtime incompatibility or unmatched preprocessing behavior will be documented before proceeding with the full experiment.
+
+Reference: https://github.com/Lexsi-Labs/aligntune/blob/main/docs/PARAMETERS.md
 
 ### 12.4 Order, cut order and cost
 
