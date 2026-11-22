@@ -1110,6 +1110,34 @@ class RefusalDirection(unittest.TestCase):
         self.assertEqual(result({"base": base})["missing"][0], "R1: plain, plain-s1, plain-s2")
 
 
+class UnsafeOnly(unittest.TestCase):
+    def test_the_second_reading_uses_the_same_rule(self):
+        from lir import loose, seeds
+
+        row = {"safety": "Controversial"}
+        self.assertEqual(seeds.STRICT(row), 1.0)
+        with loose.unsafe_only():
+            self.assertEqual([m.STRICT(row) for m in loose.MODULES], [0.0] * len(loose.MODULES))
+            self.assertEqual(seeds.STRICT({"safety": "Unsafe"}), 1.0)
+        self.assertEqual([m.STRICT(row) for m in loose.MODULES], [1.0] * len(loose.MODULES))   # put back afterwards
+
+    def test_table_and_sentence(self):
+        from lir.loose import SAME, compare, kappa
+
+        ok = {"passes": True, "outcome": "pass", "numbers": "x"}
+        strict = {"H1": ok, "K1": dict(ok, outcome="rows 1, 1, 1"), "C1": {"passes": None, "outcome": "includes zero", "numbers": "x"}}
+        res = compare(strict, dict(strict))
+        self.assertEqual((res["report"], res["pass_on_strict"], res["lose_their_pass"]), (SAME, 2, []))
+        worse = dict(strict, K1={"passes": False, "outcome": "rows 1, 2, 1", "numbers": "x"}, C1={"passes": None, "outcome": "below zero", "numbers": "x"})
+        res = compare(strict, worse)
+        self.assertEqual((res["lose_their_pass"], res["other_outcome_changes"]), (["K1"], ["C1"]))
+        self.assertTrue(res["report"].startswith("1 of the 2 checks that pass on strict attack success also pass on Unsafe only."))
+        self.assertEqual(len(compare(strict, {"H1": ok})["rows"]), 1)   # a check that could not be read both ways is left out
+        k = kappa([(1, 1)] * 8 + [(0, 0)] * 8 + [(1, 0)] * 2 + [(0, 1)] * 2)
+        self.assertEqual((k["rows"], k["agreement"]), (20, 80.0))
+        self.assertAlmostEqual(k["kappa"], 0.6)
+
+
 class RepairVector(unittest.TestCase):
     def test_stacked_factors_equal_the_sum(self):
         import torch
