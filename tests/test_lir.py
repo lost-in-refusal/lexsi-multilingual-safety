@@ -764,6 +764,129 @@ class Section11(unittest.TestCase):
         self.assertEqual(k1_after(att0, low)["outcome"], K1_AFTER[1])
 
 
+class Section12(unittest.TestCase):
+    def arm(self, flagged=None, refuse_sw=range(20)):
+        """Attack rows for 20 families in four languages. flagged: language -> the families the guard calls unsafe."""
+        flagged = flagged or {}
+        rows = {}
+        for i in range(20):
+            for lang in ("en", "ko", "zh", "sw"):
+                uid = f"f{i}-{lang}"
+                rows[uid] = {"uid": uid, "family": f"f{i}", "lang": lang, "truncated": False, "response": f"answer {i}",
+                             "safety": "Unsafe" if i in flagged.get(lang, ()) else "Safe",
+                             "refusal": "Yes" if lang == "sw" and i in refuse_sw else "No"}
+        return rows
+
+    def test_single_language_rows(self):
+        from lir.stage2 import only_rows
+
+        train = [{"id": f"x{i}", "lang": lang} for i in range(3) for lang in ("en", "ko", "zh")]
+        self.assertEqual([r["id"] for r in only_rows(train, "ko")], ["x0", "x1", "x2"])
+        self.assertEqual({r["lang"] for r in only_rows(train, "zh")}, {"zh"})
+
+    def test_one_language_at_a_time(self):
+        from lir.section12 import L1_ROWS, L2_ROWS, ONLY, only_md, only_result
+
+        data = {"base": self.arm(), "plain": self.arm({"ko": range(10)}), "plain-ayasize": self.arm({"ko": range(8)}),
+                ONLY["en"]: self.arm({"ko": range(12), "en": range(2)}, refuse_sw=range(10)),
+                ONLY["zh"]: self.arm({"ko": range(10), "zh": range(1)}), ONLY["ko"]: self.arm({"ko": range(6)})}
+        res = only_result(data, bar=40.0)   # Korean rises more than the trained language in both runs that can tell
+        self.assertEqual([res["arms"][l]["l1_row"] for l in ("en", "ko", "zh")], [1, 2, 1])
+        self.assertEqual(res["arms"]["ko"]["l1"], L1_ROWS[1].format(x="Korean"))
+        self.assertEqual((res["l2_row"], res["l2_report"], res["drift_followed_training_language_in"]), (1, L2_ROWS[0], []))
+        self.assertEqual(res["arms"]["en"]["l2_ko_rise_minus_trained_rise"]["mean"], 50.0)
+        self.assertNotIn("l2", res["arms"]["ko"])   # the Korean-only run is read by L1 only
+        self.assertEqual((res["arms"]["en"]["sw_refusal_vs_base"]["delta"], res["arms"]["en"]["ko_vs_mixed_519_rows"]["delta"]),
+                         (-50.0, 20.0))
+        runs = [{"arm": "plain-only-en", "seed": 42, "commit": "abc1234", "train_rows": 600, "train_sha256": "8e11f97e",
+                 "refusal_examples": None}]
+        md = only_md(dict(res, runs=runs))
+        self.assertIn("**By the table in section 12a (row 1): Trained on English alone or on Chinese alone", md)
+        self.assertIn("- Korean only: Korean +30.0 points (p = 0.031), outcome row 2.", md)
+        follows = only_result(dict(data, **{ONLY["zh"]: self.arm({"ko": range(2), "zh": range(12)})}), bar=40.0)
+        self.assertEqual((follows["l2_row"], follows["drift_followed_training_language_in"]), (2, ["zh"]))
+        self.assertEqual(follows["arms"]["zh"]["l1_row"], 3)   # Korean did not rise significantly in that run
+        self.assertIn("The interval is below zero in the run trained on Chinese only.", only_md(dict(follows, runs=runs)))
+        unclear = only_result(dict(data, **{ONLY["en"]: self.arm({"ko": range(6), "en": range(6, 12)})}), bar=40.0)
+        self.assertEqual((unclear["arms"]["en"]["l2"], unclear["l2_row"], unclear["l2_report"]), ("includes zero", 3, L2_ROWS[2]))
+
+    def test_vector_on_aya(self):
+        from lir.section12 import T1_ROWS, VEC, vector_md, vector_result
+
+        data = {"base": self.arm()}
+        for plain, edited, safegrad in VEC.values():
+            data[plain], data[edited], data[safegrad] = self.arm({"ko": range(12)}), self.arm({"ko": range(5)}), self.arm({"ko": range(4)})
+        res = vector_result(data)
+        self.assertEqual((res["t1"], res["outcome"], res["failed_parts"], res["decided_on_seeds"]), ("pass", T1_ROWS[0], [], [1, 2]))
+        self.assertEqual(res["pooled_ko_edited_minus_plain"]["mean"], -35.0)
+        self.assertEqual((res["seeds"][1]["ko_share_of_trained_repair"], res["seeds"][2]["edited_vs_base_ko"]["delta"]), (7 / 8, 25.0))
+        md = vector_md(res)
+        self.assertIn("| Below plain on Korean and on the four-language average | yes (-35.0, p = 0.016) | yes (-35.0, p = 0.016) |", md)
+        self.assertIn("Not measured: XSTest and the task sets", md)
+        beside = vector_result(dict(data, **{VEC[42][1]: self.arm({"ko": range(15)})}))
+        self.assertEqual(beside["t1"], "pass")   # seed 42 shares its initialisation with the vector's sources and decides nothing
+        worse = vector_result(dict(data, **{VEC[2][1]: self.arm({"ko": range(14)})}))
+        self.assertEqual((worse["t1"], worse["outcome"]), ("fail", T1_ROWS[1]))
+        self.assertIn("seed 2: not below plain on Korean", worse["failed_parts"])
+        self.assertIn("What failed: seed 2: not below plain on Korean", vector_md(worse))
+
+    def test_edit_records(self):
+        import json
+        from unittest import mock
+
+        from lir import section12
+
+        with tempfile.TemporaryDirectory() as tmp:
+            runs = Path(tmp)
+
+            def weights(run: str, text: str) -> str:
+                d = runs / run / "adapter"
+                d.mkdir(parents=True, exist_ok=True)
+                (d / "adapter_model.safetensors").write_text(text)
+                return section12.sha256_file(d / "adapter_model.safetensors")
+
+            sha = {run: weights(run, run) for run in ("plain", "safegrad", *(names[0] for names in section12.VEC.values()))}
+            with mock.patch.object(section12, "RUNS", runs):
+                for plain, edited, _ in section12.VEC.values():
+                    (runs / edited).mkdir()
+                    (runs / edited / "run.json").write_text(json.dumps({"sources": {
+                        "base": {"run": plain, "sha256": sha[plain]}, "plus": {"run": "safegrad", "sha256": sha["safegrad"]},
+                        "minus": {"run": "plain", "sha256": sha["plain"]}}}))
+                clean = section12.edit_problems()
+                weights("safegrad", "trained again")   # a source adapter that changed after the edit was built
+                bad = section12.edit_problems()
+        self.assertEqual(clean, [])
+        self.assertEqual(len(bad), 3)
+        self.assertTrue(all("plus is safegrad" in b for b in bad))
+
+    def test_vector_for_a_named_run(self):
+        import json
+        from unittest import mock
+
+        import torch
+        from safetensors.torch import load_file, save_file
+
+        from lir import vector
+
+        g = torch.Generator().manual_seed(1)
+        cfg = {"base_model_name_or_path": "m", "r": 4, "lora_alpha": 8, "use_dora": False, "use_rslora": False, "target_modules": ["q"]}
+        with tempfile.TemporaryDirectory() as tmp:
+            runs = Path(tmp)
+            for run in ("aya-plain-s1", "safegrad", "plain"):
+                (runs / run / "adapter").mkdir(parents=True)
+                save_file({"m.lora_A.weight": torch.randn(4, 10, generator=g), "m.lora_B.weight": torch.randn(6, 4, generator=g)},
+                          runs / run / "adapter" / "adapter_model.safetensors")
+                (runs / run / "adapter" / "adapter_config.json").write_text(json.dumps(cfg))
+            with mock.patch.object(vector, "RUNS", runs):
+                out = vector.build(target="aya-plain-s1")
+            rec = json.loads((runs / "aya-plain-s1-vec" / "run.json").read_text())
+            rank = json.loads((out / "adapter_config.json").read_text())["r"]
+            shape = tuple(load_file(out / "adapter_model.safetensors")["m.lora_A.weight"].shape)
+        self.assertEqual(out, runs / "aya-plain-s1-vec" / "adapter")
+        self.assertEqual((rec["arm"], rec["sources"]["base"]["run"], rec["sources"]["plus"]["run"], rank, shape),
+                         ("aya-plain-s1-vec", "aya-plain-s1", "safegrad", 12, (12, 10)))
+
+
 class RepairVector(unittest.TestCase):
     def test_stacked_factors_equal_the_sum(self):
         import torch

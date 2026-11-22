@@ -2,6 +2,7 @@
 
   python -m lir.vector build --seed 1      # runs/plain-s1-vec/adapter
   python -m lir.vector report              # results/lir/stage2/vector.{json,md}
+  python -m lir.vector build --target aya-plain-s1   # runs/aya-plain-s1-vec/adapter (section 12b, registered)
 
 The repair vector is the SafeGrad adapter's weight change minus the plain adapter's, both
 from seed 42. It is added at full size to the plain adapter of another seed, which never saw
@@ -39,10 +40,12 @@ def combine(base: dict, plus: dict, minus: dict) -> dict:
     return out
 
 
-def build(seed: int) -> Path:
+def build(seed: int | None = None, target: str | None = None) -> Path:
+    """The vector added to the plain adapter of a seed, or to the adapter of the run named by target."""
     from safetensors.torch import load_file, save_file
 
-    names = {"base": f"plain-s{seed}", "plus": SOURCE[0], "minus": SOURCE[1]}
+    arm = target or f"plain-s{seed}"
+    names = {"base": arm, "plus": SOURCE[0], "minus": SOURCE[1]}
     dirs = {k: RUNS / v / "adapter" for k, v in names.items()}
     cfgs = {k: json.loads((d / "adapter_config.json").read_text()) for k, d in dirs.items()}
     same = ("base_model_name_or_path", "r", "lora_alpha", "use_dora", "use_rslora", "target_modules")
@@ -55,13 +58,13 @@ def build(seed: int) -> Path:
     tensors = {k: load_file(d / WEIGHTS) for k, d in dirs.items()}
     if not (tensors["base"].keys() == tensors["plus"].keys() == tensors["minus"].keys()):
         raise SystemExit("the adapters do not cover the same modules")
-    out = RUNS / f"plain-s{seed}-vec" / "adapter"
+    out = RUNS / f"{arm}-vec" / "adapter"
     out.mkdir(parents=True, exist_ok=True)
     save_file(combine(**tensors), out / WEIGHTS, metadata={"format": "pt"})
     cfg = dict(cfgs["base"], r=3 * cfgs["base"]["r"], lora_alpha=3 * cfgs["base"]["lora_alpha"])
     write_json(out / "adapter_config.json", cfg)
     write_json(out.parent / "run.json", {
-        "arm": f"plain-s{seed}-vec", "edit": "plain adapter + (SafeGrad adapter - plain adapter, seed 42)",
+        "arm": f"{arm}-vec", "edit": "plain adapter + (SafeGrad adapter - plain adapter, seed 42)",
         "sources": {k: {"run": names[k], "sha256": sha256_file(dirs[k] / WEIGHTS)} for k in names},
         "sha256": sha256_file(out / WEIGHTS), "commit": git_commit()})
     print("wrote", out)
@@ -130,11 +133,12 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("cmd", choices=["build", "report"])
     ap.add_argument("--seed", type=int, choices=TEST_SEEDS)
+    ap.add_argument("--target", help="build: a run under runs/ whose adapter gets the vector, in place of --seed")
     a = ap.parse_args()
     if a.cmd == "build":
-        if a.seed is None:
-            raise SystemExit("--seed is required for build")
-        build(a.seed)
+        if (a.seed is None) == (a.target is None):
+            raise SystemExit("build needs --seed or --target, not both")
+        build(a.seed, a.target)
     else:
         report()
 
