@@ -7,8 +7,9 @@ runs the same `lir.train` and `lir.evaluate` as the laptop, and uploads everythi
 ## Before the first job
 
 - Use a commit that is pushed. The job clones from GitHub and refuses to start from uncommitted changes.
-- `export HF_TOKEN=...` in the shell. The token needs Jobs rights on `lost-in-refusal-lexsi`, the Tiny Aya Global
-  licence accepted on its account, and write access to `lost-in-refusal`. The command passes the token by name only.
+- Be logged in (`hf auth login`) or `export HF_TOKEN=...` in the shell. The token needs Jobs rights on
+  `lost-in-refusal-lexsi`, the Tiny Aya Global licence accepted on its account, and write access to
+  `lost-in-refusal`. The command passes the token by name only.
 - Print the job first: add `--dry-run`. Nothing is submitted.
 
 ## The jobs

@@ -1,7 +1,7 @@
 """Runs on a Hugging Face GPU for preregistration sections 12.0 to 12.2 on Aish's branch (deliverable D20).
 
   python -m lir.hfjob launch --job control --dry-run    # print the job, submit nothing
-  python -m lir.hfjob launch --job control              # submit it; needs HF_TOKEN with Jobs rights on the namespace
+  python -m lir.hfjob launch --job control              # submit it; needs a login with Jobs rights on the namespace
   python -m lir.hfjob run --job control                 # what the job runs inside the container
 
 A job clones this repository at one pushed commit, installs requirements-gpu.txt, trains or downloads each arm's
@@ -68,8 +68,6 @@ def launch(a) -> None:
         raise SystemExit(f"commit {commit[:7]} is not on the remote yet: push it first, the job clones from GitHub")
     cmd = job_command(a.job, commit, a.flavor, a.timeout, a.namespace, a.dry_run)
     print(" ".join(cmd[:-1]) + f" '{cmd[-1]}'")
-    if not a.dry_run and not os.environ.get("HF_TOKEN"):
-        raise SystemExit("set HF_TOKEN in this shell first (a token with Jobs rights on the namespace and access to Tiny Aya)")
     sys.exit(subprocess.run(cmd, cwd=ROOT).returncode)
 
 

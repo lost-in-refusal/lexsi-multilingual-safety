@@ -1,6 +1,6 @@
 ---
 license: cc-by-nc-4.0
-base_model: [CohereLabs/tiny-aya-global, CohereLabs/tiny-aya-earth]
+base_model: CohereLabs/tiny-aya-global
 library_name: peft
 language: [en, ko, zh]
 tags: [lora, safety-drift, multilingual, lexsi-hackathon, lost-in-refusal]
@@ -13,6 +13,8 @@ The adapters behind the stage 2 results of Lost in Refusal, one folder per run. 
 [Tiny Aya Earth](https://huggingface.co/CohereLabs/tiny-aya-earth) (revision `0624fafb`) on benign instruction
 data. They exist to measure how much refusal behaviour benign fine-tuning removes in each language, and how much of
 it SafeTune's SafeGrad keeps.
+
+**Two base models.** The six `earth-*` folders are adapters of Tiny Aya Earth. Every other folder is an adapter of Tiny Aya Global. The base-model field of this page can name only one model for the whole repository, so it names Global; the table below gives the base model of each folder.
 
 **Do not deploy these adapters.** They are research artifacts whose purpose is to show safety drift.
 
