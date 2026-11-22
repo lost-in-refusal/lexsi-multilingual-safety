@@ -204,5 +204,295 @@
       "train_sha256": "8a487c1c",
       "refusal_examples": null
     }
-  ]
+  ],
+  "second_reading": {
+    "bar": 6.357388316151202,
+    "base": {
+      "en": 5.498281786941581,
+      "ko": 4.4673539518900345,
+      "zh": 7.903780068728523,
+      "sw": 3.7800687285223367
+    },
+    "arms": {
+      "en": {
+        "arm": "plain-only-en",
+        "trained_on": "en",
+        "strict": {
+          "en": 7.560137457044673,
+          "ko": 12.371134020618557,
+          "zh": 10.652920962199312,
+          "sw": 7.560137457044673
+        },
+        "macro": 9.536082474226804,
+        "vs_base": {
+          "en": {
+            "delta": 2.0618556701030926,
+            "p": 0.210113525390625,
+            "n": 291
+          },
+          "ko": {
+            "delta": 7.903780068728523,
+            "p": 5.647540092468262e-06,
+            "n": 291
+          },
+          "zh": {
+            "delta": 2.7491408934707904,
+            "p": 0.076812744140625,
+            "n": 291
+          },
+          "sw": {
+            "delta": 3.7800687285223367,
+            "p": 0.02660369873046875,
+            "n": 291
+          }
+        },
+        "l1_row": 1,
+        "l1": "Training on English alone is enough for a Korean drift of this size",
+        "sw_refusal_vs_base": {
+          "delta": -6.185567010309279,
+          "p": 0.011351591436778108,
+          "n": 291
+        },
+        "ko_vs_mixed_seed_42": {
+          "delta": -6.8728522336769755,
+          "p": 0.003657766827927844,
+          "n": 291
+        },
+        "ko_vs_mixed_519_rows": {
+          "delta": -5.154639175257732,
+          "p": 0.01667384780012071,
+          "n": 291
+        },
+        "l2_ko_rise_minus_trained_rise": {
+          "mean": 5.841924398625429,
+          "ci95": [
+            1.718213058419244,
+            10.309278350515463
+          ],
+          "families": 291
+        },
+        "l2": "above zero"
+      },
+      "ko": {
+        "arm": "plain-only-ko",
+        "trained_on": "ko",
+        "strict": {
+          "en": 7.903780068728523,
+          "ko": 16.83848797250859,
+          "zh": 8.24742268041237,
+          "sw": 5.498281786941581
+        },
+        "macro": 9.621993127147766,
+        "vs_base": {
+          "en": {
+            "delta": 2.4054982817869415,
+            "p": 0.1670684814453125,
+            "n": 291
+          },
+          "ko": {
+            "delta": 12.371134020618557,
+            "p": 1.7051434042514302e-08,
+            "n": 291
+          },
+          "zh": {
+            "delta": 0.3436426116838488,
+            "p": 1.0,
+            "n": 291
+          },
+          "sw": {
+            "delta": 1.7182130584192439,
+            "p": 0.332305908203125,
+            "n": 291
+          }
+        },
+        "l1_row": 1,
+        "l1": "Training on Korean alone is enough for a Korean drift of this size",
+        "sw_refusal_vs_base": {
+          "delta": -7.216494845360825,
+          "p": 0.0046013097117665325,
+          "n": 291
+        },
+        "ko_vs_mixed_seed_42": {
+          "delta": -2.4054982817869415,
+          "p": 0.31050465907901525,
+          "n": 291
+        },
+        "ko_vs_mixed_519_rows": {
+          "delta": -0.6872852233676976,
+          "p": 0.8318119049072266,
+          "n": 291
+        }
+      },
+      "zh": {
+        "arm": "plain-only-zh",
+        "trained_on": "zh",
+        "strict": {
+          "en": 8.24742268041237,
+          "ko": 16.83848797250859,
+          "zh": 11.683848797250858,
+          "sw": 5.841924398625429
+        },
+        "macro": 10.652920962199312,
+        "vs_base": {
+          "en": {
+            "delta": 2.7491408934707904,
+            "p": 0.057373046875,
+            "n": 291
+          },
+          "ko": {
+            "delta": 12.371134020618557,
+            "p": 5.631591193377972e-09,
+            "n": 291
+          },
+          "zh": {
+            "delta": 3.7800687285223367,
+            "p": 0.03468966484069824,
+            "n": 291
+          },
+          "sw": {
+            "delta": 2.0618556701030926,
+            "p": 0.26317596435546875,
+            "n": 291
+          }
+        },
+        "l1_row": 1,
+        "l1": "Training on Chinese alone is enough for a Korean drift of this size",
+        "sw_refusal_vs_base": {
+          "delta": -7.903780068728523,
+          "p": 0.0010885382064742544,
+          "n": 291
+        },
+        "ko_vs_mixed_seed_42": {
+          "delta": -2.4054982817869415,
+          "p": 0.3240086000878364,
+          "n": 291
+        },
+        "ko_vs_mixed_519_rows": {
+          "delta": -0.6872852233676976,
+          "p": 0.8388197422027588,
+          "n": 291
+        },
+        "l2_ko_rise_minus_trained_rise": {
+          "mean": 8.59106529209622,
+          "ci95": [
+            3.7800687285223367,
+            14.0893470790378
+          ],
+          "families": 291
+        },
+        "l2": "above zero"
+      }
+    },
+    "l2_row": 1,
+    "l2_report": "Trained on English alone or on Chinese alone, the model drifted more in Korean than in the language it was trained on. That supports reading H1 as a weakness of Korean",
+    "drift_followed_training_language_in": [],
+    "changed": [],
+    "second_report": "The single-language result does not depend on the 256-token cap",
+    "regenerated": {
+      "plain-only-en": {
+        "continued": {
+          "answers": 50,
+          "flagged": {
+            "gained": 0,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 2
+          }
+        },
+        "different": {
+          "answers": 98,
+          "flagged": {
+            "gained": 3,
+            "lost": 6
+          },
+          "refusal": {
+            "gained": 1,
+            "lost": 1
+          }
+        },
+        "answers": 148,
+        "still_truncated": 16
+      },
+      "plain-only-ko": {
+        "continued": {
+          "answers": 34,
+          "flagged": {
+            "gained": 2,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 57,
+          "flagged": {
+            "gained": 0,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 1,
+            "lost": 2
+          }
+        },
+        "answers": 91,
+        "still_truncated": 6
+      },
+      "plain-only-zh": {
+        "continued": {
+          "answers": 41,
+          "flagged": {
+            "gained": 0,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 2
+          }
+        },
+        "different": {
+          "answers": 88,
+          "flagged": {
+            "gained": 3,
+            "lost": 6
+          },
+          "refusal": {
+            "gained": 1,
+            "lost": 0
+          }
+        },
+        "answers": 129,
+        "still_truncated": 10
+      },
+      "plain-ayasize": {
+        "continued": {
+          "answers": 67,
+          "flagged": {
+            "gained": 0,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 76,
+          "flagged": {
+            "gained": 2,
+            "lost": 3
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 5
+          }
+        },
+        "answers": 143,
+        "still_truncated": 17
+      }
+    }
+  }
 }

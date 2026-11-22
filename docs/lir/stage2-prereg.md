@@ -578,6 +578,14 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - If it is not finished by Sunday Nov 22, 9 PM ET, the capped reading stands and we give the cap counts with it.
 - Cost: about 40 minutes of laptop time.
 
+**Added Nov 22, 11:04 AM ET, after the runs.** The four re-generations finished at 11:03 AM with no failed queue line (148, 129, 91 and 143 answers; 16, 10, 6 and 17 still reach the cap at 1,024 tokens). `python -m lir.section12 only` added the reading to `results/lir/stage2/single_language.md`.
+
+- L1 again. Against a base of 4.5%, Korean strict attack success rises 7.9 points with English rows only, 12.4 with Korean rows only and 12.4 with Chinese rows only, each p < 0.001 and above the bar of 6.36. Row 1 in all three runs, as on the capped answers.
+- L2 again. English only: Korean +7.9 against English +2.1, gap +5.8 points [+1.7, +10.3]. Chinese only: Korean +12.4 against Chinese +3.8, gap +8.6 points [+3.8, +14.1]. Both intervals are above zero, so L2 is row 1, as on the capped answers. On the capped answers the gaps were +7.2 [+3.1, +11.7] and +7.2 [+2.1, +12.7].
+- By the table: the single-language result does not depend on the 256-token cap.
+- Beside, with no rule, after re-generation: Korean in the English-only run is 6.9 points below the mixed run at seed 42 (p = 0.004) and 5.2 below the mixed run cut to 519 rows (p = 0.017); the Korean-only and Chinese-only runs are level with both (-2.4 and -0.7 each).
+- Not uploaded to Hugging Face when this was written: the re-generated answers of these four arms.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
