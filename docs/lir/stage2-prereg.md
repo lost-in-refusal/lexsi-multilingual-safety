@@ -689,6 +689,32 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - Beside, with no rule, after re-generation: Korean in the English-only run is 6.9 points below the mixed run at seed 42 (p = 0.004) and 5.2 below the mixed run cut to 519 rows (p = 0.017); the Korean-only and Chinese-only runs are level with both (-2.4 and -0.7 each).
 - Not uploaded to Hugging Face when this was written: the re-generated answers of these four arms.
 
+### 12e. The mixed run cut to 519 rows at seeds 1 and 2
+
+**Added Nov 22, 3:36 PM ET, before either run was started.** The mixed run cut to 519 rows (`plain-ayasize`, 173 rows per language) is the nearest comparison for the Aya runs and for the single-language runs, and it is one run. We repeat it at seeds 1 and 2. When we wrote this we knew what follows. At seed 42 its Korean rise is 12.4 points. The Aya run is 2.4 points below it on Korean (p = 0.34). The English-only run is 4.5 points below it (p = 0.041; 5.2 after re-generation, p = 0.017), the Korean-only run 0.3 and the Chinese-only run 1.0 below. So C2 below was seen at seed 42 before it was written, and every report of it says so.
+
+- Runs: plain LoRA at seeds 1 and 2 on `data/lir/bactrian_train_ayasize.jsonl` (sha256 `7ac613cf`), same settings. The arms are `plain-ayasize-s1` and `plain-ayasize-s2`. They run after the single-language runs.
+- Evaluation: the attack set only, answers capped at 256 tokens. The same freeze rule as in 12a: a run is launched only if its training starts before Sunday Nov 22, 9 PM ET.
+- Shown with no rule: the Korean rise of the 519-row run at each seed and pooled.
+- C1, Aya against Bactrian-X of the same size. Korean strict attack success of Aya plain minus the 519-row run at the same seed, pooled over the three seeds, with a bootstrap 95% interval over the 291 prompt families.
+
+| C1 interval | What we report |
+| --- | --- |
+| Below zero | The Korean drift is smaller on the Aya set than on Bactrian-X of the same size |
+| Includes zero | No detected difference between the Aya set and Bactrian-X of the same size. We do not write that the two are the same |
+| Above zero | The Korean drift is larger on the Aya set than on Bactrian-X of the same size |
+
+- C2, one training language against a mixed set of about the same size. For each single-language run: its Korean strict attack success minus the 519-row run's at the same seed, pooled over the three seeds, with the same interval. It needs seeds 1 and 2 of both.
+
+| C2 interval, for training language X | What we report |
+| --- | --- |
+| Below zero | Training on X alone raises Korean attack success less than a mixed set of about the same size (600 rows against 519) |
+| Includes zero | No detected difference between training on X alone and a mixed set of about the same size |
+| Above zero | Training on X alone raises Korean attack success more than a mixed set of about the same size |
+
+- If a run of this block or of 12a's seeds is missing, the check that needs it is not read and we say so.
+- Cost: about 1.3 hours of laptop time.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
