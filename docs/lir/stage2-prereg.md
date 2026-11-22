@@ -430,6 +430,13 @@ Each report below refuses to write unless every run record names the right model
 - With no pass rule. SafeGrad against base Earth on Korean: +5.8 (p = 0.008), +2.7 (p = 0.20) and +3.1 points (p = 0.14). The Swahili refusal rate under plain changes by -6.9 (p = 0.006), -4.8 (p = 0.038) and -3.8 points (p = 0.135), beside -13.1, -6.2 and -8.6 on Global at the same seeds. E2 and row C keep their Nov 20 readings.
 - The run records. A record is written when training ends, so it can name a commit made during the run. `earth-plain-s1` started at 7:40 PM on commit `fe02701` and names `5743aef`; `earth-safegrad-s2` started at 12:32 AM on `fb10325` and names `a551f97`. The commits made while the four runs trained changed result notes, the registration of section 12 with its data files, report code and tests, the vector builder, the status page and a feedback document. `lir/train.py`, `lir/evaluate.py` and `lir/common.py` are the same as at the seed 42 Earth runs (commits `45a83d8` and `b0cd6ef`).
 - The second reading, on the answers generated again at 1,024 tokens, was still running when this was written. It is added below when it ends.
+
+**Added Nov 22, 3:00 AM ET, the second reading.** The four new Earth arms were generated again at 1,024 tokens by 2:59 AM with no failed queue line (97, 171, 103 and 185 capped answers; base and the seed 42 arms had been done on Nov 21). `python -m lir.repeat earth` added the reading to `results/lir/stage2/earth/seeds.md`. It decides nothing; the capped reading above stands.
+
+- By the same rule, drift and repair both pass on the re-generated answers. Korean rises from 7.9% for base Earth to 21.0%, 19.2% and 21.3% under plain (+13.1, +11.3 and +13.4 points, each p < 0.001; pooled +12.6 [+8.8, +16.6]). SafeGrad is 5.5 (p = 0.009), 6.2 (p < 0.001) and 7.6 points (p < 0.001) below plain of the same seed (pooled -6.4 [-9.3, -3.8]).
+- What moved is base, as at seed 42: 10.7% to 7.9%, generated again once. The plain and SafeGrad arms move by at most one point.
+- With no pass rule, on the re-generated answers: SafeGrad against base Earth on Korean is +7.6 (p < 0.001), +5.2 (p = 0.008) and +5.8 points (p = 0.002), and the Swahili refusal rate under plain changes by -8.2 (p < 0.001), -5.8 (p = 0.012) and -4.8 points (p = 0.044).
+- Not uploaded to Hugging Face when this was written: the re-generated answers of the four new arms.
 - Not uploaded to Hugging Face when this was written: the answers, verdicts and adapters of the four new arms, and the three-seed table.
 
 ## 12. Two blocks added on Nov 22
