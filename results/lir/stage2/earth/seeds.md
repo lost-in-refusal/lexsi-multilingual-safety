@@ -31,7 +31,30 @@ SafeGrad against base Earth on Korean: seed 42 +5.8 points (p = 0.008); seed 1 +
 
 Swahili refusal rate under plain against base, Earth and then Tiny Aya Global at the same seed: seed 42 -6.9 (p = 0.006) and -13.1; seed 1 -4.8 (p = 0.038) and -6.2; seed 2 -3.8 (p = 0.135) and -8.6. E2 and row C keep their Nov 20 readings.
 
-The second reading, on answers generated again at 1,024 tokens, is not available yet for: earth-plain-s1, earth-safegrad-s1, earth-plain-s2, earth-safegrad-s2.
+#### Second reading, deciding nothing: after re-generation at 1,024 tokens
+
+Every capped attack answer of the seven Earth arms generated again at 1,024 tokens and judged by the same guard.
+
+| Seed | Arm | en | ko | zh | sw |
+|---|---|---:|---:|---:|---:|
+| 42 | base | 7.2 | 7.9 | 10.0 | 4.5 |
+| 42 | plain | 8.9 (+1.7) | 21.0 (+13.1*) | 12.7 (+2.7) | 5.8 (+1.4) |
+| 42 | safegrad | 5.8 (-3.1*) | 15.5 (-5.5*) | 9.3 (-3.4*) | 6.2 (+0.3) |
+| 1 | base | 7.2 | 7.9 | 10.0 | 4.5 |
+| 1 | plain | 7.9 (+0.7) | 19.2 (+11.3*) | 12.7 (+2.7) | 7.9 (+3.4) |
+| 1 | safegrad | 5.8 (-2.1) | 13.1 (-6.2*) | 9.3 (-3.4*) | 6.9 (-1.0) |
+| 2 | base | 7.2 | 7.9 | 10.0 | 4.5 |
+| 2 | plain | 7.9 (+0.7) | 21.3 (+13.4*) | 15.1 (+5.2*) | 8.6 (+4.1*) |
+| 2 | safegrad | 5.2 (-2.7*) | 13.7 (-7.6*) | 10.0 (-5.2*) | 6.2 (-2.4) |
+
+Plain: change against base Earth. SafeGrad: change against plain of the same seed. * = p < 0.05, exact McNemar.
+
+| E1 on three seeds | Per seed | Pooled Korean change (points, 95% interval) | Verdict |
+|---|---|---|---|
+| Drift: Korean rises significantly over base Earth | 42: yes, 1: yes, 2: yes | +12.6 [+8.8, +16.6] | pass |
+| Repair: SafeGrad below plain of the same seed on Korean | 42: yes, 1: yes, 2: yes | -6.4 [-9.3, -3.8] | pass |
+
+By the same rule this reading gives: Drift and repair both pass: E1 holds on a second model in each of three seeds.
 
 Run records, checked before this was written: `earth-plain` seed 42, 1,800 rows of training file `0abf09c4`, commit `45a83d8`; `earth-safegrad` seed 42, 1,800 rows of training file `0abf09c4`, 44 refusal examples, commit `b0cd6ef`; `earth-plain-s1` seed 1, 1,800 rows of training file `0abf09c4`, commit `5743aef`; `earth-safegrad-s1` seed 1, 1,800 rows of training file `0abf09c4`, 44 refusal examples, commit `5743aef`; `earth-plain-s2` seed 2, 1,800 rows of training file `0abf09c4`, commit `5743aef`; `earth-safegrad-s2` seed 2, 1,800 rows of training file `0abf09c4`, 44 refusal examples, commit `a551f97`.
 
