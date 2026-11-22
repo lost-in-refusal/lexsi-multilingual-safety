@@ -441,6 +441,13 @@ Each report below refuses to write unless every run record names the right model
 
 ## 12. Two blocks added on Nov 22
 
+**Added Nov 22, 3:14 PM ET: a second section 12 exists.** Aish committed a section 12, "Runs on Hugging Face GPUs: per-language fine-tunes, NF4, AlignTune", on the branch `aish/prereg-a2-a4-paper` on Nov 21 at 8:59 PM ET (commits `b985813` and `8cd4049`). The section below was written on Nov 22 at 12:27 AM on `mingyu/stage2` without that branch having been read. So the two were written independently, both carry the number 12, and both use the names L1, L2 and T1 for different rules. Nothing below was renumbered or renamed after its runs. Until the two are merged, cite the parts below as 12a to 12d and their rules as L1 (12a), L2 (12a) and T1 (12b).
+
+- The single-language runs of 12a are the same three fine-tunes as her 12.1, trained and evaluated on the laptop and not on a Hugging Face GPU. The arms here are `plain-only-en`, `plain-only-ko` and `plain-only-zh`; hers are `plain-en`, `plain-ko` and `plain-zh`. Her section was registered first.
+- Her 12.1 is therefore no longer blind. The laptop results of 12a were known from Nov 22, 5:07 AM, and those of 12d from 11:03 AM. That has to be written into her 12.1 before `plain-ko` is launched on the GPU.
+- The laptop results do not decide her L1 or L2. Those compare each run with a base model evaluated on the same GPU.
+- How the two sections are merged and numbered is for Aish and Mingyu to decide. It is not decided here.
+
 **Added Nov 22, 12:27 AM ET, after every result above had been read and before any run below was started.** The Earth runs of section 11c were still going and none of their answers had been read. Both blocks finish before the Sunday 9 PM stop on new experiments. Each report refuses to write unless the run records match what is registered here and every arm has all 1,164 attack verdicts.
 
 ### 12a. One training language at a time

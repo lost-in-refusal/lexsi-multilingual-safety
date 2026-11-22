@@ -1,6 +1,8 @@
 # Stage 2 results so far
 
-Updated Nov 22, 3:06 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 22, 3:14 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+
+**Two sections are numbered 12.** Aish registered a section 12 for the Hugging Face GPU runs on her branch `aish/prereg-a2-a4-paper` (Nov 21, 8:59 PM). The section 12 on this branch (12a to 12d) was written a few hours later without that branch having been read. Both use the names L1, L2 and T1 for different rules, and the laptop single-language runs here are the same three fine-tunes as her 12.1. On this page, "section 12a" to "12d" and L1, L2 and T1 mean the laptop ones. The two are not merged yet; the note at the top of section 12 of the preregistration has the details.
 
 | Check | Result | Seeds | Main numbers | Detail |
 |---|---|---:|---|---|
