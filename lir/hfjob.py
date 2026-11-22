@@ -20,14 +20,18 @@ import threading
 import time
 from pathlib import Path
 
-from lir.common import DATA, HF_ORG, ROOT, RUNS, write_json
+from lir.common import DATA, HF_ORG, ROOT, RUNS, sha256_file, write_json
 
 NAMESPACE = "lost-in-refusal-lexsi"   # the organization whose credits pay for the job
 FLAVOR, TIMEOUT, IMAGE = "l4x1", "3h", "python:3.12"
 REPO_URL = "https://github.com/lost-in-refusal/lexsi-multilingual-safety.git"
 STAGING = os.environ.get("LIR_STAGING_REPO", f"{HF_ORG}/lost-in-refusal-gpu-runs")   # private dataset repository
-# The seed 42 adapters trained on the laptop are the two stage 1 repositories, not the stage 2 one.
-LAPTOP = {"plain": f"{HF_ORG}/tiny-aya-global-bactrian-lora-plain", "safegrad": f"{HF_ORG}/tiny-aya-global-bactrian-lora-safegrad"}
+# The seed 42 adapters trained on the laptop are the two stage 1 repositories, not the stage 2 one. Each is pinned
+# to a revision, and the downloaded weights must have the hash of the file the laptop evaluated.
+LAPTOP = {"plain": (f"{HF_ORG}/tiny-aya-global-bactrian-lora-plain", "0e57114e1804beb4c81a3afad0076d9733067010",
+                    "f244c893ba78532f94e68658b86a290abd90ef319536854908ac867b5b5b3f83"),
+          "safegrad": (f"{HF_ORG}/tiny-aya-global-bactrian-lora-safegrad", "8b2687f885d388e4a3a370fb04252a21c3f13e99",
+                       "dca9b81486c46d1ba683fbafaa0ca933058467ade7a7baa09eedab36e10fac16")}
 SETS = ["attack", "xstest"]
 NF4 = {"LIR_QUANT": "nf4"}
 
@@ -114,12 +118,14 @@ def run_step(cmd: list[str], env: dict, log: Path) -> dict:
     peak, stop = [0], threading.Event()
 
     def watch() -> None:
-        while not stop.wait(5):
+        while True:   # the first sample is taken at once, then one every 5 seconds until the command ends
             try:
                 out = subprocess.run(["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits"],
                                      capture_output=True, text=True).stdout.split()
                 peak[0] = max(peak[0], *(int(x) for x in out)) if out else peak[0]
             except (FileNotFoundError, ValueError):
+                return
+            if stop.wait(5):
                 return
 
     threading.Thread(target=watch, daemon=True).start()
@@ -151,16 +157,23 @@ def run(a) -> None:
     for step in JOBS[a.job]:
         arm, env, adapter = step["arm"], step.get("env", {}), None
         if "hub" in step:   # an adapter trained on the laptop, not retrained
-            adapter = snapshot_download(LAPTOP[step["hub"]], local_dir=RUNS / arm / "adapter",
+            repo, revision, sha = LAPTOP[step["hub"]]
+            adapter = snapshot_download(repo, revision=revision, local_dir=RUNS / arm / "adapter",
                                         allow_patterns=["adapter_config.json", "adapter_model.safetensors"])
+            if sha256_file(Path(adapter) / "adapter_model.safetensors") != sha:
+                raise SystemExit(f"{repo}@{revision[:8]}: the adapter weights are not the file the laptop evaluated")
         if "train" in step:
             done = run_step(py + ["lir.train", "--arm", "plain", "--output", str(RUNS / arm), "--train-file",
                                   str(DATA / step["train"])], {}, out / "logs" / f"{arm}.train.log")
             record["steps"].append(dict(done, arm=arm, what="train"))
             adapter = str(RUNS / arm / "adapter")
-        cmd = py + ["lir.evaluate", "--arm", arm, "--sets", *SETS] + (["--adapter", str(adapter)] if adapter else [])
-        done = run_step(cmd, env, out / "logs" / f"{arm}.evaluate.log")
-        record["steps"].append(dict(done, arm=arm, what="evaluate", adapter_from=step.get("hub") or step.get("train")))
+        # lir.evaluate generates and then judges. Here its two halves run as two processes, with the same functions,
+        # so that the peak GPU memory of the first is the model's alone and does not include the guard.
+        cmd = py + ["lir.evaluate", "--arm", arm, "--sets", *SETS, "--skip-guard"] + (["--adapter", str(adapter)] if adapter else [])
+        done = run_step(cmd, env, out / "logs" / f"{arm}.generate.log")
+        record["steps"].append(dict(done, arm=arm, what="generate", adapter_from=step.get("hub") or step.get("train")))
+        done = run_step(py + ["lir.hfjob", "guard", "--job", a.job, "--arm", arm], {}, out / "logs" / f"{arm}.guard.log")
+        record["steps"].append(dict(done, arm=arm, what="guard"))
         write_json(out / "job.json", record)   # kept current, so a job that dies later still leaves a record
     record["finished_utc"] = time.strftime("%Y%m%d-%H%M%S", time.gmtime())
     write_json(out / "job.json", record)
@@ -178,16 +191,27 @@ def run(a) -> None:
     print(f"uploaded to {STAGING}/{dest}")
 
 
+def guard_sets(a) -> None:
+    """The second half of lir.evaluate: the guard's verdict on every answer the arm generated."""
+    from lir import guard
+    from lir.common import read_jsonl
+
+    tok, model = guard.load()
+    for name in SETS:
+        guard.judge(tok, model, read_jsonl(RUNS / "eval" / a.arm / f"{name}.gen.jsonl"), RUNS / "eval" / a.arm / f"{name}.guard.jsonl")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["launch", "run"])
+    ap.add_argument("what", choices=["launch", "run", "guard"])
     ap.add_argument("--job", required=True, choices=sorted(JOBS))
+    ap.add_argument("--arm", help="guard: the arm whose answers are judged (used inside a job)")
     ap.add_argument("--flavor", default=FLAVOR)
     ap.add_argument("--timeout", default=TIMEOUT)
     ap.add_argument("--namespace", default=NAMESPACE)
     ap.add_argument("--dry-run", action="store_true", help="launch: print the job and submit nothing")
     a = ap.parse_args()
-    (launch if a.what == "launch" else run)(a)
+    {"launch": launch, "run": run, "guard": guard_sets}[a.what](a)
 
 
 if __name__ == "__main__":

@@ -1047,6 +1047,16 @@ class GpuJobs(unittest.TestCase):
                 if "train" in step:
                     self.assertTrue((hfjob.DATA / step["train"]).exists())
 
+    def test_laptop_adapters_are_pinned(self):
+        from lir import hfjob
+
+        for arm, (repo, revision, sha) in hfjob.LAPTOP.items():
+            self.assertTrue(repo.endswith(f"-lora-{arm}"))
+            self.assertEqual((len(revision), len(sha)), (40, 64))
+            local = hfjob.RUNS / arm / "adapter" / "adapter_model.safetensors"
+            if local.exists():   # on the laptop: the pinned hash is the hash of the adapter that was evaluated
+                self.assertEqual(hfjob.sha256_file(local), sha)
+
     def test_load_options(self):
         from unittest import mock
 

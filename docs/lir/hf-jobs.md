@@ -30,7 +30,9 @@ every job, so change the flavor for all of them or none. Follow a job with `hf j
 To the private dataset `lost-in-refusal/lost-in-refusal-gpu-runs`, under `<job>/<UTC time>-<commit>/`:
 
 - `job.json`: the commit, the GPU type and driver, the library versions, and for each step the command, the seconds it
-  took, the peak GPU memory in use and the generation speed per set.
+  took, the peak GPU memory in use and the generation speed per set. Generation and the guard run as two steps (the
+  two halves of `lir.evaluate`, same functions), so the memory of the `generate` step is the model's alone. That is
+  the figure for the ROI table; the `guard` step's memory is the safety judge's.
 - `logs/`: the full output of every step.
 - `<arm>/`: `attack.gen.jsonl`, `attack.guard.jsonl`, `xstest.gen.jsonl` and `xstest.guard.jsonl`, as on the laptop.
 - `<arm>/run/` for a trained arm: the adapter, its run record and its training log.
@@ -47,7 +49,8 @@ Nothing goes to the public outputs repository from a job. Results are copied the
   difference between a merged and an unmerged adapter. The `unmerged` job measures that difference in bfloat16. It is
   not registered: add it to 12.2 before running it, or state the confound.
 - **The seed 42 adapters are the two stage 1 repositories** (`tiny-aya-global-bactrian-lora-plain` and `-safegrad`),
-  not `tiny-aya-lora-stage2` as the brief says. The job downloads them from there.
+  not `tiny-aya-lora-stage2` as the brief says. The job downloads them from there at a pinned revision and stops if
+  the weights do not have the hash of the file the laptop evaluated.
 - **AlignTune (12.3) is not scripted.** It needs its own entry point once someone has checked that AlignTune can
   fine-tune Tiny Aya Global.
 - **The laptop already has the single-language runs** (`plain-only-en`, `plain-only-ko`, `plain-only-zh`; section 12a on
