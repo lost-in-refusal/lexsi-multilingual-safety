@@ -553,6 +553,15 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - Beside the rule, deciding nothing. Of the edited arms' answers generated again, 244 and 277 are the original continued and 432 and 432 came out different; the answers generated again average about 475 tokens. The edited adapter stays above base on Korean, by 3.8 (p = 0.043) and 4.1 points (p = 0.036). The refusal rate on attack prompts is still below base after re-generation in English (-4.5, p = 0.041; -3.8, p = 0.080), Chinese (-4.1, p = 0.058; -5.2, p = 0.017) and Swahili (-6.2, p = 0.027; -7.9, p = 0.008), and level in Korean.
 - Not uploaded to Hugging Face when this was written: the re-generated answers of these arms and the table.
 
+**Added Nov 22, 10:21 AM ET, after the other five arms were generated again.** They finished at 10:19 AM with no failed queue line: 687 answers of the seed 42 edited arm, 169 of Aya plain at seed 42, and 196, 194 and 195 of the three Aya SafeGrad arms. The reports added the rest to `vector_aya.md` and the Aya reading to `results/lir/stage2/aya/seeds.md`. T1's second reading above did not change.
+
+- Y1 to Y3 on Aya after re-generation, deciding nothing. Y1 passes again: Korean rises 9.6, 8.9 and 8.9 points (seeds 42, 1, 2; each p < 0.001) and English 1.0, 0.3 and 0.0; the pooled gap is +8.7 points [+4.6, +12.9], against +10.0 [+5.8, +14.4] on the capped answers. Y2 passes again: SafeGrad is 5.5 (p < 0.001), 3.1 (p = 0.078) and 4.8 points (p = 0.001) below plain on Korean and below it on the four-language average in each seed; pooled -4.5 [-6.8, -2.3], against -4.8 [-7.2, -2.6]. Y3 fails again: the Swahili refusal rate changes by -4.5, -4.1 and -2.1 points; pooled -3.6 [-7.8, +0.6], against -2.6 [-6.9, +1.5].
+- By the rule of this section: Y1 and Y2 hold on the original answers and after re-generation. Y3 failed on the capped answers and fails after re-generation.
+- The seed 42 row of T1, shown and deciding nothing: 14.1% to 8.2% after re-generation (-5.8 points, p = 0.005).
+- Beside, with no rule: after re-generation the edited adapter is level with SafeGrad trained on Aya at the same seed on Korean (-2.1, 0.0 and -0.3 points; p = 0.33, 1.0 and 1.0). That is no detected difference, not a test that the two are equal.
+- The capped XSTest answers of the two seed 42 Aya arms were generated again by the same command. No reading of them was registered and none was made.
+- Not uploaded to Hugging Face when this was written: the re-generated answers and the two tables.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

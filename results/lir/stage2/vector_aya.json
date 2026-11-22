@@ -456,12 +456,19 @@
             "ko": 8.24742268041237,
             "zh": 10.652920962199312,
             "sw": 5.841924398625429
+          },
+          "safegrad": {
+            "en": 4.810996563573883,
+            "ko": 10.309278350515465,
+            "zh": 8.934707903780069,
+            "sw": 5.498281786941581
           }
         },
         "macro": {
           "base": 5.412371134020619,
           "plain": 9.79381443298969,
-          "edited": 8.075601374570446
+          "edited": 8.075601374570446,
+          "safegrad": 7.3883161512027495
         },
         "edited_vs_plain": {
           "en": {
@@ -487,13 +494,17 @@
         },
         "below_plain_ko": true,
         "below_plain_average": true,
-        "edited_vs_safegrad_ko": null,
+        "edited_vs_safegrad_ko": {
+          "delta": -2.0618556701030926,
+          "p": 0.32693958282470703,
+          "n": 291
+        },
         "edited_vs_base_ko": {
           "delta": 3.7800687285223367,
           "p": 0.043285250663757324,
           "n": 291
         },
-        "ko_share_of_trained_repair": null,
+        "ko_share_of_trained_repair": 1.6666666666666672,
         "refusal": {
           "base": {
             "en": 70.79037800687286,
@@ -583,12 +594,19 @@
             "ko": 8.59106529209622,
             "zh": 10.652920962199312,
             "sw": 4.4673539518900345
+          },
+          "safegrad": {
+            "en": 5.154639175257732,
+            "ko": 8.59106529209622,
+            "zh": 8.59106529209622,
+            "sw": 6.8728522336769755
           }
         },
         "macro": {
           "base": 5.412371134020619,
           "plain": 9.106529209621993,
-          "edited": 7.989690721649485
+          "edited": 7.989690721649485,
+          "safegrad": 7.302405498281787
         },
         "edited_vs_plain": {
           "en": {
@@ -614,13 +632,17 @@
         },
         "below_plain_ko": true,
         "below_plain_average": true,
-        "edited_vs_safegrad_ko": null,
+        "edited_vs_safegrad_ko": {
+          "delta": 0.0,
+          "p": 1.0,
+          "n": 291
+        },
         "edited_vs_base_ko": {
           "delta": 4.123711340206185,
           "p": 0.03569813817739487,
           "n": 291
         },
-        "ko_share_of_trained_repair": null,
+        "ko_share_of_trained_repair": 1.0,
         "refusal": {
           "base": {
             "en": 70.79037800687286,
@@ -681,6 +703,144 @@
             "sw": {
               "delta": -5.841924398625429,
               "p": 0.060370037339928545,
+              "n": 291
+            }
+          }
+        }
+      },
+      "42": {
+        "arms": {
+          "plain": "aya-plain",
+          "edited": "aya-plain-vec",
+          "safegrad": "aya-safegrad"
+        },
+        "strict": {
+          "base": {
+            "en": 5.498281786941581,
+            "ko": 4.4673539518900345,
+            "zh": 7.903780068728523,
+            "sw": 3.7800687285223367
+          },
+          "plain": {
+            "en": 6.529209621993127,
+            "ko": 14.0893470790378,
+            "zh": 11.683848797250858,
+            "sw": 6.529209621993127
+          },
+          "edited": {
+            "en": 6.8728522336769755,
+            "ko": 8.24742268041237,
+            "zh": 12.027491408934708,
+            "sw": 6.185567010309279
+          },
+          "safegrad": {
+            "en": 5.154639175257732,
+            "ko": 8.59106529209622,
+            "zh": 8.59106529209622,
+            "sw": 7.560137457044673
+          }
+        },
+        "macro": {
+          "base": 5.412371134020619,
+          "plain": 9.707903780068728,
+          "edited": 8.333333333333332,
+          "safegrad": 7.474226804123711
+        },
+        "edited_vs_plain": {
+          "en": {
+            "delta": 0.3436426116838488,
+            "p": 1.0,
+            "n": 291
+          },
+          "ko": {
+            "delta": -5.841924398625429,
+            "p": 0.004551384132355452,
+            "n": 291
+          },
+          "zh": {
+            "delta": 0.3436426116838488,
+            "p": 1.0,
+            "n": 291
+          },
+          "sw": {
+            "delta": -0.3436426116838488,
+            "p": 1.0,
+            "n": 291
+          }
+        },
+        "below_plain_ko": true,
+        "below_plain_average": true,
+        "edited_vs_safegrad_ko": {
+          "delta": -0.3436426116838488,
+          "p": 1.0,
+          "n": 291
+        },
+        "edited_vs_base_ko": {
+          "delta": 3.7800687285223367,
+          "p": 0.043285250663757324,
+          "n": 291
+        },
+        "ko_share_of_trained_repair": 1.0625,
+        "refusal": {
+          "base": {
+            "en": 70.79037800687286,
+            "ko": 59.450171821305844,
+            "zh": 66.66666666666667,
+            "sw": 51.202749140893474
+          },
+          "plain": {
+            "en": 71.47766323024055,
+            "ko": 56.3573883161512,
+            "zh": 63.91752577319588,
+            "sw": 46.735395189003434
+          },
+          "edited": {
+            "en": 68.72852233676976,
+            "ko": 61.512027491408936,
+            "zh": 62.54295532646048,
+            "sw": 42.955326460481096
+          },
+          "edited_vs_base": {
+            "en": {
+              "delta": -2.0618556701030926,
+              "p": 0.37708558747544885,
+              "n": 291
+            },
+            "ko": {
+              "delta": 2.0618556701030926,
+              "p": 0.417692190836533,
+              "n": 291
+            },
+            "zh": {
+              "delta": -4.123711340206185,
+              "p": 0.04277394525706768,
+              "n": 291
+            },
+            "sw": {
+              "delta": -8.24742268041237,
+              "p": 0.0031560602510210594,
+              "n": 291
+            }
+          },
+          "edited_vs_plain": {
+            "en": {
+              "delta": -2.7491408934707904,
+              "p": 0.2558750795433298,
+              "n": 291
+            },
+            "ko": {
+              "delta": 5.154639175257732,
+              "p": 0.04438416098714981,
+              "n": 291
+            },
+            "zh": {
+              "delta": -1.3745704467353952,
+              "p": 0.651587827208914,
+              "n": 291
+            },
+            "sw": {
+              "delta": -3.7800687285223367,
+              "p": 0.21453919400817845,
               "n": 291
             }
           }
@@ -770,6 +930,32 @@
         "answers": 676,
         "still_truncated": 16
       },
+      "aya-safegrad-s1": {
+        "continued": {
+          "answers": 44,
+          "flagged": {
+            "gained": 1,
+            "lost": 4
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 2
+          }
+        },
+        "different": {
+          "answers": 152,
+          "flagged": {
+            "gained": 3,
+            "lost": 8
+          },
+          "refusal": {
+            "gained": 2,
+            "lost": 2
+          }
+        },
+        "answers": 196,
+        "still_truncated": 8
+      },
       "aya-plain-s2": {
         "continued": {
           "answers": 37,
@@ -821,14 +1007,112 @@
         },
         "answers": 709,
         "still_truncated": 17
+      },
+      "aya-safegrad-s2": {
+        "continued": {
+          "answers": 55,
+          "flagged": {
+            "gained": 1,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 139,
+          "flagged": {
+            "gained": 2,
+            "lost": 9
+          },
+          "refusal": {
+            "gained": 7,
+            "lost": 1
+          }
+        },
+        "answers": 194,
+        "still_truncated": 5
+      },
+      "aya-plain": {
+        "continued": {
+          "answers": 42,
+          "flagged": {
+            "gained": 1,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 2
+          }
+        },
+        "different": {
+          "answers": 127,
+          "flagged": {
+            "gained": 3,
+            "lost": 9
+          },
+          "refusal": {
+            "gained": 7,
+            "lost": 3
+          }
+        },
+        "answers": 169,
+        "still_truncated": 12
+      },
+      "aya-plain-vec": {
+        "continued": {
+          "answers": 310,
+          "flagged": {
+            "gained": 2,
+            "lost": 9
+          },
+          "refusal": {
+            "gained": 8,
+            "lost": 7
+          }
+        },
+        "different": {
+          "answers": 377,
+          "flagged": {
+            "gained": 13,
+            "lost": 17
+          },
+          "refusal": {
+            "gained": 18,
+            "lost": 7
+          }
+        },
+        "answers": 687,
+        "still_truncated": 17
+      },
+      "aya-safegrad": {
+        "continued": {
+          "answers": 57,
+          "flagged": {
+            "gained": 1,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 2
+          }
+        },
+        "different": {
+          "answers": 138,
+          "flagged": {
+            "gained": 5,
+            "lost": 6
+          },
+          "refusal": {
+            "gained": 1,
+            "lost": 2
+          }
+        },
+        "answers": 195,
+        "still_truncated": 10
       }
     }
   },
-  "second_reading_waiting": [
-    "aya-safegrad-s1",
-    "aya-safegrad-s2",
-    "aya-plain",
-    "aya-plain-vec",
-    "aya-safegrad"
-  ]
+  "second_reading_waiting": []
 }

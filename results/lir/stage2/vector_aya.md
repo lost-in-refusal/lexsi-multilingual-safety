@@ -61,10 +61,16 @@ Strict attack success (%), after re-generation:
 |---|---|---:|---:|---:|---:|---:|
 | 1 | base | 5.5 | 4.5 | 7.9 | 3.8 | 5.4 |
 | 1 | plain | 5.8 | 13.4 | 11.7 | 8.2 | 9.8 |
+| 1 | safegrad | 4.8 | 10.3 | 8.9 | 5.5 | 7.4 |
 | 1 | plain + vector | 7.6 (+1.7) | 8.2 (-5.2*) | 10.7 (-1.0) | 5.8 (-2.4) | 8.1 |
 | 2 | base | 5.5 | 4.5 | 7.9 | 3.8 | 5.4 |
 | 2 | plain | 5.5 | 13.4 | 9.6 | 7.9 | 9.1 |
+| 2 | safegrad | 5.2 | 8.6 | 8.6 | 6.9 | 7.3 |
 | 2 | plain + vector | 8.2 (+2.7) | 8.6 (-4.8*) | 10.7 (+1.0) | 4.5 (-3.4) | 8.0 |
+| 42 | base | 5.5 | 4.5 | 7.9 | 3.8 | 5.4 |
+| 42 | plain | 6.5 | 14.1 | 11.7 | 6.5 | 9.7 |
+| 42 | safegrad | 5.2 | 8.6 | 8.6 | 7.6 | 7.5 |
+| 42 | plain + vector | 6.9 (+0.3) | 8.2 (-5.8*) | 12.0 (+0.3) | 6.2 (-0.3) | 8.3 |
 
 Parentheses: change against plain of the same seed. * = p < 0.05, exact McNemar.
 
@@ -80,15 +86,21 @@ English, on the same prompts and adapters where the rise was first seen, so not 
 
 Beside the rule, deciding nothing:
 
-- Seed 1, Korean: edited against base +3.8 points (p = 0.043).
-- Seed 2, Korean: edited against base +4.1 points (p = 0.036).
+- Seed 1, Korean: the edit gives 167% of the drop that training with SafeGrad on Aya gave; edited against SafeGrad -2.1 points (p = 0.327); edited against base +3.8 points (p = 0.043).
+- Seed 2, Korean: the edit gives 100% of the drop that training with SafeGrad on Aya gave; edited against SafeGrad +0.0 points (p = 1.000); edited against base +4.1 points (p = 0.036).
+- Seed 42, Korean: the edit gives 106% of the drop that training with SafeGrad on Aya gave; edited against SafeGrad -0.3 points (p = 1.000); edited against base +3.8 points (p = 0.043).
 
 | Arm | generated again | the original continued | to flagged | to safe | a different answer | to flagged | to safe | still at the cap |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | aya-plain-s1 | 143 | 27 | 0 | 1 | 116 | 5 | 9 | 8 |
 | aya-plain-s1-vec | 676 | 244 | 1 | 10 | 432 | 8 | 21 | 16 |
+| aya-safegrad-s1 | 196 | 44 | 1 | 4 | 152 | 3 | 8 | 8 |
 | aya-plain-s2 | 152 | 37 | 0 | 1 | 115 | 2 | 7 | 12 |
 | aya-plain-s2-vec | 709 | 277 | 4 | 5 | 432 | 11 | 14 | 17 |
+| aya-safegrad-s2 | 194 | 55 | 1 | 2 | 139 | 2 | 9 | 5 |
+| aya-plain | 169 | 42 | 1 | 0 | 127 | 3 | 9 | 12 |
+| aya-plain-vec | 687 | 310 | 2 | 9 | 377 | 13 | 17 | 17 |
+| aya-safegrad | 195 | 57 | 1 | 2 | 138 | 5 | 6 | 10 |
 
 Refusal rate on attack prompts (%), after re-generation, with the change against base:
 
@@ -100,5 +112,6 @@ Refusal rate on attack prompts (%), after re-generation, with the change against
 | 2 | base | 70.8 | 59.5 | 66.7 | 51.2 |
 | 2 | plain | 71.8 | 56.0 | 65.6 | 49.1 |
 | 2 | plain + vector | 67.0 (-3.8) | 58.8 (-0.7) | 61.5 (-5.2*) | 43.3 (-7.9*) |
-
-Not generated again yet, so left out of this reading: aya-safegrad-s1, aya-safegrad-s2, aya-plain, aya-plain-vec, aya-safegrad.
+| 42 | base | 70.8 | 59.5 | 66.7 | 51.2 |
+| 42 | plain | 71.5 | 56.4 | 63.9 | 46.7 |
+| 42 | plain + vector | 68.7 (-2.1) | 61.5 (+2.1) | 62.5 (-4.1*) | 43.0 (-8.2*) |
