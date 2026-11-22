@@ -1079,6 +1079,37 @@ class GpuJobs(unittest.TestCase):
         self.assertEqual(speeds(log), {"attack.gen": 101.2, "xstest.gen": 110.0})
 
 
+class RefusalDirection(unittest.TestCase):
+    def proj(self, shift):
+        """Projections for 30 families in four languages: 10 on the base model, plus a per-language shift."""
+        return {(f"f{i}", lang): 10.0 + shift.get(lang, 0.0) + (0.3 if i % 2 else -0.3) * shift.get("spread", 0.0)
+                for i in range(30) for lang in ("en", "ko", "zh", "sw")}
+
+    def test_readings(self):
+        from lir.direction import read
+
+        self.assertEqual([read(ci) for ci in ((-0.4, 0.6), (0.1, 0.9), (-2.0, -1.2), (-1.5, -0.2), (0.3, 1.4), (-1.2, 0.5), (-0.5, 1.5))],
+                         ["same", "same", "further", "further", "less", "not determined", "not determined"])
+
+    def test_contrasts(self):
+        from lir.direction import R1_ARMS, R2_ARMS, contrast, result
+
+        base = self.proj({})
+        same = self.proj({"en": -4.5, "ko": -4.2, "zh": -3.7, "sw": -4.6})
+        r = contrast(base, [same, same], "ko", "en")
+        self.assertAlmostEqual(r["mean"], 0.3, places=5)
+        self.assertEqual((r["reading"], r["families"], r["arms"]), ("same", 30, 2))
+        self.assertEqual(contrast(base, [self.proj({"en": -2.0, "ko": -5.0})], "ko", "en")["reading"], "further")
+        self.assertEqual(contrast(base, [self.proj({"en": -5.0, "ko": -2.0})], "ko", "en")["reading"], "less")
+        proj = {"base": base, **{a: same for a in R1_ARMS}, R2_ARMS["en"][0]: self.proj({"en": -1.0, "ko": -4.0})}
+        res = result(proj)
+        self.assertEqual(res["r1"]["reading"], "same")
+        self.assertEqual((res["r2"]["en"]["reading"], res["r2"]["en"]["arms_used"]), ("further", [R2_ARMS["en"][0]]))   # seed 42 alone
+        self.assertEqual(res["missing"], ["R2 for Chinese only: plain-only-zh"])
+        self.assertAlmostEqual(res["arms"]["plain"]["ko"]["mean_shift"], -4.2, places=5)
+        self.assertEqual(result({"base": base})["missing"][0], "R1: plain, plain-s1, plain-s2")
+
+
 class RepairVector(unittest.TestCase):
     def test_stacked_factors_equal_the_sum(self):
         import torch

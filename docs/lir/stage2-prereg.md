@@ -723,6 +723,32 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - If a run of this block or of 12a's seeds is missing, the check that needs it is not read and we say so.
 - Cost: about 1.3 hours of laptop time.
 
+### 12f. How far each language moves along the refusal direction
+
+**Added Nov 22, 6:53 PM ET, before the activations of any arm below were extracted.** Stage 1 found one direction in the base model's activations that separates harmful from harmless prompts in all four languages, and showed that plain fine-tuning lowers every language's projection on it. Two things are known from stage 1's file (`results/lir/probe.json`, seed 42). The median projection of attack prompts on the base model is 15.52 in English, 13.72 in Chinese, 13.30 in Korean and 11.72 in Swahili. Plain fine-tuning lowers those four medians by 4.52, 3.72, 4.16 and 4.66. So at seed 42 Korean did not move further than English. If that holds in general, the larger Korean drift is not a larger movement along this direction, and the language that starts with less room loses more refusals. This section tests the first half on runs whose activations have not been extracted. When we wrote this we knew every behavioural result above and, for activations, only the stage 1 file.
+
+- What is extracted: last-token activations at every layer, with the stage 1 code unchanged (`python -m lir.probe extract`), for plain at seeds 1 and 2; the English-only and Chinese-only runs at seeds 42, 1 and 2; and, shown beside, the Korean-only runs and SafeGrad at seeds 1 and 2. Base, plain and SafeGrad at seed 42 were extracted in stage 1.
+- The direction and the layer are stage 1's and are fixed: the base model's English direction at layer 17 (mean activation of English MultiJail prompts minus English harmless prompts, over the families not held out for the probes, unit length). The new code (`lir/direction.py`) first has to reproduce the published medians of base and plain to within 0.001. It does.
+- The statistic. A prompt's shift is its projection under the fine-tuned model minus its projection under the base model. For two languages a and b we take the shift in a minus the shift in b for the same MultiJail family, averaged over the arms, with a bootstrap 95% interval over the 291 families (5,000 draws). Shifts are negative when the projection falls, so a negative value means that a moved further.
+- The margin is 1.0 projection unit, about a quarter of the seed 42 shift. It is fixed now.
+
+| The interval of "shift in a minus shift in b" | Reading |
+| --- | --- |
+| Inside (-1.0, +1.0) | a and b moved the same distance along the refusal direction, to within 1 unit |
+| Not inside, and entirely below zero | a moved further than b |
+| Not inside, and entirely above zero | a moved less far than b |
+| Anything else | Not determined at this sample size |
+
+- R1, the three main seeds: Korean against English, over plain at seeds 42, 1 and 2. Prediction: the same distance.
+  - If "the same distance": we write that plain fine-tuning moved Korean and English the same distance along the refusal direction although Korean attack success rose and English did not, so the difference between the two languages is not in how far they moved.
+  - If "Korean moved further": the larger Korean drift comes with a larger movement along the direction, and we say so.
+  - Otherwise we give the interval and make neither claim.
+- R2, one training language: for the English-only runs, Korean against English; for the Chinese-only runs, Korean against Chinese. Over seeds 42, 1 and 2 if all three have activations, otherwise seed 42 alone, and we say which. No prediction. The same four readings; "the same distance" here means that training on one language moved Korean as far as the language trained on.
+- Shown with no rule: each arm's median projection and mean shift in the four languages; the Korean-only and SafeGrad arms; and each arm's refusal rate on attack prompts beside its projections.
+- What this can and cannot show. It is a statement about one direction at one layer, found in English on the base model. It uses no judge. Equal movement along the direction does not show that the direction causes refusal: stage 1's steering experiment is our only causal evidence, on 80 families at seed 42. The second half of the account, that a language with a lower starting projection loses more refusals for the same movement, is not tested here. With four languages there is no test worth registering, and one curve fitted on the base model does not carry over: in stage 1's file English under plain has a median of 11.0 with 66.7% refusals, and base Swahili 11.7 with 50.9%.
+- The freeze. Extraction is one process launched before Sunday Nov 22, 9 PM ET. If it has not started by then, it is not run and this section is listed as not run.
+- Cost: about an hour of laptop time. No model is trained and no answer is generated or judged.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
