@@ -994,6 +994,55 @@ class Section12(unittest.TestCase):
                          ("aya-plain-s1-vec", "aya-plain-s1", "safegrad", 12, (12, 10)))
 
 
+class GpuJobs(unittest.TestCase):
+    def test_job_command(self):
+        from lir import hfjob
+
+        cmd = hfjob.job_command("control", "abc1234def", dry_run=True)
+        self.assertEqual(cmd[:3], ["hf", "jobs", "run"])
+        for flag, value in (("--flavor", "l4x1"), ("--namespace", "lost-in-refusal-lexsi"), ("--timeout", "3h"), ("--secrets", "HF_TOKEN")):
+            self.assertEqual(cmd[cmd.index(flag) + 1], value)
+        self.assertIn("--dry-run", cmd)
+        self.assertNotIn("--dry-run", hfjob.job_command("control", "abc1234def"))
+        self.assertIn("git checkout -q abc1234def", cmd[-1])
+        self.assertIn("python -m lir.hfjob run --job control", cmd[-1])
+        self.assertFalse(any(part.startswith("HF_TOKEN=") or "hf_" in part for part in cmd))   # the token goes by name only
+
+    def test_arms_are_not_laptop_arms(self):
+        from lir import hfjob, publish
+
+        arms = [step["arm"] for steps in hfjob.JOBS.values() for step in steps]
+        self.assertEqual(len(arms), len(set(arms)))
+        laptop = set(publish.STAGE1_ARMS + publish.STAGE2_ARMS + publish.STAGE2_LATER)
+        self.assertEqual(set(arms) & laptop, set())
+        for steps in hfjob.JOBS.values():
+            for step in steps:
+                self.assertLessEqual(set(step), {"arm", "hub", "train", "env"})
+                if "train" in step:
+                    self.assertTrue((hfjob.DATA / step["train"]).exists())
+
+    def test_load_options(self):
+        from unittest import mock
+
+        from lir.generate import load_options
+
+        with mock.patch.dict("os.environ", {}, clear=True):
+            self.assertEqual((load_options(), load_options(merge=False)), ((True, None), (False, None)))   # every laptop run
+        with mock.patch.dict("os.environ", {"LIR_QUANT": "nf4"}, clear=True):
+            self.assertEqual(load_options(), (False, "nf4"))   # NF4 base weights, adapter on top and not merged
+        with mock.patch.dict("os.environ", {"LIR_MERGE": "0"}, clear=True):
+            self.assertEqual(load_options(), (False, None))
+        with mock.patch.dict("os.environ", {"LIR_QUANT": "int8"}, clear=True), self.assertRaises(SystemExit):
+            load_options()
+
+    def test_speeds_from_a_log(self):
+        from lir.hfjob import speeds
+
+        log = "[attack.gen] 40/1164 bs=40 batch 12.0s | 90.5 tok/s overall\n[attack.gen] 1164/1164 bs=20 batch 9.1s | 101.2 tok/s overall\n" \
+              "[xstest.gen] 999/999 bs=30 batch 8.0s | 110.0 tok/s overall\n"
+        self.assertEqual(speeds(log), {"attack.gen": 101.2, "xstest.gen": 110.0})
+
+
 class RepairVector(unittest.TestCase):
     def test_stacked_factors_equal_the_sum(self):
         import torch

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 from pathlib import Path
 
@@ -16,11 +17,28 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from lir.common import MODEL, MODEL_REV, device, read_jsonl
 
 
+def load_options(merge: bool = True) -> tuple[bool, str | None]:
+    """Whether a LoRA adapter is merged, and the quantization of the base weights. LIR_QUANT=nf4 loads them in 4-bit
+    NF4 with the adapter left unmerged, and LIR_MERGE=0 leaves it unmerged in bfloat16 (preregistration section 12.2,
+    Hugging Face GPU only). With neither set, as on every laptop run, nothing changes."""
+    quant = os.environ.get("LIR_QUANT") or None
+    if quant not in (None, "nf4"):
+        raise SystemExit(f"LIR_QUANT={quant}: only nf4 is known")
+    return merge and quant is None and os.environ.get("LIR_MERGE") != "0", quant
+
+
 def load_model(adapter: str | None = None, merge: bool = True, dtype=torch.bfloat16):
     tok = AutoTokenizer.from_pretrained(MODEL, revision=MODEL_REV)
     tok.padding_side = "left"
+    merge, quant = load_options(merge)
+    extra = {}
+    if quant == "nf4":   # bitsandbytes 4-bit NF4, double quantization on, compute in bfloat16; placed on the GPU as it loads
+        from transformers import BitsAndBytesConfig
+
+        extra = {"device_map": {"": 0}, "quantization_config": BitsAndBytesConfig(
+            load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.bfloat16)}
     model = AutoModelForCausalLM.from_pretrained(
-        MODEL, revision=MODEL_REV, dtype=dtype, attn_implementation="eager"
+        MODEL, revision=MODEL_REV, dtype=dtype, attn_implementation="eager", **extra
     )
     if adapter:
         from peft import PeftModel
@@ -32,7 +50,7 @@ def load_model(adapter: str | None = None, merge: bool = True, dtype=torch.bfloa
         model = PeftModel.from_pretrained(model, adapter)
         if merge:
             model = model.merge_and_unload()
-    return tok, model.to(device()).eval()
+    return tok, (model if quant else model.to(device())).eval()
 
 
 def chat_prefix(tok, prompt: str, system: str | None = None) -> str:
