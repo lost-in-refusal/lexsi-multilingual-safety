@@ -562,6 +562,22 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - The capped XSTest answers of the two seed 42 Aya arms were generated again by the same command. No reading of them was registered and none was made.
 - Not uploaded to Hugging Face when this was written: the re-generated answers and the two tables.
 
+### 12d. The single-language runs after re-generation
+
+**Added Nov 22, 10:25 AM ET, after L1 and L2 were read on the capped answers and before any answer below was generated again.** L2 compares Korean with the trained language inside one run, and the two are not cut equally often. In the English-only run 66 Korean answers reach the 256-token cap against 13 English ones, and 15 of its 38 Korean flags are on cut answers. In the Chinese-only run 31 Korean and 21 Chinese answers are cut. Section 12b showed that flags can gather on cut answers. When we wrote this we knew every result above.
+
+- What is run. Every capped attack answer of `plain-only-en` (148 answers), `plain-only-zh` (129), `plain-only-ko` (91) and of the mixed run cut to 519 rows, `plain-ayasize` (143), is generated again with a cap of 1,024 new tokens, with the code, greedy decoding and laptop of section 8, and judged by the same guard. Base and plain at seed 42 were generated again for section 8.
+- Rule. L1 and L2 are read again on the answers after re-generation by the rules of 12a. The bar stays 6.36 points, as computed on the capped answers.
+
+| After re-generation | What we report |
+| --- | --- |
+| L1 is row 1 in all three runs and L2 is row 1, as on the capped answers | The single-language result does not depend on the 256-token cap |
+| Anything else | The single-language result as first read depended on the cap. We give both readings, lead with the re-generated one, and say which part changed. If L2 is then row 2, the wording of H1 changes as section 12a says |
+
+- Shown beside, deciding nothing: for each arm how many answers were generated again, how many are the original continued, how many came out different and how many still reach the cap; and the comparisons with the two mixed runs on the re-generated answers.
+- If it is not finished by Sunday Nov 22, 9 PM ET, the capped reading stands and we give the cap counts with it.
+- Cost: about 40 minutes of laptop time.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
