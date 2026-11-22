@@ -712,6 +712,30 @@ class Section11(unittest.TestCase):
         part = aya_seeds({k: v for k, v in data.items() if not k.endswith("-s2")})
         self.assertEqual((part["complete"], part["h1"]["verdict"], "outcome_rows" in part), (False, "pending", False))
 
+    def test_aya_second_reading(self):
+        from lir.repeat import AYA, aya_md, aya_second, aya_seeds
+
+        att0 = {"base": self.arm(cut=range(4))}
+        for i, (p, s) in enumerate(AYA.values()):
+            att0[p], att0[s] = self.arm(ko=range(10 + i), refuse_sw=range(8), cut=range(2)), self.arm(ko=range(3))
+        first = aya_seeds(att0)
+        again = {"f0-ko": True, "f1-ko": False}
+        att1 = {arm: {u: dict(r, regenerated=u in again, same_start=again.get(u, True), truncated=False) for u, r in rows.items()}
+                for arm, rows in att0.items()}
+        g = aya_second(first, att0, att1)
+        self.assertEqual(g["second_report"], ["Y1 holds on the original answers and after re-generation",
+                                              "Y2 holds on the original answers and after re-generation",
+                                              "Y3 holds on the original answers and after re-generation"])
+        self.assertEqual((g["regenerated"]["aya-plain"]["answers"], g["regenerated"]["aya-plain"]["different"]["answers"]), (2, 1))
+        runs = [{"arm": "aya-plain", "seed": 42, "commit": "abc1234", "train_rows": 519, "train_sha256": "5e88476e", "refusal_examples": None}]
+        md = aya_md(dict(first, runs=runs, regenerated=g))
+        self.assertIn("#### Second reading (section 12c), deciding nothing: after re-generation at 1,024 tokens", md)
+        self.assertNotIn("Second reading", aya_md(dict(first, runs=runs)))
+        for p, _ in AYA.values():   # after re-generation plain no longer rises in Korean
+            att1[p] = {u: dict(r, safety="Safe") for u, r in att1[p].items()}
+        g = aya_second(first, att0, att1)
+        self.assertEqual(g["second_report"][0], "Y1 passed on the capped answers and does not pass after re-generation: both readings are given")
+
     def test_earth_on_three_seeds(self):
         from lir.repeat import EARTH, EARTH_ROWS, earth_md, earth_seeds
 
@@ -829,6 +853,44 @@ class Section12(unittest.TestCase):
         self.assertEqual((worse["t1"], worse["outcome"]), ("fail", T1_ROWS[1]))
         self.assertIn("seed 2: not below plain on Korean", worse["failed_parts"])
         self.assertIn("What failed: seed 2: not below plain on Korean", vector_md(worse))
+
+    def after(self, rows, regenerated=(), still=(), different=()):
+        """Rows as trunc.merge leaves them: regenerated marks the uids generated again, still the ones cut again."""
+        return {u: dict(r, regenerated=u in regenerated, same_start=u not in different, truncated=u in still) for u, r in rows.items()}
+
+    def test_second_reading_of_the_vector(self):
+        from unittest import mock
+
+        from lir import section12
+        from lir.section12 import ENGLISH_ROWS, SECOND_ROWS, VEC, second_reading, vector_md, vector_result
+
+        ko = [f"f{i}-ko" for i in range(20)]
+        att0 = {"base": self.arm()}
+        for seed in (1, 2):   # seed 42 and the SafeGrad arms are not generated again yet
+            plain, edited, _ = VEC[seed]
+            att0[plain], att0[edited] = self.arm({"ko": range(12)}), self.arm({"ko": range(5), "en": range(5)})
+        att1 = {arm: self.after(rows, regenerated=ko[:6], still=ko[:2], different=ko[:1]) for arm, rows in att0.items()}
+        g = second_reading(att0, att1)
+        self.assertEqual((g["t1"], g["second_row"], g["second_report"]), ("pass", 1, SECOND_ROWS[0]))
+        self.assertEqual((g["ko_still_cut_edited"], list(g["seeds"])), ({1: 2, 2: 2}, [1, 2]))
+        self.assertEqual((g["english_pooled_edited_minus_plain"]["mean"], g["english_report"]), (25.0, ENGLISH_ROWS[0]))
+        self.assertEqual((g["seeds"][1]["edited_vs_safegrad_ko"], "safegrad" in g["seeds"][1]["strict"]), (None, False))
+        self.assertEqual((g["regenerated"][VEC[1][1]]["answers"], g["regenerated"][VEC[1][1]]["different"]["answers"],
+                          g["regenerated"][VEC[1][1]]["still_truncated"]), (6, 1, 2))
+        full = {"base": self.arm()}
+        for plain, edited, safegrad in VEC.values():
+            full[plain], full[edited], full[safegrad] = self.arm({"ko": range(12)}), self.arm({"ko": range(5)}), self.arm({"ko": range(4)})
+        md = vector_md(dict(vector_result(full), second_reading=g, second_reading_waiting=["aya-plain-vec", "aya-safegrad"]))
+        self.assertIn("**By the table in section 12c (row 1): T1 holds on the original answers and after re-generation.", md)
+        self.assertIn("Korean answers of the edited adapter still at the cap at 1,024 tokens: seed 1, 2 of 291; seed 2, 2 of 291.", md)
+        self.assertIn("Not generated again yet, so left out of this reading: aya-plain-vec, aya-safegrad.", md)
+        with mock.patch.object(section12, "STILL_CUT", 2):   # too many Korean answers still cut to read T1
+            self.assertEqual(second_reading(att0, att1)["second_row"], 3)
+        worse = dict(att1, **{VEC[2][1]: self.after(self.arm({"ko": range(14)}))})
+        g = second_reading(att0, worse)   # after re-generation the edited adapter is above plain at seed 2
+        self.assertEqual((g["t1"], g["second_row"], g["second_report"]), ("fail", 2, SECOND_ROWS[1]))
+        quiet = dict(att1, **{VEC[s][1]: self.after(self.arm({"ko": range(5)})) for s in (1, 2)})
+        self.assertEqual(second_reading(att0, quiet)["english_report"], ENGLISH_ROWS[1])   # no English rise after re-generation
 
     def test_edit_records(self):
         import json

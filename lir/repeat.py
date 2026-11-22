@@ -1,6 +1,7 @@
 """Preregistration section 11: the Aya and Earth runs at seeds 1 and 2, and K1 read again after re-generation.
 
   python -m lir.repeat aya      # Y1 to Y3 on three seeds   -> results/lir/stage2/aya/seeds.{json,md}
+                                # with the second reading of section 12c once the Aya arms are generated again
   python -m lir.repeat k1       # K1 on re-generated answers -> results/lir/stage2/truncation/k1.{json,md}
   python -m lir.repeat earth    # E1 on three seeds          -> results/lir/stage2/earth/seeds.{json,md}
 
@@ -125,7 +126,43 @@ def aya_md(res: dict) -> str:
         for s, r in res["seeds"].items()) + ".", "", runs_note(res["runs"]), "",
         "Not run at seeds 1 and 2: XSTest, the two task sets and the size control. Over-refusal and task score on Aya "
         "stay one-seed results."]
+    if "regenerated" in res:
+        lines += aya_second_md(res["regenerated"])
     return "\n".join(lines)
+
+
+def aya_second(first: dict, att0: dict[str, dict], att1: dict[str, dict], seeds: dict[int, tuple[str, str]] = AYA) -> dict:
+    """Section 12c: Y1 to Y3 read again on the answers after re-generation at 1,024 tokens. It decides nothing; the
+    capped reading stands. first: the capped result of aya_seeds; att0, att1: arm -> {uid: row} before and after."""
+    g = aya_seeds(att1, seeds)
+    g["second_report"] = []
+    for y, h in (("Y1", "h1"), ("Y2", "h2"), ("Y3", "h3")):
+        was, now = first[h]["verdict"] == "pass", g[h]["verdict"] == "pass"
+        g["second_report"].append(
+            f"{y} holds on the original answers and after re-generation" if was and now else
+            f"{y} passed on the capped answers and does not pass after re-generation: both readings are given" if was else
+            f"{y} failed on the capped answers and {'passes' if now else 'fails'} after re-generation")
+    g["regenerated"] = {}
+    for arm in (x for pair in seeds.values() for x in pair):
+        again = [r for r in att1[arm].values() if r["regenerated"]]
+        g["regenerated"][arm] = dict(split(att0[arm], att1[arm]), answers=len(again),
+                                     still_truncated=sum(bool(r["truncated"]) for r in again))
+    return g
+
+
+def aya_second_md(g: dict) -> list[str]:
+    lines = ["", "#### Second reading (section 12c), deciding nothing: after re-generation at 1,024 tokens", "",
+             "Every capped attack answer of base and of the six Aya arms generated again at 1,024 tokens and judged by the "
+             "same guard. Section 12c registered this reading before any Aya answer was generated again. The capped "
+             "reading above is the one that decides.", "", seed_table(g, names=("Y1", "Y2", "Y3")), ""]
+    lines += [f"- {row}." for row in g["second_report"]]
+    lines += ["", "| Arm | generated again | the original continued | to flagged | to safe | a different answer | to flagged | to safe | still at the cap |",
+              "|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for arm, x in g["regenerated"].items():
+        c, d = x["continued"], x["different"]
+        lines.append(f"| {arm} | {x['answers']} | {c['answers']} | {c['flagged']['gained']} | {c['flagged']['lost']} | "
+                     f"{d['answers']} | {d['flagged']['gained']} | {d['flagged']['lost']} | {x['still_truncated']} |")
+    return lines
 
 
 def aya(a) -> None:
@@ -138,6 +175,9 @@ def aya(a) -> None:
                                   "align": "alignment_sft.jsonl" if i else None}
                             for seed, pair in AYA.items() for i, arm in enumerate(pair)})
     res = dict(aya_seeds(data), runs=run_lines(arms))
+    again = {arm: trunc.after(arm, "attack") for arm in ["base"] + arms}
+    if all(rows is not None for rows in again.values()):   # section 12c, once all six Aya arms are generated again
+        res["regenerated"] = aya_second(res, data, again)
     write(OUT / "aya" / "seeds", res, aya_md(res))
 
 
