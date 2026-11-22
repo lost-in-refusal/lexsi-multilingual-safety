@@ -496,6 +496,14 @@ Question: does loading the model in 4 bits change its safety, and does SafeGrad'
 - Over-refusal on XSTest under both precisions, no pass rule.
 - Mixed per-node quantization with CircuitKIT is not run here. It is exploratory and only if added to this file first.
 
+**Added Nov 22, 6:50 PM ET by Mingyu, as a review note, before any run of this section. Aish's text above is unchanged, and this addition needs her agreement before the extra arms are run.** The laptop evaluation code merges a LoRA adapter into the base weights before generating, and the hardware control of 12.0 does the same. The NF4 arms above keep the adapter unmerged on top of 4-bit base weights. So for plain and SafeGrad, "NF4 minus bfloat16" as written contains two differences: 4-bit base weights, and an unmerged adapter in place of a merged one. For base there is no adapter and the comparison is clean.
+
+- Extra arms, if Aish agrees: plain and SafeGrad at seed 42 in bfloat16 with the adapter left unmerged (`gpu-plain-unmerged`, `gpu-safegrad-unmerged`; job `unmerged` in `lir/hfjob.py`), attack set and XSTest, same GPU type.
+- Q1 and Q2 are then read for plain and SafeGrad against the unmerged bfloat16 arms: NF4 minus unmerged bfloat16 is the effect of quantization. Unmerged minus merged bfloat16 is shown beside it with an exact McNemar test and no pass rule; it is the effect of merging.
+- If the extra arms are not run, Q1 and Q2 are read as written above, and every report of them says that the NF4 arms differ from the bfloat16 arms in merging as well as in precision.
+- Two smaller points for the same reading. The seed 42 adapters are the two stage 1 repositories (`tiny-aya-global-bactrian-lora-plain` and `-safegrad`), which the job downloads at a pinned revision. Peak GPU memory for the ROI table is taken from the generation step alone, because the guard runs as a second step and is larger than a 4-bit Tiny Aya.
+- The task set of 12.1 and 12.3 cannot run on an L4 as written: its judge (Qwen3-14B in bfloat16, about 30 GB) does not fit 24 GB, and 12.0 fixes one GPU type.
+
 ### 12.3 A4. AlignTune
 
 Question: does a plain fine-tune run through Lexsi's AlignTune drift the same way as our LoRA?
