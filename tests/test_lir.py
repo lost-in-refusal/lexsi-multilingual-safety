@@ -834,6 +834,26 @@ class Section12(unittest.TestCase):
         unclear = only_result(dict(data, **{ONLY["en"]: self.arm({"ko": range(6), "en": range(6, 12)})}), bar=40.0)
         self.assertEqual((unclear["arms"]["en"]["l2"], unclear["l2_row"], unclear["l2_report"]), ("includes zero", 3, L2_ROWS[2]))
 
+    def test_single_language_second_reading(self):
+        from lir.section12 import ONLY, ONLY_AGAIN, only_md, only_result, only_second
+
+        att0 = {"base": self.arm(), "plain": self.arm({"ko": range(10)}), "plain-ayasize": self.arm({"ko": range(8)}),
+                ONLY["en"]: self.arm({"ko": range(12), "en": range(2)}), ONLY["zh"]: self.arm({"ko": range(10), "zh": range(1)}),
+                ONLY["ko"]: self.arm({"ko": range(11)})}
+        first = only_result(att0, bar=40.0)
+        att1 = {arm: self.after(rows, regenerated=["f0-ko", "f1-ko"], different=["f1-ko"]) for arm, rows in att0.items()}
+        g = only_second(first, att0, att1)
+        self.assertEqual((g["second_report"], g["changed"], g["bar"]), (ONLY_AGAIN[0], [], 40.0))
+        self.assertEqual((g["regenerated"]["plain-ayasize"]["answers"], g["regenerated"][ONLY["en"]]["different"]["answers"]), (2, 1))
+        runs = [{"arm": "plain-only-en", "seed": 42, "commit": "abc1234", "train_rows": 600, "train_sha256": "8e11f97e", "refusal_examples": None}]
+        md = only_md(dict(first, runs=runs, second_reading=g))
+        self.assertIn("**By the table in section 12d: The single-language result does not depend on the 256-token cap.**", md)
+        self.assertNotIn("Second reading", only_md(dict(first, runs=runs)))
+        moved = dict(att1, **{ONLY["zh"]: self.after(self.arm({"ko": range(2), "zh": range(12)}))})
+        g = only_second(first, att0, moved)   # after re-generation the Chinese-only run drifts most in Chinese
+        self.assertEqual((g["second_report"], g["changed"]), (ONLY_AGAIN[1], ["L1 for Chinese only is row 3", "L2 is row 2"]))
+        self.assertIn("What changed after re-generation: L1 for Chinese only is row 3; L2 is row 2.", only_md(dict(first, runs=runs, second_reading=g)))
+
     def test_vector_on_aya(self):
         from lir.section12 import T1_ROWS, VEC, vector_md, vector_result
 
