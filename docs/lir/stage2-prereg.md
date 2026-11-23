@@ -998,6 +998,8 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 
 **The extension.** Mingyu reported on Nov 23 that the organisers have confirmed the deadline extension. The confirmed date and hour are not on record in this file; they are added here when we have them in writing. Sections 12.4 and 13a stopped new launches after Sunday Nov 22, 9 PM ET "unless the extension is confirmed". From this note on a run may be launched again, on one condition: it has a dated entry in this section before it starts. The runs listed as not run under 12.4 and in the status page stay listed that way until they have such an entry.
 
+**Added Nov 23, 4:17 AM ET by Mingyu.** The new deadline, as Mingyu reports it: Saturday Nov 28 at the same hour as before, 11:59 PM AoE, which is Sunday Nov 29, 6:59 AM ET. This is his report of the organisers' announcement and not a copy of it.
+
 ### 14a. The mixing baseline at seeds 1 and 2
 
 Question: at seed 42, adding the 47 refusal examples to the training data protected Korean as well as SafeGrad and raised over-refusal. Is that also so at other seeds?
