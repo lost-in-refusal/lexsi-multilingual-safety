@@ -2409,7 +2409,7 @@
     "Unsupported details remain a primary-outcome component and coverage check, not an additional standalone nonregression gate."
   ],
   "provenance": {
-    "pack": "/Users/kyle/Lexsi/evidence/lora-v3-development-comparison",
+    "pack": "evidence/lora-v3-development-comparison",
     "pack_manifest_sha256": "ae75dcf63554062cf093422d96e61e3557037daa0aa130a3886086a1b6ee4a45",
     "review_context_sha256": "f16e9afbd16813e9065de585e5fa7bb7c16f0ad354534cc0999b3fcd7ef7ef94",
     "pack_files": {
@@ -2420,17 +2420,17 @@
     },
     "annotation_files": [
       {
-        "path": "/Users/kyle/Lexsi/evidence/lora-v3-development-comparison/annotations-en-model.json",
+        "path": "evidence/lora-v3-development-comparison/annotations-en-model.json",
         "sha256": "69f571de774e4512c55b922c81a8e7ca5f02a5b793ed4bb0c67d3a1a561464a2",
         "count": 40
       },
       {
-        "path": "/Users/kyle/Lexsi/evidence/lora-v3-development-comparison/annotations-ko-model.json",
+        "path": "evidence/lora-v3-development-comparison/annotations-ko-model.json",
         "sha256": "e0e057b5a61f8ff92f7f1dac846379e3d61fafa5ffaa236db125f7c98f1ea6a5",
         "count": 40
       }
     ],
-    "goal_config_path": "/Users/kyle/Lexsi/configs/model-improvement-goal.json",
+    "goal_config_path": "configs/model-improvement-goal.json",
     "goal_config_sha256": "fa9d112b623e8cc6d9e4b843c8610212a8b709571ebc272e4ef69c186001d3d5",
     "script_sha256": "e4d467fc3c983e062070113a083fa0178fb23c9a94176b5eee16d44a32b645a5",
     "comparison_validator_sha256": "ea5f25f902584a0c31f806ae4ec0cb769464d405ff97678d39c6c8782bd0c5ef"

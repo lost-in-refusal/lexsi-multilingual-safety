@@ -1291,5 +1291,5 @@
     "A35.8": 4.1484832763671875e-05,
     "A8.10": 1.9073486328125e-06
   },
-  "artifact": "/Users/kyle/Lexsi/results/lir/circuits/raw/safegrad/ko.pt"
+  "artifact": "results/lir/circuits/raw/safegrad/ko.pt"
 }

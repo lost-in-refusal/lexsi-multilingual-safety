@@ -1496,5 +1496,5 @@
     "A29.12": 1.621246337890625e-05,
     "A22.0": 9.179115295410156e-06
   },
-  "artifact": "/Users/kyle/Lexsi/results/lir/circuits/raw/base/sw.pt"
+  "artifact": "results/lir/circuits/raw/base/sw.pt"
 }

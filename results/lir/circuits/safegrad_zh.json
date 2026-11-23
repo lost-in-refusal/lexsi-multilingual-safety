@@ -1291,5 +1291,5 @@
     "A4.14": 3.6716461181640625e-05,
     "A2.14": 1.7881393432617188e-05
   },
-  "artifact": "/Users/kyle/Lexsi/results/lir/circuits/raw/safegrad/zh.pt"
+  "artifact": "results/lir/circuits/raw/safegrad/zh.pt"
 }

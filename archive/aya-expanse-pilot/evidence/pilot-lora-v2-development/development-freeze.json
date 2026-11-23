@@ -3,7 +3,7 @@
   "frozen_utc": "2026-11-03T03:39:48.744855+00:00",
   "source_commit": "8e5ab7915eb03f92f5dbd32e4722c5a7cb17ea7d",
   "training_report_sha256": "c79271d9555d926e33219c4c9306090b0023a42391c13b8ae3c797304eb0cb22",
-  "adapter_training_run": "/Users/kyle/Lexsi/results/correction-lora-v2-20261102",
+  "adapter_training_run": "results/correction-lora-v2-20261102",
   "files": {
     "scripts/run_pilot_baseline.py": "4d44eaf77765c35d5ab2db564d2aa2318a53a06ad000b1d10a152c58de6cda00",
     "scripts/grounding_comparison.py": "ea5f25f902584a0c31f806ae4ec0cb769464d405ff97678d39c6c8782bd0c5ef",

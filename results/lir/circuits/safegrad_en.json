@@ -1291,5 +1291,5 @@
     "A29.12": 1.2993812561035156e-05,
     "A20.14": 9.5367431640625e-06
   },
-  "artifact": "/Users/kyle/Lexsi/results/lir/circuits/raw/safegrad/en.pt"
+  "artifact": "results/lir/circuits/raw/safegrad/en.pt"
 }

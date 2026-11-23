@@ -1,6 +1,6 @@
 {
   "task": "lir_refusal_plain_en",
-  "model": "/Users/kyle/.cache/huggingface/hub/models--CohereLabs--tiny-aya-global/snapshots/af89d219b53ed9b13b8a4645f9c8028973510324",
+  "model": "~/.cache/huggingface/hub/models--CohereLabs--tiny-aya-global/snapshots/af89d219b53ed9b13b8a4645f9c8028973510324",
   "algorithm": "eap-ig",
   "level": "node",
   "node_scores": {
@@ -1065,12 +1065,12 @@
     "version": "0.2.0",
     "git_sha": null,
     "created_at": "2026-11-06T19:50:42Z",
-    "base_model": "/Users/kyle/.cache/huggingface/hub/models--CohereLabs--tiny-aya-global/snapshots/af89d219b53ed9b13b8a4645f9c8028973510324",
+    "base_model": "~/.cache/huggingface/hub/models--CohereLabs--tiny-aya-global/snapshots/af89d219b53ed9b13b8a4645f9c8028973510324",
     "method": "discover.eap-ig",
     "inputs": [
       {
         "kind": "model",
-        "ref": "/Users/kyle/.cache/huggingface/hub/models--CohereLabs--tiny-aya-global/snapshots/af89d219b53ed9b13b8a4645f9c8028973510324",
+        "ref": "~/.cache/huggingface/hub/models--CohereLabs--tiny-aya-global/snapshots/af89d219b53ed9b13b8a4645f9c8028973510324",
         "provenance": null
       }
     ],

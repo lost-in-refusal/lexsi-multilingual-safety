@@ -31,6 +31,19 @@ def _repo(api: HfApi, repo_id: str, kind: str, public: bool) -> None:
     api.create_repo(repo_id, repo_type=kind, private=not public, exist_ok=True)
 
 
+TEXT = {".json", ".jsonl", ".md", ".txt", ".csv", ".py", ".html", ".yaml", ".yml"}
+
+
+def no_home_paths(folder: Path) -> None:
+    """Stop an upload if a staged text file names this machine's home directory. The test is for the home directory
+    itself: some dataset rows contain text that merely looks like a path and must go up unchanged."""
+    home = str(Path.home())
+    bad = [str(p.relative_to(folder)) for p in sorted(folder.rglob("*"))
+           if p.is_file() and p.suffix in TEXT and home in p.read_text(errors="ignore")]
+    if bad:
+        raise SystemExit("these staged files name the home directory, nothing uploaded: " + ", ".join(bad[:10]))
+
+
 def push_data(api: HfApi, public: bool) -> None:
     _repo(api, DATA_REPO, "dataset", public)
     with tempfile.TemporaryDirectory() as tmp:
@@ -42,6 +55,7 @@ def push_data(api: HfApi, public: bool) -> None:
             else:
                 shutil.copy(p, t / p.name)
         shutil.copy(CARDS / "data.md", t / "README.md")
+        no_home_paths(t)
         api.upload_folder(folder_path=t, repo_id=DATA_REPO, repo_type="dataset",
                           commit_message="Frozen datasets")
     print("pushed", DATA_REPO)
@@ -62,6 +76,7 @@ def push_evals(api: HfApi, arms: list[str], public: bool) -> None:
             if (res / sub).exists():
                 shutil.copytree(res / sub, t / sub)
         shutil.copy(CARDS / "evals.md", t / "README.md")
+        no_home_paths(t)
         api.upload_folder(folder_path=t, repo_id=EVAL_REPO, repo_type="dataset",
                           commit_message=f"Evaluation outputs: {', '.join(arms)}")
     print("pushed", EVAL_REPO)
@@ -78,6 +93,7 @@ def push_adapter(api: HfApi, arm: str, public: bool) -> None:
             if (run / name).exists():
                 shutil.copy(run / name, t / name)
         shutil.copy(CARDS / f"adapter-{arm}.md", t / "README.md")
+        no_home_paths(t)   # a run record written on the laptop holds absolute paths; write them relative before uploading
         api.upload_folder(folder_path=t, repo_id=repo_id, commit_message=f"{arm} LoRA adapter")
     print("pushed", repo_id)
 
@@ -238,6 +254,7 @@ def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool, aya_task: boo
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy(ROOT / rel, dest)
         shutil.copy(CARDS / "evals.md", t / "README.md")
+        no_home_paths(t)
         files = sorted(p for p in t.rglob("*") if p.is_file())
         size = sum(p.stat().st_size for p in files)
         print(f"{len(files)} files, {size / 1e6:.1f} MB -> {EVAL_REPO}")
@@ -286,6 +303,7 @@ def push_space(api: HfApi, public: bool) -> None:
         shutil.copy(ROOT / "space" / "index.html", t / "index.html")
         shutil.copy(ROOT / "space" / "README.md", t / "README.md")
         (t / "examples.json").write_text(json.dumps(data, ensure_ascii=False))
+        no_home_paths(t)
         api.upload_folder(folder_path=t, repo_id=SPACE_REPO, repo_type="space", commit_message="Demo Space",
                           delete_patterns=["style.css"])
     print("pushed", SPACE_REPO)

@@ -135,7 +135,7 @@
   "scope": "Matched fictional-policy development comparison; no statistical significance or general safety claim.",
   "runs": {
     "grounded_with_conciseness": {
-      "directory": "/Users/kyle/Lexsi/evidence/pilot-grounded",
+      "directory": "evidence/pilot-grounded",
       "files": {
         "report.json": "27d7dbaeb01ae0d8e3e005d95608e5542e8d39aeac27978becd11bf9545a326b",
         "curated-samples.json": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
@@ -176,7 +176,7 @@
       }
     },
     "grounded_without_conciseness": {
-      "directory": "/Users/kyle/Lexsi/evidence/pilot-grounded-no-conciseness",
+      "directory": "evidence/pilot-grounded-no-conciseness",
       "files": {
         "report.json": "705705ab240f8099fbb73223929e8e095cbf1ae60c6b8f0a88b48842755ef9a1",
         "curated-samples.json": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",

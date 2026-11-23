@@ -1,6 +1,6 @@
 {
   "provenance": {
-    "pack": "/Users/kyle/Lexsi/evidence/conciseness-ablation",
+    "pack": "evidence/conciseness-ablation",
     "pack_manifest_sha256": "457d267be035a045bb85a6f0981a73eae30488cece959cf4a024f0ce1cdbccec",
     "review_context_sha256": "21dd5d5a09d9d213a25367b81efe2afe25bf8779696672067648e315757b9b9a",
     "reviewpack_sha256": "955b19ee089769f7030cc32295f0d2a9a506dfe3dafcbdd71199113db0fdd2da",
@@ -9,12 +9,12 @@
     "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
     "annotation_files": [
       {
-        "path": "/Users/kyle/Lexsi/evidence/conciseness-ablation/annotations-en-model.json",
+        "path": "evidence/conciseness-ablation/annotations-en-model.json",
         "sha256": "57c7b540d97db33d5945e1a4f11826cd49f850e0ca581dd54c4743fd681579a8",
         "count": 40
       },
       {
-        "path": "/Users/kyle/Lexsi/evidence/conciseness-ablation/annotations-ko-model.json",
+        "path": "evidence/conciseness-ablation/annotations-ko-model.json",
         "sha256": "bcf18dbac1e27a6c6a8f463406b2b5ffce43f663f110f937e081edaa3147d928",
         "count": 40
       }

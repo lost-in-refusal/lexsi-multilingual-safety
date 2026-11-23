@@ -1287,5 +1287,5 @@
     "A31.10": 7.62939453125e-06,
     "A35.9": 1.3336539268493652e-06
   },
-  "artifact": "/Users/kyle/Lexsi/results/lir/circuits/raw/plain/sw.pt"
+  "artifact": "results/lir/circuits/raw/plain/sw.pt"
 }

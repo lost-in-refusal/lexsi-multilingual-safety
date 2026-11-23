@@ -1,7 +1,7 @@
 {
   "provenance": {
-    "run": "/Users/kyle/Lexsi/evidence/pilot-development",
-    "annotations": "/Users/kyle/Lexsi/evidence/pilot-development/annotations-model.json",
+    "run": "evidence/pilot-development",
+    "annotations": "evidence/pilot-development/annotations-model.json",
     "annotation_sha256": "89a120974dcd961d50766dbc7472e4fbd6403be57fa674c5e673a6cfee813f38",
     "responsefile_sha256": "8e7c0ffc3cbe48c7dc7717db60d85aa377d9ab876f424826c98eb5aeab1d5f8e",
     "run_report_sha256": "45afb437e5317cc2dcd3463552bdbd7e88b4ad13feb3446c8378ea058f7762f6",

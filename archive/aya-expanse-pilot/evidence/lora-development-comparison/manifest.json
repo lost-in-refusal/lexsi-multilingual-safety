@@ -143,7 +143,7 @@
   "scope": "Matched fictional-policy development comparison; no statistical significance or general safety claim.",
   "runs": {
     "baseline": {
-      "directory": "/Users/kyle/Lexsi/evidence/pilot-development",
+      "directory": "evidence/pilot-development",
       "files": {
         "report.json": "45afb437e5317cc2dcd3463552bdbd7e88b4ad13feb3446c8378ea058f7762f6",
         "curated-samples.json": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",
@@ -181,7 +181,7 @@
       }
     },
     "plain_lora": {
-      "directory": "/Users/kyle/Lexsi/evidence/pilot-lora-development",
+      "directory": "evidence/pilot-lora-development",
       "files": {
         "report.json": "7be0efa39351aa81385a9691ceb1ade13ac0cb69c0df2cd2bdcaa40502ea8dc5",
         "curated-samples.json": "ff70455051a91f2db61ffe49d7ba9a4eb8ce366e089b49011bcd933ec40a04c8",

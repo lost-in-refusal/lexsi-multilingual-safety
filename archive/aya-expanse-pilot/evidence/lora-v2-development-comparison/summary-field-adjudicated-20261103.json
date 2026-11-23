@@ -1,6 +1,6 @@
 {
   "provenance": {
-    "pack": "/Users/kyle/Lexsi/evidence/lora-v2-development-comparison",
+    "pack": "evidence/lora-v2-development-comparison",
     "pack_manifest_sha256": "fe081f1075a968c50dc466ab4b35f1d75810bf2a8b00f2327f79916481a3e830",
     "review_context_sha256": "90fd178efebe1da6998e6d79a241b2f60eb001e38257940f5f01c2406d33422d",
     "reviewpack_sha256": "8a1e21d0e77592458116ed917ab8d0fb50eedba2b5c3115847f3052634828dbf",
@@ -9,7 +9,7 @@
     "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
     "annotation_files": [
       {
-        "path": "/Users/kyle/Lexsi/evidence/lora-v2-development-comparison/annotations-field-adjudicated-20261103.json",
+        "path": "evidence/lora-v2-development-comparison/annotations-field-adjudicated-20261103.json",
         "sha256": "4d2fa0c5de67734a509afaee894b438158538f6b910010b463beffaca091220b",
         "count": 80
       }

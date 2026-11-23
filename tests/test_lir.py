@@ -397,6 +397,19 @@ class Publish(unittest.TestCase):
                 got = [arm for arm in ("attack-only", "both-sets", "half-done", "never") if publish.regenerated(arm)]
         self.assertEqual(got, ["attack-only", "both-sets"])
 
+    def test_home_paths_stop_an_upload(self):
+        from lir import publish
+
+        with tempfile.TemporaryDirectory() as tmp:
+            t = Path(tmp)
+            (t / "a.jsonl").write_text('{"response": "on macOS it may be /Users/John/Documents/file.txt"}\n')   # dataset text
+            publish.no_home_paths(t)
+            (t / "sub").mkdir()
+            (t / "sub" / "run.json").write_text('{"artifact": "' + str(Path.home()) + '/Lexsi/results/x.pt"}')
+            with self.assertRaises(SystemExit) as stop:
+                publish.no_home_paths(t)
+        self.assertIn("sub/run.json", str(stop.exception))
+
     def test_stage_adapters(self):
         import json
         from unittest import mock

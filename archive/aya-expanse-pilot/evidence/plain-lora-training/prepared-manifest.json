@@ -5,23 +5,23 @@
   "scope": "CPU-only tokenizer audit; no model weights loaded, memory compatibility test, generation, or training.",
   "inputs": {
     "data": {
-      "path": "/Users/kyle/Lexsi/data/corrections/examples.jsonl",
+      "path": "data/corrections/examples.jsonl",
       "sha256": "579a87a59182393d0332c822e3920c146e33c128c4678b6d0dba012ac5448381"
     },
     "policy": {
-      "path": "/Users/kyle/Lexsi/data/pilot/policy.json",
+      "path": "data/pilot/policy.json",
       "sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08"
     },
     "evaluation": {
-      "path": "/Users/kyle/Lexsi/data/pilot/scenarios.jsonl",
+      "path": "data/pilot/scenarios.jsonl",
       "sha256": "f0b2ea2aafe90fb84f058e04ffd13e84b5bf144d352faaf426574d03a823a6cd"
     },
     "config": {
-      "path": "/Users/kyle/Lexsi/configs/correction-lora.json",
+      "path": "configs/correction-lora.json",
       "sha256": "0380ce93c2199be9a89d1b84c1c6e24cc80e6ec75cb7dc117ed9aad8b33ac130"
     },
     "runtime": {
-      "path": "/Users/kyle/Lexsi/configs/runtime.json",
+      "path": "configs/runtime.json",
       "sha256": "e0a03038012113b28715fe8bcdc6858a5df476a9be61ec2258393bd8da8e068b"
     }
   },
@@ -73,7 +73,7 @@
     "model": "CohereLabs/aya-expanse-8b",
     "requested_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
     "actual_snapshot_commit": "5062468bf9bc0c6035fd64e06274333ec127d980",
-    "snapshot_path": "/Users/kyle/.cache/huggingface/hub/models--CohereLabs--aya-expanse-8b/snapshots/5062468bf9bc0c6035fd64e06274333ec127d980",
+    "snapshot_path": "~/.cache/huggingface/hub/models--CohereLabs--aya-expanse-8b/snapshots/5062468bf9bc0c6035fd64e06274333ec127d980",
     "class": "CohereTokenizer",
     "eos_token_id": 255001,
     "chat_template_sha256": "90c33aee14aa2a226127516d48ee9184c9b90745d4a04c484621ec2e82fb712c",

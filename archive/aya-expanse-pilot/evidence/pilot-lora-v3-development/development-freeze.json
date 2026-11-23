@@ -3,7 +3,7 @@
   "frozen_utc": "2026-11-03T04:14:31.626081+00:00",
   "source_commit": "cf1810b9ee6cac7a797c1ebcfb055f39082f87af",
   "training_report_sha256": "389c16e4c0c6eac46ec9e98ea028cf2d057cc3c8a1e27461da4b7921e2a4f8c1",
-  "adapter_training_run": "/Users/kyle/Lexsi/results/correction-lora-v3-20261102",
+  "adapter_training_run": "results/correction-lora-v3-20261102",
   "adapter_identity": {
     "schema_version": 1,
     "model": "CohereLabs/aya-expanse-8b",

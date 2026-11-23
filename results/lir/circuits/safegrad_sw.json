@@ -1287,5 +1287,5 @@
     "A3.6": 3.9577484130859375e-05,
     "A11.1": 1.811981201171875e-05
   },
-  "artifact": "/Users/kyle/Lexsi/results/lir/circuits/raw/safegrad/sw.pt"
+  "artifact": "results/lir/circuits/raw/safegrad/sw.pt"
 }

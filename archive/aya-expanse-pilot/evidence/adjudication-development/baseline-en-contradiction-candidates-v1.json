@@ -14,7 +14,7 @@
       "label": "plain_lora",
       "mode": "adapted"
     },
-    "reference_directory": "/Users/kyle/Lexsi/evidence/pilot-development",
+    "reference_directory": "evidence/pilot-development",
     "reference_run_nonce": "ba45bdc02d894a199ff8340c093c504c",
     "reference_responses_sha256": "8e7c0ffc3cbe48c7dc7717db60d85aa377d9ab876f424826c98eb5aeab1d5f8e",
     "review_context_sha256": "d286303821ac7622589700a4dc959d7876b05b6c7a824111108e99e6e9a57e3f",

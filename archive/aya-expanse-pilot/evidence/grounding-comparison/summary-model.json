@@ -1,6 +1,6 @@
 {
   "provenance": {
-    "pack": "/Users/kyle/Lexsi/evidence/grounding-comparison",
+    "pack": "evidence/grounding-comparison",
     "pack_manifest_sha256": "b7b34313df5b77fba2804cbbb62f2c424d55f634b92c69d2833f9bcb9a08fcf3",
     "review_context_sha256": "06275154e19b7fb4da4819c79296facb60d3cb9ffe8d0dfeef5b2fcd27331502",
     "reviewpack_sha256": "6585e59235d03fbbf73b3902101888fdc5aeee2283991a790dbf506c657d2997",
@@ -9,12 +9,12 @@
     "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08",
     "annotation_files": [
       {
-        "path": "/Users/kyle/Lexsi/evidence/grounding-comparison/annotations-en-model.json",
+        "path": "evidence/grounding-comparison/annotations-en-model.json",
         "sha256": "09ca6430a0cd09d5bab74722dd8f966497369c89ed6bd192ce94ac53941525fe",
         "count": 40
       },
       {
-        "path": "/Users/kyle/Lexsi/evidence/grounding-comparison/annotations-ko-model.json",
+        "path": "evidence/grounding-comparison/annotations-ko-model.json",
         "sha256": "6e06a650e12073490e9f9192abff5b23c0881b3ed4ba404afb8d5be40b6db04a",
         "count": 40
       }

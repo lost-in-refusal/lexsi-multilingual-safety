@@ -4606,7 +4606,7 @@
     "policy_sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08"
   },
   "training_config_sha256": "1d8563937bf18932e6b0810c260e943cd6c85609f8424c12f67e5b32f6f7c3e1",
-  "prepared_directory": "/Users/kyle/Lexsi/evidence/correction-preparation-v2/preflight",
+  "prepared_directory": "evidence/correction-preparation-v2/preflight",
   "prepared_manifest_sha256": "b1d4df209b6d9f148f094c5279017dba1606a4d9c81ef91525f045824025344d",
   "prepared_file_hashes": {
     "train.jsonl": "16674015f3b7fef18fb417a20730d6addd89ac893937d4397b2635e01b8c6d5d",
@@ -4619,23 +4619,23 @@
   },
   "input_hashes": {
     "data": {
-      "path": "/Users/kyle/Lexsi/data/corrections-v2/examples.jsonl",
+      "path": "data/corrections-v2/examples.jsonl",
       "sha256": "410421b89d0996e12203b1bf0b70f5d028f0e75788e56261e142aa1aa0479b86"
     },
     "policy": {
-      "path": "/Users/kyle/Lexsi/data/pilot/policy.json",
+      "path": "data/pilot/policy.json",
       "sha256": "7cd9627e0ab3fc06efb5fdd063ecc1d1432362a1583c492b37b3d8e4c708be08"
     },
     "evaluation": {
-      "path": "/Users/kyle/Lexsi/data/pilot/scenarios.jsonl",
+      "path": "data/pilot/scenarios.jsonl",
       "sha256": "f0b2ea2aafe90fb84f058e04ffd13e84b5bf144d352faaf426574d03a823a6cd"
     },
     "config": {
-      "path": "/Users/kyle/Lexsi/configs/correction-lora-v2.json",
+      "path": "configs/correction-lora-v2.json",
       "sha256": "1d8563937bf18932e6b0810c260e943cd6c85609f8424c12f67e5b32f6f7c3e1"
     },
     "runtime": {
-      "path": "/Users/kyle/Lexsi/configs/runtime.json",
+      "path": "configs/runtime.json",
       "sha256": "e0a03038012113b28715fe8bcdc6858a5df476a9be61ec2258393bd8da8e068b"
     }
   },
@@ -4708,7 +4708,7 @@
     "model": "CohereLabs/aya-expanse-8b",
     "requested_revision": "5062468bf9bc0c6035fd64e06274333ec127d980",
     "actual_snapshot_commit": "5062468bf9bc0c6035fd64e06274333ec127d980",
-    "snapshot_path": "/Users/kyle/.cache/huggingface/hub/models--CohereLabs--aya-expanse-8b/snapshots/5062468bf9bc0c6035fd64e06274333ec127d980",
+    "snapshot_path": "~/.cache/huggingface/hub/models--CohereLabs--aya-expanse-8b/snapshots/5062468bf9bc0c6035fd64e06274333ec127d980",
     "class": "CohereTokenizer",
     "eos_token_id": 255001,
     "chat_template_sha256": "90c33aee14aa2a226127516d48ee9184c9b90745d4a04c484621ec2e82fb712c",
