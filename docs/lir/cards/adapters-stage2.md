@@ -42,6 +42,8 @@ The seed 42 runs on Tiny Aya Global are in their own repositories from stage 1:
 | `earth-plain-s1`, `earth-plain-s2` | Earth | `bactrian_train.jsonl` | 1,800 | 1, 2 | Plain LoRA |
 | `earth-safegrad-s1`, `earth-safegrad-s2` | Earth | The same file | 1,800 | 1, 2 | SafeGrad, with Earth's own 44 refusals |
 | `plain-only-en`, `plain-only-ko`, `plain-only-zh` | Global | `bactrian_train_only_en.jsonl`, `_ko`, `_zh`: the 600 rows of one language from the 1,800-row file, the same 600 items in each | 600 | 42 | Plain LoRA |
+| `plain-only-en-s1`, `plain-only-ko-s1`, `plain-only-zh-s1`, `plain-only-en-s2`, `plain-only-ko-s2`, `plain-only-zh-s2` | Global | The same three single-language files | 600 | 1 and 2 | Plain LoRA |
+| `plain-ayasize-s1`, `plain-ayasize-s2` | Global | `bactrian_train_ayasize.jsonl`, as for `plain-ayasize` | 519 | 1 and 2 | Plain LoRA |
 | `aya-plain-s1-vec`, `aya-plain-s2-vec`, `aya-plain-vec` | Global | None | | | No training. The same seed 42 difference (from the Bactrian-X adapters), added to the Aya plain adapter of seed 1, 2 or 42. Rank 48. Registered before it was run. These models write answers about twice as long as the plain ones |
 
 The file with no Korean rows has 1,748 rows. One was over the length limit and was dropped, so those runs trained
