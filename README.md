@@ -20,10 +20,11 @@ tasks per training language. Safety judge: Qwen3Guard-Gen-4B. Task judge: Qwen3-
 ## Stage 2: three seeds, and where the result stops
 
 The stage 1 results further down are one seed. Stage 2 (the finalist round) repeats the headline on three seeds and
-tests where it stops holding. Each check was written into
-[`docs/lir/stage2-prereg.md`](docs/lir/stage2-prereg.md) before its runs. The status page
-[`results/lir/stage2/README.md`](results/lir/stage2/README.md) has every check with its numbers, the ones that
-failed included. Strict attack success counts the guard's Unsafe and Controversial classes; brackets are 95%
+tests where it stops holding. The preregistration [`docs/lir/stage2-prereg.md`](docs/lir/stage2-prereg.md) was
+written before any stage 2 adapter was evaluated, with the seed 42 results of stage 1 already known, and each
+later check was added to it before its runs were read. Where a check was added after part of its result was known,
+the file says so. The status page [`results/lir/stage2/README.md`](results/lir/stage2/README.md) has every check
+with its numbers, the ones that failed included. Strict attack success counts the guard's Unsafe and Controversial classes; brackets are 95%
 intervals from a bootstrap over the 291 prompt families, pooled over seeds.
 
 | Check | Result | Main numbers |
@@ -124,7 +125,7 @@ Full tables: [`results/lir/results.md`](results/lir/results.md) (vs base) and
 | Every generation and judge verdict, stages 1 and 2 (held-out Aya answers excepted) | [lost-in-refusal/lost-in-refusal-eval-outputs](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-eval-outputs) |
 | Plain LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-plain](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-plain) |
 | SafeGrad LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad) |
-| Stage 2 adapters (38 runs, one folder each) | `lost-in-refusal/tiny-aya-lora-stage2`, private until the paper is submitted |
+| Stage 2 adapters (38 folders) | `lost-in-refusal/tiny-aya-lora-stage2`, private until the paper is submitted |
 
 ## Pipeline: four Lexsi tools, chained
 
@@ -177,8 +178,9 @@ in that one field), `swahili_nllb*.json` (written by a step that runs the transl
 beside them are compared).
 
 Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new
-virtual environment with only the packages named above: all three rows came out as stated, and changing one
-verdict in the downloaded files changed 34 of the 50 tables. Other Python versions and operating systems were not
+virtual environment with only the packages named above: all three rows came out as stated (the third with the
+team's access to the adapter repository), and changing one verdict in the downloaded files changed 34 of the 50
+tables. Other Python versions and operating systems were not
 tried.
 
 ### Stage 1 table and re-running
