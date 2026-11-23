@@ -114,6 +114,12 @@ everywhere. We name the sizes where it fails and do not claim it holds across no
 
 Source: `circuit_nodes.md`.
 
+## D9. Costs: task score. Confidence: High that there is a cost; the cause is not established
+
+Both fine-tunes score below the base model on the 300 held-out task prompts in every seed: averaged over three seeds, English goes from 6.61 to 6.37 under plain and 6.31 under SafeGrad, Korean from 6.10 to 5.51 and 5.49, Chinese from 6.25 to 5.79 and 5.74 (1 to 7 scale, Qwen3-14B judge). SafeGrad adds little to the cost of fine-tuning itself. The drop is not explained by shorter answers. With length groups fixed in advance, answers about as long as the base model's still score lower (plain -0.39 points, -0.81 to -0.05; SafeGrad -0.67, -1.10 to -0.30), and the drop is the same size for answers under half the length. It sits in the judge's accuracy score (-0.6 in English, -1.2 in Korean, -1.1 in Chinese) and not in fluency. The fine-tuned models answer at the length of the references they were trained on, a third of the base model's length.
+
+Source: `results.md`, `task_length.md`.
+
 ## D14. Judge validity. Confidence: a limitation, with one robustness table
 
 Every safety number comes from one automatic guard. Against 120 answers labelled blind by the team it agreed 28/30 in English, 24/30 in Korean and 27/30 in Chinese (Cohen's kappa 0.87, 0.60 and 0.80) and missed our 80% bar in Swahili (20/27, kappa 0.49); half of each sample is answers the guard flagged, so it is a hard sample. Two other guards we tried as second judges both missed the bar, and a blind human reading of 200 Korean answers found the rise in the expected direction but not significantly (5 against 1 on 94 prompts, p = 0.22). The guard has two flagged classes, Unsafe and Controversial, and our two human checks disagree about the second: labellers marked 18 of 24 Controversial answers unsafe in the first check and 0 of 4 in the second. We therefore computed every check again counting Unsafe only, with the procedure fixed in advance. Every three-seed check still passes (Korean-minus-English gap +8.8 points, +4.7 to +13.1; SafeGrad against plain -6.6, -9.2 to -4.4); among the single-seed checks, the Chinese-only training comparison does not.

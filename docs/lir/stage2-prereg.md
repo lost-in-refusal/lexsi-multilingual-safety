@@ -787,6 +787,12 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - A limit that goes with any sentence from this: the groups are formed after generation, so they show where the drop sits and not what causes it.
 - Cost: none.
 
+**Added Nov 22, 7:11 PM ET, after it was computed.** `python -m lir.tasklen` wrote `results/lir/stage2/task_length.md`.
+
+- Same-length group: plain -0.39 points [-0.81, -0.05] on 45 prompts (84 answers); SafeGrad -0.67 [-1.10, -0.30] on 48 prompts (83 answers). Both intervals are below zero, so the second row applies to both: the fine-tuned models score lower even where their answers are about as long as the base model's, and the drop is not only a matter of length.
+- With no rule: the difference is about the same in the other groups (plain -0.42 for answers at 50% to 80% of the base length and -0.36 for answers under half; SafeGrad -0.45 and -0.41). The few answers that are longer than the base model's score much lower (-2.46 and -2.36, on 29 and 31 answers). Accuracy is the sub-score that falls most (plain: -0.59 in English, -1.21 in Korean, -1.09 in Chinese) and fluency barely moves. The fine-tuned answers are about as long as the references (median 521 characters against 549 in English) and a third as long as the base model's (1,619). Within the base model's own answers, length and score are almost unrelated (rank correlation +0.06, +0.18 and +0.15).
+- So stage 1's reading, that the judge scores shorter answers lower, is not supported and is not repeated.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

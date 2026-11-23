@@ -74,6 +74,8 @@ def describe(base: dict, arms: list[dict]) -> dict:
     out = {}
     for lang in LANGS:
         ids = [u for u, r in base.items() if r["lang"] == lang and all(u in a for a in arms)]
+        if not ids:
+            continue
         out[lang] = {"score_base": mean(base[u]["score"] for u in ids),
                      "score_arm": mean(mean(a[u]["score"] for u in ids) for a in arms),
                      "median_chars_base": median(base[u]["chars"] for u in ids),

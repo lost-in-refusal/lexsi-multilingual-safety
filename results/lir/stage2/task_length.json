@@ -1,0 +1,180 @@
+{
+  "same_length": [
+    0.8,
+    1.25
+  ],
+  "under_half": 0.5,
+  "methods": {
+    "plain": {
+      "groups": {
+        "same": {
+          "mean": -0.39444444444444443,
+          "ci95": [
+            -0.8074074074074075,
+            -0.05185185185185186
+          ],
+          "prompts": 45,
+          "answers": 84
+        },
+        "shorter": {
+          "mean": -0.41754385964912283,
+          "ci95": [
+            -0.618859649122807,
+            -0.21271929824561403
+          ],
+          "prompts": 95,
+          "answers": 176
+        },
+        "under half": {
+          "mean": -0.3556159420289855,
+          "ci95": [
+            -0.4960144927536232,
+            -0.2101449275362319
+          ],
+          "prompts": 230,
+          "answers": 611
+        },
+        "longer": {
+          "mean": -2.463235294117647,
+          "ci95": [
+            -3.573529411764706,
+            -1.3455882352941178
+          ],
+          "prompts": 17,
+          "answers": 29
+        }
+      },
+      "reading": "lower",
+      "report": "The fine-tuned models score lower even where their answers are about as long as the base model's, so the drop is not only a matter of length",
+      "by_language": {
+        "en": {
+          "score_base": 6.6125,
+          "score_arm": 6.3741666666666665,
+          "median_chars_base": 1619.0,
+          "median_chars_arm": 521.1666666666666,
+          "median_chars_reference": 549.0,
+          "sub_score_change": {
+            "accuracy": -0.59,
+            "instruction_following": -0.17666666666666667,
+            "coherence": -0.15666666666666668,
+            "fluency": -0.03
+          }
+        },
+        "ko": {
+          "score_base": 6.1,
+          "score_arm": 5.509166666666666,
+          "median_chars_base": 928.5,
+          "median_chars_arm": 275.8333333333333,
+          "median_chars_reference": 297.5,
+          "sub_score_change": {
+            "accuracy": -1.21,
+            "instruction_following": -0.3566666666666667,
+            "coherence": -0.59,
+            "fluency": -0.20666666666666667
+          }
+        },
+        "zh": {
+          "score_base": 6.25,
+          "score_arm": 5.785833333333334,
+          "median_chars_base": 761.0,
+          "median_chars_arm": 190.5,
+          "median_chars_reference": 238.0,
+          "sub_score_change": {
+            "accuracy": -1.0933333333333333,
+            "instruction_following": -0.36333333333333334,
+            "coherence": -0.37,
+            "fluency": -0.030000000000000002
+          }
+        }
+      }
+    },
+    "safegrad": {
+      "groups": {
+        "same": {
+          "mean": -0.6710069444444444,
+          "ci95": [
+            -1.1006944444444444,
+            -0.3020833333333333
+          ],
+          "prompts": 48,
+          "answers": 83
+        },
+        "shorter": {
+          "mean": -0.45075757575757575,
+          "ci95": [
+            -0.6738215488215488,
+            -0.22643097643097645
+          ],
+          "prompts": 99,
+          "answers": 184
+        },
+        "under half": {
+          "mean": -0.4054005722460658,
+          "ci95": [
+            -0.5337982832618026,
+            -0.2707439198855508
+          ],
+          "prompts": 233,
+          "answers": 602
+        },
+        "longer": {
+          "mean": -2.357843137254902,
+          "ci95": [
+            -3.3627450980392157,
+            -1.3823529411764706
+          ],
+          "prompts": 17,
+          "answers": 31
+        }
+      },
+      "reading": "lower",
+      "report": "The fine-tuned models score lower even where their answers are about as long as the base model's, so the drop is not only a matter of length",
+      "by_language": {
+        "en": {
+          "score_base": 6.6125,
+          "score_arm": 6.308333333333334,
+          "median_chars_base": 1619.0,
+          "median_chars_arm": 507.8333333333333,
+          "median_chars_reference": 549.0,
+          "sub_score_change": {
+            "accuracy": -0.7233333333333334,
+            "instruction_following": -0.22666666666666668,
+            "coherence": -0.2,
+            "fluency": -0.06666666666666667
+          }
+        },
+        "ko": {
+          "score_base": 6.1,
+          "score_arm": 5.491666666666666,
+          "median_chars_base": 928.5,
+          "median_chars_arm": 290.6666666666667,
+          "median_chars_reference": 297.5,
+          "sub_score_change": {
+            "accuracy": -1.22,
+            "instruction_following": -0.43,
+            "coherence": -0.6466666666666667,
+            "fluency": -0.1366666666666667
+          }
+        },
+        "zh": {
+          "score_base": 6.25,
+          "score_arm": 5.741666666666667,
+          "median_chars_base": 761.0,
+          "median_chars_arm": 185.83333333333334,
+          "median_chars_reference": 238.0,
+          "sub_score_change": {
+            "accuracy": -1.0733333333333335,
+            "instruction_following": -0.4,
+            "coherence": -0.4633333333333333,
+            "fluency": -0.09666666666666666
+          }
+        }
+      }
+    }
+  },
+  "base_length_against_score": {
+    "en": 0.06223365797904074,
+    "ko": 0.17673551843874633,
+    "zh": 0.1496754344543675
+  }
+}
