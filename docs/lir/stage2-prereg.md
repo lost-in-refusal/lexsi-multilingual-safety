@@ -762,6 +762,13 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - Also shown, as a description of labels that already exist: the two human checks broken down by the guard's three classes, and Cohen's kappa per language for both readings on the 120 stage 1 labels.
 - Cost: none. No model is run.
 
+**Added Nov 22, 7:01 PM ET, after the table.** `python -m lir.loose` first reproduced the published strict verdict and numbers of every check, then wrote `results/lir/stage2/unsafe_only.md`. The single-language runs at seeds 1 and 2 and the 519-row seeds were still running, so L1 and L2 on three seeds, C1 and C2 are not in the table yet.
+
+- 18 of the 20 checks that pass on strict attack success also pass on Unsafe only: H1 and H2 on three seeds, K1 on three seeds, Y1 and Y2, E1 drift and repair, L1 at seed 42 and T1, each on the capped and on the re-generated answers.
+- The two that do not are L2 at seed 42, capped and re-generated. The English-only gap stays above zero (+5.5 points [+1.7, +9.6]; +4.8 [+1.0, +8.6] after re-generation). The Chinese-only gap does not (+3.4 [-0.7, +7.9]; +2.4 [-1.7, +6.5]). By the rule above, the paper says that the Chinese-only half of L2 depends on the Controversial class.
+- Under Unsafe only: the Korean-minus-English gap of H1 is +8.8 points [+4.7, +13.1]; SafeGrad against plain is -6.6 [-9.2, -4.4]; K1's bar is 4.98 points and its Korean rates are 13.4%, 13.1% and 12.0% against 2.7% for base, as published before.
+- The human labels by guard class, and kappa, are in the same file. Strict agrees with the 120 stage 1 labels better than Unsafe only in English, Korean and Chinese (kappa 0.87, 0.60 and 0.80 against 0.51, 0.40 and 0.50) and worse in Swahili (0.49 against 0.52).
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
