@@ -1428,6 +1428,97 @@ class Rebuild(unittest.TestCase):
                     self.assertIn("fetch", str(stop.exception))
 
 
+class MixingSeeds(unittest.TestCase):
+    """Section 14a: each mixing run against SafeGrad at the same seed, decided on the new seeds only."""
+    LANGS = ("en", "ko", "zh", "sw")
+
+    def attack(self, ko=range(4)):
+        return {f"a{i}-{l}": {"uid": f"a{i}-{l}", "family": f"a{i}", "lang": l, "refusal": "No",
+                              "safety": "Unsafe" if l == "ko" and i in ko else "Safe"} for i in range(40) for l in self.LANGS}
+
+    def xstest(self, en=range(3)):
+        return {f"x{i}-{l}": {"uid": f"x{i}-{l}", "family": f"x{i}", "lang": l, "safety": "Safe",
+                              "refusal": "Yes" if l == "en" and i in en else "No"} for i in range(40) for l in self.LANGS}
+
+    def task(self, score=6.0):
+        return {f"t{i}": {"uid": f"t{i}", "lang": "en", "safety": "Safe", "refusal": "No", "task_score": score} for i in range(30)}
+
+    def sets(self, mix_ko=range(4), mix_en=range(13), mix_score=6.0, arms=("plain-mix1", "plain-mix5")):
+        """SafeGrad at three seeds, and each mixing arm at seeds 42, 1 and 2. Seed 42 is given a different picture
+        from the new seeds, so a decision that used it would show."""
+        att = {"base": self.attack(range(2))}
+        xs = {"base": self.xstest(range(4))}
+        task = {"base": self.task()}
+        for run in ("safegrad", "safegrad-s1", "safegrad-s2"):
+            att[run], xs[run], task[run] = self.attack(), self.xstest(), self.task()
+        for arm in arms:
+            att[arm], xs[arm], task[arm] = self.attack(range(30)), self.xstest(range(0)), self.task(1.0)   # seed 42
+            for s in (1, 2):
+                att[f"{arm}-s{s}"], xs[f"{arm}-s{s}"], task[f"{arm}-s{s}"] = self.attack(mix_ko), self.xstest(mix_en), self.task(mix_score)
+        return att, xs, task
+
+    def test_decided_on_the_new_seeds_only(self):
+        from lir.repeat import M1_ROWS, M2_ROWS, SECTION3_ROWS, mix_md, mix_result
+
+        res = mix_result(*self.sets())
+        r = res["arms"]["plain-mix1"]
+        self.assertEqual((res["new_seeds"], res["waiting"], list(res["arms"])), ([1, 2], [], ["plain-mix1", "plain-mix5"]))
+        # same Korean attack success as SafeGrad at the new seeds; 13 against 3 of 40 English safe prompts refused
+        self.assertEqual((r["m1"]["side"], r["m2"]["side"], r["m3"]["side"]), ("includes", "above", "includes"))
+        self.assertAlmostEqual(r["m1"]["mean"], 0.0)
+        self.assertAlmostEqual(r["m2"]["mean"], 25.0)
+        self.assertEqual((r["m1_report"], r["m2_report"], r["section3_report"]), (M1_ROWS["includes"], M2_ROWS["above"], SECTION3_ROWS[1]))
+        # seed 42 (Korean much worse, no English refusals, low task score) is shown and decides nothing
+        self.assertEqual([(s, row["new"]) for s, row in r["seeds"].items()], [(42, False), (1, True), (2, True)])
+        self.assertAlmostEqual(r["seeds"][42]["ko_strict"]["delta"], 65.0)
+        self.assertEqual(r["all_seeds"]["seeds"], [42, 1, 2])
+        self.assertAlmostEqual(r["all_seeds"]["m1"]["mean"], 65.0 / 3)
+        self.assertAlmostEqual(r["seeds"][1]["over_refusal"]["en"]["mixing"], 32.5)
+        self.assertAlmostEqual(r["seeds"][1]["vs_base"]["en_over_refusal"]["delta"], 22.5)
+        self.assertAlmostEqual(res["arms_averaged"]["m2"]["mean"], 25.0)
+        text = mix_md(dict(res, runs=[]))
+        self.assertIn(f"{M2_ROWS['above']}.**", text)
+        self.assertIn(f"**For section 3: {SECTION3_ROWS[1]}.**", text)
+        self.assertIn("| 42 | no, seen before |", text)
+
+    def test_each_row_of_the_section_3_table(self):
+        from lir.repeat import SECTION3_ROWS, mix_result, section3_row, side
+
+        worse = mix_result(*self.sets(mix_ko=range(14)))["arms"]["plain-mix1"]      # Korean 35% against 10%
+        self.assertEqual((worse["m1"]["side"], worse["section3_report"]), ("above", SECTION3_ROWS[0]))
+        same = mix_result(*self.sets(mix_en=range(3)))["arms"]["plain-mix1"]        # no difference anywhere
+        self.assertEqual((same["m2"]["side"], same["section3_report"]), ("includes", SECTION3_ROWS[2]))
+        costly = mix_result(*self.sets(mix_en=range(3), mix_score=5.0))["arms"]["plain-mix1"]   # task score one point lower
+        self.assertEqual((costly["m3"]["side"], costly["section3_report"]), ("below", SECTION3_ROWS[3]))
+        self.assertAlmostEqual(costly["m3"]["mean"], -1.0)
+        better = mix_result(*self.sets(mix_ko=range(0)))["arms"]["plain-mix1"]      # Korean 0% against 10%
+        self.assertEqual(better["m1"]["side"], "below")
+        self.assertEqual([side({"ci95": c}) for c in ([0.1, 2.0], [-2.0, -0.1], [-1.0, 1.0], [0.0, 0.0])], ["above", "below", "includes", "includes"])
+        self.assertEqual([section3_row(*k) for k in (("above", "above", "below"), ("includes", "above", "below"), ("below", "includes", "above"),
+                                                     ("below", "below", "includes"), ("includes", "includes", "below"))],
+                         [SECTION3_ROWS[0], SECTION3_ROWS[1], SECTION3_ROWS[2], SECTION3_ROWS[2], SECTION3_ROWS[3]])
+
+    def test_one_arm_is_read_when_the_other_is_not_finished(self):
+        from lir.repeat import mix_md, mix_result
+
+        att, xs, task = self.sets()
+        del xs["plain-mix5-s2"]     # the second run of the second arm has no XSTest verdicts yet
+        res = mix_result(att, xs, task)
+        self.assertEqual((list(res["arms"]), res["waiting"]), (["plain-mix1"], ["plain-mix5"]))
+        self.assertNotIn("arms_averaged", res)
+        self.assertIn("**Read for `plain-mix1` only.** Not fully judged yet at the new seeds: `plain-mix5`.", mix_md(dict(res, runs=[])))
+        del task["plain-mix1-s1"]
+        self.assertEqual(mix_result(att, xs, task)["arms"], {})
+
+    def test_registered_wording(self):
+        from lir.common import ROOT
+        from lir.repeat import M1_ROWS, M2_ROWS, SECTION3_ROWS
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        for sentence in [*M1_ROWS.values(), *M2_ROWS.values(), *SECTION3_ROWS]:
+            self.assertIn(sentence, prereg)   # the report can only say what section 14a registered
+
+
 if __name__ == "__main__":
     unittest.main()
 

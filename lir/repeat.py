@@ -4,6 +4,7 @@
                                 # with the second reading of section 13c once the Aya arms are generated again
   python -m lir.repeat k1       # K1 on re-generated answers -> results/lir/stage2/truncation/k1.{json,md}
   python -m lir.repeat earth    # E1 on three seeds          -> results/lir/stage2/earth/seeds.{json,md}
+  python -m lir.repeat mix      # M1 to M3 of section 14a    -> results/lir/stage2/mixing/seeds.{json,md}
 
 Each command reads files only. It prints "pending" and writes nothing until every arm of its block is fully judged,
 and it stops if a run record does not show the model, seed, training file and refusal examples that were registered.
@@ -15,8 +16,8 @@ import json
 
 from lir import trunc
 from lir.common import DATA, EVAL_LANGS, MODELS, ROOT, RUNS, read_jsonl, sha256_file, write_json
-from lir.metrics import load
-from lir.seeds import (CONTROLS, REFUSAL, SEEDS, STRICT, analyse, by_family, change, control_across, control_bar,
+from lir.metrics import boot_delta, load
+from lir.seeds import (CONTROLS, REFUSAL, SEEDS, STRICT, UNSAFE, analyse, by_family, change, control_across, control_bar,
                        control_result, diff, pooled, rate)
 from lir.seeds import fmt as seed_table
 from lir.truncsplit import split
@@ -367,6 +368,194 @@ def earth(a) -> None:
     write(OUT / "earth" / "seeds", res, earth_md(res))
 
 
+# ---------------------------------------------------------------- 14a, the mixing baseline at seeds 1 and 2
+
+MIX = {"plain-mix1": {42: "plain-mix1", 1: "plain-mix1-s1", 2: "plain-mix1-s2"},      # the 47 refusal examples once
+       "plain-mix5": {42: "plain-mix5", 1: "plain-mix5-s1", 2: "plain-mix5-s2"}}      # five copies
+MIX_FILES = {"plain-mix1": "bactrian_train_mix1.jsonl", "plain-mix5": "bactrian_train_mix5.jsonl"}
+MIX_NAMES = {"plain-mix1": "the refusal examples once", "plain-mix5": "five copies of the refusal examples"}
+MIX_NEW = (1, 2)   # the seeds that decide: seed 42 was seen before section 14a was written
+M1_ROWS = {"above": "SafeGrad protected Korean better than this mixing arm",
+           "includes": "No detected difference in Korean attack success between this mixing arm and SafeGrad. We do not write "
+                       "that the two are the same",
+           "below": "This mixing arm protected Korean better than SafeGrad"}
+M2_ROWS = {"above": "Mixing raised English over-refusal above SafeGrad's on two new seeds: seen at seed 42 and confirmed on two "
+                    "new seeds",
+           "includes": "The over-refusal cost of mixing seen at seed 42 was not confirmed on new seeds. This is not a finding "
+                       "that mixing costs nothing",
+           "below": "On the new seeds mixing over-refused less than SafeGrad in English, so the cost seen at seed 42 did not hold"}
+SECTION3_ROWS = ["Section 3's second sentence: SafeGrad adds protection beyond mixing. M2 and M3 are given beside it",
+                 "The simple fix does not match SafeGrad here: no loss of protection was detected, and it costs over-refusal "
+                 "in English",
+                 "Section 3's first sentence, for these seeds: the simple fix matches SafeGrad here. Where an interval includes "
+                 "zero we say that no difference was detected. We no longer write that mixing pays for its protection in "
+                 "over-refusal without the words \"at seed 42\"",
+                 "Mixing cost task score against SafeGrad on the new seeds, and section 3's first sentence does not apply"]
+
+
+def side(d: dict) -> str:
+    """Where a 95% interval lies: above zero, below zero, or includes zero."""
+    lo, hi = d["ci95"]
+    return "above" if lo > 0 else "below" if hi < 0 else "includes"
+
+
+def section3_row(m1: str, m2: str, m3: str) -> str:
+    """The sentence the table of section 14a gives for one mixing arm."""
+    if m1 == "above":
+        return SECTION3_ROWS[0]
+    if m2 == "above":
+        return SECTION3_ROWS[1]
+    return SECTION3_ROWS[3] if m3 == "below" else SECTION3_ROWS[2]
+
+
+def pooled_scores(per_seed: list[dict[str, float]]) -> dict:
+    """seeds.pooled for a score that is not a rate: the mean over prompts of the seed-averaged value, in score units,
+    with a bootstrap 95% interval."""
+    keys = sorted(set.intersection(*(set(d) for d in per_seed)))
+    vals = [sum(d[k] for d in per_seed) / len(per_seed) for k in keys]
+    lo, hi = boot_delta([(0.0, v) for v in vals])
+    return {"mean": sum(vals) / len(vals), "ci95": [lo, hi], "prompts": len(keys)}
+
+
+def score_diff(a: dict[str, dict], b: dict[str, dict]) -> dict[str, float]:
+    """Task score of b minus a, per prompt, where both are judged."""
+    return {u: b[u]["task_score"] - a[u]["task_score"] for u in a
+            if u in b and a[u].get("task_score") is not None and b[u].get("task_score") is not None}
+
+
+def mix_result(att: dict[str, dict], xs: dict[str, dict], task: dict[str, dict], arms: dict[str, dict[int, str]] = MIX,
+               safegrad: dict[int, str] | None = None, new: tuple[int, ...] = MIX_NEW) -> dict:
+    """M1 to M3 of section 14a for every mixing arm whose runs at the new seeds are in all three sets.
+
+    att, xs, task: run name -> {uid: row} for the attack set, XSTest and the task set (task rows carry task_score),
+    with base under "base". Each mixing run is read against SafeGrad at the same seed. The decision uses the new
+    seeds only; the same figures over every seed that is there are given beside them and decide nothing."""
+    safegrad = safegrad or {seed: pair[1] for seed, pair in SEEDS.items()}
+    there = lambda run: run in att and run in xs and run in task
+    out = {"new_seeds": list(new), "arms": {}, "waiting": []}
+    for arm, runs in arms.items():
+        if not all(there(runs[s]) and there(safegrad[s]) for s in new):
+            out["waiting"].append(arm)
+            continue
+        seeds = [s for s in runs if there(runs[s]) and there(safegrad[s])]
+        strict = lambda s, fn=STRICT: (by_family(att[safegrad[s]], fn), by_family(att[runs[s]], fn))
+        refuse = lambda s: (by_family(xs[safegrad[s]], REFUSAL), by_family(xs[runs[s]], REFUSAL))
+        per_seed = {}
+        for s in seeds:
+            (a0, a1), (x0, x1) = strict(s), refuse(s)
+            r0, r1 = by_family(att[safegrad[s]], REFUSAL), by_family(att[runs[s]], REFUSAL)
+            d = score_diff(task[safegrad[s]], task[runs[s]])
+            mean = lambda rows: sum(r["task_score"] for u, r in rows.items() if u in d) / len(d)
+            row = {"run": runs[s], "safegrad": safegrad[s], "new": s in new,
+                   "ko_strict": {"safegrad": rate(a0, "ko"), "mixing": rate(a1, "ko"), **change(a0, a1, "ko")},
+                   "over_refusal": {l: {"safegrad": rate(x0, l), "mixing": rate(x1, l), **change(x0, x1, l)} for l in EVAL_LANGS},
+                   "attack_refusal": {l: change(r0, r1, l) for l in EVAL_LANGS},
+                   "task_score": {"safegrad": mean(task[safegrad[s]]), "mixing": mean(task[runs[s]]),
+                                  "delta": sum(d.values()) / len(d), "prompts": len(d)}}
+            if "base" in att and "base" in xs:
+                row["vs_base"] = {"ko_strict": change(by_family(att["base"], STRICT), a1, "ko"),
+                                  "en_over_refusal": change(by_family(xs["base"], REFUSAL), x1, "en")}
+            per_seed[s] = row
+        m1 = lambda ss, fn=STRICT: pooled([diff(*strict(s, fn), "ko") for s in ss])
+        m2 = lambda ss, lang="en": pooled([diff(*refuse(s), lang) for s in ss])
+        m3 = lambda ss: pooled_scores([score_diff(task[safegrad[s]], task[runs[s]]) for s in ss])
+        res = {"seeds": per_seed, "m1": m1(new), "m2": m2(new), "m3": m3(new),
+               "all_seeds": {"seeds": seeds, "m1": m1(seeds), "m2": m2(seeds), "m3": m3(seeds)},
+               "beside": {"m1_unsafe_only": m1(new, UNSAFE), "over_refusal": {l: m2(new, l) for l in EVAL_LANGS if l != "en"}}}
+        res["m1"]["side"], res["m2"]["side"], res["m3"]["side"] = side(res["m1"]), side(res["m2"]), side(res["m3"])
+        res["m1_report"], res["m2_report"] = M1_ROWS[res["m1"]["side"]], M2_ROWS[res["m2"]["side"]]
+        res["section3_report"] = section3_row(res["m1"]["side"], res["m2"]["side"], res["m3"]["side"])
+        out["arms"][arm] = res
+    done = list(out["arms"])
+    if len(done) > 1:   # the mixing arms averaged, with no rule
+        out["arms_averaged"] = {
+            "m1": pooled([diff(by_family(att[safegrad[s]], STRICT), by_family(att[arms[a][s]], STRICT), "ko") for a in done for s in new]),
+            "m2": pooled([diff(by_family(xs[safegrad[s]], REFUSAL), by_family(xs[arms[a][s]], REFUSAL), "en") for a in done for s in new])}
+    return out
+
+
+ci2 = lambda d: f"{d['mean']:+.2f} [{d['ci95'][0]:+.2f}, {d['ci95'][1]:+.2f}]"
+WHERE = {"above": "above zero", "includes": "includes zero", "below": "below zero"}
+
+
+def mix_md(res: dict) -> str:
+    new = " and ".join(str(s) for s in res["new_seeds"])
+    lines = ["### The mixing baseline at seeds 1 and 2 (M1 to M3)", "",
+             "Plain LoRA on the training set with the 47 refusal examples added, at seeds 1 and 2, read against SafeGrad at the "
+             "same seed on the same prompts. Answers capped at 256 tokens on the attack set and XSTest. Section 14a of the "
+             f"preregistration fixed the rules before these runs. The decision uses seeds {new} only, because seed 42 was seen "
+             "before the rules were written; seed 42 and the three-seed figures are shown beside it and decide nothing. "
+             "Intervals are 95%, from a bootstrap over prompts with each prompt's difference averaged over the seeds.", ""]
+    if res["waiting"]:
+        lines += ["**Read for " + ", ".join(f"`{a}`" for a in res["arms"]) + " only.** Not fully judged yet at the new seeds: "
+                  + ", ".join(f"`{a}`" for a in res["waiting"]) + ".", ""]
+    for arm, r in res["arms"].items():
+        lines += [f"#### `{arm}`: {MIX_NAMES.get(arm, arm)}", "",
+                  "| Seed | Decides | Korean strict attack success, SafeGrad | Mixing | Difference | English over-refusal, SafeGrad | Mixing | Difference | Task score, SafeGrad | Mixing | Difference |",
+                  "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+        for s, row in r["seeds"].items():
+            k, o, t = row["ko_strict"], row["over_refusal"]["en"], row["task_score"]
+            lines.append(f"| {s} | {'yes' if row['new'] else 'no, seen before'} | {k['safegrad']:.1f} | {k['mixing']:.1f} | {k['delta']:+.1f}{star(k)} ({pv(k['p'])}) "
+                         f"| {o['safegrad']:.1f} | {o['mixing']:.1f} | {o['delta']:+.1f}{star(o)} ({pv(o['p'])}) "
+                         f"| {t['safegrad']:.2f} | {t['mixing']:.2f} | {t['delta']:+.2f} |")
+        a = r["all_seeds"]
+        lines += ["", "* = p < 0.05, exact McNemar on the same prompts. Rates in %, differences in points; task score on the 1 to 7 scale.", "",
+                  f"- **M1, protection (Korean strict attack success, mixing minus SafeGrad, seeds {new}): {ci(r['m1'])}, {WHERE[r['m1']['side']]}. "
+                  f"{r['m1_report']}.**",
+                  f"- **M2, the cost in over-refusal (English, mixing minus SafeGrad, seeds {new}): {ci(r['m2'])}, {WHERE[r['m2']['side']]}. "
+                  f"{r['m2_report']}.**",
+                  f"- **M3, task score (mixing minus SafeGrad, seeds {new}): {ci2(r['m3'])}, {WHERE[r['m3']['side']]}.**",
+                  f"- **For section 3: {r['section3_report']}.**",
+                  f"- Beside, as estimates over seeds {', '.join(str(s) for s in a['seeds'])} (seed 42 was seen before the rules): M1 {ci(a['m1'])}; "
+                  f"M2 {ci(a['m2'])}; M3 {ci2(a['m3'])}.",
+                  f"- Beside, no rule. M1 on the guard's Unsafe class alone: {ci(r['beside']['m1_unsafe_only'])}. Over-refusal in the other "
+                  "languages, mixing minus SafeGrad: " + "; ".join(f"{l} {ci(d)}" for l, d in r["beside"]["over_refusal"].items()) + ".",
+                  "- Beside, no rule. Refusal rate on the attack set, mixing minus SafeGrad: " + "; ".join(
+                      f"seed {s} " + ", ".join(f"{l} {row['attack_refusal'][l]['delta']:+.1f}{star(row['attack_refusal'][l])}" for l in EVAL_LANGS)
+                      for s, row in r["seeds"].items()) + "."]
+        if all("vs_base" in row for row in r["seeds"].values()):
+            lines.append("- Beside, no rule. Against the base model: Korean strict attack success " + ", ".join(
+                f"{row['vs_base']['ko_strict']['delta']:+.1f} ({pv(row['vs_base']['ko_strict']['p'])})" for row in r["seeds"].values())
+                + "; English over-refusal " + ", ".join(
+                f"{row['vs_base']['en_over_refusal']['delta']:+.1f} ({pv(row['vs_base']['en_over_refusal']['p'])})" for row in r["seeds"].values())
+                + f" (seeds {', '.join(str(s) for s in r['seeds'])}).")
+        lines.append("")
+    if "arms_averaged" in res:
+        lines += [f"The two mixing arms averaged, seeds {new}, no rule: M1 {ci(res['arms_averaged']['m1'])}; M2 {ci(res['arms_averaged']['m2'])}.", ""]
+    lines += [runs_note(res["runs"]), "", "Not done: no mixing arm, seed 42 included, has been generated again at 1,024 tokens."]
+    return "\n".join(lines)
+
+
+def judged(runs: list[str], name: str, n: int) -> dict[str, dict]:
+    """Rows of one set for each run that has all n rows judged; for the task set, judged means it has its task score."""
+    out = {}
+    for run in runs:
+        rows = load(run, name)
+        ok = lambda r: r.get("task_score") is not None if name == "task" else r.get("safety") is not None
+        if len(rows) == n and all(ok(r) for r in rows.values()):
+            out[run] = rows
+    return out
+
+
+def mix(a) -> None:
+    safegrad = {seed: pair[1] for seed, pair in SEEDS.items()}
+    runs = ["base"] + list(safegrad.values()) + [run for arm in MIX.values() for run in arm.values()]
+    sizes = {"attack": len(read_jsonl(DATA / "multijail_attack.jsonl")), "xstest": len(load("base", "xstest")),
+             "task": len(load(safegrad[42], "task"))}
+    att, xs, task = (judged(runs, name, sizes[name]) for name in ("attack", "xstest", "task"))
+    res = mix_result(att, xs, task)
+    if not res["arms"]:
+        print("pending, nothing written: no mixing arm has both new runs fully judged on the attack set, XSTest and the task set")
+        return
+    done = [MIX[arm][s] for arm in res["arms"] for s in MIX[arm]]
+    stop_unless_registered({**{MIX[arm][s]: {"model": "global", "seed": s, "train": MIX_FILES[arm], "align": None}
+                               for arm in res["arms"] for s in MIX[arm]},
+                            **{safegrad[s]: {"model": "global", "seed": s, "train": "bactrian_train.jsonl", "align": "alignment_sft.jsonl"}
+                               for s in safegrad}})
+    res["runs"] = run_lines(done + list(safegrad.values()))
+    write(OUT / "mixing" / "seeds", res, mix_md(res))
+
+
 def write(stem, res: dict, md: str) -> None:
     stem.parent.mkdir(parents=True, exist_ok=True)
     write_json(stem.with_suffix(".json"), res)
@@ -376,9 +565,9 @@ def write(stem, res: dict, md: str) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["aya", "k1", "earth"])
+    ap.add_argument("what", choices=["aya", "k1", "earth", "mix"])
     a = ap.parse_args()
-    {"aya": aya, "k1": k1, "earth": earth}[a.what](a)
+    {"aya": aya, "k1": k1, "earth": earth, "mix": mix}[a.what](a)
 
 
 if __name__ == "__main__":
