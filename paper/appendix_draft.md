@@ -140,7 +140,7 @@ The recommended layout on hackathon.lexsi.ai marks these as required or as value
 
 - **"With more credits" (required):** planned approach and the expected before and after. Candidates, in order of
   value: the mixing baseline at seeds 1 and 2 with XSTest and re-generation (does mixing's over-refusal cost hold
-  on three seeds?); a second human reading of the Korean rise on the 191 unread prompts and a second labeller;
+  on three seeds?); a human reading of the Korean rise on the 161 Korean prompts no person has read (100 were read for K2 and 30 in stage 1) and a second labeller;
   the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; a second untrained language and the Fire and Water models; LoRA
   rank, learning rate and epoch sensitivity; a second safety benchmark.
 - **"Declaration of work done outside the hackathon" (required):** for the team to state.

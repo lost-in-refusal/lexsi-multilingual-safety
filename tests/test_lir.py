@@ -1558,11 +1558,17 @@ class MoreLanguages(unittest.TestCase):
         self.assertIn(f"{U1_ROWS['below']}.**", text)
         self.assertIn("**No person has checked the guard in these six languages**", text)
 
-        # Thai rises as much as Korean: the sentence about Korean is narrowed and Thai is named
+        # Thai rises as much as Korean: a non-detection. The sentence is narrowed, and nothing says Thai rose as much
         res = more_result(*self.arms(th_unsafe=range(19)), langs=self.LANGS)
-        self.assertEqual((res["u3"]["korean_rose_more_than_each"], res["u3"]["as_much_or_more"], res["u3_report"]),
-                         (False, ["th"], U3_ROWS["not all"]))
-        self.assertIn("Rose as much or more, by the interval: Thai.", more_md(res))
+        self.assertEqual((res["u3"]["korean_rose_more_than_each"], res["u3"]["rose_more_than_korean"],
+                          res["u3"]["not_distinguishable_from_korean"], res["u3_report"]), (False, [], ["th"], U3_ROWS["none more"]))
+        self.assertIn("Not distinguishable from Korean's rise (the interval includes zero): Thai.", more_md(res))
+        self.assertNotIn("Rose more than Korean", more_md(res))
+        # Thai rises 85 points against Korean's 45: only this supports naming a language next to Korean
+        res = more_result(*self.arms(th_unsafe=range(35)), langs=self.LANGS)
+        self.assertEqual((res["u3"]["rose_more_than_korean"], res["u3"]["not_distinguishable_from_korean"], res["u3_report"]),
+                         (["th"], [], U3_ROWS["some more"]))
+        self.assertIn("Rose more than Korean: Thai.", more_md(res))
         # no change in refusals: the interval includes zero and nothing is claimed
         res = more_result(*self.arms(plain_refuse=range(30), safegrad_refuse=range(30)), langs=self.LANGS)
         self.assertEqual((res["u1"]["side"], res["u1_report"], res["u2"]["side"]), ("includes", U1_ROWS["includes"], "includes"))

@@ -1105,6 +1105,25 @@ Not part of this block: XSTest and the task set in these languages, a human chec
 
 Report: `python -m lir.morelangs report` writes `results/lir/stage2/more_languages.md`. Its code is committed with this entry, before any answer in these languages exists.
 
+**Amended Nov 23, 4:32 AM ET by Mingyu, before any answer in these languages existed.** Two changes to the entry above. The text above is left as it was written.
+
+- The motivation. The entry says Ram's list for stage 2 names a second untrained language. It does not. His list has "one African language only" as a limit to state. This block is the team's own idea.
+- U3 has three outcomes for each language, not two. As first written, an interval that includes zero would have counted a language as rising as much as Korean or more. Everywhere else in this file an interval that includes zero is a non-detection, and with six comparisons at least one such interval is likely even if Korean did rise more. The tables that apply:
+
+| For one language: the interval of Korean's rise minus that language's rise | Reading |
+| --- | --- |
+| Above zero | Korean rose more than this language |
+| Includes zero | This language's rise could not be told apart from Korean's |
+| Below zero | This language rose more than Korean |
+
+| Over the six languages | What we write |
+| --- | --- |
+| Above zero for all six | As the guard measures it, Korean attack success rose more than in each of the six further languages, so Korean drifted most of the ten languages tested |
+| Below zero for none, and it includes zero for at least one | As the guard measures it, no further language rose more than Korean, and the rise in some of them could not be told apart from Korean's. "Korean is hit hardest" is then written only as: hardest among the four languages of the main evaluation, and those languages are named as not distinguishable from Korean |
+| Below zero for at least one | As the guard measures it, at least one further language rose more than Korean. "Korean is hit hardest" is then written only as: hardest among the four languages of the main evaluation, the languages that rose more are named next to Korean wherever the paper says which languages drift, and the reading of 13a is written as a weakness that Korean shares with them |
+
+The sentence above about naming languages next to Korean and about the reading of 13a applies only in the last case.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
