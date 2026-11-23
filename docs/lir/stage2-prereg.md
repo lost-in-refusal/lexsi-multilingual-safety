@@ -437,17 +437,34 @@ Everything above was trained and evaluated on one laptop. These runs use a Huggi
 - Same guard, same task judge, same prompts and caps as stage 2.
 
 
-**Added Nov 22, after the D18 hardware-control run.** The hardware control completed on a Hugging Face L4 GPU using Tiny Aya Global base and the existing plain LoRA seed 42 adapter, without retraining. Both arms were evaluated on the same 1,164 attack prompts as the laptop runs (291 per language).
 
-- **GPU base strict attack success:** English 5.50%, Korean 5.50%, Chinese 7.90%, and Swahili 5.15%.
-- **GPU plain strict attack success:** English 6.87%, Korean 19.93%, Chinese 13.40%, and Swahili 6.87%.
-- **Laptop comparison:** The original laptop-versus-GPU percentages and McNemar p-values require recalculation using the preregistered strict definition (Unsafe or Controversial). The earlier figures used a different definition and are not reported as strict attack success.
-- **Exact answer differences:** The earlier comparison reported 1,117 of 1,164 base answers (95.96%) and 1,094 of 1,164 plain answers (93.99%) differing between laptop and GPU. These text-difference counts are independent of the strict attack-success definition, but should be confirmed against the matched generation files.
-- **XSTest:** The earlier comparison found relatively small differences in over-refusal between laptop and GPU. Base Chinese increased from 6.4% on the laptop to 8.4% on the GPU.
+**Added Nov 22, after the D18 hardware-control run and laptop-versus-GPU verification.** The hardware control completed on a Hugging Face L4 GPU using Tiny Aya Global base and the existing plain LoRA seed 42 adapter, without retraining. The original Tiny Aya Global laptop results were matched to the GPU control results using prompt IDs. Both arms contained the same 1,164 attack prompts (291 per language) and 999 XSTest prompts. Strict attack success counts Unsafe or Controversial verdicts.
 
-**Outcome:** The hardware control completed, but the GPU did not reproduce the laptop answers exactly. Section 12.0 specifies no numerical pass/fail threshold, so no binary pass is claimed. The D6 and D11 results are compared against the D18 GPU baseline rather than the laptop baseline. The cause of the generation differences remains unverified. Model revisions, adapter revisions, and evaluation settings should be checked before attributing the differences solely to hardware.
+**Strict attack success, laptop versus GPU:**
 
-GPU job: `lir-control`, ID `6b0356e0130a00b5aa8123e2`. Evaluation commit: `330ebbab5860f8f8a891451f90b63c7e7d28a140`. Confidence: Medium, pending verification of configuration equivalence and completion of the corrected laptop-versus-GPU comparison.
+| Arm | Language | Laptop | GPU | Exact McNemar p |
+| --- | --- | --- | --- | --- |
+| Base | English | 6.87% (20/291) | 5.50% (16/291) | 0.125 |
+| Base | Korean | 5.15% (15/291) | 5.50% (16/291) | 1.000 |
+| Base | Chinese | 8.59% (25/291) | 7.90% (23/291) | 0.727 |
+| Base | Swahili | 6.19% (18/291) | 5.15% (15/291) | 0.508 |
+| Plain | English | 6.87% (20/291) | 6.87% (20/291) | 1.000 |
+| Plain | Korean | 19.24% (56/291) | 19.93% (58/291) | 0.727 |
+| Plain | Chinese | 13.40% (39/291) | 13.40% (39/291) | 1.000 |
+| Plain | Swahili | 7.56% (22/291) | 6.87% (20/291) | 0.727 |
+
+- **Paired safety comparisons:** None of the eight laptop-versus-GPU strict attack-success comparisons was individually significant at p < 0.05 using two-sided exact McNemar tests.
+- **Exact attack-answer differences:** Base differed on 735 of 1,164 prompts (63.14%). Plain differed on 532 of 1,164 prompts (45.70%). These are exact response-text differences, not strict attack-success differences.
+- **XSTest over-refusal, base (laptop → GPU):** English 9.6% → 9.6%, Korean 7.6% → 8.4%, Chinese 8.8% → 8.4%, and Swahili 7.6% → 8.4%.
+- **XSTest over-refusal, plain (laptop → GPU):** English 7.2% → 6.8%, Korean 5.6% → 4.8%, Chinese 5.6% → 4.8%, and Swahili 2.8% → 2.8%.
+- **XSTest answer differences:** Base differed on 747 of 999 prompts (74.77%). Plain differed on 499 of 999 prompts (49.95%).
+- **Configuration verification:** All attack and XSTest prompt IDs and prompt texts matched between the laptop and GPU files. However, generated-token counts differed on 416 base and 442 plain attack prompts, and on 325 base and 382 plain XSTest prompts. Configuration equivalence therefore requires further verification before attributing answer differences solely to hardware.
+
+**Outcome:** The hardware control completed. Although many exact generated answers differed, no individually significant change in strict attack success was detected across the eight laptop-versus-GPU comparisons. Section 12.0 specifies no numerical pass/fail threshold, so no binary pass is claimed. D6 and D11 are compared against the D18 GPU baseline rather than the laptop baseline. The cause of the answer differences remains unverified.
+
+GPU job: `lir-control`, ID `6b0356e0130a00b5aa8123e2`. Evaluation commit: `330ebbab5860f8f8a891451f90b63c7e7d28a140`.
+
+Confidence: Medium, because the comparisons use one seed and model-judge verdicts, and generation configuration equivalence remains to be verified.
 
 ### 12.1 A2. Training language and drift
 
