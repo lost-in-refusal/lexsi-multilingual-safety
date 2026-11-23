@@ -1,4 +1,4 @@
-"""Preregistration 12h: is the task-score drop after fine-tuning a matter of shorter answers?
+"""Preregistration 13h: is the task-score drop after fine-tuning a matter of shorter answers?
 
   python -m lir.tasklen      # -> results/lir/stage2/task_length.{json,md}
 
@@ -123,7 +123,7 @@ def md(res: dict) -> str:
              "Task score (1 to 7, Qwen3-14B judge) on the 300 held-out Bactrian-X prompts, for plain and SafeGrad at seeds 42, 1 "
              "and 2 against the base model. Each fine-tuned answer is grouped by its length in characters relative to the base "
              f"model's answer to the same prompt: about the same ({res['same_length'][0]:.0%} to {res['same_length'][1]:.0%}), shorter, "
-             f"under half, or longer. Section 12h of the preregistration fixed the groups and the reading before this was computed. "
+             f"under half, or longer. Section 13h of the preregistration fixed the groups and the reading before this was computed. "
              "The groups are formed after generation, so this locates the drop; it does not show what causes it.", "",
              "Task score minus the base model's on the same prompt, by length group (95% interval over prompts):", "",
              "| Method | About the same length | Shorter (50% to 80%) | Under half | Longer |", "|---|---|---|---|---|"]

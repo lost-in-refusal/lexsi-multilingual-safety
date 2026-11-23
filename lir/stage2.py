@@ -8,7 +8,7 @@
   python -m lir.stage2 ko-check     # after the new spot check is filled in
   python -m lir.stage2 refusals --arm earth-base --out alignment_sft_earth.jsonl
   python -m lir.stage2 noko         # training set with no Korean row (check K1 in the preregistration)
-  python -m lir.stage2 only         # one training file per language (section 12a of the preregistration)
+  python -m lir.stage2 only         # one training file per language (section 13a of the preregistration)
 
 mix: SafeGrad draws 4 refusal examples per optimizer step (171 steps, about 684
 views). Mixing the 47 examples into the data once gives 141 views over three

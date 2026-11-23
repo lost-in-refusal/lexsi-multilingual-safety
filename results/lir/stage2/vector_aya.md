@@ -1,6 +1,6 @@
 ### The seed 42 repair vector added to the Aya plain adapters
 
-The vector is the SafeGrad adapter minus the plain adapter, both trained on Bactrian-X at seed 42. It is added at full size to the plain adapters trained on the Aya set, with no training and nothing tuned. Judged on the attack set with answers capped at 256 tokens. Section 12b of the preregistration fixed the rule before the runs. T1 is decided on seeds 1 and 2. The seed 42 adapter starts from the same LoRA initialisation as the vector's two source adapters, so its row is shown and decides nothing.
+The vector is the SafeGrad adapter minus the plain adapter, both trained on Bactrian-X at seed 42. It is added at full size to the plain adapters trained on the Aya set, with no training and nothing tuned. Judged on the attack set with answers capped at 256 tokens. Section 13b of the preregistration fixed the rule before the runs. T1 is decided on seeds 1 and 2. The seed 42 adapter starts from the same LoRA initialisation as the vector's two source adapters, so its row is shown and decides nothing.
 
 Strict attack success (%):
 
@@ -51,9 +51,9 @@ Not measured: XSTest and the task sets were not run on the edited adapters, so t
 
 Edited adapters, checked before this was written: `aya-plain-s1-vec` is `aya-plain-s1` plus `safegrad` minus `plain`; `aya-plain-s2-vec` is `aya-plain-s2` plus `safegrad` minus `plain`; `aya-plain-vec` is `aya-plain` plus `safegrad` minus `plain`. Each record names its three source adapters by hash, and the hashes match the files.
 
-#### Second reading (section 12c): after re-generation at 1,024 tokens
+#### Second reading (section 13c): after re-generation at 1,024 tokens
 
-Every attack answer of these arms that reached the 256-token cap was generated again at 1,024 tokens and judged by the same guard. Section 12c fixed this reading after T1 had been read on the capped answers and before any answer was generated again.
+Every attack answer of these arms that reached the 256-token cap was generated again at 1,024 tokens and judged by the same guard. Section 13c fixed this reading after T1 had been read on the capped answers and before any answer was generated again.
 
 Strict attack success (%), after re-generation:
 
@@ -80,7 +80,7 @@ Parentheses: change against plain of the same seed. * = p < 0.05, exact McNemar.
 
 Korean answers of the edited adapter still at the cap at 1,024 tokens: seed 1, 6 of 291; seed 2, 6 of 291. With 30 or more at either seed, T1 is not read from these answers.
 
-**By the table in section 12c (row 1): T1 holds on the original answers and after re-generation. The edit made answers much longer.**
+**By the table in section 13c (row 1): T1 holds on the original answers and after re-generation. The edit made answers much longer.**
 
 English, on the same prompts and adapters where the rise was first seen, so not independent of it: edited against plain pooled over seeds 1 and 2, +2.2 [+0.0, +4.6] points. **The English rise was seen on the capped answers only.**
 

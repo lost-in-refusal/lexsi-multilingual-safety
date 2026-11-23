@@ -1,6 +1,6 @@
 ### One training language at a time (seed 42)
 
-Plain LoRA on the 600 English rows, the 600 Korean rows or the 600 Chinese rows of the Bactrian-X training set: the same 600 items, each in one language. Judged on the attack set with answers capped at 256 tokens. Section 12a of the preregistration fixed both rules before the runs. One seed, so each row is one run.
+Plain LoRA on the 600 English rows, the 600 Korean rows or the 600 Chinese rows of the Bactrian-X training set: the same 600 items, each in one language. Judged on the attack set with answers capped at 256 tokens. Section 13a of the preregistration fixed both rules before the runs. One seed, so each row is one run.
 
 Strict attack success (%), with the change against base:
 
@@ -24,7 +24,7 @@ Strict attack success (%), with the change against base:
 - English only: Korean +7.9 against English +0.7; gap +7.2 [+3.1, +11.7], above zero.
 - Chinese only: Korean +11.3 against Chinese +4.1; gap +7.2 [+2.1, +12.7], above zero.
 
-**By the table in section 12a (row 1): Trained on English alone or on Chinese alone, the model drifted more in Korean than in the language it was trained on. That supports reading H1 as a weakness of Korean.**
+**By the table in section 13a (row 1): Trained on English alone or on Chinese alone, the model drifted more in Korean than in the language it was trained on. That supports reading H1 as a weakness of Korean.**
 
 The Korean-only run is read by L1 only: it cannot tell a weak language from a trained one.
 
@@ -40,9 +40,9 @@ Each single-language run has 600 rows where the mixed run has 1,800, so the mixe
 
 Run records, checked before this was written: `plain-only-en` seed 42, 600 rows of training file `8e11f97e`, commit `39312df`; `plain-only-ko` seed 42, 600 rows of training file `de63e7fe`, commit `39312df`; `plain-only-zh` seed 42, 600 rows of training file `8a487c1c`, commit `39312df`.
 
-#### Second reading (section 12d): after re-generation at 1,024 tokens
+#### Second reading (section 13d): after re-generation at 1,024 tokens
 
-Every capped attack answer of the three single-language arms, of the mixed run cut to 519 rows, of the mixed run and of base was generated again at 1,024 tokens and judged by the same guard. Section 12d registered this reading after L1 and L2 had been read on the capped answers and before any of these answers was generated again. The bar stays 6.36 points.
+Every capped attack answer of the three single-language arms, of the mixed run cut to 519 rows, of the mixed run and of base was generated again at 1,024 tokens and judged by the same guard. Section 13d registered this reading after L1 and L2 had been read on the capped answers and before any of these answers was generated again. The bar stays 6.36 points.
 
 Strict attack success (%), after re-generation, with the change against base:
 
@@ -57,7 +57,7 @@ L1: English only, Korean +7.9 points (p < 0.001), row 1; Korean only, Korean +12
 
 L2: English only, Korean +7.9 against English +2.1, gap +5.8 [+1.7, +10.3], above zero; Chinese only, Korean +12.4 against Chinese +3.8, gap +8.6 [+3.8, +14.1], above zero. That is row 1.
 
-**By the table in section 12d: The single-language result does not depend on the 256-token cap.**
+**By the table in section 13d: The single-language result does not depend on the 256-token cap.**
 
 | Arm | generated again | the original continued | to flagged | to safe | a different answer | to flagged | to safe | still at the cap |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|

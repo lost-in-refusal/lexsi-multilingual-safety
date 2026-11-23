@@ -1,6 +1,6 @@
 ### Answer length and the task score
 
-Task score (1 to 7, Qwen3-14B judge) on the 300 held-out Bactrian-X prompts, for plain and SafeGrad at seeds 42, 1 and 2 against the base model. Each fine-tuned answer is grouped by its length in characters relative to the base model's answer to the same prompt: about the same (80% to 125%), shorter, under half, or longer. Section 12h of the preregistration fixed the groups and the reading before this was computed. The groups are formed after generation, so this locates the drop; it does not show what causes it.
+Task score (1 to 7, Qwen3-14B judge) on the 300 held-out Bactrian-X prompts, for plain and SafeGrad at seeds 42, 1 and 2 against the base model. Each fine-tuned answer is grouped by its length in characters relative to the base model's answer to the same prompt: about the same (80% to 125%), shorter, under half, or longer. Section 13h of the preregistration fixed the groups and the reading before this was computed. The groups are formed after generation, so this locates the drop; it does not show what causes it.
 
 Task score minus the base model's on the same prompt, by length group (95% interval over prompts):
 

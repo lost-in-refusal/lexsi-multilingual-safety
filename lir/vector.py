@@ -2,7 +2,7 @@
 
   python -m lir.vector build --seed 1      # runs/plain-s1-vec/adapter
   python -m lir.vector report              # results/lir/stage2/vector.{json,md}
-  python -m lir.vector build --target aya-plain-s1   # runs/aya-plain-s1-vec/adapter (section 12b, registered)
+  python -m lir.vector build --target aya-plain-s1   # runs/aya-plain-s1-vec/adapter (section 13b, registered)
 
 The repair vector is the SafeGrad adapter's weight change minus the plain adapter's, both
 from seed 42. It is added at full size to the plain adapter of another seed, which never saw

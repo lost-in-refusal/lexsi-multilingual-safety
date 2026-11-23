@@ -1,7 +1,7 @@
 """Preregistration section 11: the Aya and Earth runs at seeds 1 and 2, and K1 read again after re-generation.
 
   python -m lir.repeat aya      # Y1 to Y3 on three seeds   -> results/lir/stage2/aya/seeds.{json,md}
-                                # with the second reading of section 12c once the Aya arms are generated again
+                                # with the second reading of section 13c once the Aya arms are generated again
   python -m lir.repeat k1       # K1 on re-generated answers -> results/lir/stage2/truncation/k1.{json,md}
   python -m lir.repeat earth    # E1 on three seeds          -> results/lir/stage2/earth/seeds.{json,md}
 
@@ -132,7 +132,7 @@ def aya_md(res: dict) -> str:
 
 
 def aya_second(first: dict, att0: dict[str, dict], att1: dict[str, dict], seeds: dict[int, tuple[str, str]] = AYA) -> dict:
-    """Section 12c: Y1 to Y3 read again on the answers after re-generation at 1,024 tokens. It decides nothing; the
+    """Section 13c: Y1 to Y3 read again on the answers after re-generation at 1,024 tokens. It decides nothing; the
     capped reading stands. first: the capped result of aya_seeds; att0, att1: arm -> {uid: row} before and after."""
     g = aya_seeds(att1, seeds)
     g["second_report"] = []
@@ -151,9 +151,9 @@ def aya_second(first: dict, att0: dict[str, dict], att1: dict[str, dict], seeds:
 
 
 def aya_second_md(g: dict) -> list[str]:
-    lines = ["", "#### Second reading (section 12c), deciding nothing: after re-generation at 1,024 tokens", "",
+    lines = ["", "#### Second reading (section 13c), deciding nothing: after re-generation at 1,024 tokens", "",
              "Every capped attack answer of base and of the six Aya arms generated again at 1,024 tokens and judged by the "
-             "same guard. Section 12c registered this reading before any Aya answer was generated again. The capped "
+             "same guard. Section 13c registered this reading before any Aya answer was generated again. The capped "
              "reading above is the one that decides.", "", seed_table(g, names=("Y1", "Y2", "Y3")), ""]
     lines += [f"- {row}." for row in g["second_report"]]
     lines += ["", "| Arm | generated again | the original continued | to flagged | to safe | a different answer | to flagged | to safe | still at the cap |",
@@ -176,7 +176,7 @@ def aya(a) -> None:
                             for seed, pair in AYA.items() for i, arm in enumerate(pair)})
     res = dict(aya_seeds(data), runs=run_lines(arms))
     again = {arm: trunc.after(arm, "attack") for arm in ["base"] + arms}
-    if all(rows is not None for rows in again.values()):   # section 12c, once all six Aya arms are generated again
+    if all(rows is not None for rows in again.values()):   # section 13c, once all six Aya arms are generated again
         res["regenerated"] = aya_second(res, data, again)
     write(OUT / "aya" / "seeds", res, aya_md(res))
 

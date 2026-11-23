@@ -1,4 +1,4 @@
-"""Preregistration 12f: how far fine-tuning moves each language along the base model's refusal direction.
+"""Preregistration 13f: how far fine-tuning moves each language along the base model's refusal direction.
 
   python -m lir.probe extract --arm plain-s1 --adapter runs/plain-s1/adapter   # activations, the stage 1 code unchanged
   python -m lir.direction                    # R1 and R2 -> results/lir/stage2/refusal_direction.{json,md}
@@ -88,7 +88,7 @@ def summary(base: dict, arm: dict) -> dict:
 
 
 def result(proj: dict[str, dict]) -> dict:
-    """R1 and R2 of section 12f. proj: arm -> projections, with base and whichever arms have activations."""
+    """R1 and R2 of section 13f. proj: arm -> projections, with base and whichever arms have activations."""
     base = proj["base"]
     res = {"layer": LAYER, "margin": MARGIN, "arms": {a: summary(base, p) for a, p in proj.items()}, "missing": []}
     if all(a in proj for a in R1_ARMS):
@@ -121,7 +121,7 @@ def md(res: dict) -> str:
     lines = ["### How far each language moves along the refusal direction", "",
              f"Projection of each MultiJail attack prompt's layer-{res['layer']} activation on the base model's English "
              "refusal direction (the direction of stage 1, found on the base model alone). A shift is an arm's projection "
-             "minus the base model's on the same prompt. Section 12f of the preregistration fixed R1 and R2 before the "
+             "minus the base model's on the same prompt. Section 13f of the preregistration fixed R1 and R2 before the "
              "activations of the new arms were extracted. No judge is involved.", "",
              "Median projection per language, with the mean shift against base in parentheses:", "",
              "| Arm | en | ko | zh | sw |", "|---|---:|---:|---:|---:|"]

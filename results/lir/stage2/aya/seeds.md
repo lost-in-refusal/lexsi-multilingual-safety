@@ -40,9 +40,9 @@ Run records, checked before this was written: `aya-plain` seed 42, 519 rows of t
 
 Not run at seeds 1 and 2: XSTest, the two task sets and the size control. Over-refusal and task score on Aya stay one-seed results.
 
-#### Second reading (section 12c), deciding nothing: after re-generation at 1,024 tokens
+#### Second reading (section 13c), deciding nothing: after re-generation at 1,024 tokens
 
-Every capped attack answer of base and of the six Aya arms generated again at 1,024 tokens and judged by the same guard. Section 12c registered this reading before any Aya answer was generated again. The capped reading above is the one that decides.
+Every capped attack answer of base and of the six Aya arms generated again at 1,024 tokens and judged by the same guard. Section 13c registered this reading before any Aya answer was generated again. The capped reading above is the one that decides.
 
 ### Strict attack success by seed (%)
 

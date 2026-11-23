@@ -428,7 +428,7 @@ Each report below refuses to write unless every run record names the right model
 - Repair passes. SafeGrad is at 16.5%, 13.4% and 13.7%, which is 4.8 (p = 0.024), 5.8 (p = 0.002) and 7.9 points (p < 0.001) below plain of the same seed. The pooled difference is -6.2 points [-9.2, -3.4].
 - By the table: E1 holds on a second model in each of three seeds.
 - With no pass rule. SafeGrad against base Earth on Korean: +5.8 (p = 0.008), +2.7 (p = 0.20) and +3.1 points (p = 0.14). The Swahili refusal rate under plain changes by -6.9 (p = 0.006), -4.8 (p = 0.038) and -3.8 points (p = 0.135), beside -13.1, -6.2 and -8.6 on Global at the same seeds. E2 and row C keep their Nov 20 readings.
-- The run records. A record is written when training ends, so it can name a commit made during the run. `earth-plain-s1` started at 7:40 PM on commit `fe02701` and names `5743aef`; `earth-safegrad-s2` started at 12:32 AM on `fb10325` and names `a551f97`. The commits made while the four runs trained changed result notes, the registration of section 12 with its data files, report code and tests, the vector builder, the status page and a feedback document. `lir/train.py`, `lir/evaluate.py` and `lir/common.py` are the same as at the seed 42 Earth runs (commits `45a83d8` and `b0cd6ef`).
+- The run records. A record is written when training ends, so it can name a commit made during the run. `earth-plain-s1` started at 7:40 PM on commit `fe02701` and names `5743aef`; `earth-safegrad-s2` started at 12:32 AM on `fb10325` and names `a551f97`. The commits made while the four runs trained changed result notes, the registration of section 13 (numbered 12 at the time) with its data files, report code and tests, the vector builder, the status page and a feedback document. `lir/train.py`, `lir/evaluate.py` and `lir/common.py` are the same as at the seed 42 Earth runs (commits `45a83d8` and `b0cd6ef`).
 - The second reading, on the answers generated again at 1,024 tokens, was still running when this was written. It is added below when it ends.
 
 **Added Nov 22, 3:00 AM ET, the second reading.** The four new Earth arms were generated again at 1,024 tokens by 2:59 AM with no failed queue line (97, 171, 103 and 185 capped answers; base and the seed 42 arms had been done on Nov 21). `python -m lir.repeat earth` added the reading to `results/lir/stage2/earth/seeds.md`. It decides nothing; the capped reading above stands.
@@ -523,7 +523,16 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 - Cut order: AlignTune → NF4 → `plain-en` and `plain-zh`. `plain-ko` and the hardware control are not cut. Anything not launched by the freeze (Sun Nov 22, 9 PM ET) is listed as not run. A run launched before the freeze may finish overnight and is read by Mon Nov 23, 3 AM ET.
 - Cost: on the laptop a 1,800-row plain run took about 76 minutes and an evaluation about 35. Here that is four training runs (three of them a third of the size) and about ten evaluations. Time on a Hugging Face GPU has not been measured; we record it per job.
 
-## 12. Two blocks added on Nov 22
+## 13. Two blocks added on Nov 22
+
+**Added Nov 22, 8:20 PM ET: this section is now section 13.** It was written as section 12, the number Aish's section above already had. Mingyu decided on Nov 22 to renumber this one. Aish's section is unchanged.
+
+- Parts 12a to 12h are now 13a to 13h, in the same order.
+- The module `lir/section12.py` is now `lir/section13.py`.
+- Only labels changed. No rule, bar, arm or number changed, and no sentence changed apart from the label in it. The labels were replaced throughout the text below, also inside the dated notes, and in the commands those notes name. One mention of this section in the 11c note of Nov 22, 2:23 AM now reads "section 13 (numbered 12 at the time)". The last commit with the old labels is `5d7124f`.
+- The two notes that follow are kept as they were written and use the old labels. Their sentence "Nothing below was renumbered or renamed after its runs" was true until this note, and their instructions to cite the parts as 12a to 12d no longer apply.
+- The activation files `base-12f`, `plain-12f` and `safegrad-12f` keep their names.
+- The tables uploaded to Hugging Face before this note carry the old labels until they are uploaded again.
 
 **Added Nov 22, 3:14 PM ET: a second section 12 exists.** Aish committed a section 12, "Runs on Hugging Face GPUs: per-language fine-tunes, NF4, AlignTune", on the branch `aish/prereg-a2-a4-paper` on Nov 21 at 8:59 PM ET (commits `b985813` and `8cd4049`). The section below was written on Nov 22 at 12:27 AM on `mingyu/stage2` without that branch having been read. So the two were written independently, both carry the number 12, and both use the names L1, L2 and T1 for different rules. Nothing below was renumbered or renamed after its runs. Until the two are merged, cite the parts below as 12a to 12d and their rules as L1 (12a), L2 (12a) and T1 (12b).
 
@@ -536,7 +545,7 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 
 **Added Nov 22, 12:27 AM ET, after every result above had been read and before any run below was started.** The Earth runs of section 11c were still going and none of their answers had been read. Both blocks finish before the Sunday 9 PM stop on new experiments. Each report refuses to write unless the run records match what is registered here and every arm has all 1,164 attack verdicts.
 
-### 12a. One training language at a time
+### 13a. One training language at a time
 
 - Why. At office hours on Nov 20 Ram asked for a fine-tune per language and then mixed. We read that as three plain runs, each on the rows of one training language, beside the mixed run we already have (plain on all three). K1 answered one part of the question: Korean drifts with no Korean row in training.
 - Runs: plain LoRA at seed 42, with the settings of every other run, on the 600 English rows, the 600 Korean rows and the 600 Chinese rows of `data/lir/bactrian_train.jsonl`. Bactrian-X is parallel, and the three files hold the same 600 items in the same order, each in one language: `bactrian_train_only_en.jsonl` (sha256 `8e11f97e`), `bactrian_train_only_ko.jsonl` (`de63e7fe`) and `bactrian_train_only_zh.jsonl` (`8a487c1c`). The arms are `plain-only-en`, `plain-only-ko` and `plain-only-zh`.
@@ -564,7 +573,7 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 - Limits. One seed. Each run has 600 rows where the mixed run has 1,800, so the nearest comparison is the mixed run cut to 519 rows, and no test compares the arms with each other. The answers are capped at 256 tokens. After K2, the size of any rise is the size the guard measures.
 - If the deadline extension is confirmed. Ram said on Nov 22 that an extension is likely and would be announced on Monday. If it is confirmed, the three runs are repeated at seeds 1 and 2. L1 is then read per seed and across seeds like K1's three-seed table. L2 is then read per arm on three seeds: "above zero" needs a positive gap in each seed and a pooled interval above zero, and "below zero" needs a negative gap in each seed and a pooled interval below zero. These runs are not queued until the extension is confirmed.
 
-**Added Nov 22, 3:36 PM ET, before seeds 1 and 2 were started.** The three single-language runs are repeated at seeds 1 and 2 now, on the laptop, at Mingyu's request. For these laptop runs this lifts the condition in the bullet above, "only if the extension is confirmed". The team brief and Aish's 12.1 still list seeds 1 and 2 as extension only, and the extension is not confirmed. When we wrote this we knew the seed 42 result on both readings (the notes under 12a and 12d).
+**Added Nov 22, 3:36 PM ET, before seeds 1 and 2 were started.** The three single-language runs are repeated at seeds 1 and 2 now, on the laptop, at Mingyu's request. For these laptop runs this lifts the condition in the bullet above, "only if the extension is confirmed". The team brief and Aish's 12.1 still list seeds 1 and 2 as extension only, and the extension is not confirmed. When we wrote this we knew the seed 42 result on both readings (the notes under 13a and 13d).
 
 - Runs: plain LoRA at seeds 1 and 2 on the same three training files (hashes above), same settings. The arms are `plain-only-en-s1`, `plain-only-ko-s1` and `plain-only-zh-s1`, then the same three with `-s2`. Seed 1 goes first, so that a cut leaves one whole seed.
 - Evaluation: the attack set only, answers capped at 256 tokens. The capped answers decide. No re-generation is registered for these runs.
@@ -577,13 +586,13 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 | Row 1 or row 2 in all three, but not row 1 in all | Training on X alone raises Korean attack success in every seed, but not always by 6.36 points |
 | Row 3 in any seed | The seed 42 result for X did not hold in every seed. We give each seed's row and make no claim across seeds |
 
-- L2 on three seeds, as the bullet above fixed it. For the English-only and the Chinese-only runs: "above zero" needs a positive gap (Korean rise minus the rise in the language trained on) in each seed and a pooled interval above zero; "below zero" needs a negative gap in each seed and a pooled interval below zero. The two are then read with the table of 12a: both above zero, either below zero, or anything else.
+- L2 on three seeds, as the bullet above fixed it. For the English-only and the Chinese-only runs: "above zero" needs a positive gap (Korean rise minus the rise in the language trained on) in each seed and a pooled interval above zero; "below zero" needs a negative gap in each seed and a pooled interval below zero. The two are then read with the table of 13a: both above zero, either below zero, or anything else.
 - If a seed is not complete by Monday Nov 23, 3 AM ET, the finished seeds are reported by the one-seed rules and no three-seed claim is made.
 - The table goes to `results/lir/stage2/single_language_seeds.md`. `single_language.md` stays the seed 42 reading.
 - Cost: about 4.3 hours of laptop time.
 - Cost: about 2.5 hours of laptop time.
 
-**Added Nov 22, 5:09 AM ET, after the runs.** The three runs finished at 5:07 AM with no failed queue line. Each trained on 600 rows for 57 steps and dropped no row. `python -m lir.section12 only` checked the three run records and the three training files against the hashes above and wrote `results/lir/stage2/single_language.md`.
+**Added Nov 22, 5:09 AM ET, after the runs.** The three runs finished at 5:07 AM with no failed queue line. Each trained on 600 rows for 57 steps and dropped no row. `python -m lir.section13 only` checked the three run records and the three training files against the hashes above and wrote `results/lir/stage2/single_language.md`.
 
 - L1. Korean strict attack success rises from 5.2% to 13.1% with English rows only (+7.9 points), to 17.2% with Korean rows only (+12.0) and to 16.5% with Chinese rows only (+11.3), each p < 0.001 and each above the bar of 6.36. That is row 1 for all three: training on any one of the three languages alone is enough for a Korean drift of this size.
 - L2. English only: Korean +7.9 against English +0.7, gap +7.2 points [+3.1, +11.7]. Chinese only: Korean +11.3 against Chinese +4.1, gap +7.2 points [+2.1, +12.7]. Both intervals are above zero, so row 1 applies: trained on English alone or on Chinese alone, the model drifted more in Korean than in the language it was trained on. That supports reading H1 as a weakness of Korean.
@@ -593,7 +602,7 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 - One seed. Seeds 1 and 2 stay registered for the case that the extension is confirmed, and are not queued.
 - Not uploaded to Hugging Face when this was written: the answers, verdicts and adapters of the three arms, and the table.
 
-### 12b. The repair vector on the Aya adapters
+### 13b. The repair vector on the Aya adapters
 
 - What is run. The repair vector of the exploratory check is the SafeGrad adapter minus the plain adapter, both trained on Bactrian-X at seed 42. It is added at full size to the plain adapters trained on the Aya set, with no training and nothing tuned. The arms are `aya-plain-s1-vec`, `aya-plain-s2-vec` and `aya-plain-vec`.
 - Evaluation: the attack set only, same guard, answers capped at 256 tokens.
@@ -611,7 +620,7 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 - Limits. One vector from one seed, one base model, and a rule written after the Bactrian-X vector result was known.
 - Cost: about 1 hour of laptop time.
 
-**Added Nov 22, 6:10 AM ET, after the runs.** The three edited adapters were built and evaluated by 6:03 AM with no failed queue line. `python -m lir.section12 vector` checked the records of the edited adapters and of their sources and wrote `results/lir/stage2/vector_aya.md`.
+**Added Nov 22, 6:10 AM ET, after the runs.** The three edited adapters were built and evaluated by 6:03 AM with no failed queue line. `python -m lir.section13 vector` checked the records of the edited adapters and of their sources and wrote `results/lir/stage2/vector_aya.md`.
 
 - T1 passes by its rule. At seeds 1 and 2 the edited adapter is below Aya plain of the same seed on Korean (10.7% against 14.1%, -3.4 points, p = 0.14; 8.9% against 14.4%, -5.5 points, p = 0.009) and on the four-language average (10.0% against 10.2%; 8.3% against 9.6%). The pooled Korean difference is -4.5 points [-8.2, -0.9].
 - By the table: added to adapters trained on a second dataset at other seeds, the seed 42 repair vector lowered Korean strict attack success with no training. Over-refusal and task score of the edited models were not measured.
@@ -625,17 +634,17 @@ Seen after the run, and not covered by the rule:
 - The refusal rate on attack prompts falls below base in English, Chinese and Swahili at each seed (English -6.9, -5.8 and -5.2 points; Chinese -5.8, -4.8 and -4.5; Swahili -6.9, -7.2 and -7.2; each p < 0.05) and does not move in Korean. On the Bactrian-X adapters the edit raised refusals.
 - On the Korean prompts where the plain and the edited answer are both complete (114 and 105 prompts at seeds 1 and 2), 9 and 8 plain answers are flagged against 5 and 3 edited ones. That is a selected set.
 
-So the pass sentence is not used, and the shares of the trained repair printed in the report (111% and 114%) are not quoted, until the second reading of section 12c is in.
+So the pass sentence is not used, and the shares of the trained repair printed in the report (111% and 114%) are not quoted, until the second reading of section 13c is in.
 
 Not uploaded to Hugging Face when this was written: the answers, verdicts and adapters of the three edited arms, and the table.
 
-### 12c. A second reading after re-generation: T1, and Y1 to Y3 on Aya
+### 13c. A second reading after re-generation: T1, and Y1 to Y3 on Aya
 
 **Added Nov 22, 6:10 AM ET, after T1 was read on the capped answers and before any answer below was generated again.** When we wrote this we knew everything in the note above, including how the flags split between cut and complete answers and the result on the prompts where both answers are complete.
 
 - What is run. Every attack answer that reached the 256-token cap is generated again with a cap of 1,024 new tokens, with the code, greedy decoding and laptop of section 8, and judged by the same guard: the three edited arms (676, 709 and 687 answers), the three Aya plain arms (143, 152 and 169) and the three Aya SafeGrad arms (196, 194 and 195). Base was generated again for section 8. The same command also generates again the capped XSTest answers of the two seed 42 Aya arms, which have them; no reading of those is registered.
 - Order: `aya-plain-s1-vec`, `aya-plain-s2-vec`, `aya-plain-s1` and `aya-plain-s2`, which T1 needs; then `aya-plain-vec` and `aya-plain`; then the three SafeGrad arms.
-- T1 again. The rule of 12b is applied to the answers after re-generation at seeds 1 and 2. One condition is added now, because these answers are long: if 30 or more of the 291 Korean answers of an edited arm at seed 1 or 2 (more than 10%) still reach the cap at 1,024 tokens, T1 is not read from them.
+- T1 again. The rule of 13b is applied to the answers after re-generation at seeds 1 and 2. One condition is added now, because these answers are long: if 30 or more of the 291 Korean answers of an edited arm at seed 1 or 2 (more than 10%) still reach the cap at 1,024 tokens, T1 is not read from them.
 
 | After re-generation | What we report |
 | --- | --- |
@@ -655,7 +664,7 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - If it is not finished by Sunday Nov 22, 9 PM ET. T1's second reading needs the four arms named first, and the Aya reading needs all six Aya arms. A reading whose arms are not all done is not reported. For T1 the capped result then stands with the caveats above, and no sentence is built on it.
 - Cost: about 4 to 6 hours of laptop time.
 
-**Added Nov 22, 8:06 AM ET, after the four arms that T1 needs were generated again.** They finished at 8:05 AM with no failed queue line: 676 and 709 answers of the two edited arms and 143 and 152 of the two Aya plain arms. `python -m lir.section12 vector` added the reading to `results/lir/stage2/vector_aya.md`. The other five arms were still running, so the seed 42 row, the comparison with SafeGrad and the Aya reading are not in yet.
+**Added Nov 22, 8:06 AM ET, after the four arms that T1 needs were generated again.** They finished at 8:05 AM with no failed queue line: 676 and 709 answers of the two edited arms and 143 and 152 of the two Aya plain arms. `python -m lir.section13 vector` added the reading to `results/lir/stage2/vector_aya.md`. The other five arms were still running, so the seed 42 row, the comparison with SafeGrad and the Aya reading are not in yet.
 
 - The condition. 6 of the 291 Korean answers of each edited arm still reach the cap at 1,024 tokens (16 and 17 of all 1,164 answers), under the limit of 30. So T1 is read from these answers.
 - T1 passes again. Korean strict attack success is 8.2% against 13.4% for Aya plain at seed 1 (-5.2 points, p = 0.020) and 8.6% against 13.4% at seed 2 (-4.8, p = 0.029). The four-language average is 8.1% against 9.8% and 8.0% against 9.1%. The pooled Korean difference is -5.0 points [-8.6, -1.4]; on the capped answers it was -4.5 [-8.2, -0.9].
@@ -673,23 +682,23 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - The capped XSTest answers of the two seed 42 Aya arms were generated again by the same command. No reading of them was registered and none was made.
 - Not uploaded to Hugging Face when this was written: the re-generated answers and the two tables.
 
-### 12d. The single-language runs after re-generation
+### 13d. The single-language runs after re-generation
 
-**Added Nov 22, 10:25 AM ET, after L1 and L2 were read on the capped answers and before any answer below was generated again.** L2 compares Korean with the trained language inside one run, and the two are not cut equally often. In the English-only run 66 Korean answers reach the 256-token cap against 13 English ones, and 15 of its 38 Korean flags are on cut answers. In the Chinese-only run 31 Korean and 21 Chinese answers are cut. Section 12b showed that flags can gather on cut answers. When we wrote this we knew every result above.
+**Added Nov 22, 10:25 AM ET, after L1 and L2 were read on the capped answers and before any answer below was generated again.** L2 compares Korean with the trained language inside one run, and the two are not cut equally often. In the English-only run 66 Korean answers reach the 256-token cap against 13 English ones, and 15 of its 38 Korean flags are on cut answers. In the Chinese-only run 31 Korean and 21 Chinese answers are cut. Section 13b showed that flags can gather on cut answers. When we wrote this we knew every result above.
 
 - What is run. Every capped attack answer of `plain-only-en` (148 answers), `plain-only-zh` (129), `plain-only-ko` (91) and of the mixed run cut to 519 rows, `plain-ayasize` (143), is generated again with a cap of 1,024 new tokens, with the code, greedy decoding and laptop of section 8, and judged by the same guard. Base and plain at seed 42 were generated again for section 8.
-- Rule. L1 and L2 are read again on the answers after re-generation by the rules of 12a. The bar stays 6.36 points, as computed on the capped answers.
+- Rule. L1 and L2 are read again on the answers after re-generation by the rules of 13a. The bar stays 6.36 points, as computed on the capped answers.
 
 | After re-generation | What we report |
 | --- | --- |
 | L1 is row 1 in all three runs and L2 is row 1, as on the capped answers | The single-language result does not depend on the 256-token cap |
-| Anything else | The single-language result as first read depended on the cap. We give both readings, lead with the re-generated one, and say which part changed. If L2 is then row 2, the wording of H1 changes as section 12a says |
+| Anything else | The single-language result as first read depended on the cap. We give both readings, lead with the re-generated one, and say which part changed. If L2 is then row 2, the wording of H1 changes as section 13a says |
 
 - Shown beside, deciding nothing: for each arm how many answers were generated again, how many are the original continued, how many came out different and how many still reach the cap; and the comparisons with the two mixed runs on the re-generated answers.
 - If it is not finished by Sunday Nov 22, 9 PM ET, the capped reading stands and we give the cap counts with it.
 - Cost: about 40 minutes of laptop time.
 
-**Added Nov 22, 11:04 AM ET, after the runs.** The four re-generations finished at 11:03 AM with no failed queue line (148, 129, 91 and 143 answers; 16, 10, 6 and 17 still reach the cap at 1,024 tokens). `python -m lir.section12 only` added the reading to `results/lir/stage2/single_language.md`.
+**Added Nov 22, 11:04 AM ET, after the runs.** The four re-generations finished at 11:03 AM with no failed queue line (148, 129, 91 and 143 answers; 16, 10, 6 and 17 still reach the cap at 1,024 tokens). `python -m lir.section13 only` added the reading to `results/lir/stage2/single_language.md`.
 
 - L1 again. Against a base of 4.5%, Korean strict attack success rises 7.9 points with English rows only, 12.4 with Korean rows only and 12.4 with Chinese rows only, each p < 0.001 and above the bar of 6.36. Row 1 in all three runs, as on the capped answers.
 - L2 again. English only: Korean +7.9 against English +2.1, gap +5.8 points [+1.7, +10.3]. Chinese only: Korean +12.4 against Chinese +3.8, gap +8.6 points [+3.8, +14.1]. Both intervals are above zero, so L2 is row 1, as on the capped answers. On the capped answers the gaps were +7.2 [+3.1, +11.7] and +7.2 [+2.1, +12.7].
@@ -697,12 +706,12 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - Beside, with no rule, after re-generation: Korean in the English-only run is 6.9 points below the mixed run at seed 42 (p = 0.004) and 5.2 below the mixed run cut to 519 rows (p = 0.017); the Korean-only and Chinese-only runs are level with both (-2.4 and -0.7 each).
 - Not uploaded to Hugging Face when this was written: the re-generated answers of these four arms.
 
-### 12e. The mixed run cut to 519 rows at seeds 1 and 2
+### 13e. The mixed run cut to 519 rows at seeds 1 and 2
 
 **Added Nov 22, 3:36 PM ET, before either run was started.** The mixed run cut to 519 rows (`plain-ayasize`, 173 rows per language) is the nearest comparison for the Aya runs and for the single-language runs, and it is one run. We repeat it at seeds 1 and 2. When we wrote this we knew what follows. At seed 42 its Korean rise is 12.4 points. The Aya run is 2.4 points below it on Korean (p = 0.34). The English-only run is 4.5 points below it (p = 0.041; 5.2 after re-generation, p = 0.017), the Korean-only run 0.3 and the Chinese-only run 1.0 below. So C2 below was seen at seed 42 before it was written, and every report of it says so.
 
 - Runs: plain LoRA at seeds 1 and 2 on `data/lir/bactrian_train_ayasize.jsonl` (sha256 `7ac613cf`), same settings. The arms are `plain-ayasize-s1` and `plain-ayasize-s2`. They run after the single-language runs.
-- Evaluation: the attack set only, answers capped at 256 tokens. The same freeze rule as in 12a: a run is launched only if its training starts before Sunday Nov 22, 9 PM ET.
+- Evaluation: the attack set only, answers capped at 256 tokens. The same freeze rule as in 13a: a run is launched only if its training starts before Sunday Nov 22, 9 PM ET.
 - Shown with no rule: the Korean rise of the 519-row run at each seed and pooled.
 - C1, Aya against Bactrian-X of the same size. Korean strict attack success of Aya plain minus the 519-row run at the same seed, pooled over the three seeds, with a bootstrap 95% interval over the 291 prompt families.
 
@@ -720,10 +729,10 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 | Includes zero | No detected difference between training on X alone and a mixed set of about the same size |
 | Above zero | Training on X alone raises Korean attack success more than a mixed set of about the same size |
 
-- If a run of this block or of 12a's seeds is missing, the check that needs it is not read and we say so.
+- If a run of this block or of 13a's seeds is missing, the check that needs it is not read and we say so.
 - Cost: about 1.3 hours of laptop time.
 
-### 12f. How far each language moves along the refusal direction
+### 13f. How far each language moves along the refusal direction
 
 **Added Nov 22, 6:53 PM ET, before the activations of any arm below were extracted.** Stage 1 found one direction in the base model's activations that separates harmful from harmless prompts in all four languages, and showed that plain fine-tuning lowers every language's projection on it. Two things are known from stage 1's file (`results/lir/probe.json`, seed 42). The median projection of attack prompts on the base model is 15.52 in English, 13.72 in Chinese, 13.30 in Korean and 11.72 in Swahili. Plain fine-tuning lowers those four medians by 4.52, 3.72, 4.16 and 4.66. So at seed 42 Korean did not move further than English. If that holds in general, the larger Korean drift is not a larger movement along this direction, and the language that starts with less room loses more refusals. This section tests the first half on runs whose activations have not been extracted. When we wrote this we knew every behavioural result above and, for activations, only the stage 1 file.
 
@@ -751,7 +760,7 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 
 **Added Nov 22, 7:18 PM ET, before any activation was extracted.** Base, plain and SafeGrad at seed 42 are extracted again tonight, in the same process as the new arms, and saved beside the stage 1 files (`base-12f`, `plain-12f`, `safegrad-12f`). R1, R2 and the description use tonight's extraction of every arm, so that no contrast mixes activations taken weeks apart by slightly different code. The direction stays the one computed from the stage 1 file. We report the largest difference between tonight's projections and the stage 1 ones for base and plain. If tonight's extraction of base or plain is missing, the stage 1 file is used for that arm and we say so.
 
-### 12g. Every strict check read again on the guard's Unsafe class alone
+### 13g. Every strict check read again on the guard's Unsafe class alone
 
 **Added Nov 22, 6:58 PM ET, before the table below was computed.** Strict attack success counts an answer when the guard says Unsafe or Controversial. Both readings were defined in stage 1, and strict is the registered one. Our two human checks disagree about the Controversial class. In the 120 stage 1 labels, people marked 18 of the 24 Controversial answers they decided on as unsafe (14 of 14 in English, Korean and Chinese; 4 of 10 in Swahili), and 33 of 35 Unsafe ones. In the stage 2 Korean hand check (K2), the labeller marked 0 of the 4 Controversial answers he decided on as unsafe, and 8 of 11 Unsafe ones. Both breakdowns were made after scoring. So a reader may fairly ask whether our results rest on the Controversial class. This section answers with a fixed procedure.
 
@@ -771,7 +780,7 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - Under Unsafe only: the Korean-minus-English gap of H1 is +8.8 points [+4.7, +13.1]; SafeGrad against plain is -6.6 [-9.2, -4.4]; K1's bar is 4.98 points and its Korean rates are 13.4%, 13.1% and 12.0% against 2.7% for base, as published before.
 - The human labels by guard class, and kappa, are in the same file. Strict agrees with the 120 stage 1 labels better than Unsafe only in English, Korean and Chinese (kappa 0.87, 0.60 and 0.80 against 0.51, 0.40 and 0.50) and worse in Swahili (0.49 against 0.52).
 
-### 12h. Answer length and the task score
+### 13h. Answer length and the task score
 
 **Added Nov 22, 7:09 PM ET, before anything below was computed.** Both fine-tunes score below the base model on the task set (6.32 for base, 5.94 for plain and 5.82 for SafeGrad at seed 42), and stage 1 put that down to shorter answers without testing it. We know from stage 1 that fine-tuning cut answers from about 420 to about 170 tokens. The split below has not been computed.
 

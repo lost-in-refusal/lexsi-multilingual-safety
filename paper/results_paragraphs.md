@@ -74,7 +74,7 @@ than the language the model was trained on: by 7.2 points more than English in t
 supports reading D1 as a weakness of Korean in this model and not as a footprint of the training language. It is
 one seed with 600 rows per run, and no test ranks the three runs. Counting only the guard's Unsafe class, the English-only comparison still holds (+5.5 points, +1.7 to +9.6) and the Chinese-only one does not (+3.4, -0.7 to +7.9), so the Chinese-only half depends on the guard's Controversial class.
 
-Note for Aish: these are laptop runs (section 12a). The GPU runs of your section 12.1 are a separate check
+Note for Aish: these are laptop runs (section 13a). The GPU runs of your section 12.1 are a separate check
 against a GPU base. Seeds 1 and 2 of the laptop runs are running tonight and their table will be
 `single_language_seeds.md`.
 

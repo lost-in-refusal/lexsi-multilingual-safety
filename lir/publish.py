@@ -103,7 +103,7 @@ ADAPTER_REPO = f"{HF_ORG}/tiny-aya-lora-stage2"
 STAGE2_ADAPTERS = ["plain-s1", "safegrad-s1", "plain-s2", "safegrad-s2", "plain-mix1", "plain-mix5", "plain-noko",
                    "plain-noko-s1", "plain-noko-s2", "plain-ayasize", "aya-plain", "aya-safegrad", "earth-plain",
                    "earth-safegrad", "plain-s1-vec", "plain-s2-vec",
-                   # sections 11 and 12 of the preregistration, Nov 21 and 22
+                   # sections 11 and 13 of the preregistration, Nov 21 and 22
                    "aya-plain-s1", "aya-safegrad-s1", "aya-plain-s2", "aya-safegrad-s2", "earth-plain-s1", "earth-safegrad-s1",
                    "earth-plain-s2", "earth-safegrad-s2", "plain-only-en", "plain-only-ko", "plain-only-zh",
                    "aya-plain-s1-vec", "aya-plain-s2-vec", "aya-plain-vec"]
@@ -174,7 +174,7 @@ def push_adapters(api: HfApi, arms: list[str] | None, public: bool, dry_run: boo
 STAGE2_ARMS = ["plain-s1", "safegrad-s1", "plain-s2", "safegrad-s2", "plain-mix1", "plain-mix5", "plain-noko",
                "earth-base", "earth-plain", "earth-safegrad"]
 STAGE2_LATER = ["plain-s1-vec", "plain-s2-vec", "plain-noko-s1", "plain-noko-s2", "aya-plain", "aya-safegrad", "plain-ayasize",
-                # sections 11 and 12 of the preregistration, Nov 21 and 22. Attack set only
+                # sections 11 and 13 of the preregistration, Nov 21 and 22. Attack set only
                 "aya-plain-s1", "aya-safegrad-s1", "aya-plain-s2", "aya-safegrad-s2", "earth-plain-s1", "earth-safegrad-s1",
                 "earth-plain-s2", "earth-safegrad-s2", "plain-only-en", "plain-only-ko", "plain-only-zh",
                 "aya-plain-s1-vec", "aya-plain-s2-vec", "aya-plain-vec"]

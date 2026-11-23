@@ -59,7 +59,7 @@ Nothing goes to the public outputs repository from a job. Results are copied the
   the weights do not have the hash of the file the laptop evaluated.
 - **AlignTune (12.3) is not scripted.** It needs its own entry point once someone has checked that AlignTune can
   fine-tune Tiny Aya Global.
-- **The laptop already has the single-language runs** (`plain-only-en`, `plain-only-ko`, `plain-only-zh`; section 12a on
+- **The laptop already has the single-language runs** (`plain-only-en`, `plain-only-ko`, `plain-only-zh`; section 13a on
   `mingyu/stage2`). Section 12.1 is no longer blind and should say so before `only-ko` is launched.
 
 This script has been checked with `--dry-run` and unit tests only. No job has been submitted with it yet: the account
