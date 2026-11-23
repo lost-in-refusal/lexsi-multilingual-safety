@@ -1364,7 +1364,8 @@ class Rebuild(unittest.TestCase):
         self.assertEqual(len(tables), len(set(tables)))   # no table is written by two commands
         self.assertFalse(set(tables) & set(left))
         self.assertLessEqual(set(images), set(left))      # an image is drawn again but never counted
-        self.assertLessEqual({c.get("needs") for c in COMMANDS}, {None, "records"})
+        self.assertEqual({c.get("needs") for c in COMMANDS}, {None, "auditkit", "records"})
+        self.assertEqual({c["args"][0] for c in COMMANDS if c.get("needs") == "auditkit"}, {"lir.metrics"})
         r = subprocess.run(["git", "ls-files", S2.as_posix()], cwd=ROOT, capture_output=True, text=True)
         if r.returncode == 0 and r.stdout.strip():   # in a checkout: every committed file is rebuilt or named with a reason
             tracked = {Path(l).relative_to(S2).as_posix() for l in r.stdout.splitlines()} - {"README.md"}

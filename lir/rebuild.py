@@ -9,8 +9,9 @@ were made in, and the other two commands only work in a folder that `fetch` made
 
 `tables` deletes each table before the command that writes it runs, so a command that writes nothing cannot pass.
 A table counts as rebuilt only if it comes back byte for byte the same as the committed file. The report commands
-run with the Hub switched off. They need no model, no GPU and, apart from the figures (matplotlib), no package
-outside the standard library.
+run with the Hub switched off and need no model and no GPU. Most need nothing outside the standard library; the
+figures need matplotlib, and the five tables written by `lir.metrics` need AuditKIT, which has no dependencies of
+its own (the README gives the commit). A command whose package or input is missing is skipped and named.
 
 `records` reads the seed 42 records from the two public stage 1 adapter repositories and the others from the stage 2
 adapter repository, which is private until the paper is submitted. Without access to it, the reports that check a
@@ -39,22 +40,23 @@ RECORD_FILES = ("run.json", "train_log.jsonl", "surgery_log.jsonl")
 MARK = "rebuild.json"                       # written by fetch into runs/; says where the files came from
 S2 = Path("results") / "lir" / "stage2"
 
-# What each report command writes under results/lir/stage2, and what it reads beyond the public outputs:
-# nothing (None) or the training records ("records"). Images are written by the command but not compared.
+# What each report command writes under results/lir/stage2, and what it needs beyond the public outputs and the
+# standard library: nothing, AuditKIT ("auditkit") or the training records ("records"). Images are written by the
+# command but not compared.
 COMMANDS = [
     {"args": ["lir.seeds"], "tables": ["seeds.json", "seeds.md"]},
     {"args": ["lir.seeds", "--figure"], "tables": ["drift_by_language.json", "korean_by_setting.json"],
      "images": ["drift_by_language.png", "korean_by_setting.png"]},
     {"args": ["lir.metrics", "--arms", "base", "plain", "safegrad", "plain-s1", "safegrad-s1", "plain-s2", "safegrad-s2",
-              "plain-mix1", "plain-mix5", "--out", str(S2)], "tables": ["results.json", "results.md"]},
+              "plain-mix1", "plain-mix5", "--out", str(S2)], "tables": ["results.json", "results.md"], "needs": "auditkit"},
     {"args": ["lir.metrics", "--arms", "safegrad", "plain-mix1", "plain-mix5", "--ref", "safegrad", "--out", str(S2 / "mixing")],
-     "tables": ["mixing/results.json", "mixing/results.md"]},
+     "tables": ["mixing/results.json", "mixing/results.md"], "needs": "auditkit"},
     {"args": ["lir.metrics", "--arms", "earth-base", "earth-plain", "earth-safegrad", "--ref", "earth-base", "--out", str(S2 / "earth")],
-     "tables": ["earth/results.json", "earth/results.md"]},
+     "tables": ["earth/results.json", "earth/results.md"], "needs": "auditkit"},
     {"args": ["lir.metrics", "--arms", "base", "aya-plain", "aya-safegrad", "--out", str(S2 / "aya")],
-     "tables": ["aya/results.json", "aya/results.md"]},
+     "tables": ["aya/results.json", "aya/results.md"], "needs": "auditkit"},
     {"args": ["lir.metrics", "--arms", "base", "plain-s1", "safegrad-s1", "plain-s1-vec", "plain-s2", "safegrad-s2", "plain-s2-vec",
-              "--out", str(S2 / "vector")], "tables": ["vector/results.json", "vector/results.md"]},
+              "--out", str(S2 / "vector")], "tables": ["vector/results.json", "vector/results.md"], "needs": "auditkit"},
     {"args": ["lir.earth"], "tables": ["earth/checks.json", "earth/checks.md"]},
     {"args": ["lir.vector", "report"], "tables": ["vector.json", "vector.md"]},
     {"args": ["lir.harm"], "tables": ["harm_categories.json", "harm_categories.md"]},
@@ -213,11 +215,14 @@ def run_command(cmd: dict) -> dict:
 
 
 def tables() -> int:
+    import importlib.util
+
     m = mark()
     have = bool(m.get("records") and m["records"].get("stage2"))
+    here = {None: True, "records": have, "auditkit": importlib.util.find_spec("auditkit") is not None}
     done, skipped = [], []
     for cmd in COMMANDS:
-        if cmd.get("needs") == "records" and not have:
+        if not here[cmd.get("needs")]:
             skipped.append(cmd)
             continue
         res = run_command(cmd)
@@ -232,10 +237,13 @@ def tables() -> int:
     print(f"\n{counts.get('identical', 0)} tables from {len(done)} commands came out identical to the committed files"
           + (f"; {sum(v for k, v in counts.items() if k != 'identical')} did not" if bad else "") + ".")
     print(f"Outputs: {m['outputs']} at {m['outputs_revision'][:12]}." + (f" Training records: {ADAPTERS} at {m['records']['stage2_revision'][:12]}." if have else ""))
-    if skipped:
-        print("\nSkipped, because the training records of the stage 2 runs are not here (`python -m lir.rebuild records`):")
-        for cmd in skipped:
-            print(f"  python -m {' '.join(cmd['args'])}: {', '.join(cmd['tables'])}")
+    for need, why in (("auditkit", "AuditKIT is not installed (the README gives the commit; it has no dependencies)"),
+                      ("records", "the training records of the stage 2 runs are not here (`python -m lir.rebuild records`)")):
+        if any(cmd.get("needs") == need for cmd in skipped):
+            print(f"\nSkipped, because {why}:")
+            for cmd in skipped:
+                if cmd.get("needs") == need:
+                    print(f"  python -m {' '.join(cmd['args'])}: {', '.join(cmd['tables'])}")
     print("\nNot rebuilt by this command:")
     for names, why in NOT_REBUILT:
         print(f"  {', '.join(names)}: {why}.")
