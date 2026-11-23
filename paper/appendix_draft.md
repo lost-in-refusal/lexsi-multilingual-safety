@@ -10,7 +10,14 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
 - **Code:** `github.com/lost-in-refusal/lexsi-multilingual-safety`, branch `mingyu/stage2` (merged into `main` before
   submission). Every table in `results/lir/stage2/` is written by a command named at the top of its module
   (`python -m lir.seeds`, `lir.repeat`, `lir.section13`, `lir.loose`, `lir.direction`, `lir.trunc`, `lir.gpu`).
-- **Tests:** `python -m unittest tests.test_lir` (76 tests; each registered rule has a test on made-up data).
+- **Tests:** `python -m unittest tests.test_lir` (80 tests; each registered rule has a test on made-up data).
+- **Rebuild:** `python -m lir.rebuild fetch` and `python -m lir.rebuild tables`, in a fresh clone, download the public outputs
+  at a pinned revision and run each report again, with no GPU, no model and no login. Tested on Nov 23 in a clean
+  copy of the repository and a new environment: 26 tables came out byte for byte the same as the committed files
+  with only `huggingface_hub` and `matplotlib` installed, 36 with AuditKIT as well, and 50 (from 25 commands) with
+  the training records, which are public once the adapter repository is. Changing one verdict in the downloaded
+  files changed 34 of the 50. Not rebuilt: the tables that need adapter weights, the activation files or the
+  held-out Aya answers, and the images. The README lists them.
 - **Outputs:** every generation and guard verdict is in `lost-in-refusal/lost-in-refusal-eval-outputs` (public), one
   folder per run, with the re-generated answers under `truncation-regenerated/` and the answers, verdicts, job
   records and logs of the GPU jobs under `gpu/`. One exception: the answers to the held-out Aya prompts quote Aya

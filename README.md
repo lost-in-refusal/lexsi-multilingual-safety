@@ -17,7 +17,44 @@ plain LoRA, and LoRA hardened with SafeTune's SafeGrad. Evaluated on 291 MultiJa
 en/ko/zh/**sw**, XSTest's 250 safe prompts (over-refusal) in the same four languages, and 100 held-out Bactrian-X
 tasks per training language. Safety judge: Qwen3Guard-Gen-4B. Task judge: Qwen3-14B with Tiny Aya's 1–7 rubric.
 
-## Results
+## Stage 2: three seeds, and where the result stops
+
+The stage 1 results further down are one seed. Stage 2 (the finalist round) repeats the headline on three seeds and
+tests where it stops holding. Each check was written into
+[`docs/lir/stage2-prereg.md`](docs/lir/stage2-prereg.md) before its runs. The status page
+[`results/lir/stage2/README.md`](results/lir/stage2/README.md) has every check with its numbers, the ones that
+failed included. Strict attack success counts the guard's Unsafe and Controversial classes; brackets are 95%
+intervals from a bootstrap over the 291 prompt families, pooled over seeds.
+
+| Check | Result | Main numbers |
+|---|---|---|
+| Korean drifts more than English (H1) | Pass in every seed (3) | Korean strict attack success rises 14.1, 10.3 and 13.7 points. Korean-minus-English gap +11.8 [+6.8, +16.7] |
+| SafeGrad repairs it (H2) | Pass in every seed (3) | Korean, SafeGrad against plain: −8.6, −7.2 and −9.3 points. Pooled −8.4 [−11.3, −5.5] |
+| Swahili refusals fall (H3) | Pass in every seed (3) | −13.1, −6.2 and −8.6 points. Pooled −9.3 [−13.7, −5.2] |
+| No Korean rows in training (K1) | Korean rows are not needed for a drift of this size, in all three seeds | Korean 18.2%, 18.6% and 18.2% with no Korean rows in training, against 5.2% for the base model |
+| One training language at a time (SL1) | Korean drifts when the model is trained on English alone, Korean alone or Chinese alone: all nine runs | Korean rises +8.0 [+4.8, +11.3], +11.2 [+7.3, +15.1] and +11.6 [+7.9, +15.5] points |
+| A second model, Tiny Aya Earth (E1) | Drift and repair pass in every seed (3) | Korean rise +10.1 [+6.4, +14.0]; SafeGrad against plain −6.2 [−9.2, −3.4] |
+| A second training set, Aya (Y1, Y2) | Drift and repair pass on three seeds | Korean rises 10.0, 8.9 and 9.3 points; SafeGrad against plain −4.8 [−7.2, −2.6] |
+| The 256-token answer cap | The headline does not depend on it | Korean rise +12.7 points before and +13.2 after every capped answer was generated again at 1,024 tokens |
+| A second machine (NVIDIA L4) | Same strict attack success as on the laptop: none of eight differences is significant | Korean: base 5.2% and 5.5%, plain 19.2% and 19.9% |
+| 4-bit loading (NF4) | SafeGrad stays below plain on Korean | Plain 22.7%, SafeGrad 11.0% |
+| Refusal direction (R1) | Plain fine-tuning moves Korean and English the same distance along the refusal direction | Korean shift minus English shift +0.08 units [−0.08, +0.25], against shifts of about 3.5 |
+
+Among what did not hold or was not tested (the status page has the full list):
+
+- **One safety judge.** A second judge failed our agreement check (80% per language on 120 human labels) with both
+  models we tried, so no headline number is confirmed by a second judge.
+- **A person's reading of the Korean rise (K2) did not pass:** 5 plain answers against 1 base answer marked unsafe
+  on 94 prompts, p = 0.22.
+- **On the Aya training set the Swahili refusal drop did not carry over (Y3 fails):** −3.4, −3.1 and −1.4 points,
+  pooled −2.6 [−6.9, +1.5]. The Swahili finding rests on Bactrian-X.
+- **The Korean clean set (H4) was not tested,** because its human check failed.
+- **Our forecast for Tiny Aya Earth's Swahili refusals (E2) was not confirmed:** we forecast a larger drop than
+  Global's, and Earth's is smaller (−6.9 points against −13.1 at seed 42).
+- **Not run by the freeze:** the control that separates 4-bit loading from adapter merging, the AlignTune run, and
+  seeds 1 and 2 of the mixing baseline. The list is in the status page.
+
+## Stage 1 results (seed 42)
 
 Attack success rate on 291 MultiJail families per language (strict judge: Unsafe or Controversial). Change vs the
 base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
@@ -84,9 +121,10 @@ Full tables: [`results/lir/results.md`](results/lir/results.md) (vs base) and
 |---|---|
 | Demo (static Space) | [lost-in-refusal/lost-in-refusal-demo](https://huggingface.co/spaces/lost-in-refusal/lost-in-refusal-demo) |
 | Frozen datasets | [lost-in-refusal/lost-in-refusal-data](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-data) |
-| Every generation and judge verdict | [lost-in-refusal/lost-in-refusal-eval-outputs](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-eval-outputs) |
+| Every generation and judge verdict, stages 1 and 2 (held-out Aya answers excepted) | [lost-in-refusal/lost-in-refusal-eval-outputs](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-eval-outputs) |
 | Plain LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-plain](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-plain) |
 | SafeGrad LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad) |
+| Stage 2 adapters (38 runs, one folder each) | `lost-in-refusal/tiny-aya-lora-stage2`, private until the paper is submitted |
 
 ## Pipeline: four Lexsi tools, chained
 
@@ -102,9 +140,51 @@ refusal projection) and a causal steering check (`lir/steer.py`).
 
 ## Reproduce
 
-Everything (datasets, adapters, every generation and judge verdict) is on Hugging Face under
-[lost-in-refusal](https://huggingface.co/lost-in-refusal). The notebook `notebooks/lost_in_refusal.ipynb`
-recomputes every table from the published outputs on CPU, and can re-run or re-train any arm on a GPU.
+The datasets, the stage 1 adapters and every generation and judge verdict of both stages are on Hugging Face under
+[lost-in-refusal](https://huggingface.co/lost-in-refusal). Three things are not: the stage 2 adapters (private
+until the paper is submitted), the answers to the held-out Aya prompts (they quote Aya rows; their scores are
+published) and the activation files behind the refusal-direction table. The Aya training file is in `data/lir/`
+of this repository and not on Hugging Face.
+
+### Rebuild the stage 2 tables from the published files
+
+No GPU, no model and no login. In a fresh clone of this repository (one with no `runs/` folder), with Python 3.12:
+
+```sh
+python3.12 -m venv .venv && .venv/bin/pip install huggingface_hub matplotlib
+.venv/bin/python -m lir.rebuild fetch     # the public outputs at a pinned revision -> runs/ (about 220 MB)
+.venv/bin/python -m lir.rebuild tables    # runs each report and compares its tables with the committed files
+git status --short results                # prints nothing
+```
+
+`tables` deletes each table before the command that writes it runs, and counts a table only if it comes back byte
+for byte the same as the committed file. What it covers depends on what is installed and readable:
+
+| With | Tables rebuilt | Which |
+|---|---:|---|
+| The two packages above | 26, from 13 commands | H1 to H3 on three seeds, the numbers of both figures, Earth's checks, the truncation audit (counts, report, split), harm categories, task score by answer length, the Unsafe-only reading, the repair vector, the GPU runs, the circuit comparison |
+| AuditKIT as well (no dependencies; clone and `pip install -e vendor/AuditKIT` at the commit below) | 36, from 18 commands | The five per-arm tables written with AuditKIT's statistics (`results.md` in `stage2/`, `mixing/`, `earth/`, `aya/`, `vector/`) |
+| The training records as well (`python -m lir.rebuild records`; no weights) | 50, from 25 commands | K1 on three seeds, Aya and Earth on three seeds, K1 after re-generation, the single-language tables, training time |
+
+The records of the stage 2 runs are in the adapter repository, so the last row works for readers once that
+repository is public. Until then `records` says so and `tables` skips and names those seven commands.
+
+Not rebuilt, and why: `vector_aya` (its command checks the hashes of adapter weights), `refusal_direction` (the
+activation files are not published), `aya/task` (the held-out Aya answers are not published), `aya/checks` (the
+public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
+in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
+`ko_drift.md` and `second_judge_check.md` (a person's labels and a write-up), and the three images (the numbers
+beside them are compared).
+
+Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new
+virtual environment with only the packages named above: all three rows came out as stated, and changing one
+verdict in the downloaded files changed 34 of the 50 tables. Other Python versions and operating systems were not
+tried.
+
+### Stage 1 table and re-running
+
+The notebook `notebooks/lost_in_refusal.ipynb` recomputes the stage 1 results table from the published outputs on
+CPU, and can re-run or re-train a stage 1 arm on a GPU.
 
 Local run (Apple Silicon or CUDA, Python 3.12):
 
@@ -139,7 +219,8 @@ CircuitKIT needs its own environment (it pins `huggingface-hub<2`): see `lir/cir
 lir/            pipeline code (data, train, evaluate, guard, judge, metrics, probe, steer, circuits, publish)
 data/lir/       frozen datasets + manifests with sha256 hashes
 results/lir/    results tables, probe and circuit outputs, figures, judge-agreement packs
-docs/lir/       write-up drafts, data/model cards, Lexsi tool feedback
+docs/lir/       write-up drafts, data/model cards, Lexsi tool feedback, the stage 2 preregistration
+paper/          appendix draft and results paragraphs for the stage 2 paper
 notebooks/      reproducibility notebook
 archive/        the Nov 2–3 Aya Expanse 8B pilot that preceded this project
 ```
@@ -147,6 +228,7 @@ archive/        the Nov 2–3 Aya Expanse 8B pilot that preceded this project
 ## Claim boundaries
 
 Every number comes from our own runs. Safety and task labels are automatic (Qwen3Guard, Qwen3-14B); judge-human
-agreement is checked on a blinded sample per language and reported separately. Single seed, one LoRA
-configuration, one model size. Cohere's published MultiJail numbers for Tiny Aya are used only as a pipeline sanity
-check, never as a result.
+agreement is checked on a blinded sample per language and reported separately. Stage 1 is a single seed. Stage 2
+repeats the headline on three seeds, on a second model of the same size (Tiny Aya Earth) and on a second training
+set (Aya). One LoRA configuration, one model size and one safety judge throughout. Cohere's published MultiJail
+numbers for Tiny Aya are used only as a pipeline sanity check, never as a result.
