@@ -12,8 +12,11 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
   (`python -m lir.seeds`, `lir.repeat`, `lir.section13`, `lir.loose`, `lir.direction`, `lir.trunc`, `lir.gpu`).
 - **Tests:** `python -m unittest tests.test_lir` (76 tests; each registered rule has a test on made-up data).
 - **Outputs:** every generation and guard verdict is in `lost-in-refusal/lost-in-refusal-eval-outputs` (public), one
-  folder per run, with the re-generated answers under `truncation-regenerated/`. Adapters: the two stage 1
-  repositories (seed 42) and `lost-in-refusal/tiny-aya-lora-stage2` (30 folders; public at submission).
+  folder per run, with the re-generated answers under `truncation-regenerated/` and the answers, verdicts, job
+  records and logs of the GPU jobs under `gpu/`. One exception: the answers to the held-out Aya prompts quote Aya
+  rows, so only their scores are there. Adapters: the two stage 1 repositories (seed 42) and
+  `lost-in-refusal/tiny-aya-lora-stage2` (38 folders; public at submission). The three adapters trained on the GPU
+  are in a private staging dataset.
 - **Hardware:** one Apple M5 Pro laptop, 48 GB, macOS 26.5, PyTorch 2.15.0 on MPS, bfloat16. No cloud GPU was used
   for any number in the paper unless a result says "GPU" (section 12.0 to 12.3 of the preregistration). The GPU runs
   used one NVIDIA L4 (23 GB, driver 620.70.06, CUDA 13.2) on Hugging Face Jobs, with PyTorch 2.15.0, transformers
