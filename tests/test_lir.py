@@ -1321,6 +1321,112 @@ class RepairVector(unittest.TestCase):
         self.assertTrue(torch.allclose(prod(out), prod(base) + prod(plus) - prod(minus), atol=1e-5))
 
 
+class Rebuild(unittest.TestCase):
+    def test_layout_of_the_public_outputs(self):
+        from lir.rebuild import layout
+
+        files = ["README.md", "base/attack.gen.jsonl", "base/attack.guard.jsonl", "plain-s1/attack.gen.jsonl",
+                 "plain+steer-en-L17-c1/steer.json", "plain+steer-en-L17-c1/attack.gen.jsonl",
+                 "truncation-regenerated/base/attack.gen.jsonl", "truncation-regenerated/base/attack.guard.jsonl",
+                 "gpu/control/20261122-205736-330ebba/job.json", "gpu/control/20261122-205736-330ebba/gpu-base/attack.gen.jsonl",
+                 "gpu/staging_revision.txt", "judge-check-backtranslations/base.sw.nllb.bt.jsonl",
+                 "stage2/seeds.md", "circuits/base_en.json", "steering/results.json"]
+        with tempfile.TemporaryDirectory() as tmp:
+            hub, runs = Path(tmp) / "hub", Path(tmp) / "runs"
+            for f in files:
+                (hub / f).parent.mkdir(parents=True, exist_ok=True)
+                (hub / f).write_text(f)
+            n = layout(hub, runs)
+            got = sorted(p.relative_to(runs).as_posix() for p in runs.rglob("*") if p.is_file())
+            self.assertEqual(got, sorted([
+                "eval/base/attack.gen.jsonl", "eval/base/attack.guard.jsonl", "eval/plain-s1/attack.gen.jsonl",
+                "eval/plain+steer-en-L17-c1/steer.json", "eval/plain+steer-en-L17-c1/attack.gen.jsonl",
+                "trunc/base/attack.gen.jsonl", "trunc/base/attack.guard.jsonl",
+                "gpu/control/20261122-205736-330ebba/job.json", "gpu/control/20261122-205736-330ebba/gpu-base/attack.gen.jsonl",
+                "gpu/revision.txt",   # the name `python -m lir.gpu` reads
+                "swcheck/base.sw.nllb.bt.jsonl"]))   # tables, circuit files and write-ups are not laid out
+            self.assertEqual(n, {"eval": 5, "trunc": 2, "gpu": 3, "swcheck": 1})
+            self.assertEqual((runs / "gpu" / "revision.txt").read_text(), "gpu/staging_revision.txt")
+            bare = Path(tmp) / "bare"   # a download with arm folders only
+            (bare / "base").mkdir(parents=True)
+            (bare / "base" / "attack.gen.jsonl").write_text("x")
+            self.assertEqual(layout(bare, Path(tmp) / "runs2"), {"eval": 1, "trunc": 0, "gpu": 0, "swcheck": 0})
+
+    def test_every_table_is_classified(self):
+        import subprocess
+
+        from lir.common import ROOT
+        from lir.rebuild import COMMANDS, NOT_REBUILT, S2
+
+        tables = [t for c in COMMANDS for t in c["tables"]]
+        images = [t for c in COMMANDS for t in c.get("images", [])]
+        left = [t for names, _ in NOT_REBUILT for t in names]
+        self.assertEqual(len(tables), len(set(tables)))   # no table is written by two commands
+        self.assertFalse(set(tables) & set(left))
+        self.assertLessEqual(set(images), set(left))      # an image is drawn again but never counted
+        self.assertLessEqual({c.get("needs") for c in COMMANDS}, {None, "records"})
+        r = subprocess.run(["git", "ls-files", S2.as_posix()], cwd=ROOT, capture_output=True, text=True)
+        if r.returncode == 0 and r.stdout.strip():   # in a checkout: every committed file is rebuilt or named with a reason
+            tracked = {Path(l).relative_to(S2).as_posix() for l in r.stdout.splitlines()} - {"README.md"}
+            self.assertEqual(tracked, set(tables) | set(left))
+
+    def test_a_command_that_writes_nothing_does_not_pass(self):
+        import subprocess
+        import sys
+        from unittest import mock
+
+        from lir import rebuild
+
+        self.assertEqual([rebuild.verdict(b"a", b"a"), rebuild.verdict(b"a", b"b"), rebuild.verdict(b"a", None), rebuild.verdict(None, b"a")],
+                         ["identical", "differs", "not written", "not a committed file"])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            out = root / rebuild.S2
+            out.mkdir(parents=True)
+            for name in ("same.md", "changed.md", "silent.md", "picture.png"):
+                (out / name).write_text(f"committed {name}\n")
+            # three stand-in report commands: one rewrites its table as committed, one changes it, one writes nothing
+            (root / "writes_same.py").write_text(f"from pathlib import Path\nPath({str(out / 'same.md')!r}).write_text('committed same.md\\n')\n"
+                                                 f"Path({str(out / 'picture.png')!r}).write_text('drawn again')\n")
+            (root / "writes_other.py").write_text(f"from pathlib import Path\nPath({str(out / 'changed.md')!r}).write_text('another number\\n')\n")
+            (root / "writes_nothing.py").write_text("print('pending: not every arm is judged')\n")
+            git = lambda *a: subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@example.org", *a], cwd=root, check=True, capture_output=True)
+            git("init", "-q")
+            git("add", "-A")
+            git("commit", "-q", "-m", "tables")
+            with mock.patch.object(rebuild, "ROOT", root):
+                same = rebuild.run_command({"args": ["writes_same"], "tables": ["same.md"], "images": ["picture.png"]})
+                other = rebuild.run_command({"args": ["writes_other"], "tables": ["changed.md"]})
+                silent = rebuild.run_command({"args": ["writes_nothing"], "tables": ["silent.md"]})
+                missing = rebuild.run_command({"args": ["no_such_module"], "tables": ["silent.md"]})
+            self.assertEqual((same["rc"], same["tables"]), (0, {"same.md": "identical"}))
+            self.assertEqual((out / "picture.png").read_text(), "committed picture.png\n")   # the image is put back, not compared
+            self.assertEqual(other["tables"], {"changed.md": "differs"})
+            self.assertEqual((out / "changed.md").read_text(), "another number\n")            # left in place for `git diff`
+            self.assertEqual((silent["rc"], silent["tables"]), (0, {"silent.md": "not written"}))   # exit code 0 and still not a pass
+            self.assertIn("pending", silent["last_line"])
+            self.assertEqual((out / "silent.md").read_text(), "committed silent.md\n")        # restored from the commit
+            self.assertNotEqual(missing["rc"], 0)
+            self.assertEqual(missing["tables"], {"silent.md": "not written"})
+
+    def test_only_a_folder_made_by_fetch_is_used(self):
+        from unittest import mock
+
+        from lir import rebuild
+
+        with tempfile.TemporaryDirectory() as tmp:
+            runs = Path(tmp) / "runs"
+            (runs / "eval").mkdir(parents=True)
+            with mock.patch.object(rebuild, "RUNS", runs):
+                with self.assertRaises(SystemExit) as stop:
+                    rebuild.fetch("main")   # a folder of real runs is never written over; nothing is downloaded
+                self.assertIn("exists", str(stop.exception))
+                for step in (rebuild.tables, rebuild.records):
+                    with self.assertRaises(SystemExit) as stop:
+                        step()                  # and the tables are never rebuilt from a folder fetch did not make
+                    self.assertIn("fetch", str(stop.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
 

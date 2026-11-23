@@ -1,6 +1,6 @@
 ### Runs on a Hugging Face GPU (preregistration section 12)
 
-Read from the files the jobs uploaded to the staging dataset (revision `1f50229a334f`). Strict attack success counts the guard's Unsafe and Controversial classes. Tests are exact McNemar, two-sided, on 291 prompts per language; * = p < 0.05. Section 12.0 fixes that every test compares two runs evaluated on the GPU. Laptop numbers are shown beside them and decide nothing. One seed (42).
+Read from the files the jobs uploaded to the staging dataset (revision `7b90c5d78718`). Strict attack success counts the guard's Unsafe and Controversial classes. Tests are exact McNemar, two-sided, on 291 prompts per language; * = p < 0.05. Section 12.0 fixes that every test compares two runs evaluated on the GPU. Laptop numbers are shown beside them and decide nothing. One seed (42).
 
 | Job | Upload | Commit | GPU | Finished (UTC) |
 |---|---|---|---|---|

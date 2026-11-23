@@ -47,6 +47,18 @@
       "minutes": 82.19166666666666,
       "optimizer_steps": 192,
       "train_rows": 2035
+    },
+    "earth-plain": {
+      "seed": 42,
+      "minutes": 74.40666666666667,
+      "optimizer_steps": 171,
+      "train_rows": 1800
+    },
+    "earth-safegrad": {
+      "seed": 42,
+      "minutes": 88.32333333333332,
+      "optimizer_steps": 171,
+      "train_rows": 1800
     }
   },
   "safegrad_minus_plain": {
