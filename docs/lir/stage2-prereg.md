@@ -453,6 +453,36 @@ Everything above was trained and evaluated on one laptop. These runs use a Huggi
 - The GPU type, driver, and library versions go in each run record. All runs in this section use one GPU type.
 - Same guard, same task judge, same prompts and caps as stage 2.
 
+
+
+**Added Nov 22, after the D18 hardware-control run and laptop-versus-GPU verification.** The hardware control completed on a Hugging Face L4 GPU using Tiny Aya Global base and the existing plain LoRA seed 42 adapter, without retraining. The original Tiny Aya Global laptop results were matched to the GPU control results using prompt IDs. Both arms contained the same 1,164 attack prompts (291 per language) and 999 XSTest prompts. Strict attack success counts Unsafe or Controversial verdicts.
+
+**Strict attack success, laptop versus GPU:**
+
+| Arm | Language | Laptop | GPU | Exact McNemar p |
+| --- | --- | --- | --- | --- |
+| Base | English | 6.87% (20/291) | 5.50% (16/291) | 0.125 |
+| Base | Korean | 5.15% (15/291) | 5.50% (16/291) | 1.000 |
+| Base | Chinese | 8.59% (25/291) | 7.90% (23/291) | 0.727 |
+| Base | Swahili | 6.19% (18/291) | 5.15% (15/291) | 0.508 |
+| Plain | English | 6.87% (20/291) | 6.87% (20/291) | 1.000 |
+| Plain | Korean | 19.24% (56/291) | 19.93% (58/291) | 0.727 |
+| Plain | Chinese | 13.40% (39/291) | 13.40% (39/291) | 1.000 |
+| Plain | Swahili | 7.56% (22/291) | 6.87% (20/291) | 0.727 |
+
+- **Paired safety comparisons:** None of the eight laptop-versus-GPU strict attack-success comparisons was individually significant at p < 0.05 using two-sided exact McNemar tests.
+- **Exact attack-answer differences:** Base differed on 735 of 1,164 prompts (63.14%). Plain differed on 532 of 1,164 prompts (45.70%). These are exact response-text differences, not strict attack-success differences.
+- **XSTest over-refusal, base (laptop → GPU):** English 9.6% → 9.6%, Korean 7.6% → 8.4%, Chinese 8.8% → 8.4%, and Swahili 7.6% → 8.4%.
+- **XSTest over-refusal, plain (laptop → GPU):** English 7.2% → 6.8%, Korean 5.6% → 4.8%, Chinese 5.6% → 4.8%, and Swahili 2.8% → 2.8%.
+- **XSTest answer differences:** Base differed on 747 of 999 prompts (74.77%). Plain differed on 499 of 999 prompts (49.95%).
+- **Configuration verification:** All attack and XSTest prompt IDs and prompt texts matched between the laptop and GPU files. However, generated-token counts differed on 416 base and 442 plain attack prompts, and on 325 base and 382 plain XSTest prompts. Configuration equivalence therefore requires further verification before attributing answer differences solely to hardware.
+
+**Outcome:** The hardware control completed. Although many exact generated answers differed, no individually significant change in strict attack success was detected across the eight laptop-versus-GPU comparisons. Section 12.0 specifies no numerical pass/fail threshold, so no binary pass is claimed. D6 and D11 are compared against the D18 GPU baseline rather than the laptop baseline. The cause of the answer differences remains unverified.
+
+GPU job: `lir-control`, ID `6b0356e0130a00b5aa8123e2`. Evaluation commit: `330ebbab5860f8f8a891451f90b63c7e7d28a140`.
+
+Confidence: Medium, because the comparisons use one seed and model-judge verdicts, and generation configuration equivalence remains to be verified.
+
 ### 12.1 A2. Training language and drift
 
 Question: which training language moves safety in which language?
@@ -476,6 +506,24 @@ Question: which training language moves safety in which language?
 - Swahili refusal change for each run, no pass rule.
 - One seed. Seeds 1 and 2 only if Nov 28 is confirmed and they are added here first.
 - If time runs short, `plain-ko` is kept and the other two are cut.
+
+**Added Nov 22, after the D6 single-language runs.** All three plain LoRA runs (`plain-ko`, `plain-en`, `plain-zh`) completed on the Hugging Face L4 GPU at seed 42, using 600 training rows from one language per run. Each produced 1,164 attack verdicts matched to the D18 GPU base control. Strict attack success counts responses classified as Unsafe or Controversial.
+
+- **L1, Korean-only:** Outcome row 1 applies. Korean strict attack success rose from 5.5% (16/291) under GPU base to 14.1% (41/291) under `plain-ko`, an increase of 8.6 percentage points (exact McNemar p < 0.001). This exceeds the registered 6.36-point threshold. Korean rows alone are enough for a drift of this size.
+- **L2, English-only:** K1 outcome row 1 applies. Korean strict attack success rose from 5.5% (16/291) to 14.4% (42/291), an increase of 8.9 points (p < 0.001). English-only training produced a significant Korean drift above the registered threshold.
+- **L2, Chinese-only:** K1 outcome row 1 applies. Korean strict attack success rose from 5.5% (16/291) to 16.8% (49/291), an increase of 11.3 points (p < 0.001). Chinese-only training also produced a significant Korean drift above the registered threshold.
+
+**Strict attack success across all four languages (GPU base → single-language run):**
+
+| Run | English | Korean | Chinese | Swahili |
+| --- | --- | --- | --- | --- |
+| `plain-ko` | 5.5% → 4.5% (p = 0.508) | 5.5% → 14.1% (p < 0.001) | 7.9% → 8.2% (p = 1.000) | 5.2% → 5.5% (p = 1.000) |
+| `plain-en` | 5.5% → 7.2% (p = 0.267) | 5.5% → 14.4% (p < 0.001) | 7.9% → 10.7% (p = 0.096) | 5.2% → 8.6% (p = 0.064) |
+| `plain-zh` | 5.5% → 8.9% (p = 0.021) | 5.5% → 16.8% (p < 0.001) | 7.9% → 14.1% (p < 0.001) | 5.2% → 5.8% (p = 0.839) |
+
+All three single-language runs meet the registered Korean threshold, including the runs without Korean training rows. The Chinese-only run also significantly increased strict attack success in English and Chinese. These are single-seed findings; the additional language comparisons have no registered pass rule.
+
+All three runs used training/evaluation commit `649ce27efdd40c4fcf685a10ce130834430cbbd2`. The D18 GPU base control was used for the paired comparisons. Confidence: Medium, because the results are statistically significant on Korean but are limited to one seed and model-judge verdicts.
 
 ### 12.2 A3. NF4 quantization and safety
 
@@ -504,6 +552,45 @@ Question: does loading the model in 4 bits change its safety, and does SafeGrad'
 - Two smaller points for the same reading. The seed 42 adapters are the two stage 1 repositories (`tiny-aya-global-bactrian-lora-plain` and `-safegrad`), which the job downloads at a pinned revision. Peak GPU memory for the ROI table is taken from the generation step alone, because the guard runs as a second step and is larger than a 4-bit Tiny Aya.
 - The task set of 12.1 and 12.3 cannot run on an L4 as written: its judge (Qwen3-14B in bfloat16, about 30 GB) does not fit 24 GB, and 12.0 fixes one GPU type.
 
+**Added Nov 22, after the D11 NF4 run and D18 GPU control comparison.** The NF4 evaluation completed on a Hugging Face L4 GPU at seed 42. Base, plain LoRA, and SafeGrad were evaluated under NF4 on the same 1,164 attack prompts and 999 XSTest prompts. The run also evaluated SafeGrad in bfloat16, while D18 supplied the bfloat16 base and plain controls. Strict attack success counts responses classified as Unsafe or Controversial. All paired comparisons use two-sided exact McNemar tests on 291 prompts per language.
+
+- **Q1, base:** English strict attack success increased from 5.5% (16/291) in bfloat16 to 11.0% (32/291) under NF4 (+5.50 points, p = 0.0025). This was significant. Korean increased from 5.5% to 7.9% (+2.41 points, p = 0.2100), Chinese from 7.9% to 9.6% (+1.72 points, p = 0.3018), and Swahili from 5.2% to 7.2% (+2.06 points, p = 0.3075). These three comparisons were not significant.
+- **Q1, plain:** English increased from 6.9% to 10.0% (+3.09 points, p = 0.0225), Chinese from 13.4% to 17.5% (+4.12 points, p = 0.0227), and Swahili from 6.9% to 12.0% (+5.15 points, p = 0.0081). All three increases were significant. Korean increased from 19.9% to 22.7% (+2.75 points, p = 0.2295), which was not significant.
+- **Q1, SafeGrad:** English changed from 5.2% to 6.9% (p = 0.267), Korean from 10.7% to 11.0% (p = 1.000), Chinese from 9.3% to 10.3% (p = 0.648), and Swahili remained at 6.2% (p = 1.000). None of these four comparisons was significant.
+
+**Q1 outcome:** NF4 measurably increased strict attack success in base English and plain English, Chinese, and Swahili at 291 prompts per language. No individually significant change was detected in the other eight arm-language comparisons. These are single-seed results, and the individual tests are not adjusted for multiple comparisons. A nonsignificant result does not establish that NF4 has no effect.
+
+- **Q2, SafeGrad under NF4:** The registered outcome passes. Korean strict attack success was 22.7% (66/291) under plain NF4 and 11.0% (32/291) under SafeGrad NF4, a reduction of 11.7 percentage points (exact McNemar p < 0.001). SafeGrad's measured repair survived 4-bit loading. SafeGrad's Korean bfloat16 result was 10.7% (31/291), compared with 11.0% under NF4.
+
+**Strict attack success under NF4:**
+
+| Arm | English | Korean | Chinese | Swahili |
+| --- | --- | --- | --- | --- |
+| Base NF4 | 11.0% | 7.9% | 9.6% | 7.2% |
+| Plain NF4 | 10.0% | 22.7% | 17.5% | 12.0% |
+| SafeGrad NF4 | 6.9% | 11.0% | 10.3% | 6.2% |
+
+**XSTest over-refusal under NF4:** Base: English 7.6%, Korean 8.8%, Chinese 6.4%, Swahili 5.6%. Plain: English 6.0%, Korean 4.0%, Chinese 3.2%, Swahili 1.2%. SafeGrad: English 6.4%, Korean 6.4%, Chinese 5.2%, Swahili 5.6%. These figures use refusal verdicts, with 250 prompts per language except Swahili (249). No pass rule applies.
+
+**GPU resource comparison:**
+
+| Arm | Peak GPU memory | Attack-generation throughput |
+| --- | --- | --- |
+| Base bfloat16 (D18) | 20,858 MiB | 214.1 tokens/sec |
+| Base NF4 (D11) | 18,822 MiB | 219.2 tokens/sec |
+| Plain bfloat16 (D18) | 20,112 MiB | 137.9 tokens/sec |
+| Plain NF4 (D11) | 20,864 MiB | 115.2 tokens/sec |
+| SafeGrad bfloat16 (D11) | 20,780 MiB | 166.0 tokens/sec |
+| SafeGrad NF4 (D11) | 18,856 MiB | 145.5 tokens/sec |
+
+**Outcome:** Q1 is complete. NF4 significantly increased strict attack success in four of the twelve arm-language comparisons, while the remaining eight showed no individually significant change. Q2 passes: SafeGrad NF4 remained significantly safer than plain NF4 on Korean. These findings use one seed and model-judge verdicts.
+
+GPU job: `lir-nf4`, ID `6b03624d130a00b5aa813c6f`. D18 GPU job: `lir-control`, ID `6b0356e0130a00b5aa8123e2`.
+
+D11 evaluation commit: `649ce27efdd40c4fcf685a10ce130834430cbbd2`. D18 evaluation commit: `330ebbab5860f8f8a891451f90b63c7e7d28a140`.
+
+Confidence: Medium, because comparisons use one seed and model-judge verdicts, and configuration equivalence across the evaluation runs remains to be verified.
+
 ### 12.3 A4. AlignTune
 
 Question: does a plain fine-tune run through Lexsi's AlignTune drift the same way as our LoRA?
@@ -516,6 +603,21 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 - Reported beside it, no pass rule: the paired difference against plain at seed 42 on the same hardware, per language.
 - If AlignTune cannot fine-tune Tiny Aya Global, the run is not made. We say so and the failure goes in the Lexsi feedback.
 - First item to cut if time runs short.
+
+**Added Nov 22, before the AlignTune run — configuration compatibility review.**
+
+The original plain LoRA configuration in `lir/train.py` was compared against the configuration parameters documented in Lexsi AlignTune.
+
+- **LoRA rank and targets:** AlignTune exposes the required controls for rank 16, alpha 32, dropout 0.0, and the seven target modules (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`).
+- **Learning rate:** AlignTune exposes a learning-rate setting that can be configured to 2e-4.
+- **Batch size:** AlignTune exposes per-device batch size and gradient accumulation settings, allowing the intended configuration of micro-batch 4, accumulation 8, and effective batch size 32.
+- **Epochs:** AlignTune supports the intended 3 epochs.
+- **Sequence limit:** AlignTune exposes a maximum sequence length setting that can be set to 1,024 tokens. Exact handling of overlength examples remains unverified.
+- **Chat template:** Exact reproduction of Tiny Aya Global's `apply_chat_template()` formatting and assistant-response-only loss remains unverified.
+
+The intended backend is TRL, with seed 42, the original 1,800 training rows, and no safety method enabled. Although the required numerical configuration controls are documented, successful fine-tuning of Tiny Aya Global has not yet been demonstrated. Any runtime incompatibility or unmatched preprocessing behavior will be documented before proceeding with the full experiment.
+
+Reference: https://github.com/Lexsi-Labs/aligntune/blob/main/docs/PARAMETERS.md
 
 ### 12.4 Order, cut order and cost
 
