@@ -1281,6 +1281,12 @@ Environment. AlignTune requires trl 1.7.1 and torch below 2.14, and the main env
 
 Cost: about two to three hours of laptop time for the training (our plain run took 76 minutes) and about 50 minutes for the evaluation.
 
+**Added Nov 23, 2:31 PM ET by Mingyu, before the run was queued.** Three additions to the entry above. Its text is left as written.
+
+- A second way not to fit. Under memory pressure the laptop may slow down instead of stopping. After the first five optimizer steps the script projects the training time from those steps. They hold the longest batches, so the projection is high. If it is over five hours, the run stops and this counts as not fitting: the fallback at micro-batch 2 is tried once, under the same rule, and if that stops as well the run is listed as not run. For scale: the run has 171 optimizer steps, our plain run took 27 seconds a step, and five hours is 105 seconds a step.
+- The settings are enforced, not only recorded. Training does not start unless the configuration TRL received has the registered values (epochs, micro-batch, accumulation, learning rate, schedule, warm-up, weight decay, clipping, optimizer, seeds, no autocast, batch order, gradient checkpointing, no checkpoints, sequence limit, loss on the response only) and the device is the laptop's GPU. Checked without weights for both micro-batch settings: no value differs. The model named by its hub identifier loads offline from the cache, which holds the pinned revision.
+- The run script is `scripts/aligntune_run.sh`. A folder left by an attempt that did not finish is kept beside under another name. If the fallback is taken, the run record lists it among the differences.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

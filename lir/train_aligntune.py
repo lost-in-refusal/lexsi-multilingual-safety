@@ -95,6 +95,40 @@ def trainer_kwargs(cfg: dict, model_ref: str, output: Path, micro_batch: int | N
     )
 
 
+SLOW_AFTER_STEPS = 5          # optimizer steps after which the training time is projected
+SLOW_LIMIT_S = 5 * 3600       # a projection above this stops the run (section 14d)
+NOT_FIT = 4                   # exit code: out of memory, or projected to take too long; the queue then tries the fallback once
+
+
+def settings_of(args) -> dict[str, str]:
+    """The training settings as trl's SFTConfig holds them, as strings."""
+    names = ("num_train_epochs", "per_device_train_batch_size", "gradient_accumulation_steps", "learning_rate", "lr_scheduler_type",
+             "warmup_steps", "weight_decay", "max_grad_norm", "optim", "seed", "data_seed", "bf16", "fp16",
+             "train_sampling_strategy", "gradient_checkpointing", "save_strategy", "max_length", "packing",
+             "completion_only_loss", "assistant_only_loss", "loss_type")
+    return {k: str(getattr(getattr(args, k), "value", getattr(args, k))) for k in names}
+
+
+def expected_settings(cfg: dict, kw: dict) -> dict[str, str]:
+    """What settings_of must return for the registered run (kw: the arguments from trainer_kwargs)."""
+    return {"num_train_epochs": str(cfg["epochs"]), "per_device_train_batch_size": str(kw["batch_size"]),
+            "gradient_accumulation_steps": str(kw["gradient_accumulation_steps"]), "learning_rate": str(cfg["learning_rate"]),
+            "lr_scheduler_type": "cosine", "warmup_steps": "0.03", "weight_decay": "0.0", "max_grad_norm": "1.0",
+            "optim": "adamw_torch", "seed": str(cfg["seed"]), "data_seed": str(cfg["seed"]), "bf16": "False", "fp16": "False",
+            "train_sampling_strategy": "group_by_length", "gradient_checkpointing": "True", "save_strategy": "no",
+            "max_length": str(cfg["max_seq_length"]), "packing": "False", "completion_only_loss": "True",
+            "assistant_only_loss": "False", "loss_type": "nll"}
+
+
+def projected_seconds(elapsed_s: float, steps_done: int, steps_total: int) -> float:
+    """Training time if every step took as long as the steps so far. The longest batches come first, so this is high."""
+    return elapsed_s / steps_done * steps_total
+
+
+class NotFit(Exception):
+    """The run does not fit on this machine as configured: out of memory, or too slow."""
+
+
 def to_messages(row: dict) -> dict:
     """One row of AlignTune's dataset, with prompt and completion as message lists, so that TRL applies the chat template."""
     return {"prompt": [{"role": "user", "content": row["prompt"]}],
@@ -158,6 +192,8 @@ def train(a) -> None:
         model_ref = MODEL       # the adapter then names the model the way lir/generate.py expects
         if cached_revision(MODEL) != MODEL_REV:
             raise SystemExit(f"the cache resolves {MODEL} to {cached_revision(MODEL)}, not to the pinned {MODEL_REV}")
+    if out.exists() and not (out / "run.json").exists():   # an attempt that did not finish: kept beside, under another name
+        out.rename(out.with_name(f"{out.name}.failed-{time.strftime('%H%M%S')}"))
     out.mkdir(parents=True, exist_ok=False)
 
     import aligntune
@@ -183,8 +219,10 @@ def train(a) -> None:
     if got != (LORA["r"], LORA["lora_alpha"], LORA["lora_dropout"], sorted(LORA["target_modules"])):
         raise SystemExit(f"AlignTune built a different adapter: {got}")
     if not rehearsal:
-        loaded = getattr(model.config, "_commit_hash", None)
-        if loaded != MODEL_REV:
+        if lcfg.base_model_name_or_path != MODEL:   # lir/generate.py refuses an adapter that names another model
+            raise SystemExit(f"the adapter names {lcfg.base_model_name_or_path} as its base model, not {MODEL}")
+        loaded = getattr(model.config, "_commit_hash", None)   # not always set; the cache check above is the gate
+        if loaded not in (None, MODEL_REV):
             raise SystemExit(f"the model was loaded at revision {loaded}, not {MODEL_REV}")
         expect = json.loads((RUNS / "plain" / "run.json").read_text())["trainable_params"]
         if n_train != expect:
@@ -208,7 +246,7 @@ def train(a) -> None:
     class CheckBeforeTraining(TrainerCallback):
         """Stops before the first step unless the rows TRL prepared are the rows lir/train.py would train on."""
 
-        def on_train_begin(self, args, state, control, train_dataloader=None, **kw):
+        def on_train_begin(self, args, state, control, train_dataloader=None, **_):
             problems = compare_prepared(train_dataloader.dataset, baseline)
             if problems:
                 raise SystemExit("training not started: " + "; ".join(problems))
@@ -218,20 +256,42 @@ def train(a) -> None:
                 want = baseline[i]["labels"] + [-100] * (batch["labels"].shape[1] - k)
                 if batch["labels"][i].tolist() != want or batch["input_ids"][i, :k].tolist() != baseline[i]["input_ids"]:
                     raise SystemExit(f"training not started: the collated batch differs from lir/train.py's at row {i}")
-            checked.update(rows=len(baseline), settings={k: str(getattr(args, k)) for k in (
-                "num_train_epochs", "max_steps", "per_device_train_batch_size", "gradient_accumulation_steps", "learning_rate",
-                "lr_scheduler_type", "warmup_steps", "weight_decay", "max_grad_norm", "optim", "seed", "data_seed", "bf16", "fp16",
-                "train_sampling_strategy", "gradient_checkpointing", "save_strategy", "max_length", "packing",
-                "completion_only_loss", "assistant_only_loss", "loss_type")}, device=str(args.device))
+            got, want = settings_of(args), expected_settings(cfg, kw)
+            wrong = {k: (got[k], want[k]) for k in want if got[k] != want[k]}
+            if wrong:
+                raise SystemExit(f"training not started: settings differ from the registered ones (got, registered): {wrong}")
+            if not rehearsal and str(args.device) != "mps":
+                raise SystemExit(f"training not started: the device is {args.device}, not mps")
+            checked.update(rows=len(baseline), settings=got, device=str(args.device), t0=time.time())
             print(f"checked before training: all {len(baseline)} rows have lir/train.py's token IDs and prompt boundary; "
                   f"device {args.device}", flush=True)
 
+    class StopIfTooSlow(TrainerCallback):
+        """After the first optimizer steps, stops a run whose projected training time is over the registered limit."""
+
+        def on_step_end(self, args, state, control, **_):
+            if state.global_step == SLOW_AFTER_STEPS and not rehearsal:
+                need = projected_seconds(time.time() - checked["t0"], state.global_step, state.max_steps)
+                checked["projected_s_after_first_steps"] = round(need)
+                print(f"after {state.global_step} optimizer steps: projected training time {need / 3600:.1f} h", flush=True)
+                if need > SLOW_LIMIT_S:
+                    raise NotFit(f"projected training time {need / 3600:.1f} h, over the limit of {SLOW_LIMIT_S / 3600:.0f} h")
+
     log_cb = LogCallback(out / "train_log.jsonl")
     own = trainer.get_hf_callbacks
-    trainer.get_hf_callbacks = lambda: own() + [CheckBeforeTraining(), log_cb]
+    trainer.get_hf_callbacks = lambda: own() + [CheckBeforeTraining(), StopIfTooSlow(), log_cb]
 
     t0 = time.time()
-    result = trainer.train()   # AlignTune's own training call
+    try:
+        result = trainer.train()   # AlignTune's own training call
+    except NotFit as e:
+        print(f"stopped, does not fit: {e}", flush=True)
+        raise SystemExit(NOT_FIT)
+    except RuntimeError as e:
+        if "out of memory" not in str(e).lower():
+            raise
+        print(f"stopped, does not fit: {str(e)[:300]}", flush=True)
+        raise SystemExit(NOT_FIT)
     elapsed = time.time() - t0
     if not checked:
         raise SystemExit("the check before training did not run")
@@ -253,7 +313,11 @@ def train(a) -> None:
         "aligntune": {"version": aligntune.__version__ if hasattr(aligntune, "__version__") else None, "commit": ALIGNTUNE_COMMIT},
         "versions": {"trl": trl.__version__, "transformers": transformers.__version__, "peft": peft.__version__},
         "rows_checked_against_lir_train": checked["rows"], "settings_passed_to_trl": checked["settings"],
-        "differences_from_lir_train": DIFFERENCES,
+        "projected_s_after_first_steps": checked.get("projected_s_after_first_steps"),
+        "differences_from_lir_train": DIFFERENCES + ([] if kw["batch_size"] == cfg["batch_size"] else [
+            f"micro-batch {kw['batch_size']} with accumulation {kw['gradient_accumulation_steps']}, where lir/train.py has "
+            f"{cfg['batch_size']} with {cfg['gradient_accumulation_steps']} (the same effective batch): the fallback of section 14d, "
+            "taken after the run at the registered micro-batch did not fit in memory or was projected to take too long"]),
     })
     print(f"{ARM}: {result.get('steps')} optimizer steps, training loss {result.get('final_loss')}, {elapsed / 60:.1f} min")
 

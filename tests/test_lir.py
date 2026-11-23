@@ -1705,6 +1705,16 @@ class AlignTune(unittest.TestCase):
         self.assertEqual((small["batch_size"], small["gradient_accumulation_steps"]), (2, 16))
         with self.assertRaises(ValueError):
             trainer_kwargs(cfg, "m", Path("out"), micro_batch=5)
+        # what the configuration trl receives must hold before the first step, and the rule for a run that is too slow
+        from lir.train_aligntune import SLOW_LIMIT_S, expected_settings, projected_seconds
+
+        want = expected_settings(cfg, kw)
+        self.assertEqual((want["warmup_steps"], want["train_sampling_strategy"], want["bf16"], want["optim"], want["save_strategy"]),
+                         ("0.03", "group_by_length", "False", "adamw_torch", "no"))
+        self.assertEqual(expected_settings(cfg, small)["gradient_accumulation_steps"], "16")
+        self.assertAlmostEqual(projected_seconds(500.0, 5, 171), 17100.0)     # 100 seconds a step: 4.75 hours
+        self.assertLess(projected_seconds(500.0, 5, 171), SLOW_LIMIT_S)
+        self.assertGreater(projected_seconds(550.0, 5, 171), SLOW_LIMIT_S)
 
     def test_rows_go_to_trl_as_messages(self):
         from lir.train_aligntune import to_messages
