@@ -103,10 +103,10 @@ def read_all() -> dict[str, dict]:
                                             "numbers": "Korean rise " + ", ".join(f"{r['arms'][l]['vs_base']['ko']['delta']:+.1f}" for l in ONLY) + f"; bar {lbar:.2f}"}
             out[f"L2, seed 42, {label}"] = {"passes": r["l2_row"] == 1, "outcome": f"row {r['l2_row']}",
                                             "numbers": "; ".join(f"{l}-only gap {ci(r['arms'][l]['l2_ko_rise_minus_trained_rise'])}" for l in ("en", "zh"))}
-    three = ["base"] + [p for p, _ in SEEDS.values()] + [a for s in SEEDS3 for a in ONLY_SEEDS[s].values()] \
-        + list(SMALL_SEEDS.values()) + list(section12.AYA_PLAIN.values())
-    data = capped(three)
+    data = capped(["base"] + [p for p, _ in SEEDS.values()] + [a for s in SEEDS3 for a in ONLY_SEEDS[s].values()])
     if data:
+        for arm in (*SMALL_SEEDS.values(), *section12.AYA_PLAIN.values()):   # C1 and C2 need these; L1 and L2 do not
+            data.update(capped([arm]) or {})
         r = section12.seeds_result(data, seeds.control_bar(data))
         rows = {l: r["l1"][l]["rows"] for l in ONLY}
         out["L1, three seeds, capped"] = {"passes": all(x == 1 for v in rows.values() for x in v),
@@ -114,8 +114,9 @@ def read_all() -> dict[str, dict]:
                                          "numbers": "; ".join(f"{l} " + ci(r["l1"][l]["pooled_ko_rise"]) for l in ONLY)}
         out["L2, three seeds, capped"] = {"passes": r["l2_row"] == 1, "outcome": f"row {r['l2_row']}",
                                          "numbers": "; ".join(f"{l}-only gap {ci(r['l2'][l]['pooled'])}" for l in ("en", "zh"))}
-        out["C1, capped"] = {"passes": None, "outcome": r["c1"]["side"], "numbers": "Aya minus 519 rows " + ci(r["c1"]["aya_minus_519_rows"])}
-        for l in ONLY:
+        if "c1" in r:
+            out["C1, capped"] = {"passes": None, "outcome": r["c1"]["side"], "numbers": "Aya minus 519 rows " + ci(r["c1"]["aya_minus_519_rows"])}
+        for l in ONLY if "c2" in r else ():
             out[f"C2, {l} only, capped"] = {"passes": None, "outcome": r["c2"][l]["side"],
                                            "numbers": "minus 519 rows " + ci(r["c2"][l]["only_minus_519_rows"])}
     vec = ["base"] + [x for names in VEC.values() for x in names]

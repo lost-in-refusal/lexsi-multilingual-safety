@@ -27,6 +27,7 @@ R1_ARMS = ("plain", "plain-s1", "plain-s2")
 R2_ARMS = {"en": ("plain-only-en", "plain-only-en-s1", "plain-only-en-s2"),
            "zh": ("plain-only-zh", "plain-only-zh-s1", "plain-only-zh-s2")}
 BESIDE = ("safegrad", "safegrad-s1", "safegrad-s2", "plain-only-ko", "plain-only-ko-s1", "plain-only-ko-s2")
+AGAIN = {"base": "base-12f", "plain": "plain-12f", "safegrad": "safegrad-12f"}   # the seed 42 arms extracted again with the new ones
 NAMES = {"en": "English", "ko": "Korean", "zh": "Chinese", "sw": "Swahili"}
 READINGS = {"same": "{a} and {b} moved the same distance along the refusal direction, to within {m:.0f} unit",
             "further": "{a} moved further along the refusal direction than {b}",
@@ -140,6 +141,12 @@ def md(res: dict) -> str:
         lines += [f"| {arm} | " + " | ".join(f"{v[l]:.1f}" for l in EVAL_LANGS) + " |" for arm, v in res["refusal"].items()]
     if res["missing"]:
         lines += ["", "Not read, because activations are missing: " + "; ".join(res["missing"]) + "."]
+    if res.get("files"):
+        again = [a for a, f in res["files"].items() if f != a]
+        lines += ["", "Base, plain and SafeGrad at seed 42 were extracted again with the new arms"
+                  + ("" if len(again) == len(res["files"]) else " (" + ", ".join(a for a in res["files"] if a not in again) + " from the stage 1 file)")
+                  + ". Largest difference from the stage 1 projection of the same prompt: " + "; ".join(
+                      f"{a} {v['largest_difference']:.3f} (mean {v['mean_difference']:.3f})" for a, v in res.get("against_stage1", {}).items()) + "."]
     return "\n".join(lines)
 
 
@@ -151,19 +158,26 @@ def main() -> None:
     stage1 = json.loads((ROOT / "results" / "lir" / "probe.json").read_text())
     if stage1["best_layer"] != LAYER:
         raise SystemExit(f"stage 1 picked layer {stage1['best_layer']}, not {LAYER}")
-    proj = {"base": projections("base", unit)}
-    for arm in (*R1_ARMS, *(x for arms in R2_ARMS.values() for x in arms), *BESIDE):
-        if (ACT / f"{arm}.npz").exists():
-            proj[arm] = projections(arm, unit)
+    old = {arm: projections(arm, unit) for arm in ("base", "plain")}   # the stage 1 files
     for arm in ("base", "plain"):   # the new code path must give the medians stage 1 published
         for l in EVAL_LANGS:
-            mine = float(np.median([v for (f, x), v in proj[arm].items() if x == l]))
+            mine = float(np.median([v for (f, x), v in old[arm].items() if x == l]))
             if abs(mine - stage1["margin"][arm][l]["median_proj"]) > 1e-3:
                 raise SystemExit(f"{arm} {l}: median projection {mine:.4f}, stage 1 has {stage1['margin'][arm][l]['median_proj']:.4f}")
     print("base and plain reproduce the stage 1 median projections")
     if a.medians:
         return
+    # every arm from tonight's extraction where it exists; the seed 42 arms fall back to the stage 1 file
+    file_of = lambda arm: AGAIN[arm] if arm in AGAIN and (ACT / f"{AGAIN[arm]}.npz").exists() else arm
+    proj, used = {}, {}
+    for arm in ("base", *R1_ARMS, *(x for arms in R2_ARMS.values() for x in arms), *BESIDE):
+        if (ACT / f"{file_of(arm)}.npz").exists():
+            proj[arm], used[arm] = projections(file_of(arm), unit), file_of(arm)
     res = result(proj)
+    res["files"] = {arm: f for arm, f in used.items() if arm in AGAIN}
+    res["against_stage1"] = {arm: {"largest_difference": max(abs(proj[arm][k] - old[arm][k]) for k in old[arm]),
+                                   "mean_difference": float(np.mean([abs(proj[arm][k] - old[arm][k]) for k in old[arm]]))}
+                             for arm in ("base", "plain") if used.get(arm) == AGAIN[arm]}
     res["refusal"] = {arm: r for arm in proj if (r := refusal_rates(arm))}
     write_json(OUT / "refusal_direction.json", res)
     (OUT / "refusal_direction.md").write_text(md(res) + "\n")
