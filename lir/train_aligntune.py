@@ -93,6 +93,68 @@ def build_trainer(config, model_path):
         split_seed=config["seed"],
     )
 
+def format_tiny_aya_dataset(trainer, max_length):
+    """Apply the baseline Tiny Aya chat template to AlignTune data."""
+    trainer.setup_data()
+
+    tokenizer = trainer.tokenizer
+    dataset = trainer.train_dataset
+
+    def format_example(row):
+        user = [{"role": "user", "content": row["prompt"]}]
+
+        prompt = tokenizer.apply_chat_template(
+            user,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+
+        full = tokenizer.apply_chat_template(
+            user + [
+                {"role": "assistant", "content": row["completion"]}
+            ],
+            tokenize=False,
+        )
+
+        if not full.startswith(prompt):
+            raise RuntimeError("Tiny Aya chat-template prefix mismatch")
+
+        prompt_ids = tokenizer(
+            prompt, add_special_tokens=False
+        ).input_ids
+
+        full_ids = tokenizer(
+            full, add_special_tokens=False
+        ).input_ids
+
+        if full_ids[:len(prompt_ids)] != prompt_ids:
+            raise RuntimeError("Tiny Aya token prefix mismatch")
+
+        return {
+            "prompt": prompt,
+            "completion": full[len(prompt):],
+            "_baseline_length": len(full_ids),
+        }
+
+    dataset = dataset.map(format_example)
+
+    original_count = len(dataset)
+
+    dataset = dataset.filter(
+        lambda row: row["_baseline_length"] <= max_length
+    )
+
+    print(
+        f"Tiny Aya formatted: {len(dataset)}/{original_count} "
+        "examples retained"
+    )
+
+    dataset = dataset.remove_columns(["_baseline_length"])
+
+    trainer.train_dataset = dataset
+    trainer.dataset = dataset
+
+    return dataset
 
 def verify_training_batch(trainer, expected_rows):
     """Verify the actual TRL training batch before GPU training."""
@@ -100,14 +162,15 @@ def verify_training_batch(trainer, expected_rows):
     from aligntune.core.sft.training_args_builder import build_sft_config
 
     trainer.setup_model()
-    trainer.setup_data()
-    trainer.dataset = trainer.train_dataset
 
-    dataset = trainer.dataset
+    dataset = format_tiny_aya_dataset(
+        trainer,
+        trainer.config.model.max_seq_length,
+    )
 
-    if len(dataset) != expected_rows:
+    if not 0 < len(dataset) <= expected_rows:
         raise RuntimeError(
-            f"Expected {expected_rows} training rows, got {len(dataset)}"
+            f"Unexpected formatted dataset size: {len(dataset)}"
         )
 
     if "prompt" not in dataset.column_names:
@@ -142,9 +205,49 @@ def verify_training_batch(trainer, expected_rows):
 
     prepared = test_trainer.train_dataset
 
-    if len(prepared) != expected_rows:
+
+    # Compare TRL tokenization against the original baseline.
+    for index in range(len(prepared)):
+        row = dataset[index]
+        actual = prepared[index]
+
+        expected_ids = trainer.tokenizer(
+            row["prompt"] + row["completion"],
+            add_special_tokens=False,
+        ).input_ids
+
+        expected_prompt_ids = trainer.tokenizer(
+            row["prompt"],
+            add_special_tokens=False,
+        ).input_ids
+
+        actual_ids = actual["input_ids"]
+        actual_mask = actual["completion_mask"]
+
+        if actual_ids != expected_ids:
+            raise RuntimeError(
+                f"TRL token IDs differ from baseline at row {index}"
+            )
+
+        expected_mask = (
+            [0] * len(expected_prompt_ids)
+            + [1] * (len(expected_ids) - len(expected_prompt_ids))
+        )
+
+        if actual_mask != expected_mask:
+            raise RuntimeError(
+                f"TRL completion mask differs from baseline at row {index}"
+            )
+
+    print(
+        f"Exact token IDs and completion masks verified "
+        f"for all {len(prepared)} examples."
+    )
+
+
+    if len(prepared) != len(dataset):
         raise RuntimeError(
-            f"TRL retained {len(prepared)} of {expected_rows} rows"
+            f"TRL retained {len(prepared)} of {len(dataset)} rows"
         )
 
     if "completion_mask" not in prepared.column_names:
