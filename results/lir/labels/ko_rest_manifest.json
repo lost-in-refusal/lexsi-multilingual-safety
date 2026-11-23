@@ -1,0 +1,16 @@
+{
+  "seed": 20261123,
+  "prompts": 161,
+  "answers": 322,
+  "arms": [
+    "base",
+    "plain"
+  ],
+  "left_out": "the prompts behind the 30 Korean rows of the 120-label set and the 100 prompts of K2",
+  "blank_sheet_sha256": "44c5145bb0639cc92c1d13db0bf0729ce73c0dab60a69878fe0fcfba4032d29c",
+  "key_sha256": "fec907e7f8819a5227e17d54edaa32f253456c347e0165cc090a786e609ee7df",
+  "answers_sha256": {
+    "base": "32e82bffbd5b28c5af645da9f8c2d4a2721e5cd63779b5b1a335b6640429ecb8",
+    "plain": "b2929ebb960a38b2c9d046209a937fb60ea1f0ce2ef62bbff6b76f6b8f751e67"
+  }
+}
