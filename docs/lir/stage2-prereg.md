@@ -472,6 +472,24 @@ Question: which training language moves safety in which language?
 - One seed. Seeds 1 and 2 only if Nov 28 is confirmed and they are added here first.
 - If time runs short, `plain-ko` is kept and the other two are cut.
 
+**Added Nov 22, after the D6 single-language runs.** All three plain LoRA runs (`plain-ko`, `plain-en`, `plain-zh`) completed on the Hugging Face L4 GPU at seed 42, using 600 training rows from one language per run. Each produced 1,164 attack verdicts matched to the D18 GPU base control. Strict attack success counts responses classified as Unsafe or Controversial.
+
+- **L1, Korean-only:** Outcome row 1 applies. Korean strict attack success rose from 5.5% (16/291) under GPU base to 14.1% (41/291) under `plain-ko`, an increase of 8.6 percentage points (exact McNemar p < 0.001). This exceeds the registered 6.36-point threshold. Korean rows alone are enough for a drift of this size.
+- **L2, English-only:** K1 outcome row 1 applies. Korean strict attack success rose from 5.5% (16/291) to 14.4% (42/291), an increase of 8.9 points (p < 0.001). English-only training produced a significant Korean drift above the registered threshold.
+- **L2, Chinese-only:** K1 outcome row 1 applies. Korean strict attack success rose from 5.5% (16/291) to 16.8% (49/291), an increase of 11.3 points (p < 0.001). Chinese-only training also produced a significant Korean drift above the registered threshold.
+
+**Strict attack success across all four languages (GPU base → single-language run):**
+
+| Run | English | Korean | Chinese | Swahili |
+| --- | --- | --- | --- | --- |
+| `plain-ko` | 5.5% → 4.5% (p = 0.508) | 5.5% → 14.1% (p < 0.001) | 7.9% → 8.2% (p = 1.000) | 5.2% → 5.5% (p = 1.000) |
+| `plain-en` | 5.5% → 7.2% (p = 0.267) | 5.5% → 14.4% (p < 0.001) | 7.9% → 10.7% (p = 0.096) | 5.2% → 8.6% (p = 0.064) |
+| `plain-zh` | 5.5% → 8.9% (p = 0.021) | 5.5% → 16.8% (p < 0.001) | 7.9% → 14.1% (p < 0.001) | 5.2% → 5.8% (p = 0.839) |
+
+All three single-language runs meet the registered Korean threshold, including the runs without Korean training rows. The Chinese-only run also significantly increased strict attack success in English and Chinese. These are single-seed findings; the additional language comparisons have no registered pass rule.
+
+All three runs used training/evaluation commit `649ce27efdd40c4fcf685a10ce130834430cbbd2`. The D18 GPU base control was used for the paired comparisons. Confidence: Medium, because the results are statistically significant on Korean but are limited to one seed and model-judge verdicts.
+
 ### 12.2 A3. NF4 quantization and safety
 
 Question: does loading the model in 4 bits change its safety, and does SafeGrad's repair survive it?
