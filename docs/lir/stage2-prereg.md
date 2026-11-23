@@ -769,6 +769,24 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - Under Unsafe only: the Korean-minus-English gap of H1 is +8.8 points [+4.7, +13.1]; SafeGrad against plain is -6.6 [-9.2, -4.4]; K1's bar is 4.98 points and its Korean rates are 13.4%, 13.1% and 12.0% against 2.7% for base, as published before.
 - The human labels by guard class, and kappa, are in the same file. Strict agrees with the 120 stage 1 labels better than Unsafe only in English, Korean and Chinese (kappa 0.87, 0.60 and 0.80 against 0.51, 0.40 and 0.50) and worse in Swahili (0.49 against 0.52).
 
+### 12h. Answer length and the task score
+
+**Added Nov 22, 7:09 PM ET, before anything below was computed.** Both fine-tunes score below the base model on the task set (6.32 for base, 5.94 for plain and 5.82 for SafeGrad at seed 42), and stage 1 put that down to shorter answers without testing it. We know from stage 1 that fine-tuning cut answers from about 420 to about 170 tokens. The split below has not been computed.
+
+- Data: the 300 held-out Bactrian-X task prompts, with the answers and judge scores that already exist for base and for plain and SafeGrad at seeds 42, 1 and 2. No model is run.
+- For each fine-tuned answer, the length ratio is its length in characters over the base model's answer to the same prompt. Groups, fixed now: about the same length (ratio 0.8 to 1.25), shorter (0.5 to 0.8), under half (below 0.5), longer (above 1.25).
+- The statistic: the fine-tuned answer's task score minus the base model's on the same prompt, averaged within a group and over the three seeds, with a bootstrap 95% interval over prompts. Plain and SafeGrad are read separately.
+
+| In the same-length group | What we report |
+| --- | --- |
+| The interval includes zero | Where the fine-tuned answer is about as long as the base model's, its task score is not detectably different |
+| The interval is below zero | The fine-tuned models score lower even where their answers are about as long as the base model's, so the drop is not only a matter of length |
+| Fewer than 30 prompts in the group | Too few fine-tuned answers are about as long as the base model's to tell |
+
+- Shown with no rule: the difference in the other groups and how many answers fall in each; per language, the change in each of the judge's four sub-scores and the median answer length beside the reference's; and, within the base model's own answers, the rank correlation between length and score.
+- A limit that goes with any sentence from this: the groups are formed after generation, so they show where the drop sits and not what causes it.
+- Cost: none.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

@@ -1151,6 +1151,29 @@ class UnsafeOnly(unittest.TestCase):
         self.assertAlmostEqual(k["kappa"], 0.6)
 
 
+class TaskLength(unittest.TestCase):
+    def rows(self, chars, score):
+        """40 task prompts with one answer length and one score each."""
+        return {f"t{i}": {"lang": "en", "chars": chars, "ref_chars": 200, "score": score, "subs": {k: score for k in
+                ("accuracy", "instruction_following", "coherence", "fluency")}} for i in range(40)}
+
+    def test_groups_and_readings(self):
+        from lir.tasklen import READINGS, by_length, describe, group_of, spearman
+
+        self.assertEqual([group_of(x) for x in (1.0, 0.8, 1.25, 1.3, 0.79, 0.5, 0.49)],
+                         ["same", "same", "same", "longer", "shorter", "shorter", "under half"])
+        base = self.rows(400, 6.0)
+        short = by_length(base, [self.rows(100, 5.0)])           # every answer under half as long, one point lower
+        self.assertEqual((short["reading"], short["report"]), ("too few", READINGS["too few"]))
+        self.assertEqual((short["groups"]["under half"]["answers"], short["groups"]["under half"]["mean"]), (40, -1.0))
+        self.assertEqual(by_length(base, [self.rows(400, 6.0), self.rows(380, 6.0)])["reading"], "level")
+        self.assertEqual(by_length(base, [self.rows(420, 5.2)])["reading"], "lower")   # as long, and still lower
+        d = describe(base, [self.rows(100, 5.0), self.rows(120, 5.5)])["en"]
+        self.assertEqual((d["score_base"], d["score_arm"], d["median_chars_arm"], d["sub_score_change"]["fluency"]), (6.0, 5.25, 110, -0.75))
+        self.assertAlmostEqual(spearman([1, 2, 3, 4], [10, 20, 30, 40]), 1.0)
+        self.assertAlmostEqual(spearman([1, 2, 3, 4], [4, 3, 2, 1]), -1.0)
+
+
 class RepairVector(unittest.TestCase):
     def test_stacked_factors_equal_the_sum(self):
         import torch
