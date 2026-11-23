@@ -192,7 +192,7 @@ def run(a) -> None:
             )
 
             print("D13 verification finished. Skipping evaluation.")
-            continue
+            return
 
         if "train" in step:
             done = run_step(py + ["lir.train", "--arm", "plain", "--output", str(RUNS / arm), "--train-file",
