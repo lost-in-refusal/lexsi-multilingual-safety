@@ -87,7 +87,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 20 | K1 no Korean rows; K2 Korean rise judged by a person; circuit node counts; truncation audit; harm categories; Aya (Y1 to Y3) | K1 row 1 in three seeds. K2 does not pass. Circuits hold at 3 of 5 sizes. Audit: headline unchanged. Y1, Y2 pass; Y3 fails |
 | Nov 21, 4:39 PM | Section 11: Aya and Earth at seeds 1 and 2; K1 after re-generation | All as on one seed, on both readings |
 | Nov 21, 8:59 PM (Aish) | Section 12.0 to 12.4: GPU runs (hardware control, single-language, NF4, AlignTune) | Hardware control: no significant difference from the laptop in eight comparisons. L1 and L2: row 1 in all three runs. Q2 passes. Q1: NF4 raises attack success for base in English and for plain in three languages, where the comparison also differs in merging. AlignTune: no result yet |
-| Nov 22 (Mingyu) | Section 13a to 13h: single-language runs on the laptop; repair vector on Aya (V1); second readings; 519-row seeds (C1, C2); refusal direction (R1, R2); Unsafe-only reading; task score by answer length | 13a to 13d, 13g and 13h read; seeds, C1, C2, R1, R2 pending |
+| Nov 22 (Mingyu) | Section 13a to 13h: single-language runs on the laptop; repair vector on Aya (V1); second readings; 519-row seeds (C1, C2); refusal direction (R1, R2); Unsafe-only reading; task score by answer length | SL1 and SL2: row 1 on three seeds. V1 passes on both readings. C1 includes zero; C2 is below zero for English rows only. Unsafe-only: 20 of 22 passes kept. Task score: not a length effect. R1 and R2 pending |
 
 Deviations and things a reader should know:
 
@@ -109,7 +109,7 @@ Deviations and things a reader should know:
 6. **The repair vector on Bactrian-X was not registered** (exploratory). Its test on the Aya adapters was. That
    test passed, but the edit doubled answer length, so it was read a second time on completed answers.
 7. **Under the guard's Unsafe class alone, the Chinese-only half of SL2 does not hold at seed 42.** Every
-   three-seed check does.
+   three-seed check does, SL2 on three seeds among them.
 8. **The first five rows of the Korean-by-setting figure were chosen after their results were known.** The three
    single-language rows were fixed before those runs were read.
 9. **Stage 1 explained the task-score drop by shorter answers. That does not hold.** With length groups fixed in

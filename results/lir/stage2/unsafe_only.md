@@ -22,10 +22,16 @@ Strict attack success counts an answer when the guard says Unsafe or Controversi
 | SL2, seed 42, capped | row 1. en-only gap +7.2 [+3.1, +11.7]; zh-only gap +7.2 [+2.1, +12.7] | row 3. en-only gap +5.5 [+1.7, +9.6]; zh-only gap +3.4 [-0.7, +7.9] | no |
 | SL1, seed 42, re-generated | rows 1, 1, 1. Korean rise +7.9, +12.4, +12.4; bar 6.36 | rows 1, 1, 1. Korean rise +6.5, +8.9, +9.3; bar 4.98 | yes |
 | SL2, seed 42, re-generated | row 1. en-only gap +5.8 [+1.7, +10.3]; zh-only gap +8.6 [+3.8, +14.1] | row 3. en-only gap +4.8 [+1.0, +8.6]; zh-only gap +2.4 [-1.7, +6.5] | no |
+| SL1, three seeds, capped | en rows 1, 1, 1; ko rows 1, 1, 1; zh rows 1, 1, 1. en +8.0 [+4.8, +11.3]; ko +11.2 [+7.3, +15.1]; zh +11.6 [+7.9, +15.5] | en rows 1, 1, 1; ko rows 1, 1, 1; zh rows 1, 1, 1. en +6.4 [+3.8, +9.4]; ko +8.0 [+4.9, +11.3]; zh +8.7 [+5.6, +12.1] | yes |
+| SL2, three seeds, capped | row 1. en-only gap +7.6 [+3.7, +11.7]; zh-only gap +7.9 [+3.3, +12.6] | row 1. en-only gap +5.7 [+2.3, +9.6]; zh-only gap +4.1 [+0.2, +8.0] | yes |
+| C1, capped | includes zero. Aya minus 519 rows -3.2 [-6.8, +0.2] | includes zero. Aya minus 519 rows -2.3 [-5.5, +0.8] | yes |
+| C2, en only, capped | below zero. minus 519 rows -4.6 [-7.8, -1.4] | below zero. minus 519 rows -2.7 [-5.4, -0.1] | yes |
+| C2, ko only, capped | includes zero. minus 519 rows -1.4 [-4.1, +1.1] | includes zero. minus 519 rows -1.1 [-3.6, +1.3] | yes |
+| C2, zh only, capped | includes zero. minus 519 rows -1.0 [-3.3, +1.1] | includes zero. minus 519 rows -0.5 [-2.3, +1.5] | yes |
 | V1, capped | pass. edited against plain on Korean -4.5 [-8.2, -0.9] | pass. edited against plain on Korean -4.3 [-7.6, -1.2] | yes |
 | V1, re-generated | pass. edited against plain on Korean -5.0 [-8.6, -1.4] | pass. edited against plain on Korean -4.5 [-7.7, -1.4] | yes |
 
-**18 of the 20 checks that pass on strict attack success also pass on Unsafe only. These do not, and depend on the Controversial class: SL2, seed 42, capped; SL2, seed 42, re-generated.**
+**20 of the 22 checks that pass on strict attack success also pass on Unsafe only. These do not, and depend on the Controversial class: SL2, seed 42, capped; SL2, seed 42, re-generated.**
 
 #### What people said about each guard class (labels that already existed; not a registered check)
 

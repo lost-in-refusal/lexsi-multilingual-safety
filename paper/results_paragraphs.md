@@ -62,24 +62,22 @@ test compares one category with another, so we do not rank them.
 
 Source: `harm_categories.md`, `harm_categories_regenerated.md`.
 
-## D6. Training language and drift. Confidence: High without Korean rows (three seeds); Medium for one language at a time (seed 42; seeds 1 and 2 running)
+## D6. Training language and drift. Confidence: High (three seeds, preregistered, significant in every run)
 
 Korean drifts whether or not Korean is in the training data. With English and Chinese rows only, Korean attack
 success still rose 13.1, 13.4 and 13.1 points over three seeds, no different from training with Korean rows
 (+0.5 points, -2.3 to +3.3), also after capped answers were completed. Trained on one language at a time (600
-rows, seed 42), Korean rose 7.9 points with English rows only, 12.0 with Korean rows only and 11.3 with Chinese
-rows only, each significant. In the two runs that can tell a weak language from a trained one, Korean rose more
-than the language the model was trained on: by 7.2 points more than English in the English-only run (+3.1 to
-+11.7) and 7.2 more than Chinese in the Chinese-only run (+2.1 to +12.7); both hold after re-generation. This
-supports reading D1 as a weakness of Korean in this model and not as a footprint of the training language. It is
-one seed with 600 rows per run, and no test ranks the three runs. Counting only the guard's Unsafe class, the English-only comparison still holds (+5.5 points, +1.7 to +9.6) and the Chinese-only one does not (+3.4, -0.7 to +7.9), so the Chinese-only half depends on the guard's Controversial class.
+rows, three seeds), Korean rose 7.9, 8.9 and 7.2 points with English rows only, 12.0, 9.6 and 12.0 with Korean rows only and 11.3, 11.0 and 12.4 with Chinese
+rows only, each significant and above the bar. In the two runs that can tell a weak language from a trained one, Korean rose more
+than the language the model was trained on in every seed: pooled, by 7.6 points more than English in the English-only run (+3.7 to
++11.7) and 7.9 more than Chinese in the Chinese-only run (+3.3 to +12.6); at seed 42 both also hold after re-generation. This
+supports reading D1 as a weakness of Korean in this model and not as a footprint of the training language. No test ranks the three runs, but one registered comparison separates them from a mixed set of the same size: English rows alone raised Korean 4.6 points less than a 519-row mixed set (-7.8 to -1.4), while Korean rows alone and Chinese rows alone were not detectably different from it. Counting only the guard's Unsafe class, both comparisons hold on three seeds (+5.7 points, +2.3 to +9.6, and +4.1, +0.2 to +8.0); read at seed 42 alone, the Chinese-only one does not (+3.4, -0.7 to +7.9).
 
 The three single-language runs were repeated on a cloud GPU (section 12.1, Hannah's jobs), each against the base model evaluated on that GPU: Korean rose 8.6 points with Korean rows only, 8.9 with English rows only and 11.3 with Chinese rows only, each significant and above the bar. That check was registered before the laptop runs but run after their results were known.
 
-Note for Aish: the laptop runs are section 13a (checks SL1 and SL2) and the GPU runs are your section 12.1 (L1 and L2). Seeds 1 and 2 of the laptop runs finish tonight and their table will be
-`single_language_seeds.md`.
+Note for Aish: the laptop runs are section 13a (checks SL1 and SL2, and C2 in 13e) and the GPU runs are your section 12.1 (L1 and L2). Seeds 1 and 2 of the laptop runs were read on capped answers only.
 
-Source: `noko.md`, `truncation/k1.md`, `single_language.md`, `gpu.md`.
+Source: `noko.md`, `truncation/k1.md`, `single_language_seeds.md`, `single_language.md`, `gpu.md`.
 
 ## D7. Second dataset: Aya. Confidence: High for drift and repair; the Swahili part fails
 
