@@ -137,6 +137,14 @@ Both fine-tunes score below the base model on the 300 held-out task prompts in e
 
 Source: `results.md`, `task_length.md`.
 
+## D10. The simple fix: refusal examples mixed into the training data. Confidence: Medium (preregistered and significant; two new seeds decide, because seed 42 was seen before the rules)
+
+We compared SafeGrad with the simplest alternative: adding the same 47 refusal examples to the training data, once (141 views over training) or as five copies (705 views, close to the 684 SafeGrad uses). Each mixing run is read against SafeGrad at the same seed on the same prompts, and seeds 1 and 2 decide. With five copies, the simple fix protected Korean better than SafeGrad: Korean strict attack success was 2.7 points lower (-5.2 to -0.5; 6.2% against 8.2% at seed 1 and 6.2% against 9.6% at seed 2). With the examples added once, no difference was detected (-0.5 points, -2.9 to +1.9). Both arms raised over-refusal of safe English prompts above SafeGrad's, by 5.2 points (+2.8 to +8.0) and 5.0 points (+2.6 to +7.6), while SafeGrad's own English over-refusal is not distinguishable from the base model's in any seed. Task score did not differ (+0.02 and +0.04 on the 1 to 7 scale; both intervals include zero). So SafeGrad's advantage over the simple fix is that it does not raise over-refusal. It is not better protection.
+
+Not to be written from this: that SafeGrad protects better than mixing; "holds on three seeds"; that more copies protect more (the two arms were not tested against each other); that mixing brings Korean back to the base model's level. Answers are capped at 256 tokens and no mixing arm was generated again. One guard.
+
+Source: `mixing/seeds.md`; `mixing/results.md` for seed 42; section 14a of the preregistration.
+
 ## D14. Judge validity. Confidence: a limitation, with one robustness table
 
 Every safety number comes from one automatic guard. Against 120 answers labelled blind by the team it agreed 28/30 in English, 24/30 in Korean and 27/30 in Chinese (Cohen's kappa 0.87, 0.60 and 0.80) and missed our 80% bar in Swahili (20/27, kappa 0.49); half of each sample is answers the guard flagged, so it is a hard sample. Two other guards we tried as second judges both missed the bar, and a blind human reading of 200 Korean answers found the rise in the expected direction but not significantly (5 against 1 on 94 prompts, p = 0.22). The guard has two flagged classes, Unsafe and Controversial, and our two human checks disagree about the second: labellers marked 18 of 24 Controversial answers unsafe in the first check and 0 of 4 in the second. We therefore computed every check again counting Unsafe only, with the procedure fixed in advance. Every three-seed check still passes (Korean-minus-English gap +8.8 points, +4.7 to +13.1; SafeGrad against plain -6.6, -9.2 to -4.4); the Chinese-only training comparison does not when it is read at seed 42 alone, and does on three seeds (+4.1 points, +0.2 to +8.0).
@@ -144,6 +152,8 @@ Every safety number comes from one automatic guard. Against 120 answers labelled
 Source: `second_judge_check.md`, `ko_drift.md`, `unsafe_only.md`.
 
 ## What changed since the brief's table (Sat 9:45 PM)
+
+- D10 is new (Nov 23, under the deadline extension): the mixing baseline on two new seeds. It changes one argument. With five copies of the refusal examples, mixing protected Korean better than SafeGrad, so SafeGrad's advantage over the simple fix is in over-refusal only. Any sentence that puts SafeGrad ahead of mixing on protection has to go.
 
 - D8 is no longer a single run: Earth holds on three seeds, on both readings.
 - D7 holds after re-generation as well.

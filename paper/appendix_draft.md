@@ -94,11 +94,13 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 
 | When (ET) | What was registered | Outcome |
 |---|---|---|
-| Nov 19, 10:30 PM, before any stage 2 evaluation | H1 Korean drifts more than English; H2 SafeGrad repairs it; H3 Swahili refusals fall; H4 Korean clean set; costs; mixing baselines (no prediction); second judge (Checks A, B); Swahili re-translation (Check C); Earth (E1, E2) | H1, H2, H3 pass in three seeds. H4 not tested. Mixing: same protection as SafeGrad at seed 42, more over-refusal. Check A failed with both judges, so Check B was not run. Check C passes. E1 holds; E2 not confirmed |
+| Nov 19, 10:30 PM, before any stage 2 evaluation | H1 Korean drifts more than English; H2 SafeGrad repairs it; H3 Swahili refusals fall; H4 Korean clean set; costs; mixing baselines (no prediction); second judge (Checks A, B); Swahili re-translation (Check C); Earth (E1, E2) | H1, H2, H3 pass in three seeds. H4 not tested. Mixing at seed 42: no detected difference in protection from SafeGrad, more over-refusal (seeds 1 and 2 are in the Nov 23 row). Check A failed with both judges, so Check B was not run. Check C passes. E1 holds; E2 not confirmed |
 | Nov 20 | K1 no Korean rows; K2 Korean rise judged by a person; circuit node counts; truncation audit; harm categories; Aya (Y1 to Y3) | K1 row 1 in three seeds. K2 does not pass. Circuits hold at 3 of 5 sizes. Audit: headline unchanged. Y1, Y2 pass; Y3 fails |
 | Nov 21, 4:39 PM | Section 11: Aya and Earth at seeds 1 and 2; K1 after re-generation | All as on one seed, on both readings |
 | Nov 21, 8:59 PM (Aish) | Section 12.0 to 12.4: GPU runs (hardware control, single-language, NF4, AlignTune) | Hardware control: no significant difference from the laptop in eight comparisons. L1 and L2: row 1 in all three runs. Q2 passes. Q1: NF4 raises attack success for base in English and for plain in three languages, where the comparison also differs in merging. AlignTune: no result yet |
 | Nov 22 (Mingyu) | Section 13a to 13h: single-language runs on the laptop; repair vector on Aya (V1); second readings; 519-row seeds (C1, C2); refusal direction (R1, R2); Unsafe-only reading; task score by answer length | SL1 and SL2: row 1 on three seeds. V1 passes on both readings. C1 includes zero; C2 is below zero for English rows only (seen at seed 42 before it was registered). Unsafe-only: 20 of 22 passes kept. Task score: not a length effect. R1: Korean and English moved the same distance, as predicted. R2: with English rows only Korean moved less far than English; with Chinese rows only Korean and Chinese moved the same distance |
+| Nov 23, 3:58 AM (Mingyu), under the deadline extension | Section 14a: the mixing baseline at seeds 1 and 2 (M1 to M3), decided on the two new seeds | Five copies: mixing protected Korean better than SafeGrad (-2.7 points [-5.2, -0.5]). Examples added once: no detected difference (-0.5 [-2.9, +1.9]). Both arms: English over-refusal about 5 points above SafeGrad's (+5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]). Task score: no detected difference |
+| Nov 23, 4:26 AM and 4:45 AM (Mingyu), under the deadline extension | Section 14b: six more untrained languages (U1 to U3). Section 14c: a second reading of the Korean rise by a person (K3) | Not read when this was written |
 
 Deviations and things a reader should know:
 
@@ -130,17 +132,23 @@ Deviations and things a reader should know:
     ET) and finished. Not run: the two bfloat16 arms with the adapter left unmerged, which would separate 4-bit
     loading from merging (12.2 review note; no upload by 11:44 PM); the AlignTune run (12.3; only its configuration
     review is on record, and a 32-second check of one training batch on the GPU at 11:21 PM, after the freeze); the task set on the GPU (its judge does not fit an L4); seeds 1 and 2 of the GPU
-    single-language runs; the mixing baseline at seeds 1 and 2; and a re-generation of the seed 1 and 2
-    single-language answers, which was not registered. Cut earlier: the Korean clean set (H4), Check B and a third
+    single-language runs; and a re-generation of the seed 1 and 2
+    single-language answers, which was not registered. The mixing baseline at seeds 1 and 2 was not launched by the
+    freeze either; it ran on Nov 23 under the deadline extension (section 14a, item 11). Cut earlier: the Korean clean set (H4), Check B and a third
     judge.
+11. **SafeGrad is not ahead of the simple fix on protection.** On two new seeds (section 14a), five copies of the
+    refusal examples mixed into the training data left Korean attack success 2.7 points below SafeGrad's
+    [-5.2, -0.5], and with the examples added once no difference was detected. Both arms raised English
+    over-refusal about 5 points above SafeGrad's. SafeGrad's advantage is in over-refusal only. Seed 42 was seen
+    before the rules were written, so two seeds decide; the two arms were not tested against each other.
 
 ## D. What the organizers' write-up layout asks for that the draft does not have yet
 
 The recommended layout on hackathon.lexsi.ai marks these as required or as valued options. Most are short.
 
 - **"With more credits" (required):** planned approach and the expected before and after. Candidates, in order of
-  value: the mixing baseline at seeds 1 and 2 with XSTest and re-generation (does mixing's over-refusal cost hold
-  on three seeds?); a human reading of the Korean rise on the 161 Korean prompts no person has read (100 were read for K2 and 30 in stage 1) and a second labeller;
+  value: a re-generation of the mixing arms at 1,024 tokens and a direct test of five copies against one (the mixing
+  baseline itself ran at seeds 1 and 2 under the extension); a human reading of the Korean rise on the 161 Korean prompts no person has read (100 were read for K2 and 30 in stage 1) and a second labeller;
   the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; a second untrained language and the Fire and Water models; LoRA
   rank, learning rate and epoch sensitivity; a second safety benchmark.
 - **"Declaration of work done outside the hackathon" (required):** for the team to state.
