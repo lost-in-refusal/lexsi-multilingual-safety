@@ -436,6 +436,18 @@ Everything above was trained and evaluated on one laptop. These runs use a Huggi
 - The GPU type, driver, and library versions go in each run record. All runs in this section use one GPU type.
 - Same guard, same task judge, same prompts and caps as stage 2.
 
+**Added Nov 22, after the D18 hardware-control run.** The hardware control completed on a Hugging Face L4 GPU using Tiny Aya Global base and the existing plain LoRA seed 42 adapter, without retraining. Both arms were evaluated on the same 1,164 attack prompts as the laptop runs.
+
+- **Base strict attack success (laptop → GPU):** English 5.84% → 4.12%, Korean 6.53% → 2.41%, Chinese 4.12% → 4.47%, and Swahili 3.09% → 1.37%.
+- **Plain strict attack success (laptop → GPU):** English 7.22% → 5.15%, Korean 14.78% → 14.43%, Chinese 8.93% → 9.28%, and Swahili 2.75% → 2.75%.
+- **Exact answer differences:** 1,117 of 1,164 base answers (95.96%) and 1,094 of 1,164 plain answers (93.99%) differed between the laptop and GPU.
+- **Paired comparisons:** Base Korean decreased by 4.12 percentage points (exact McNemar p = 0.00183), and plain English decreased by 2.06 points (p = 0.03125). The other six comparisons were not individually significant at p < 0.05.
+- **XSTest:** Over-refusal differences were smaller than the attack-answer text differences. The largest observed difference was base Chinese, increasing from 6.4% on the laptop to 8.4% on the GPU.
+
+**Outcome:** The hardware control completed, but the GPU did not reproduce the laptop answers exactly. Section 12.0 specifies no numerical pass/fail threshold, so no binary pass is claimed. The D6 and D11 results must be compared against the D18 GPU baseline, not the laptop baseline. The cause of the generation differences remains unverified, and the matching model revisions, adapter revisions, and evaluation settings should be checked before attributing them solely to hardware.
+
+GPU job: `lir-control`, ID `6b0356e0130a00b5aa8123e2`. Evaluation commit: `330ebbab5860f8f8a891451f90b63c7e7d28a140`. Confidence: Medium, pending verification of configuration equivalence and the strict-metric calculation.
+
 ### 12.1 A2. Training language and drift
 
 Question: which training language moves safety in which language?
