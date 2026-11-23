@@ -10,7 +10,7 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
 - **Code:** `github.com/lost-in-refusal/lexsi-multilingual-safety`, branch `mingyu/stage2` (merged into `main` before
   submission). Every table in `results/lir/stage2/` is written by a command named at the top of its module
   (`python -m lir.seeds`, `lir.repeat`, `lir.section13`, `lir.loose`, `lir.direction`, `lir.trunc`, `lir.gpu`).
-- **Tests:** `python -m unittest tests.test_lir` (97 tests; each registered rule has a test on made-up data).
+- **Tests:** `python -m unittest tests.test_lir` (98 tests; each registered rule has a test on made-up data).
 - **Rebuild:** `python -m lir.rebuild fetch` and `python -m lir.rebuild tables`, in a fresh clone, download the public outputs
   at a pinned revision and run each report again, with no GPU, no model and no login. Tested on Nov 23 in a clean
   copy of the repository and a new environment: 26 tables came out byte for byte the same as the committed files
@@ -164,7 +164,7 @@ The recommended layout on hackathon.lexsi.ai marks these as required or as value
   value: a re-generation of the mixing arms at 1,024 tokens and a direct test of five copies against one (the mixing
   baseline itself ran at seeds 1 and 2 under the extension); a second labeller for the Korean reading (one person has read 261 of the 291 Korean prompts at seed 42 in two
   checks, and neither reached significance);
-  the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; in the six further untrained languages, a person's check of the guard, a re-generation at 1,024 tokens, and over-refusal and task sets; the Fire and Water models; LoRA
+  the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; in the six further untrained languages, a person's check of the guard, a re-translation check as for Swahili, and over-refusal and task sets; the Fire and Water models; LoRA
   rank, learning rate and epoch sensitivity; a second safety benchmark.
 - **"Declaration of work done outside the hackathon" (required):** for the team to state.
 - **"Results on the quantized / deployed model (GGUF, 4-bit)" (Track 2b line):** filled by the NF4 runs of 12.2

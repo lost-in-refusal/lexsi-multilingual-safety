@@ -234,3 +234,69 @@ def settings_figure(rows: list[dict], path) -> None:
     fig.tight_layout(rect=(0, 0.01, 1, 0.95))
     fig.savefig(path, dpi=170, facecolor=SURFACE)
     print("wrote", path)
+
+
+LANG10 = {"en": "English", "ko": "Korean", "zh": "Chinese", "sw": "Swahili", "it": "Italian \u2020", "vi": "Vietnamese \u2020",
+          "ar": "Arabic \u2020", "th": "Thai \u2020", "bn": "Bengali \u2020", "jv": "Javanese \u2020"}
+TRAINED = ("en", "ko", "zh")
+
+
+def ten_figure(res: dict, path) -> None:
+    """The drift figure over ten languages: the three the model was fine-tuned on, then the seven it was not. Change
+    against base under plain and under SafeGrad, mean of the seeds with its interval and each seed as a tick."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from matplotlib.ticker import MultipleLocator
+
+    panels = (("strict", "Strict attack success, as the guard measures it", "more attacks succeed  \u2192"),
+              ("refusal", "Refusal rate on attack prompts", "\u2190  fewer refusals"))
+    series = (("plain", "Plain LoRA", STAGE2["plain"], -0.17), ("safegrad", "SafeGrad LoRA", STAGE2["safegrad"], 0.17))
+    langs = [l for l in res["languages"] if l in TRAINED] + [l for l in res["languages"] if l not in TRAINED]
+    n_trained = sum(l in TRAINED for l in langs)
+    ys = {l: i + (1.2 if i >= n_trained else 0) for i, l in enumerate(langs)}       # a gap between the two groups
+    fig, axes = plt.subplots(1, 2, figsize=(10.6, 1.9 + 0.56 * len(langs)), sharey=True, facecolor=SURFACE)
+    for ax, (metric, title, hint) in zip(axes, panels):
+        ax.set_facecolor(SURFACE)
+        ax.grid(axis="x", color=GRID, lw=1)
+        ax.set_axisbelow(True)
+        ax.axvline(0, color=INK2, lw=1, zorder=1)
+        for key, _, color, dy in series:
+            for lang in langs:
+                c, y = res[metric][key][lang], ys[lang] + dy
+                ax.plot(c["ci95"], [y] * 2, color=color, lw=1.6, solid_capstyle="round", zorder=2)
+                ax.plot(list(c["seeds"].values()), [y] * len(c["seeds"]), "|", ms=11, mew=1.4, color=color, zorder=3)
+                ax.plot(c["mean"], y, "o", ms=8, mfc=color, mec=SURFACE, mew=1.6, zorder=4)
+                if key == "plain":   # one number per language and panel: the change under plain fine-tuning
+                    right = c["mean"] >= 0
+                    ax.annotate(f"{c['mean']:+.1f}".replace("-", "\u2212"), (c["ci95"][1] if right else c["ci95"][0], y),
+                                xytext=(7 if right else -7, 0), textcoords="offset points", fontsize=8.5, color=INK,
+                                va="center", ha="left" if right else "right")
+        ax.set_title(title, fontsize=11, color=INK, loc="left", pad=8)
+        ax.set_xlabel(hint, fontsize=8.5, color=INK2)
+        ax.xaxis.set_major_locator(MultipleLocator(5))
+        ax.margins(x=0.14)
+        ax.tick_params(colors=INK2, length=0, labelsize=9)
+        for edge in ("top", "right", "left", "bottom"):
+            ax.spines[edge].set_visible(False)
+    axes[0].set_yticks([ys[l] for l in langs], [LANG10.get(l, l) for l in langs])
+    axes[0].tick_params(axis="y", labelsize=10, labelcolor=INK)
+    axes[0].set_ylim(max(ys.values()) + 0.55, -1.25)
+    for y, text in ((-0.85, "Fine-tuned on"), (n_trained + 0.35, "Never fine-tuned on")):
+        axes[0].text(-0.02, y, text, transform=axes[0].get_yaxis_transform(), ha="right", va="center", fontsize=8.5,
+                     color=INK2, style="italic")
+    n = len(res["seeds"])
+    fig.supxlabel("Change against the base model, in points. Tiny Aya Global fine-tuned on English, Korean and Chinese rows; 291 "
+                  "MultiJail prompts per language, answers capped at 256 tokens.\n"
+                  f"Dots: mean of seeds {', '.join(map(str, res['seeds']))}. Lines: 95% intervals over prompts. Ticks: single "
+                  "seeds. Numbers: plain LoRA.  \u2020 No person has checked the guard in this language.",
+                  fontsize=8.5, color=INK2)
+    handles = [Line2D([], [], marker="o", ms=8, mfc=c, mec=SURFACE, mew=1.6, color=c, lw=1.6, label=lab) for _, lab, c, _ in series]
+    handles.append(Line2D([], [], marker="|", ms=11, mew=1.4, color=INK2, lw=0, label=f"one seed ({n} per arm)"))
+    fig.legend(handles=handles, loc="upper right", ncol=3, frameon=False, fontsize=9, labelcolor=INK,
+               bbox_to_anchor=(0.985, 0.998))
+    fig.tight_layout(rect=(0, 0.01, 1, 0.96))
+    fig.savefig(path, dpi=170, facecolor=SURFACE)
+    print("wrote", path)

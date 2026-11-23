@@ -24,7 +24,7 @@ the main evaluation (English, Korean, Chinese, Swahili), with Vietnamese, Thai a
 distinguishable from Korean. It is not a statement about the ten languages, and it is not a finding that the three
 rose as much as Korean. H1, Korean against English, is unchanged.
 
-Source: `seeds.md`, `drift_by_language.json`, `more_languages.md`.
+Source: `seeds.md`, `drift_by_language.json`, `more_languages.md`. Figure: `ten_languages.png` (the drift figure over all ten languages).
 
 ## D2. SafeGrad repair. Confidence: High for the direction
 

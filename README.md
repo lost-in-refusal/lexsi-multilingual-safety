@@ -188,8 +188,8 @@ activation files are not published), `aya/task` (the held-out Aya answers are no
 public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
 in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
 `ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds` and
-`more_languages` (their answers and verdicts are not published yet), and the three images (the numbers
-beside them are compared).
+`more_languages` and `ten_languages.json` (their answers and verdicts are not published yet), and the four images
+(the numbers beside three of them are compared).
 
 Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new
 virtual environment with only the packages named above: all three rows came out as stated (the third with the

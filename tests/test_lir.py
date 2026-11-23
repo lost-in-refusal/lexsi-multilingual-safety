@@ -1655,6 +1655,18 @@ class MoreLanguages(unittest.TestCase):
                     with mock.patch.object(morelangs, "judged", return_value=None), self.assertRaises(SystemExit):
                         morelangs.regen(argparse.Namespace(arm="base", before=0, dry_run=True))   # not fully judged
 
+    def test_the_ten_language_figure_has_each_arm_against_base(self):
+        from lir.morelangs import ten_languages
+
+        more, main = self.arms()
+        res = ten_languages(more, main, langs=self.LANGS, main_langs=["ko"])
+        self.assertEqual((res["languages"], res["main"], res["further"]), (["ko", "it", "th"], ["ko"], ["it", "th"]))
+        self.assertAlmostEqual(res["strict"]["plain"]["ko"]["mean"], 45.0)          # 2 of 40 unsafe under base, 20 under plain
+        self.assertAlmostEqual(res["strict"]["safegrad"]["ko"]["mean"], 15.0)       # each arm is drawn against base
+        self.assertAlmostEqual(res["refusal"]["plain"]["it"]["mean"], -50.0)
+        self.assertEqual(res["strict"]["plain"]["th"]["seeds"], {42: 5.0, 1: 5.0, 2: 5.0})
+        self.assertAlmostEqual(res["strict"]["base"]["th"], 2.5)
+
     def test_the_second_reading_is_set_beside_the_first_and_decides_nothing(self):
         from lir.morelangs import AGAIN_ROWS, again_md, again_result, more_result
 

@@ -18,6 +18,8 @@ Section 14e reads the block a second time, after every answer that reached the 2
   python -m lir.morelangs again                  # 14b's code on those answers -> more_languages_regen.{json,md}
 
 That reading decides nothing: U1 to U3 stand as `report` wrote them.
+
+  python -m lir.morelangs figure                 # ten_languages.{json,png}: the change against base in ten languages
 """
 from __future__ import annotations
 
@@ -421,9 +423,47 @@ def again(a) -> None:
     print(md)
 
 
+# ---------------------------------------------------------------- the ten-language figure
+def ten_languages(more: dict[str, dict], main: dict[str, dict], seeds: dict[int, tuple[str, str]] = SEEDS,
+                  langs: list[str] = MORE_LANGS, main_langs: list[str] | None = None) -> dict:
+    """Change against base in the languages of the main evaluation and in the further ones, per seed and pooled, for
+    strict attack success and the refusal rate: the numbers behind the ten-language figure. Description only. The
+    readings with a rule are H1 to H3 and U1 to U3."""
+    from lir.common import EVAL_LANGS
+    from lir.seeds import diff
+
+    main_langs = main_langs or EVAL_LANGS
+    out = {"seeds": list(seeds), "languages": [*main_langs, *langs], "main": list(main_langs), "further": list(langs)}
+    for name, fn in (("strict", STRICT), ("refusal", REFUSAL)):
+        out[name] = {"base": {}, "plain": {}, "safegrad": {}}
+        for data, ls in ((main, main_langs), (more, langs)):
+            base = by_family(data["base"], fn)
+            out[name]["base"].update({l: rate(base, l) for l in ls})
+            for i, key in enumerate(("plain", "safegrad")):
+                arms = {seed: by_family(data[pair[i]], fn) for seed, pair in seeds.items()}
+                out[name][key].update({l: dict(pooled([diff(base, v, l) for v in arms.values()]),
+                                               seeds={seed: change(base, v, l)["delta"] for seed, v in arms.items()})
+                                       for l in ls})
+    return out
+
+
+def figure(a) -> None:
+    from lir.figures import ten_figure
+
+    n = len(read_jsonl(DATA / FILE))
+    more = {arm: judged(arm, n) for arm in ARMS}
+    waiting = [arm for arm, rows in more.items() if rows is None]
+    if waiting:
+        print("pending, nothing written: not fully judged in the six languages: " + ", ".join(waiting))
+        return
+    res = ten_languages(more, {arm: load(arm, "attack") for arm in ARMS})
+    write_json(OUT / "ten_languages.json", res)
+    ten_figure(res, OUT / "ten_languages.png")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["build", "evaluate", "report", "regen", "again"])
+    ap.add_argument("what", choices=["build", "evaluate", "report", "regen", "again", "figure"])
     ap.add_argument("--arm", help="evaluate, regen: base, or a plain or SafeGrad run at seed 42, 1 or 2")
     ap.add_argument("--before", type=int, default=0, help="evaluate, regen: do not start at or after this time (epoch seconds)")
     ap.add_argument("--dry-run", action="store_true", help="evaluate, regen: say what would run and stop")
@@ -436,6 +476,8 @@ def main() -> None:
         regen(a)
     elif a.what == "again":
         again(a)
+    elif a.what == "figure":
+        figure(a)
     else:
         report(a)
 
