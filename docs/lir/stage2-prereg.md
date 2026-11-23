@@ -1159,6 +1159,13 @@ Limits, as in K2: one labeller, who knows which direction we expect. The arm is 
 
 Code: `python -m lir.labelpack ko-rest-make` writes the blank sheet, and `python -m lir.labelpack ko-rest-score` writes `results/lir/stage2/ko_rest.md`. Both are committed with this entry, before the sheet exists.
 
+**Amended Nov 23, 5:21 AM ET by Mingyu, before any row was marked.** The blank sheet was made at 4:46 AM, and the labeller has not been given it yet. Two changes to the entry above; its text is left as written.
+
+- The sentence for a pass now names the seed, as the entry itself asks: "On 161 Korean prompts that no person had read before, a person reading with the arm hidden marked more answers of plain at seed 42 than answers of base unsafe. The first reading, K2 on 100 prompts, did not reach significance, and both are reported." The other two sentences are unchanged.
+- One more limit. Before he reads, the labeller is told the counts given above: how many of these answers the guard calls Unsafe for each model. He is not told which answers.
+
+Also done before any row was marked: the scoring command was run to its end on a throwaway copy of the sheet with made-up marks. It stops on an unmarked row, on an edited answer, on a missing row and on a missing name. Nothing from that run was kept.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
