@@ -644,6 +644,17 @@ The intended backend is TRL, with seed 42, the original 1,800 training rows, and
 
 Reference: https://github.com/Lexsi-Labs/aligntune/blob/main/docs/PARAMETERS.md
 
+
+**Added Nov 23, after two AlignTune GPU verification attempts.** We attempted to run `plain-aligntune` on Tiny Aya Global using the usual 1,800 Bactrian-X training rows, seed 42, and the intended plain LoRA settings. The model loaded successfully and AlignTune's TRL backend processed the dataset, but the training batch did not reproduce the original baseline tokenization. We stopped before fine-tuning.
+
+- **First attempt.** GPU job `6b03be68130a00b5aa820c70` loaded the model and constructed a training batch. Prompt masking checks passed, but TRL warned that the tokenized prompt did not consistently match the beginning of the tokenized prompt and completion. The job then failed while attempting to upload a nonexistent evaluation directory. We corrected the upload behavior and added stricter tokenization checks.
+- **Second attempt.** GPU job `6b03c3ae130a00b5aa821a33`, commit `99a6a45`. We applied Tiny Aya's baseline chat template and compared TRL's prepared token IDs and completion masks against the baseline. All 1,800 rows passed formatting and length filtering, and TRL completed tokenization and label creation. Verification failed at row 0 with `RuntimeError: TRL token IDs differ from baseline at row 0`.
+- **Settings.** LoRA rank 16, alpha 32, dropout 0, the seven target modules, learning rate 2e-4, micro-batch 4, accumulation 8, three epochs, seed 42, and sequence limit 1,024 were configured. These settings were not verified through a completed training run. The unresolved difference is the chat-template/tokenization behavior, possibly involving BOS/EOS handling or the prompt-completion boundary.
+- **Decision.** We paused D13 because AlignTune was the first run to cut if time was limited. Running it without resolving the token mismatch could make the results incomparable to our original plain LoRA baseline. No adapter was trained, so T1 was not tested and no attack, XSTest, or task evaluation was performed.
+- **Limit.** This does not establish that AlignTune cannot fine-tune Tiny Aya Global. It establishes that our current integration could not reproduce the baseline tokenization. We will include this in the Lexsi feedback (D17) and revisit the experiment only if time allows.
+
+The implementation and verification code are on branch `hannah/d13-aligntune` at commit `99a6a45`. GPU job logs: [first attempt](https://huggingface.co/jobs/lost-in-refusal-lexsi/6b03be68130a00b5aa820c70) and [second attempt](https://huggingface.co/jobs/lost-in-refusal-lexsi/6b03c3ae130a00b5aa821a33).
+
 ### 12.4 Order, cut order and cost
 
 - Order: hardware control → `plain-ko` → NF4 → `plain-en` and `plain-zh` → AlignTune.
