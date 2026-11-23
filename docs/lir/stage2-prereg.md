@@ -650,6 +650,12 @@ Reference: https://github.com/Lexsi-Labs/aligntune/blob/main/docs/PARAMETERS.md
 - Cut order: AlignTune → NF4 → `plain-en` and `plain-zh`. `plain-ko` and the hardware control are not cut. Anything not launched by the freeze (Sun Nov 22, 9 PM ET) is listed as not run. A run launched before the freeze may finish overnight and is read by Mon Nov 23, 3 AM ET.
 - Cost: on the laptop a 1,800-row plain run took about 76 minutes and an evaluation about 35. Here that is four training runs (three of them a third of the size) and about ten evaluations. Time on a Hugging Face GPU has not been measured; we record it per job.
 
+**Added Nov 22, 11:49 PM ET by Mingyu, as a review note. The text above is unchanged.** What 12.4 asks to be listed, as far as the uploads to the staging dataset and the branches show at this time. A job that is still running cannot be seen there.
+
+- Launched before the freeze (9 PM ET) and read: the hardware control (job started at 3:57 PM), `plain-ko` (4:30 PM), NF4 (4:51 PM), `plain-en` and `plain-zh` (5:27 PM).
+- Not launched by the freeze, so listed as not run: the AlignTune run of 12.3. No `d13` job was uploaded before 9 PM. The first one started at 04:21:54 UTC on Nov 23 (11:21 PM ET), ran for 32 seconds at commit `6663ec9`, checked one training batch and started no training.
+- Also not run: the two bfloat16 arms with the adapter left unmerged (review note under 12.2; no upload), the task set (its judge does not fit an L4), and seeds 1 and 2 of the single-language runs, which 12.1 ties to a confirmed extension.
+
 ## 13. Two blocks added on Nov 22
 
 **Added Nov 22, 8:20 PM ET: this section is now section 13, and three of its checks have new names.** It was written as section 12, the number Aish's section above already had, and it used the names L1, L2 and T1, which her section uses for other rules. Mingyu decided on Nov 22 to renumber this one, and those three checks were renamed in the same change. Aish's section is unchanged.
