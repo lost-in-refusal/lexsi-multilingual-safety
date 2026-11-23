@@ -125,6 +125,12 @@ everywhere. We name the sizes where it fails and do not claim it holds across no
 
 Source: `circuit_nodes.md`.
 
+## Refusal direction across seeds and training languages (not in the brief's list). Confidence: High for the Korean-English comparison (three seeds, preregistered, inside a margin fixed in advance); Medium for what it means
+
+Stage 1 found a direction in the base model's activations that separates harmful from harmless prompts in all four languages. Across three seeds, plain fine-tuning moved Korean and English attack prompts the same distance along it, as predicted: the difference is 0.08 units (-0.08 to +0.25), against a shift of about 3.5 units and a margin of 1 unit fixed in advance. Korean's larger drift is therefore not a larger movement along this direction. The single-language runs sharpen this. Trained on English alone, Korean moved less far than English (by 1.41 units, 1.28 to 1.54), and Korean was still the language whose attack success rose; trained on Chinese alone, Korean and Chinese moved the same distance to within the margin. SafeGrad moved every language about 60% as far as plain. This concerns one direction at one layer, found in English on the base model, and no judge is involved. It does not show why Korean loses more for the same movement, and refusal rates do not follow the shift language by language, so the projection is not a readout of a fine-tuned model's refusals.
+
+Source: `refusal_direction.md`; stage 1's `results/lir/probe.json` for the direction.
+
 ## D9. Costs: task score. Confidence: High that there is a cost; the cause is not established
 
 Both fine-tunes score below the base model on the 300 held-out task prompts in every seed: averaged over three seeds, English goes from 6.61 to 6.37 under plain and 6.31 under SafeGrad, Korean from 6.10 to 5.51 and 5.49, Chinese from 6.25 to 5.79 and 5.74 (1 to 7 scale, Qwen3-14B judge). SafeGrad adds little to the cost of fine-tuning itself. The drop is not explained by shorter answers. With length groups fixed in advance, answers about as long as the base model's still score lower (plain -0.39 points, -0.81 to -0.05; SafeGrad -0.67, -1.10 to -0.30), and the drop is the same size for answers under half the length. It sits in the judge's accuracy score (-0.6 in English, -1.2 in Korean, -1.1 in Chinese) and not in fluency. The fine-tuned models answer at the length of the references they were trained on, a third of the base model's length.
@@ -143,6 +149,7 @@ Source: `second_judge_check.md`, `ko_drift.md`, `unsafe_only.md`.
 - D7 holds after re-generation as well.
 - D6: the three single-language runs are on three seeds on the laptop (row 1 in all nine runs), with a second reading after re-generation at seed 42, and were repeated on a GPU at seed 42.
 - D11 and D18 are new: the hardware control and 4-bit loading ran on a GPU on Nov 22 (Hannah's jobs).
+- Not in the brief: the refusal-direction check on three seeds and on the single-language runs (R1 holds as predicted).
 - Not in the brief: the seed 42 repair vector, added with no training to the Aya adapters, lowered Korean attack
   success by about 5 points on both readings (registered before it ran), but it made answers about twice as long,
   and its over-refusal and task score were not measured. If it is used at all, it belongs in the appendix with
