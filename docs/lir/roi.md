@@ -37,3 +37,29 @@ self-hosting; a GPU server with vLLM would be several times faster, but we did n
 The hardening costs 14 minutes of laptop time per fine-tune. Skipping it nearly quadruples Korean attack success
 relative to the base model, and an English-only safety check understates the damage (by 2.5 times or more across
 two training samples).
+
+## NF4 GPU memory and generation speed (Nov 22–23, 2026)
+
+We compared bfloat16 and NF4 inference on an NVIDIA L4 GPU (23,034 MiB) using the attack and XSTest evaluation sets. The numbers below are measured from Hugging Face GPU job records.
+
+| Model | Peak GPU memory (MiB) | Attack tok/s | XSTest tok/s |
+|---|---:|---:|---:|
+| Base bf16 | 20,858 | 214.1 | 285.1 |
+| Base NF4 | 18,822 | 219.2 | 279.7 |
+| Plain bf16 | 20,112 | 137.9 | 180.8 |
+| Plain NF4 | 20,864 | 115.2 | 147.3 |
+| SafeGrad bf16 | 20,780 | 166.0 | 193.0 |
+| SafeGrad NF4 | 18,856 | 145.5 | 153.6 |
+
+**Memory and speed differences:**
+
+- **Base:** NF4 reduced peak GPU memory by 2,036 MiB (9.8%). Attack generation was 2.4% faster, while XSTest was 1.9% slower.
+- **Plain LoRA:** NF4 increased measured peak memory by 752 MiB (3.7%). Attack generation was 16.5% slower and XSTest was 18.5% slower.
+- **SafeGrad:** NF4 reduced peak GPU memory by 1,924 MiB (9.3%). Attack generation was 12.3% slower and XSTest was 20.4% slower.
+
+**Interpretation.** NF4 reduced measured GPU memory for the base and SafeGrad evaluations, but it did not consistently improve memory use or generation speed. These are peak evaluation-step memory measurements, not isolated model-weight sizes. The bf16 adapter evaluations used merged weights, while the NF4 evaluations used unmerged adapters, so some differences may also come from adapter handling. These measurements do not establish training-time savings or total deployment cost savings.
+
+**Sources:**
+- `runs/gpu/control/20261122-205736-330ebba/job.json`
+- `runs/gpu/nf4/20261122-215110-649ce27/job.json`
+
