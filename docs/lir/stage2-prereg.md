@@ -1181,6 +1181,12 @@ The sentence above about naming languages next to Korean and about the reading o
 - The report as read: `results/lir/stage2/more_languages.md`, sha256 `f2e7f8fa5abadfec9c9bfc85c29e185f0e2e83e8fb9791560529ed811ca100f3`, and `more_languages.json`, sha256 `3f5788853683531152208b8328d82d959d5fd0d8a1ee52199188a268f8740aef`, committed with this note as the queue wrote them.
 - Not uploaded to Hugging Face when this was written: the answers and verdicts under `runs/morelangs/`.
 
+**Added Nov 23, 5:49 PM ET by Mingyu.** A figure over the ten languages was drawn at 4:37 PM on Nov 23, after the block was read: `results/lir/stage2/ten_languages.png`, with its numbers in `ten_languages.json` (`python -m lir.morelangs figure`). It was not planned in this entry. It has no rule and decides nothing.
+
+- For the six further languages it draws plain against base, which this entry lists beside U1 to U3, and SafeGrad against base, which it does not list. SafeGrad against base was computed for the figure after the read, with the same bootstrap over prompt families. No test is attached to it, and U2 compares SafeGrad with plain on refusals only.
+- The four languages of the main evaluation have the values of `drift_by_language.json`, and the six further languages the values of `more_languages.json`.
+- Redrawn at 5:49 PM with a second mark on Swahili. The first version put a dagger on the six further languages only (no person has checked the guard there), which could be read as saying the guard is checked in Swahili. Against a person's labels the guard missed our 80% agreement bar in Swahili (section 1, under H3), and the mark now says so. No number changed: `ten_languages.json` is the same file.
+
 ### 14c. K3: the Korean rise judged by a person, on the prompts not read before
 
 **Added Nov 23, 4:42 AM ET by Mingyu, before the sheet was made.**

@@ -236,7 +236,7 @@ def settings_figure(rows: list[dict], path) -> None:
     print("wrote", path)
 
 
-LANG10 = {"en": "English", "ko": "Korean", "zh": "Chinese", "sw": "Swahili", "it": "Italian \u2020", "vi": "Vietnamese \u2020",
+LANG10 = {"en": "English", "ko": "Korean", "zh": "Chinese", "sw": "Swahili \u2021", "it": "Italian \u2020", "vi": "Vietnamese \u2020",
           "ar": "Arabic \u2020", "th": "Thai \u2020", "bn": "Bengali \u2020", "jv": "Javanese \u2020"}
 TRAINED = ("en", "ko", "zh")
 
@@ -291,7 +291,9 @@ def ten_figure(res: dict, path) -> None:
     fig.supxlabel("Change against the base model, in points. Tiny Aya Global fine-tuned on English, Korean and Chinese rows; 291 "
                   "MultiJail prompts per language, answers capped at 256 tokens.\n"
                   f"Dots: mean of seeds {', '.join(map(str, res['seeds']))}. Lines: 95% intervals over prompts. Ticks: single "
-                  "seeds. Numbers: plain LoRA.  \u2020 No person has checked the guard in this language.",
+                  "seeds. Numbers: plain LoRA.\n"
+                  "\u2020 No person has checked the guard in this language.  \u2021 Against a person's labels the guard "
+                  "missed our agreement bar in Swahili.",
                   fontsize=8.5, color=INK2)
     handles = [Line2D([], [], marker="o", ms=8, mfc=c, mec=SURFACE, mew=1.6, color=c, lw=1.6, label=lab) for _, lab, c, _ in series]
     handles.append(Line2D([], [], marker="|", ms=11, mew=1.4, color=INK2, lw=0, label=f"one seed ({n} per arm)"))
