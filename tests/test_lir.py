@@ -1476,7 +1476,11 @@ class MixingSeeds(unittest.TestCase):
         self.assertAlmostEqual(r["seeds"][1]["over_refusal"]["en"]["mixing"], 32.5)
         self.assertAlmostEqual(r["seeds"][1]["vs_base"]["en_over_refusal"]["delta"], 22.5)
         self.assertAlmostEqual(res["arms_averaged"]["m2"]["mean"], 25.0)
+        # the four-language mean of over-refusal: 3 and 13 of 40 English prompts refused, none in the other three languages
+        self.assertAlmostEqual(r["seeds"][1]["over_refusal_mean"]["safegrad"], 1.875)
+        self.assertAlmostEqual(r["seeds"][1]["over_refusal_mean"]["delta"], 6.25)
         text = mix_md(dict(res, runs=[]))
+        self.assertIn("seed 1 1.9 and 8.1 (+6.2)", text)
         self.assertIn(f"{M2_ROWS['above']}.**", text)
         self.assertIn(f"**For section 3: {SECTION3_ROWS[1]}.**", text)
         self.assertIn("| 42 | no, seen before |", text)

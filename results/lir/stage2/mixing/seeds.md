@@ -19,6 +19,7 @@ Plain LoRA on the training set with the 47 refusal examples added, at seeds 1 an
 - Beside, as estimates over seeds 42, 1, 2 (seed 42 was seen before the rules): M1 -0.8 [-3.0, +1.3]; M2 +5.5 [+3.1, +8.1]; M3 +0.07 [+0.01, +0.13].
 - Beside, no rule. M1 on the guard's Unsafe class alone: -1.4 [-3.4, +0.7]. Over-refusal in the other languages, mixing minus SafeGrad: ko +2.2 [+0.2, +4.4]; zh +3.2 [+1.2, +5.6]; sw +3.2 [+1.0, +5.6].
 - Beside, no rule. Refusal rate on the attack set, mixing minus SafeGrad: seed 42 en +6.5*, ko +3.8*, zh +5.2*, sw +0.3; seed 1 en +6.2*, ko +2.4, zh +10.3*, sw +2.7; seed 2 en +7.6*, ko +3.4, zh +6.5*, sw +4.1*.
+- Beside, no rule, no interval. Over-refusal averaged over the four languages with equal weight, SafeGrad and mixing: seed 42 6.4 and 9.4 (+3.0); seed 1 7.1 and 11.1 (+4.0); seed 2 7.6 and 10.4 (+2.8).
 - Beside, no rule. Against the base model: Korean strict attack success +4.1 (p = 0.029), +3.4 (p = 0.052), +3.1 (p = 0.108); English over-refusal +4.4 (p = 0.007), +4.8 (p = 0.004), +5.6 (p = 0.001) (seeds 42, 1, 2).
 
 #### `plain-mix5`: five copies of the refusal examples
@@ -38,6 +39,7 @@ Plain LoRA on the training set with the 47 refusal examples added, at seeds 1 an
 - Beside, as estimates over seeds 42, 1, 2 (seed 42 was seen before the rules): M1 -2.4 [-4.6, -0.3]; M2 +5.3 [+3.1, +8.0]; M3 +0.05 [+0.00, +0.10].
 - Beside, no rule. M1 on the guard's Unsafe class alone: -1.9 [-4.0, +0.0]. Over-refusal in the other languages, mixing minus SafeGrad: ko +3.4 [+1.2, +5.8]; zh +3.0 [+1.0, +5.4]; sw +1.8 [+0.4, +3.4].
 - Beside, no rule. Refusal rate on the attack set, mixing minus SafeGrad: seed 42 en +8.2*, ko +5.2*, zh +5.8*, sw -0.3; seed 1 en +8.6*, ko +5.2*, zh +8.6*, sw +2.7; seed 2 en +8.9*, ko +5.5*, zh +9.6*, sw +4.5*.
+- Beside, no rule, no interval. Over-refusal averaged over the four languages with equal weight, SafeGrad and mixing: seed 42 6.4 and 9.2 (+2.8); seed 1 7.1 and 11.1 (+4.0); seed 2 7.6 and 10.3 (+2.7).
 - Beside, no rule. Against the base model: Korean strict attack success +3.8 (p = 0.027), +1.0 (p = 0.607), +1.0 (p = 0.648); English over-refusal +3.6 (p = 0.035), +5.6 (p = 0.001), +5.2 (p = 0.002) (seeds 42, 1, 2).
 
 The two mixing arms averaged, seeds 1 and 2, no rule: M1 -1.6 [-3.9, +0.4]; M2 +5.1 [+2.7, +7.8].

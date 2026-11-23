@@ -18,7 +18,7 @@ from lir import trunc
 from lir.common import DATA, EVAL_LANGS, MODELS, ROOT, RUNS, read_jsonl, sha256_file, write_json
 from lir.metrics import boot_delta, load
 from lir.seeds import (CONTROLS, REFUSAL, SEEDS, STRICT, UNSAFE, analyse, by_family, change, control_across, control_bar,
-                       control_result, diff, pooled, rate)
+                       control_result, diff, macro, pooled, rate)
 from lir.seeds import fmt as seed_table
 from lir.truncsplit import split
 
@@ -449,6 +449,7 @@ def mix_result(att: dict[str, dict], xs: dict[str, dict], task: dict[str, dict],
             row = {"run": runs[s], "safegrad": safegrad[s], "new": s in new,
                    "ko_strict": {"safegrad": rate(a0, "ko"), "mixing": rate(a1, "ko"), **change(a0, a1, "ko")},
                    "over_refusal": {l: {"safegrad": rate(x0, l), "mixing": rate(x1, l), **change(x0, x1, l)} for l in EVAL_LANGS},
+                   "over_refusal_mean": {"safegrad": macro(x0), "mixing": macro(x1), "delta": macro(x1) - macro(x0)},
                    "attack_refusal": {l: change(r0, r1, l) for l in EVAL_LANGS},
                    "task_score": {"safegrad": mean(task[safegrad[s]]), "mixing": mean(task[runs[s]]),
                                   "delta": sum(d.values()) / len(d), "prompts": len(d)}}
@@ -513,6 +514,11 @@ def mix_md(res: dict) -> str:
                   "- Beside, no rule. Refusal rate on the attack set, mixing minus SafeGrad: " + "; ".join(
                       f"seed {s} " + ", ".join(f"{l} {row['attack_refusal'][l]['delta']:+.1f}{star(row['attack_refusal'][l])}" for l in EVAL_LANGS)
                       for s, row in r["seeds"].items()) + "."]
+        if all("over_refusal_mean" in row for row in r["seeds"].values()):   # added after both arms were read (14a, Nov 23)
+            lines.append("- Beside, no rule, no interval. Over-refusal averaged over the four languages with equal weight, "
+                         "SafeGrad and mixing: " + "; ".join(
+                             f"seed {s} {row['over_refusal_mean']['safegrad']:.1f} and {row['over_refusal_mean']['mixing']:.1f} "
+                             f"({row['over_refusal_mean']['delta']:+.1f})" for s, row in r["seeds"].items()) + ".")
         if all("vs_base" in row for row in r["seeds"].values()):
             lines.append("- Beside, no rule. Against the base model: Korean strict attack success " + ", ".join(
                 f"{row['vs_base']['ko_strict']['delta']:+.1f} ({pv(row['vs_base']['ko_strict']['p'])})" for row in r["seeds"].values())
