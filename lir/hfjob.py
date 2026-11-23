@@ -39,6 +39,7 @@ NF4 = {"LIR_QUANT": "nf4"}
 # "train": a training file under data/lir) and the environment that changes how the model is loaded.
 # Arm names differ from every laptop arm, so a GPU result can never be read as a laptop one.
 JOBS = {
+    "d13": [{"arm": "gpu-plain-aligntune", "aligntune": True}],
     "control": [{"arm": "gpu-base"}, {"arm": "gpu-plain", "hub": "plain"}],                                   # 12.0
     "only-ko": [{"arm": "plain-ko", "train": "bactrian_train_only_ko.jsonl"}],                                  # 12.1
     "only-en": [{"arm": "plain-en", "train": "bactrian_train_only_en.jsonl"}],
@@ -56,8 +57,21 @@ JOBS = {
 def job_command(job: str, commit: str, flavor: str = FLAVOR, timeout: str = TIMEOUT, namespace: str = NAMESPACE,
                 dry_run: bool = False) -> list[str]:
     """The `hf jobs run` command for one job. The token is passed by name only and is read from the environment."""
-    inner = (f"set -euo pipefail; git clone -q {REPO_URL} repo; cd repo; git checkout -q {commit}; "
-             f"pip install -q -r requirements-gpu.txt; python -m lir.hfjob run --job {job}")
+    if job == "d13":
+        install = (
+            "pip install -q -r requirements-d13.txt; "
+            "pip install -q "
+            "'git+https://github.com/Lexsi-Labs/aligntune.git"
+            "@f53b41d0e50495278caea7c99a89505d9ddfae23'"
+        )
+    else:
+        install = "pip install -q -r requirements-gpu.txt"
+
+    inner = (
+        f"set -euo pipefail; git clone -q {REPO_URL} repo; "
+        f"cd repo; git checkout -q {commit}; "
+        f"{install}; python -m lir.hfjob run --job {job}"
+    )
     return (["hf", "jobs", "run", "--flavor", flavor, "--namespace", namespace, "--timeout", timeout, "--secrets", "HF_TOKEN",
              "--env", f"LIR_FLAVOR={flavor}", "--env", f"LIR_STAGING_REPO={STAGING}", "--name", f"lir-{job}", "--detach"]
             + (["--dry-run"] if dry_run else []) + [IMAGE, "bash", "-c", inner])
@@ -140,7 +154,6 @@ def run_step(cmd: list[str], env: dict, log: Path) -> dict:
     return {"command": " ".join(cmd), "env": env, "seconds": round(time.time() - t0, 1), "peak_gpu_mib": peak[0] or None,
             "tokens_per_second": speeds(text)}
 
-
 def run(a) -> None:
     from huggingface_hub import HfApi, snapshot_download
 
@@ -162,6 +175,25 @@ def run(a) -> None:
                                         allow_patterns=["adapter_config.json", "adapter_model.safetensors"])
             if sha256_file(Path(adapter) / "adapter_model.safetensors") != sha:
                 raise SystemExit(f"{repo}@{revision[:8]}: the adapter weights are not the file the laptop evaluated")
+        if step.get("aligntune"):
+            done = run_step(
+                py + [
+                    "lir.train_aligntune",
+                    "--model-path",
+                    str(RUNS / "d13" / "model"),
+                    "--verify-batch",
+                ],
+                {},
+                out / "logs" / f"{arm}.verify.log",
+            )
+
+            record["steps"].append(
+                dict(done, arm=arm, what="verify-aligntune")
+            )
+
+            print("D13 verification finished. Skipping evaluation.")
+            continue
+
         if "train" in step:
             done = run_step(py + ["lir.train", "--arm", "plain", "--output", str(RUNS / arm), "--train-file",
                                   str(DATA / step["train"])], {}, out / "logs" / f"{arm}.train.log")

@@ -1,0 +1,14 @@
+# D13 AlignTune + TRL GPU environment.
+# Separate from the existing D6/D11/D18 GPU environment.
+
+accelerate==1.15.0
+datasets>=4.7.0
+huggingface_hub==2.4.0
+numpy==2.5.4
+peft==0.21.2
+safetensors==0.8.0
+tokenizers==0.23.3
+torch==2.13.0
+transformers==5.22.1
+bitsandbytes==0.50.2
+trl==1.7.1
