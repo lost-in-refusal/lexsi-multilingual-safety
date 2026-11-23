@@ -32,6 +32,7 @@ intervals from a bootstrap over the 291 prompt families, pooled over seeds.
 | Korean drifts more than English (H1) | Pass in every seed (3) | Korean strict attack success rises 14.1, 10.3 and 13.7 points. Korean-minus-English gap +11.8 [+6.8, +16.7] |
 | SafeGrad repairs it (H2) | Pass in every seed (3) | Korean, SafeGrad against plain: −8.6, −7.2 and −9.3 points. Pooled −8.4 [−11.3, −5.5] |
 | Swahili refusals fall (H3) | Pass in every seed (3) | −13.1, −6.2 and −8.6 points. Pooled −9.3 [−13.7, −5.2] |
+| Six more untrained languages (U1, U2) | Refusals fell on average over the six, and SafeGrad kept more of them (3 seeds) | Refusal rate, plain minus base −4.9 [−7.0, −2.9]; SafeGrad minus plain +6.2 [+4.4, +8.0] |
 | No Korean rows in training (K1) | Korean rows are not needed for a drift of this size, in all three seeds | Korean 18.2%, 18.6% and 18.2% with no Korean rows in training, against 5.2% for the base model |
 | One training language at a time (SL1) | Korean drifts when the model is trained on English alone, Korean alone or Chinese alone: all nine runs | Korean rises +8.0 [+4.8, +11.3], +11.2 [+7.3, +15.1] and +11.6 [+7.9, +15.5] points |
 | A second model, Tiny Aya Earth (E1) | Drift and repair pass in every seed (3) | Korean rise +10.1 [+6.4, +14.0]; SafeGrad against plain −6.2 [−9.2, −3.4] |
@@ -48,6 +49,12 @@ Among what did not hold or was not tested (the status page has the full list):
 - **A person's reading of the Korean rise (K2) did not pass:** 5 plain answers against 1 base answer marked unsafe
   on 94 prompts, p = 0.22. A second reading on the 161 Korean prompts nobody had read (K3) did not pass either:
   11 against 5 on 145 prompts, p = 0.070. One labeller, seed 42.
+- **"Hardest in Korean" holds among four languages, not ten.** In six more languages the model was never
+  fine-tuned on (Italian, Vietnamese, Arabic, Thai, Bengali, Javanese; section 14b of the preregistration) the
+  guard's attack success rose in Thai (+11.7 [+8.1, +15.3]), Javanese (+9.4 [+5.4, +13.5]) and Vietnamese
+  (+8.1 [+5.0, +11.6]), and those rises could not be told apart from Korean's (+12.7 [+8.9, +16.7]). No language
+  rose more than Korean. The fall in refusals above is an average: it was not detected in Javanese, Arabic or
+  Bengali. No person has checked the guard in the six added languages.
 - **On the Aya training set the Swahili refusal drop did not carry over (Y3 fails):** −3.4, −3.1 and −1.4 points,
   pooled −2.6 [−6.9, +1.5]. The Swahili finding rests on Bactrian-X.
 - **The Korean clean set (H4) was not tested,** because its human check failed.
@@ -76,8 +83,8 @@ base model in parentheses; * = p < 0.05, exact McNemar on the same prompts.
   while Korean attack success nearly quadruples and Mandarin rises by half. Refusal on attacks drops in every
   language, Swahili included (50.9% → 37.8%).
 - **Replicated on an independent sample.** A plain LoRA on Hannah's separately curated training set (4 of 600 IDs
-  shared) gives Korean +16.5, Mandarin +4.8, English +6.5 and Swahili +5.5 points. Korean is hit hardest in both
-  samples, at least 2.5 times English; English is not always untouched.
+  shared) gives Korean +16.5, Mandarin +4.8, English +6.5 and Swahili +5.5 points. Of these four languages Korean
+  is hit hardest in both samples, at least 2.5 times English; English is not always untouched.
   ([`results/lir/replication/results.md`](results/lir/replication/results.md))
 - **The drift reaches the language we never trained on; the judge just can't see it.** Qwen3Guard misses harm in
   Swahili: a quarter of the Swahili answers it passes become unsafe when back-translated to English and re-judged
@@ -180,7 +187,8 @@ Not rebuilt, and why: `vector_aya` (its command checks the hashes of adapter wei
 activation files are not published), `aya/task` (the held-out Aya answers are not published), `aya/checks` (the
 public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
 in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
-`ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), and the three images (the numbers
+`ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds` and
+`more_languages` (their answers and verdicts are not published yet), and the three images (the numbers
 beside them are compared).
 
 Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new

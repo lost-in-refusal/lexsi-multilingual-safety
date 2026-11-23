@@ -100,7 +100,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 21, 8:59 PM (Aish) | Section 12.0 to 12.4: GPU runs (hardware control, single-language, NF4, AlignTune) | Hardware control: no significant difference from the laptop in eight comparisons. L1 and L2: row 1 in all three runs. Q2 passes. Q1: NF4 raises attack success for base in English and for plain in three languages, where the comparison also differs in merging. AlignTune: no result yet |
 | Nov 22 (Mingyu) | Section 13a to 13h: single-language runs on the laptop; repair vector on Aya (V1); second readings; 519-row seeds (C1, C2); refusal direction (R1, R2); Unsafe-only reading; task score by answer length | SL1 and SL2: row 1 on three seeds. V1 passes on both readings. C1 includes zero; C2 is below zero for English rows only (seen at seed 42 before it was registered). Unsafe-only: 20 of 22 passes kept. Task score: not a length effect. R1: Korean and English moved the same distance, as predicted. R2: with English rows only Korean moved less far than English; with Chinese rows only Korean and Chinese moved the same distance |
 | Nov 23, 3:58 AM (Mingyu), under the deadline extension | Section 14a: the mixing baseline at seeds 1 and 2 (M1 to M3), decided on the two new seeds | Five copies: mixing protected Korean better than SafeGrad (-2.7 points [-5.2, -0.5]). Examples added once: no detected difference (-0.5 [-2.9, +1.9]). Both arms: English over-refusal about 5 points above SafeGrad's (+5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]). Task score: no detected difference |
-| Nov 23, 4:26 AM (Mingyu), under the deadline extension | Section 14b: six more untrained languages (U1 to U3) | Not read when this was written |
+| Nov 23, 4:26 AM (Mingyu), under the deadline extension | Section 14b: six more untrained languages (U1 to U3), evaluation only | U1: refusals fell on average over the six (-4.9 points [-7.0, -2.9]). U2: SafeGrad kept more refusals than plain (+6.2 [+4.4, +8.0]). U3: no further language rose more than Korean, and the rise in Vietnamese, Thai and Javanese could not be told apart from Korean's, so "hardest in Korean" holds among the four languages of the main evaluation only |
 | Nov 23, 4:45 AM (Mingyu), under the deadline extension | Section 14c: a second reading of the Korean rise by a person, on the 161 prompts not read before (K3) | K3 does not pass: 11 plain against 5 base answers marked unsafe on 145 prompts, p = 0.070 |
 
 Deviations and things a reader should know:
@@ -143,6 +143,16 @@ Deviations and things a reader should know:
     [-5.2, -0.5], and with the examples added once no difference was detected. Both arms raised English
     over-refusal about 5 points above SafeGrad's. SafeGrad's advantage is in over-refusal only. Seed 42 was seen
     before the rules were written, so two seeds decide; the two arms were not tested against each other.
+12. **"Hardest in Korean" holds among four languages, not ten.** In six more languages with no training rows
+    (section 14b) the guard's attack success rose in Thai (+11.7 points [+8.1, +15.3]), Javanese (+9.4
+    [+5.4, +13.5]) and Vietnamese (+8.1 [+5.0, +11.6]), and those rises could not be told apart from Korean's
+    (+12.7 [+8.9, +16.7]). No language rose more than Korean. No person has checked the guard in the six added
+    languages, base answers there are cut at the 256-token cap far more often than fine-tuned answers, and none was
+    generated again.
+13. **The six-language block was not read strictly once.** Its rule was one reading when all seven arms were
+    judged. During a file check after the first arm, the base model's totals over the six languages together were
+    printed (strict attack success 8.8%, refusal rate 60.5%). No figure by language and no figure of a fine-tuned
+    arm was seen before the report, and no rule, code or arm changed afterwards (dated note under 14b).
 
 ## D. What the organizers' write-up layout asks for that the draft does not have yet
 
@@ -152,7 +162,7 @@ The recommended layout on hackathon.lexsi.ai marks these as required or as value
   value: a re-generation of the mixing arms at 1,024 tokens and a direct test of five copies against one (the mixing
   baseline itself ran at seeds 1 and 2 under the extension); a second labeller for the Korean reading (one person has read 261 of the 291 Korean prompts at seed 42 in two
   checks, and neither reached significance);
-  the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; a second untrained language and the Fire and Water models; LoRA
+  the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; in the six further untrained languages, a person's check of the guard, a re-generation at 1,024 tokens, and over-refusal and task sets; the Fire and Water models; LoRA
   rank, learning rate and epoch sensitivity; a second safety benchmark.
 - **"Declaration of work done outside the hackathon" (required):** for the team to state.
 - **"Results on the quantized / deployed model (GGUF, 4-bit)" (Track 2b line):** filled by the NF4 runs of 12.2

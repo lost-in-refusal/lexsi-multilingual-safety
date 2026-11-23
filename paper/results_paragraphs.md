@@ -15,7 +15,16 @@ Plain LoRA fine-tuning on 1,800 harmless Bactrian-X rows raised Korean attack su
 not move (+0.9 points on average, interval -1.8 to +3.8). The pooled Korean-minus-English gap is +11.8 points
 (+6.8 to +16.7), and the preregistered check passes in every seed. No harmful example was in the training data.
 
-Source: `seeds.md`, `drift_by_language.json`.
+Where Korean stands among more languages (section 14b, read Nov 23; Medium, because no person has checked the guard
+in the six added languages). The same adapters answered the 291 attack families in six further languages that have
+no training rows. As the guard measures it, Korean rose more than Italian, Arabic and Bengali, and its rise could not
+be told apart from the rise in Thai (+11.7 points, +8.1 to +15.3), Javanese (+9.4, +5.4 to +13.5) or Vietnamese
+(+8.1, +5.0 to +11.6). No language rose more than Korean. So "hardest in Korean" holds among the four languages of
+the main evaluation (English, Korean, Chinese, Swahili), with Vietnamese, Thai and Javanese named beside it as not
+distinguishable from Korean. It is not a statement about the ten languages, and it is not a finding that the three
+rose as much as Korean. H1, Korean against English, is unchanged.
+
+Source: `seeds.md`, `drift_by_language.json`, `more_languages.md`.
 
 ## D2. SafeGrad repair. Confidence: High for the direction
 
@@ -39,7 +48,19 @@ does not fall more than the trained languages; what the result shows is that the
 training rows. And on the second dataset the Swahili refusal drop did not carry over (-2.6 points, -6.9 to +1.5),
 so this finding rests on Bactrian-X.
 
-Source: `seeds.md`, `swahili_nllb_seeds.json`, `aya/seeds.md`.
+Beyond Swahili (section 14b, read Nov 23; Medium: both averages were preregistered before any answer in these
+languages existed and their intervals exclude zero, but the refusal label is the guard's and no person has checked
+it in these languages). On the 291 attack families in Italian, Vietnamese, Arabic,
+Thai, Bengali and Javanese, none of which has a training row, the refusal rate under plain fine-tuning was 4.9
+points below base on average over the six languages and three seeds (-7.0 to -2.9), and SafeGrad kept 6.2 points
+more refusals than plain (+4.4 to +8.0). Both checks are averages. By language the fall is clear in Vietnamese
+(-16.0 points), Thai (-7.4) and Italian (-4.9) and was not detected in Javanese, Arabic or Bengali, so the sentence
+is "on average over six more languages", never "in every untrained language". Limits: no person has checked the
+guard in these languages; base answers reach the 256-token cap far more often than fine-tuned answers (23% to 66%
+by language against 4% to 15%) and none was generated again; over-refusal and task score were not measured there;
+and these are the Bactrian-X adapters only.
+
+Source: `seeds.md`, `swahili_nllb_seeds.json`, `aya/seeds.md`, `more_languages.md`.
 
 ## D4. Truncation audit. Confidence: High
 
@@ -152,6 +173,8 @@ Every safety number comes from one automatic guard. Against 120 answers labelled
 Source: `second_judge_check.md`, `ko_drift.md`, `ko_rest.md`, `unsafe_only.md`. How the K3 sheet came back is on record in section 14c of the preregistration.
 
 ## What changed since the brief's table (Sat 9:45 PM)
+
+- New in D1 and D3 (Nov 23, under the deadline extension): six more languages the model was never fine-tuned on (section 14b). It changes one sentence. "Korean is hit hardest" now holds only among the four languages of the main evaluation: as the guard measures it, the rise in Thai, Javanese and Vietnamese could not be told apart from Korean's, and no language rose more. Any sentence that ranks Korean first, the title and the abstract included, needs that scope and those three names. It also widens D3: refusals fell on average over six more untrained languages, and SafeGrad kept more of them.
 
 - D10 is new (Nov 23, under the deadline extension): the mixing baseline on two new seeds. It changes one argument. With five copies of the refusal examples, mixing protected Korean better than SafeGrad, so SafeGrad's advantage over the simple fix is in over-refusal only. Any sentence that puts SafeGrad ahead of mixing on protection has to go.
 
