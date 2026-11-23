@@ -1,6 +1,6 @@
 ### The seed 42 repair vector added to the Aya plain adapters
 
-The vector is the SafeGrad adapter minus the plain adapter, both trained on Bactrian-X at seed 42. It is added at full size to the plain adapters trained on the Aya set, with no training and nothing tuned. Judged on the attack set with answers capped at 256 tokens. Section 13b of the preregistration fixed the rule before the runs. T1 is decided on seeds 1 and 2. The seed 42 adapter starts from the same LoRA initialisation as the vector's two source adapters, so its row is shown and decides nothing.
+The vector is the SafeGrad adapter minus the plain adapter, both trained on Bactrian-X at seed 42. It is added at full size to the plain adapters trained on the Aya set, with no training and nothing tuned. Judged on the attack set with answers capped at 256 tokens. Section 13b of the preregistration fixed the rule before the runs. V1 is decided on seeds 1 and 2. The seed 42 adapter starts from the same LoRA initialisation as the vector's two source adapters, so its row is shown and decides nothing.
 
 Strict attack success (%):
 
@@ -21,11 +21,11 @@ Strict attack success (%):
 
 Plain and SafeGrad are the adapters trained on Aya at that seed. Parentheses: change against plain of the same seed. * = p < 0.05, exact McNemar.
 
-| T1 | Seed 1 | Seed 2 | Pooled Korean change (points, 95% interval) | Verdict |
+| V1 | Seed 1 | Seed 2 | Pooled Korean change (points, 95% interval) | Verdict |
 |---|---|---|---|---|
 | Below plain on Korean and on the four-language average | yes (-3.4, p = 0.143) | yes (-5.5, p = 0.009) | -4.5 [-8.2, -0.9] | pass |
 
-**T1 passes: added to adapters trained on a second dataset at other seeds, the seed 42 repair vector lowered Korean strict attack success with no training. Over-refusal and task score of the edited models were not measured.**
+**V1 passes: added to adapters trained on a second dataset at other seeds, the seed 42 repair vector lowered Korean strict attack success with no training. Over-refusal and task score of the edited models were not measured.**
 
 #### Beside the rule, deciding nothing
 
@@ -53,7 +53,7 @@ Edited adapters, checked before this was written: `aya-plain-s1-vec` is `aya-pla
 
 #### Second reading (section 13c): after re-generation at 1,024 tokens
 
-Every attack answer of these arms that reached the 256-token cap was generated again at 1,024 tokens and judged by the same guard. Section 13c fixed this reading after T1 had been read on the capped answers and before any answer was generated again.
+Every attack answer of these arms that reached the 256-token cap was generated again at 1,024 tokens and judged by the same guard. Section 13c fixed this reading after V1 had been read on the capped answers and before any answer was generated again.
 
 Strict attack success (%), after re-generation:
 
@@ -74,13 +74,13 @@ Strict attack success (%), after re-generation:
 
 Parentheses: change against plain of the same seed. * = p < 0.05, exact McNemar.
 
-| T1 | Seed 1 | Seed 2 | Pooled Korean change (points, 95% interval) | Verdict |
+| V1 | Seed 1 | Seed 2 | Pooled Korean change (points, 95% interval) | Verdict |
 |---|---|---|---|---|
 | Below plain on Korean and on the four-language average | yes (-5.2, p = 0.020) | yes (-4.8, p = 0.029) | -5.0 [-8.6, -1.4] | pass |
 
-Korean answers of the edited adapter still at the cap at 1,024 tokens: seed 1, 6 of 291; seed 2, 6 of 291. With 30 or more at either seed, T1 is not read from these answers.
+Korean answers of the edited adapter still at the cap at 1,024 tokens: seed 1, 6 of 291; seed 2, 6 of 291. With 30 or more at either seed, V1 is not read from these answers.
 
-**By the table in section 13c (row 1): T1 holds on the original answers and after re-generation. The edit made answers much longer.**
+**By the table in section 13c (row 1): V1 holds on the original answers and after re-generation. The edit made answers much longer.**
 
 English, on the same prompts and adapters where the rise was first seen, so not independent of it: edited against plain pooled over seeds 1 and 2, +2.2 [+0.0, +4.6] points. **The English rise was seen on the capped answers only.**
 

@@ -85,7 +85,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 20 | K1 no Korean rows; K2 Korean rise judged by a person; circuit node counts; truncation audit; harm categories; Aya (Y1 to Y3) | K1 row 1 in three seeds. K2 does not pass. Circuits hold at 3 of 5 sizes. Audit: headline unchanged. Y1, Y2 pass; Y3 fails |
 | Nov 21, 4:39 PM | Section 11: Aya and Earth at seeds 1 and 2; K1 after re-generation | All as on one seed, on both readings |
 | Nov 21, 8:59 PM (Aish) | Section 12.0 to 12.4: GPU runs (hardware control, single-language, NF4, AlignTune) | Pending |
-| Nov 22 (Mingyu) | Section 13a to 13h: single-language runs on the laptop; repair vector on Aya (T1); second readings; 519-row seeds (C1, C2); refusal direction (R1, R2); Unsafe-only reading; task score by answer length | 13a to 13d, 13g and 13h read; seeds, C1, C2, R1, R2 pending |
+| Nov 22 (Mingyu) | Section 13a to 13h: single-language runs on the laptop; repair vector on Aya (V1); second readings; 519-row seeds (C1, C2); refusal direction (R1, R2); Unsafe-only reading; task score by answer length | 13a to 13d, 13g and 13h read; seeds, C1, C2, R1, R2 pending |
 
 Deviations and things a reader should know:
 
@@ -97,15 +97,16 @@ Deviations and things a reader should know:
 3. **Some checks were registered after a first result was known:** seeds 1 and 2 of K1 after its seed 42 run; the
    three-seed rules for Aya and Earth after seed 42; the second reading of the repair vector (13c) after its capped
    result; C2 after its seed 42 value had been seen. Each registration says what was known.
-4. **The laptop section was first numbered 12, the same as Aish's.** Aish registered the GPU runs first
-   (section 12); the laptop section was written a few hours later without her branch having been read. It was
-   renumbered 13 on Nov 22 (12a to 12h became 13a to 13h) with no change to any rule. The laptop single-language
-   runs are the same fine-tunes as her 12.1 on different hardware, so her 12.1 is not blind.
+4. **The laptop section was first numbered 12, the same as Aish's, and shared three check names with it.** Aish
+   registered the GPU runs first (section 12); the laptop section was written a few hours later without her branch
+   having been read. On Nov 22 it was renumbered 13 (12a to 12h became 13a to 13h) and its checks L1, L2 and T1
+   were renamed SL1, SL2 and V1, with no change to any rule. The laptop single-language runs are the same
+   fine-tunes as her 12.1 on different hardware, so her 12.1 is not blind.
 5. **Seeds 1 and 2 of the single-language runs were run before the deadline extension was confirmed,** although
    the plan listed them as extension-only. The change was written into the preregistration before they started.
 6. **The repair vector on Bactrian-X was not registered** (exploratory). Its test on the Aya adapters was. That
    test passed, but the edit doubled answer length, so it was read a second time on completed answers.
-7. **Under the guard's Unsafe class alone, the Chinese-only half of L2 does not hold at seed 42.** Every
+7. **Under the guard's Unsafe class alone, the Chinese-only half of SL2 does not hold at seed 42.** Every
    three-seed check does.
 8. **The first five rows of the Korean-by-setting figure were chosen after their results were known.** The three
    single-language rows were fixed before those runs were read.

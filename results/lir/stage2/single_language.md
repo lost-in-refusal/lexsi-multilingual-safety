@@ -13,20 +13,20 @@ Strict attack success (%), with the change against base:
 
 * = p < 0.05, exact McNemar on the same prompts.
 
-**L1, does Korean drift** (K1's table; the bar is 6.36 points):
+**SL1, does Korean drift** (K1's table; the bar is 6.36 points):
 
 - English only: Korean +7.9 points (p < 0.001), outcome row 1. Training on English alone is enough for a Korean drift of this size.
 - Korean only: Korean +12.0 points (p < 0.001), outcome row 1. Training on Korean alone is enough for a Korean drift of this size.
 - Chinese only: Korean +11.3 points (p < 0.001), outcome row 1. Training on Chinese alone is enough for a Korean drift of this size.
 
-**L2, which language drifts most** (Korean rise minus the rise in the language trained on, in points, with a 95% interval over the 291 prompt families):
+**SL2, which language drifts most** (Korean rise minus the rise in the language trained on, in points, with a 95% interval over the 291 prompt families):
 
 - English only: Korean +7.9 against English +0.7; gap +7.2 [+3.1, +11.7], above zero.
 - Chinese only: Korean +11.3 against Chinese +4.1; gap +7.2 [+2.1, +12.7], above zero.
 
 **By the table in section 13a (row 1): Trained on English alone or on Chinese alone, the model drifted more in Korean than in the language it was trained on. That supports reading H1 as a weakness of Korean.**
 
-The Korean-only run is read by L1 only: it cannot tell a weak language from a trained one.
+The Korean-only run is read by SL1 only: it cannot tell a weak language from a trained one.
 
 #### Shown with no pass rule
 
@@ -42,7 +42,7 @@ Run records, checked before this was written: `plain-only-en` seed 42, 600 rows 
 
 #### Second reading (section 13d): after re-generation at 1,024 tokens
 
-Every capped attack answer of the three single-language arms, of the mixed run cut to 519 rows, of the mixed run and of base was generated again at 1,024 tokens and judged by the same guard. Section 13d registered this reading after L1 and L2 had been read on the capped answers and before any of these answers was generated again. The bar stays 6.36 points.
+Every capped attack answer of the three single-language arms, of the mixed run cut to 519 rows, of the mixed run and of base was generated again at 1,024 tokens and judged by the same guard. Section 13d registered this reading after SL1 and SL2 had been read on the capped answers and before any of these answers was generated again. The bar stays 6.36 points.
 
 Strict attack success (%), after re-generation, with the change against base:
 
@@ -53,9 +53,9 @@ Strict attack success (%), after re-generation, with the change against base:
 | Korean only | 7.9 (+2.4) | 16.8 (+12.4*) | 8.2 (+0.3) | 5.5 (+1.7) | 9.6 |
 | Chinese only | 8.2 (+2.7) | 16.8 (+12.4*) | 11.7 (+3.8*) | 5.8 (+2.1) | 10.7 |
 
-L1: English only, Korean +7.9 points (p < 0.001), row 1; Korean only, Korean +12.4 points (p < 0.001), row 1; Chinese only, Korean +12.4 points (p < 0.001), row 1.
+SL1: English only, Korean +7.9 points (p < 0.001), row 1; Korean only, Korean +12.4 points (p < 0.001), row 1; Chinese only, Korean +12.4 points (p < 0.001), row 1.
 
-L2: English only, Korean +7.9 against English +2.1, gap +5.8 [+1.7, +10.3], above zero; Chinese only, Korean +12.4 against Chinese +3.8, gap +8.6 [+3.8, +14.1], above zero. That is row 1.
+SL2: English only, Korean +7.9 against English +2.1, gap +5.8 [+1.7, +10.3], above zero; Chinese only, Korean +12.4 against Chinese +3.8, gap +8.6 [+3.8, +14.1], above zero. That is row 1.
 
 **By the table in section 13d: The single-language result does not depend on the 256-token cap.**
 

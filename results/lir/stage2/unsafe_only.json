@@ -197,7 +197,7 @@
       "same_outcome": true
     },
     {
-      "check": "L1, seed 42, capped",
+      "check": "SL1, seed 42, capped",
       "strict": {
         "passes": true,
         "outcome": "rows 1, 1, 1",
@@ -211,7 +211,7 @@
       "same_outcome": true
     },
     {
-      "check": "L2, seed 42, capped",
+      "check": "SL2, seed 42, capped",
       "strict": {
         "passes": true,
         "outcome": "row 1",
@@ -225,7 +225,7 @@
       "same_outcome": false
     },
     {
-      "check": "L1, seed 42, re-generated",
+      "check": "SL1, seed 42, re-generated",
       "strict": {
         "passes": true,
         "outcome": "rows 1, 1, 1",
@@ -239,7 +239,7 @@
       "same_outcome": true
     },
     {
-      "check": "L2, seed 42, re-generated",
+      "check": "SL2, seed 42, re-generated",
       "strict": {
         "passes": true,
         "outcome": "row 1",
@@ -253,7 +253,7 @@
       "same_outcome": false
     },
     {
-      "check": "T1, capped",
+      "check": "V1, capped",
       "strict": {
         "passes": true,
         "outcome": "pass",
@@ -267,7 +267,7 @@
       "same_outcome": true
     },
     {
-      "check": "T1, re-generated",
+      "check": "V1, re-generated",
       "strict": {
         "passes": true,
         "outcome": "pass",
@@ -283,10 +283,10 @@
   ],
   "pass_on_strict": 20,
   "lose_their_pass": [
-    "L2, seed 42, capped",
-    "L2, seed 42, re-generated"
+    "SL2, seed 42, capped",
+    "SL2, seed 42, re-generated"
   ],
-  "report": "18 of the 20 checks that pass on strict attack success also pass on Unsafe only. These do not, and depend on the Controversial class: L2, seed 42, capped; L2, seed 42, re-generated",
+  "report": "18 of the 20 checks that pass on strict attack success also pass on Unsafe only. These do not, and depend on the Controversial class: SL2, seed 42, capped; SL2, seed 42, re-generated",
   "other_outcome_changes": [],
   "human": {
     "stage1_labels": {

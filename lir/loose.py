@@ -98,22 +98,22 @@ def read_all() -> dict[str, dict]:
     for label, data in (("capped", one_cap), ("re-generated", regenerated(["base", MIXED, SMALL] + list(ONLY.values())))):
         if data and lbar is not None:
             r = section13.only_result(data, lbar)
-            rows = [r["arms"][l]["l1_row"] for l in ONLY]
-            out[f"L1, seed 42, {label}"] = {"passes": all(x == 1 for x in rows), "outcome": "rows " + ", ".join(map(str, rows)),
+            rows = [r["arms"][l]["sl1_row"] for l in ONLY]
+            out[f"SL1, seed 42, {label}"] = {"passes": all(x == 1 for x in rows), "outcome": "rows " + ", ".join(map(str, rows)),
                                             "numbers": "Korean rise " + ", ".join(f"{r['arms'][l]['vs_base']['ko']['delta']:+.1f}" for l in ONLY) + f"; bar {lbar:.2f}"}
-            out[f"L2, seed 42, {label}"] = {"passes": r["l2_row"] == 1, "outcome": f"row {r['l2_row']}",
-                                            "numbers": "; ".join(f"{l}-only gap {ci(r['arms'][l]['l2_ko_rise_minus_trained_rise'])}" for l in ("en", "zh"))}
+            out[f"SL2, seed 42, {label}"] = {"passes": r["sl2_row"] == 1, "outcome": f"row {r['sl2_row']}",
+                                            "numbers": "; ".join(f"{l}-only gap {ci(r['arms'][l]['sl2_ko_rise_minus_trained_rise'])}" for l in ("en", "zh"))}
     data = capped(["base"] + [p for p, _ in SEEDS.values()] + [a for s in SEEDS3 for a in ONLY_SEEDS[s].values()])
     if data:
-        for arm in (*SMALL_SEEDS.values(), *section13.AYA_PLAIN.values()):   # C1 and C2 need these; L1 and L2 do not
+        for arm in (*SMALL_SEEDS.values(), *section13.AYA_PLAIN.values()):   # C1 and C2 need these; SL1 and SL2 do not
             data.update(capped([arm]) or {})
         r = section13.seeds_result(data, seeds.control_bar(data))
-        rows = {l: r["l1"][l]["rows"] for l in ONLY}
-        out["L1, three seeds, capped"] = {"passes": all(x == 1 for v in rows.values() for x in v),
+        rows = {l: r["sl1"][l]["rows"] for l in ONLY}
+        out["SL1, three seeds, capped"] = {"passes": all(x == 1 for v in rows.values() for x in v),
                                          "outcome": "; ".join(f"{l} rows {', '.join(map(str, v))}" for l, v in rows.items()),
-                                         "numbers": "; ".join(f"{l} " + ci(r["l1"][l]["pooled_ko_rise"]) for l in ONLY)}
-        out["L2, three seeds, capped"] = {"passes": r["l2_row"] == 1, "outcome": f"row {r['l2_row']}",
-                                         "numbers": "; ".join(f"{l}-only gap {ci(r['l2'][l]['pooled'])}" for l in ("en", "zh"))}
+                                         "numbers": "; ".join(f"{l} " + ci(r["sl1"][l]["pooled_ko_rise"]) for l in ONLY)}
+        out["SL2, three seeds, capped"] = {"passes": r["sl2_row"] == 1, "outcome": f"row {r['sl2_row']}",
+                                         "numbers": "; ".join(f"{l}-only gap {ci(r['sl2'][l]['pooled'])}" for l in ("en", "zh"))}
         if "c1" in r:
             out["C1, capped"] = {"passes": None, "outcome": r["c1"]["side"], "numbers": "Aya minus 519 rows " + ci(r["c1"]["aya_minus_519_rows"])}
         for l in ONLY if "c2" in r else ():
@@ -124,7 +124,7 @@ def read_all() -> dict[str, dict]:
     for label, data, which in (("capped", cap_v, None), ("re-generated", reg_v, {s: VEC[s] for s in DECIDE})):
         if data:
             r = section13.vector_result(data, which)
-            out[f"T1, {label}"] = {"passes": r["t1"] == "pass", "outcome": r["t1"],
+            out[f"V1, {label}"] = {"passes": r["v1"] == "pass", "outcome": r["v1"],
                                    "numbers": "edited against plain on Korean " + ci(r["pooled_ko_edited_minus_plain"])}
     return out
 

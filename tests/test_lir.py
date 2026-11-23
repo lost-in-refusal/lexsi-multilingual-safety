@@ -847,17 +847,17 @@ class Section13(unittest.TestCase):
         self.assertEqual({r["lang"] for r in only_rows(train, "zh")}, {"zh"})
 
     def test_one_language_at_a_time(self):
-        from lir.section13 import L1_ROWS, L2_ROWS, ONLY, only_md, only_result
+        from lir.section13 import SL1_ROWS, SL2_ROWS, ONLY, only_md, only_result
 
         data = {"base": self.arm(), "plain": self.arm({"ko": range(10)}), "plain-ayasize": self.arm({"ko": range(8)}),
                 ONLY["en"]: self.arm({"ko": range(12), "en": range(2)}, refuse_sw=range(10)),
                 ONLY["zh"]: self.arm({"ko": range(10), "zh": range(1)}), ONLY["ko"]: self.arm({"ko": range(6)})}
         res = only_result(data, bar=40.0)   # Korean rises more than the trained language in both runs that can tell
-        self.assertEqual([res["arms"][l]["l1_row"] for l in ("en", "ko", "zh")], [1, 2, 1])
-        self.assertEqual(res["arms"]["ko"]["l1"], L1_ROWS[1].format(x="Korean"))
-        self.assertEqual((res["l2_row"], res["l2_report"], res["drift_followed_training_language_in"]), (1, L2_ROWS[0], []))
-        self.assertEqual(res["arms"]["en"]["l2_ko_rise_minus_trained_rise"]["mean"], 50.0)
-        self.assertNotIn("l2", res["arms"]["ko"])   # the Korean-only run is read by L1 only
+        self.assertEqual([res["arms"][l]["sl1_row"] for l in ("en", "ko", "zh")], [1, 2, 1])
+        self.assertEqual(res["arms"]["ko"]["sl1"], SL1_ROWS[1].format(x="Korean"))
+        self.assertEqual((res["sl2_row"], res["sl2_report"], res["drift_followed_training_language_in"]), (1, SL2_ROWS[0], []))
+        self.assertEqual(res["arms"]["en"]["sl2_ko_rise_minus_trained_rise"]["mean"], 50.0)
+        self.assertNotIn("sl2", res["arms"]["ko"])   # the Korean-only run is read by SL1 only
         self.assertEqual((res["arms"]["en"]["sw_refusal_vs_base"]["delta"], res["arms"]["en"]["ko_vs_mixed_519_rows"]["delta"]),
                          (-50.0, 20.0))
         runs = [{"arm": "plain-only-en", "seed": 42, "commit": "abc1234", "train_rows": 600, "train_sha256": "8e11f97e",
@@ -866,11 +866,11 @@ class Section13(unittest.TestCase):
         self.assertIn("**By the table in section 13a (row 1): Trained on English alone or on Chinese alone", md)
         self.assertIn("- Korean only: Korean +30.0 points (p = 0.031), outcome row 2.", md)
         follows = only_result(dict(data, **{ONLY["zh"]: self.arm({"ko": range(2), "zh": range(12)})}), bar=40.0)
-        self.assertEqual((follows["l2_row"], follows["drift_followed_training_language_in"]), (2, ["zh"]))
-        self.assertEqual(follows["arms"]["zh"]["l1_row"], 3)   # Korean did not rise significantly in that run
+        self.assertEqual((follows["sl2_row"], follows["drift_followed_training_language_in"]), (2, ["zh"]))
+        self.assertEqual(follows["arms"]["zh"]["sl1_row"], 3)   # Korean did not rise significantly in that run
         self.assertIn("The interval is below zero in the run trained on Chinese only.", only_md(dict(follows, runs=runs)))
         unclear = only_result(dict(data, **{ONLY["en"]: self.arm({"ko": range(6), "en": range(6, 12)})}), bar=40.0)
-        self.assertEqual((unclear["arms"]["en"]["l2"], unclear["l2_row"], unclear["l2_report"]), ("includes zero", 3, L2_ROWS[2]))
+        self.assertEqual((unclear["arms"]["en"]["sl2"], unclear["sl2_row"], unclear["sl2_report"]), ("includes zero", 3, SL2_ROWS[2]))
 
     def test_single_language_second_reading(self):
         from lir.section13 import ONLY, ONLY_AGAIN, only_md, only_result, only_second
@@ -889,11 +889,11 @@ class Section13(unittest.TestCase):
         self.assertNotIn("Second reading", only_md(dict(first, runs=runs)))
         moved = dict(att1, **{ONLY["zh"]: self.after(self.arm({"ko": range(2), "zh": range(12)}))})
         g = only_second(first, att0, moved)   # after re-generation the Chinese-only run drifts most in Chinese
-        self.assertEqual((g["second_report"], g["changed"]), (ONLY_AGAIN[1], ["L1 for Chinese only is row 3", "L2 is row 2"]))
-        self.assertIn("What changed after re-generation: L1 for Chinese only is row 3; L2 is row 2.", only_md(dict(first, runs=runs, second_reading=g)))
+        self.assertEqual((g["second_report"], g["changed"]), (ONLY_AGAIN[1], ["SL1 for Chinese only is row 3", "SL2 is row 2"]))
+        self.assertIn("What changed after re-generation: SL1 for Chinese only is row 3; SL2 is row 2.", only_md(dict(first, runs=runs, second_reading=g)))
 
     def test_single_language_on_three_seeds(self):
-        from lir.section13 import AYA_PLAIN, C1_ROWS, C2_ROWS, L1_ACROSS, L2_ROWS, ONLY_SEEDS, SMALL_SEEDS, seeds_md, seeds_result
+        from lir.section13 import AYA_PLAIN, C1_ROWS, C2_ROWS, SL1_ACROSS, SL2_ROWS, ONLY_SEEDS, SMALL_SEEDS, seeds_md, seeds_result
 
         data = {"base": self.arm()}
         for s in (42, 1, 2):
@@ -902,9 +902,9 @@ class Section13(unittest.TestCase):
             data[ONLY_SEEDS[s]["ko"]] = self.arm({"ko": range(14)})
             data[SMALL_SEEDS[s]], data[AYA_PLAIN[s]] = self.arm({"ko": range(14)}), self.arm({"ko": range(13)})
         res = seeds_result(data, bar=40.0)
-        self.assertEqual((res["complete"], res["missing"], res["l1"]["en"]["rows"], res["l1"]["en"]["report"]),
-                         (True, [], [1, 1, 1], L1_ACROSS[0].format(x="English")))
-        self.assertEqual((res["l2"]["en"]["side"], res["l2_row"], res["l2_report"]), ("above zero", 1, L2_ROWS[0]))
+        self.assertEqual((res["complete"], res["missing"], res["sl1"]["en"]["rows"], res["sl1"]["en"]["report"]),
+                         (True, [], [1, 1, 1], SL1_ACROSS[0].format(x="English")))
+        self.assertEqual((res["sl2"]["en"]["side"], res["sl2_row"], res["sl2_report"]), ("above zero", 1, SL2_ROWS[0]))
         self.assertEqual((res["c1"]["side"], res["c1"]["report"]), ("includes zero", C1_ROWS["includes zero"]))
         self.assertEqual((res["c2"]["en"]["side"], res["c2"]["ko"]["side"]), ("below zero", "includes zero"))
         self.assertEqual(res["c2"]["en"]["report"], C2_ROWS["below zero"].format(x="English"))
@@ -913,28 +913,28 @@ class Section13(unittest.TestCase):
         self.assertIn("**By the table in section 13a (row 1): Trained on English alone or on Chinese alone", md)
         self.assertIn("This comparison was seen at seed 42 before it was registered", md)
         weak = dict(data, **{ONLY_SEEDS[2]["en"]: self.arm({"ko": range(3), "en": range(1)})})   # no significant Korean rise at seed 2
-        self.assertEqual(seeds_result(weak, bar=40.0)["l1"]["en"]["report"], L1_ACROSS[2].format(x="English"))
+        self.assertEqual(seeds_result(weak, bar=40.0)["sl1"]["en"]["report"], SL1_ACROSS[2].format(x="English"))
         part = seeds_result({k: v for k, v in data.items() if not k.endswith("-s2")}, bar=40.0)
-        self.assertEqual((part["complete"], "l1" in part, "c1" in part, len(part["missing"])), (False, False, False, 2))
+        self.assertEqual((part["complete"], "sl1" in part, "c1" in part, len(part["missing"])), (False, False, False, 2))
         self.assertIn("Not read, because runs are missing:", seeds_md(dict(part, runs=runs)))
 
     def test_vector_on_aya(self):
-        from lir.section13 import T1_ROWS, VEC, vector_md, vector_result
+        from lir.section13 import V1_ROWS, VEC, vector_md, vector_result
 
         data = {"base": self.arm()}
         for plain, edited, safegrad in VEC.values():
             data[plain], data[edited], data[safegrad] = self.arm({"ko": range(12)}), self.arm({"ko": range(5)}), self.arm({"ko": range(4)})
         res = vector_result(data)
-        self.assertEqual((res["t1"], res["outcome"], res["failed_parts"], res["decided_on_seeds"]), ("pass", T1_ROWS[0], [], [1, 2]))
+        self.assertEqual((res["v1"], res["outcome"], res["failed_parts"], res["decided_on_seeds"]), ("pass", V1_ROWS[0], [], [1, 2]))
         self.assertEqual(res["pooled_ko_edited_minus_plain"]["mean"], -35.0)
         self.assertEqual((res["seeds"][1]["ko_share_of_trained_repair"], res["seeds"][2]["edited_vs_base_ko"]["delta"]), (7 / 8, 25.0))
         md = vector_md(res)
         self.assertIn("| Below plain on Korean and on the four-language average | yes (-35.0, p = 0.016) | yes (-35.0, p = 0.016) |", md)
         self.assertIn("Not measured: XSTest and the task sets", md)
         beside = vector_result(dict(data, **{VEC[42][1]: self.arm({"ko": range(15)})}))
-        self.assertEqual(beside["t1"], "pass")   # seed 42 shares its initialisation with the vector's sources and decides nothing
+        self.assertEqual(beside["v1"], "pass")   # seed 42 shares its initialisation with the vector's sources and decides nothing
         worse = vector_result(dict(data, **{VEC[2][1]: self.arm({"ko": range(14)})}))
-        self.assertEqual((worse["t1"], worse["outcome"]), ("fail", T1_ROWS[1]))
+        self.assertEqual((worse["v1"], worse["outcome"]), ("fail", V1_ROWS[1]))
         self.assertIn("seed 2: not below plain on Korean", worse["failed_parts"])
         self.assertIn("What failed: seed 2: not below plain on Korean", vector_md(worse))
 
@@ -955,7 +955,7 @@ class Section13(unittest.TestCase):
             att0[plain], att0[edited] = self.arm({"ko": range(12)}), self.arm({"ko": range(5), "en": range(5)})
         att1 = {arm: self.after(rows, regenerated=ko[:6], still=ko[:2], different=ko[:1]) for arm, rows in att0.items()}
         g = second_reading(att0, att1)
-        self.assertEqual((g["t1"], g["second_row"], g["second_report"]), ("pass", 1, SECOND_ROWS[0]))
+        self.assertEqual((g["v1"], g["second_row"], g["second_report"]), ("pass", 1, SECOND_ROWS[0]))
         self.assertEqual((g["ko_still_cut_edited"], list(g["seeds"])), ({1: 2, 2: 2}, [1, 2]))
         self.assertEqual((g["english_pooled_edited_minus_plain"]["mean"], g["english_report"]), (25.0, ENGLISH_ROWS[0]))
         self.assertEqual((g["seeds"][1]["edited_vs_safegrad_ko"], "safegrad" in g["seeds"][1]["strict"]), (None, False))
@@ -965,14 +965,14 @@ class Section13(unittest.TestCase):
         for plain, edited, safegrad in VEC.values():
             full[plain], full[edited], full[safegrad] = self.arm({"ko": range(12)}), self.arm({"ko": range(5)}), self.arm({"ko": range(4)})
         md = vector_md(dict(vector_result(full), second_reading=g, second_reading_waiting=["aya-plain-vec", "aya-safegrad"]))
-        self.assertIn("**By the table in section 13c (row 1): T1 holds on the original answers and after re-generation.", md)
+        self.assertIn("**By the table in section 13c (row 1): V1 holds on the original answers and after re-generation.", md)
         self.assertIn("Korean answers of the edited adapter still at the cap at 1,024 tokens: seed 1, 2 of 291; seed 2, 2 of 291.", md)
         self.assertIn("Not generated again yet, so left out of this reading: aya-plain-vec, aya-safegrad.", md)
-        with mock.patch.object(section13, "STILL_CUT", 2):   # too many Korean answers still cut to read T1
+        with mock.patch.object(section13, "STILL_CUT", 2):   # too many Korean answers still cut to read V1
             self.assertEqual(second_reading(att0, att1)["second_row"], 3)
         worse = dict(att1, **{VEC[2][1]: self.after(self.arm({"ko": range(14)}))})
         g = second_reading(att0, worse)   # after re-generation the edited adapter is above plain at seed 2
-        self.assertEqual((g["t1"], g["second_row"], g["second_report"]), ("fail", 2, SECOND_ROWS[1]))
+        self.assertEqual((g["v1"], g["second_row"], g["second_report"]), ("fail", 2, SECOND_ROWS[1]))
         quiet = dict(att1, **{VEC[s][1]: self.after(self.arm({"ko": range(5)})) for s in (1, 2)})
         self.assertEqual(second_reading(att0, quiet)["english_report"], ENGLISH_ROWS[1])   # no English rise after re-generation
 
