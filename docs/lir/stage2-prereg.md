@@ -1087,6 +1087,8 @@ Report: `python -m lir.repeat mix` writes `results/lir/stage2/mixing/seeds.md`. 
 - The report as read: `results/lir/stage2/mixing/seeds.md`, sha256 `e9ac96be776ff289acf76f5b1da8d74e418fdb185f56209c7146bf15882483a0`, and `seeds.json`, sha256 `b37d16020a6bd972580b19940c9f6374803c4d793af517075c2c5e6a0c2a4982`, committed with this note as the queue wrote them.
 - Not uploaded to Hugging Face when this was written: the answers, verdicts and adapters of the four runs.
 
+**Added Nov 23, 1:05 PM ET by Mingyu, before the figure was computed.** The four-language mean of over-refusal is listed in the entry among the figures given beside, and the report lacks it. It is defined as elsewhere in this file: for one run, the equal-weight mean of its over-refusal rates on XSTest in English, Korean, Chinese and Swahili (`macro` in `lir/seeds.py`, the mean behind "averaged over the four languages" on the status page). The report will give it per seed for SafeGrad and for each mixing run, with the difference in points, at seeds 42, 1 and 2. It has no interval, no test and no rule, as everywhere else in this file. It is computed once. No other figure of the report is to change: every field of the `seeds.json` read above must come out the same, and the note below says whether it did.
+
 ### 14b. Six more languages the model was never fine-tuned on
 
 **Added Nov 23, 4:26 AM ET by Mingyu, before any answer in these languages was generated.**
