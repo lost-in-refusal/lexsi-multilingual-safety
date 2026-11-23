@@ -1612,6 +1612,58 @@ class MoreLanguages(unittest.TestCase):
             self.assertIn(sentence, prereg)
 
 
+class KoreanRest(unittest.TestCase):
+    """Section 14c (K3): the person's reading on the Korean prompts not read before."""
+
+    def test_the_unread_prompts(self):
+        import json
+
+        from lir.common import DATA, read_jsonl
+        from lir.labelpack import OUT, ko_rest_families
+
+        fams = ko_rest_families()
+        korean = {r["family"] for r in read_jsonl(DATA / "multijail_attack.jsonl") if r["lang"] == "ko"}
+        k2 = {k["family"] for k in json.loads((OUT / "ko_drift_key.json").read_text())}
+        uid_family = {r["uid"]: r["family"] for r in read_jsonl(DATA / "multijail_attack.jsonl")}
+        stage1 = {uid_family[k["uid"]] for k in json.loads((OUT / "labels_key.json").read_text()) if k["lang"] == "ko"}
+        self.assertEqual((len(korean), len(k2), len(stage1), len(fams)), (291, 100, 30, 161))
+        self.assertEqual(len(set(fams)), 161)
+        self.assertFalse(set(fams) & k2)        # K2's draw is rebuilt from its seed and left out
+        self.assertFalse(set(fams) & stage1)
+        self.assertEqual(set(fams) | k2 | stage1, korean)
+
+    def test_registered_outcomes(self):
+        from lir.labelpack import K3_ROWS, ko_drift_result, ko_rest_md, ko_rest_report
+
+        def result(base_yes, plain_yes, n=60):
+            key = [{"item": f"R{2 * i + j}", "family": f"f{i}", "arm": arm, "uid": f"u{i}"} for i in range(n) for j, arm in enumerate(("base", "plain"))]
+            labels = {k["item"]: "yes" if int(k["family"][1:]) in (base_yes if k["arm"] == "base" else plain_yes) else "no" for k in key}
+            labels[key[-1]["item"]] = "unsure"      # one prompt drops out of the test
+            res = ko_drift_result(labels, key, {k["item"]: False for k in key})
+            res.update(prompts=n, report=ko_rest_report(res), guard_strict_on_sample={"base": 1, "plain": 2},
+                       by_guard_class={c: {"yes": 0, "no": 1, "unsure": 0} for c in ("Unsafe", "Controversial", "Safe")})
+            return res
+
+        more = result(range(1), range(1, 12))       # 1 base against 11 plain answers
+        self.assertEqual((more["passes"], more["test"]["prompts"], more["report"]), (True, 59, K3_ROWS["pass"]))
+        few = result(range(1), range(1, 5))         # 1 against 4: not significant
+        self.assertEqual((few["passes"], few["report"]), (False, K3_ROWS["fail"]))
+        back = result(range(11), range(11, 12))     # 11 base against 1 plain
+        self.assertEqual((back["passes"], back["report"]), (False, K3_ROWS["reversed"]))
+        text = ko_rest_md(dict(more, with_k2={"prompts": 153, "base_unsafe": 2, "plain_unsafe": 16, "p": 0.001}), ["kk"])
+        self.assertIn(f"**The check passes. {K3_ROWS['pass']}.**", text)
+        self.assertIn("as an estimate that decides nothing", text)
+        self.assertIn(f"**The check does not pass. {K3_ROWS['fail']}.**", ko_rest_md(few, ["kk"]))
+
+    def test_registered_wording(self):
+        from lir.common import ROOT
+        from lir.labelpack import K3_ROWS
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        for sentence in K3_ROWS.values():
+            self.assertIn(sentence, prereg)
+
+
 if __name__ == "__main__":
     unittest.main()
 
