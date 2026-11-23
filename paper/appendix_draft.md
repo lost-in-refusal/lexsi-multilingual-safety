@@ -10,7 +10,7 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
 - **Code:** `github.com/lost-in-refusal/lexsi-multilingual-safety`, branch `mingyu/stage2` (merged into `main` before
   submission). Every table in `results/lir/stage2/` is written by a command named at the top of its module
   (`python -m lir.seeds`, `lir.repeat`, `lir.section13`, `lir.loose`, `lir.direction`, `lir.trunc`, `lir.gpu`).
-- **Tests:** `python -m unittest tests.test_lir` (91 tests; each registered rule has a test on made-up data).
+- **Tests:** `python -m unittest tests.test_lir` (95 tests; each registered rule has a test on made-up data).
 - **Rebuild:** `python -m lir.rebuild fetch` and `python -m lir.rebuild tables`, in a fresh clone, download the public outputs
   at a pinned revision and run each report again, with no GPU, no model and no login. Tested on Nov 23 in a clean
   copy of the repository and a new environment: 26 tables came out byte for byte the same as the committed files

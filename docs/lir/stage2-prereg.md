@@ -1220,6 +1220,67 @@ The labeller was shown the paragraph above before the sheet was scored, and was 
 
 Limits, as registered: one labeller, who knows which direction we expect; arm hidden, not blind; the Korean rise at seed 42 only.
 
+### 14d. The plain run through AlignTune (the run of 12.3), on the laptop
+
+**Added Nov 23, 2:25 PM ET by Mingyu, before the run was queued and before any model weight was loaded through AlignTune.**
+
+Question, as in 12.3: does a plain fine-tune run through Lexsi's AlignTune drift the same way as our LoRA?
+
+Why now. Section 12.3 registered this run. Hannah's two attempts on the GPU stopped before training (her note of Nov 23 under 12.3), and the run was listed as not run by the freeze. Mingyu reports on Nov 23 that Hannah told him she cannot take it further, and he takes it over. Aish registered 12.3; she has not seen this entry yet and can amend it.
+
+What was found before this entry, with the tokenizer and no model weights:
+
+- The cause of the difference at row 0. The second attempt applied the chat template to the text and gave TRL the result as strings. TRL 1.7.1 tokenizes strings with special tokens added, and the template already begins with the start-of-text token. So every row had that token twice: 441 tokens against 440 at row 0, the first difference at index 1, and the rest the same.
+- The fix is a change of data format. Given the prompt and the completion as lists of messages, TRL applies Tiny Aya's own chat template, and all 1,800 rows have the token IDs and the prompt boundary of `lir/train.py`. This was checked with TRL's own tokenizing function.
+- AlignTune's data layer does not carry that format by itself. A processing function that returns message lists leaves 0 of the 1,800 rows. Its `instruction_following` path gives TRL plain strings, which would train the model on text with no chat template. Its `sft` path builds whole conversations, and then the loss also covers the system preamble and the question, because Tiny Aya's template has no `generation` marker for TRL's assistant mask. So one step of ours sits between AlignTune's data loading and AlignTune's training call: it wraps each row's two strings as a user message and an assistant message.
+- Three arguments of the first attempts did not do what they were meant to, found by printing the configuration AlignTune builds. `warmup_steps=0` beside `warmup_ratio=0.03` gave no warm-up. `group_by_length=True` is ignored by transformers 5, so the batch order was random. `save_strategy="epoch"` would have saved three checkpoints. All three are corrected.
+- A rehearsal on a small random model with the real tokenizer, on the CPU, ran the whole path for one optimizer step: AlignTune's trainer, its model and adapter set-up, its data loading, the check before training on all 1,800 rows, the step, and the saved adapter. No real weight was loaded, and nothing from the rehearsal is kept.
+
+The run. `plain-aligntune`: seed 42, the usual 1,800 rows (`data/lir/bactrian_train.jsonl`), 3 epochs, LoRA rank 16, alpha 32, dropout 0 on the seven target modules, learning rate 2e-4, micro-batch 4 with accumulation 8, cosine schedule with 3% warm-up, weight decay 0, gradient clipping at 1.0, bfloat16, sequence limit 1,024, loss on the response only, and no safety method. AlignTune at commit `f53b41d`, the commit of Hannah's attempts, with its TRL backend.
+
+- What goes through AlignTune: the trainer is built by its `create_sft_trainer`; the model, the tokenizer and the adapter by its `setup_model`; the rows are loaded by its `setup_data`; the training is its own `train()`, which builds a `trl.SFTTrainer` and saves the adapter.
+- The check before the first step: every row TRL prepared is compared with `lir/train.py`'s encoding, token IDs and prompt boundary, and so is the first collated batch. Training does not start on a difference. The script also stops if the adapter AlignTune built does not have our LoRA settings and our number of trainable parameters, or if the model is not at the pinned revision.
+
+Two changes from 12.3:
+
+- The laptop, not the L4 of the hardware control. Mingyu's token cannot launch jobs in the team's namespace. The hardware control of 12.0 found no significant difference between the laptop and the L4 in eight comparisons, and the task judge does not fit an L4. The comparison 12.3 lists beside T1, "against plain at seed 42 on the same hardware", is therefore against `plain`: seed 42, our own trainer, this laptop.
+- Run by Mingyu, not by Hannah.
+
+Settings of our trainer that this run does not reproduce. Section 12.3 asks for them before the run:
+
+- Library versions: trl 1.7.1 and torch 2.13.0 here (AlignTune requires torch below 2.14); lir/train.py ran on torch 2.15.0 with transformers' Trainer and no trl.
+- Optimizer: AlignTune asks for adamw_torch; lir/train.py used the Trainer default, adamw_torch_fused. Same algorithm and the same betas, epsilon and weight decay.
+- Loss: trl computes the next-token loss from logits at every position and masks the prompt; lir/train.py computes logits at the response positions only. Both are the mean over the response tokens of a micro-batch.
+- Gradient checkpointing: switched on by the Trainer here; lir/train.py switches it on with use_reentrant=False.
+- Batch order and LoRA initialisation: same seed (42) and the same grouping by length, but the two programs draw from the random generators in a different order, so the batches and the initial adapter weights are not the same.
+- Data path: the rows pass through AlignTune's data manager (CuratorKIT), with its schema gate, cleaning and deduplication switched off; row count, order and text are checked against the training file.
+
+**T1**, as registered in 12.3: no prediction. Korean strict attack success against base, read with the K1 table of section 6. The bar is the one used there, half the average Korean rise of the three plain seeds (6.36 points). Section 12.3 gave no sentences, so they are fixed here:
+
+| Korean strict attack success in this run | What we write |
+| --- | --- |
+| Rises significantly over base, by at least the bar | Run through AlignTune, plain fine-tuning raised Korean attack success significantly and by at least the bar: the Korean drift is not specific to our training code |
+| Rises significantly, by less than the bar | Run through AlignTune, plain fine-tuning raised Korean attack success significantly, but by less than the bar |
+| Does not rise significantly | Run through AlignTune, plain fine-tuning did not raise Korean attack success significantly: the drift was not reproduced through AlignTune with these settings |
+
+Reported beside it, with no rule: the paired difference against `plain` per language; the change against base in the other three languages; the Swahili refusal change; Korean on the guard's Unsafe class alone; over-refusal on XSTest per language against base and against `plain`; and the task score against base and against `plain`.
+
+What the result can and cannot show. It is one run at one seed. A difference from `plain` cannot be put down to AlignTune: the settings listed above differ, the two runs do not share their batches or their initial adapter weights, and no second run through AlignTune measures its own spread. For scale, `plain` from our trainer rose 14.1, 10.3 and 13.7 points in Korean at its three seeds. Row 1 would say that the drift also shows when the training runs through a second stack. It would not say that the two stacks are equivalent.
+
+What we know as this is written: every result in this file up to here, among them `plain` at three seeds, the GPU runs of 12.0 to 12.2 and both mixing arms of 14a. No model trained through AlignTune exists.
+
+If it does not fit. TRL computes logits at every position, so the run needs more memory than ours. If it stops for lack of memory at micro-batch 4, it is run once more at micro-batch 2 with accumulation 16, the same effective batch of 32, and that is added to the list of differences. If that fails as well, or AlignTune cannot train the model on this machine for another reason, the run is listed as not run, by the rule of 12.3, and the failure goes into the Lexsi feedback.
+
+Order and limit. Through the laptop queue, after the evaluations of 14b: one line that waits for a clean tree, trains, and evaluates only if AlignTune left an adapter; then the task judge; then the report. A run not launched by Tuesday Nov 24, 9 PM ET is listed as not run.
+
+Evaluation: the attack set, XSTest and the Bactrian-X task set, with the usual caps and judges, in the main environment, as for every other arm. Capped answers decide, as everywhere in this file; nothing is generated again at 1,024 tokens in this block.
+
+Report: `python -m lir.train_aligntune report` writes `results/lir/stage2/aligntune.md`. The training script, the report code and their tests are committed with this entry.
+
+Environment. AlignTune requires trl 1.7.1 and torch below 2.14, and the main environment has torch 2.15, so it is installed in an environment of its own (`.venv-d13`; the recipe is in `requirements-d13.txt`). Hannah's commits through `99a6a45` are merged; her entry for a GPU verification job is not, because the script it called is replaced.
+
+Cost: about two to three hours of laptop time for the training (our plain run took 76 minutes) and about 50 minutes for the evaluation.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

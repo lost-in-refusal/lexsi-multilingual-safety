@@ -1,5 +1,13 @@
 # D13 AlignTune + TRL GPU environment.
 # Separate from the existing D6/D11/D18 GPU environment.
+#
+# On the laptop (section 14d) the same pins are used, in an environment of its own, because the main environment has
+# torch 2.15 and AlignTune requires torch below 2.14:
+#   python3.12 -m venv .venv-d13
+#   git clone https://github.com/Lexsi-Labs/aligntune.git vendor/aligntune
+#   git -C vendor/aligntune checkout f53b41d0e50495278caea7c99a89505d9ddfae23
+#   .venv-d13/bin/pip install -c requirements-d13.txt ./vendor/aligntune
+# bitsandbytes is not used there. datasets was held at 5.1.0, the version of the main environment.
 
 accelerate==1.15.0
 datasets>=4.7.0
