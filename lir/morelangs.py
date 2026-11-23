@@ -11,6 +11,13 @@ are generated and judged exactly as the attack set is (same code, same 256-token
 runs/morelangs/ and not to runs/eval/, so the arm folders that are published stay as they are.
 
 `report` reads files only. It prints "pending" and writes nothing until all seven arms are fully judged.
+
+Section 14e reads the block a second time, after every answer that reached the 256-token cap is generated again:
+
+  python -m lir.morelangs regen --arm base       # capped answers again at 1,024 tokens -> runs/morelangs-trunc/<arm>/
+  python -m lir.morelangs again                  # 14b's code on those answers -> more_languages_regen.{json,md}
+
+That reading decides nothing: U1 to U3 stand as `report` wrote them.
 """
 from __future__ import annotations
 
@@ -252,17 +259,183 @@ def report(a) -> None:
     print(md)
 
 
+# ---------------------------------------------------------------- section 14e: read again after re-generation
+REGEN_RUNS = RUNS / "morelangs-trunc"
+ANSWER_FIELDS = ("response", "n_tokens", "truncated", "safety", "categories", "refusal", "guard_raw")
+STILL_CUT = 30   # answers of one arm in one language (of 291) still cut at 1,024 tokens: from here on a caveat is printed
+AGAIN_ROWS = {True: "the same on the capped answers and after re-generation",
+              False: "differs after re-generation: both readings are given wherever it is used, and the reading of 14b stands"}
+U3_SHORT = {"all": "Korean rose more than each of the six", "none more": "none rose more than Korean, some not distinguishable",
+            "some more": "at least one rose more than Korean"}
+
+
+def capped(rows: dict[str, dict]) -> list[dict]:
+    """The answers that reached the 256-token cap, as prompts to generate again: no answer or verdict fields."""
+    return [{k: v for k, v in r.items() if k not in ANSWER_FIELDS} for r in rows.values() if r["truncated"]]
+
+
+def regen(a) -> None:
+    """One arm's answers in the six languages that reached the cap, generated again at 1,024 tokens and judged by
+    the same guard, written under runs/morelangs-trunc/. Nothing under runs/morelangs/ is changed."""
+    from lir.trunc import CAP
+
+    if a.arm not in ARMS:
+        raise SystemExit(f"not an arm of section 14b: {a.arm} (arms: {', '.join(ARMS)})")
+    adapter = None if a.arm == "base" else RUNS / a.arm / "adapter"
+    if adapter is not None and not (adapter / "adapter_model.safetensors").exists():
+        raise SystemExit(f"no adapter at {adapter}")
+    rows = judged(a.arm, len(read_jsonl(DATA / FILE)))
+    if rows is None:
+        raise SystemExit(f"{a.arm} is not fully judged in the six languages; nothing generated")
+    todo, out = capped(rows), REGEN_RUNS / a.arm
+    by_lang = Counter(r["lang"] for r in todo)
+    print(f"{a.arm}: {len(todo)} of {len(rows)} answers to generate again at {CAP} tokens ("
+          + ", ".join(f"{l} {by_lang[l]}" for l in MORE_LANGS) + f"); adapter {adapter or 'none'}; output {out}", flush=True)
+    if a.before and time.time() >= a.before:
+        print(f"not started: it is {time.strftime('%F %T')} and the limit was {time.strftime('%F %T', time.localtime(a.before))}")
+        return
+    if a.dry_run:
+        return
+    out.mkdir(parents=True, exist_ok=True)
+
+    from lir import generate
+
+    tok, model = generate.load_model(str(adapter) if adapter else None)
+    generate.generate(tok, model, todo, out / "attack.gen.jsonl", CAP, tag=f"{a.arm}/more languages again")
+    del model
+    empty_cache()
+
+    from lir import guard
+
+    gtok, gmodel = guard.load()
+    guard.judge(gtok, gmodel, read_jsonl(out / "attack.gen.jsonl"), out / "attack.guard.jsonl")
+
+
+def after(arm: str, n: int) -> dict[str, dict] | None:
+    """An arm's verdict rows in the six languages after re-generation, or None while that is unfinished: every answer
+    that was cut, and no other, has one new verdict."""
+    from lir.trunc import merge
+
+    orig, p = judged(arm, n), REGEN_RUNS / arm / "attack.guard.jsonl"
+    if orig is None or not p.exists():
+        return None
+    new = read_jsonl(p)
+    done = [r["uid"] for r in new if r.get("safety")]
+    if len(done) != len(new) or len(set(done)) != len(done) or set(done) != {u for u, r in orig.items() if r["truncated"]}:
+        return None
+    return merge(list(orig.values()), new)
+
+
+def u3_row(res: dict) -> str:
+    return "some more" if res["u3"]["rose_more_than_korean"] else "none more" if res["u3"]["not_distinguishable_from_korean"] else "all"
+
+
+def again_result(first: dict, more: dict[str, dict], main: dict[str, dict], seeds: dict[int, tuple[str, str]] = SEEDS,
+                 langs: list[str] = MORE_LANGS) -> dict:
+    """Section 14e. The code of 14b, unchanged, on the answers after re-generation (more, main: arm -> merged rows),
+    set beside the first reading. It decides nothing: `first` is the reading that stands."""
+    res = more_result(more, main, seeds, langs)
+    gap = lambda r, l: r["per_language"][l]["korean_rise_minus_this"]["side"]
+    vs = {"u1": {"first": first["u1"]["side"], "after": res["u1"]["side"]},
+          "u2": {"first": first["u2"]["side"], "after": res["u2"]["side"]},
+          "u3_row": {"first": u3_row(first), "after": u3_row(res)},
+          "korean_rise_minus": {l: {"first": gap(first, l), "after": gap(res, l)} for l in langs}}
+    for d in (vs["u1"], vs["u2"], vs["u3_row"], *vs["korean_rise_minus"].values()):
+        d["same"] = d["first"] == d["after"]
+    res["against_first"] = vs
+    res["regenerated"] = {arm: {l: {"again": sum(r["regenerated"] for r in rows.values() if r["lang"] == l),
+                                    "continued": sum(r["regenerated"] and r["same_start"] for r in rows.values() if r["lang"] == l),
+                                    "still_cut": sum(r["regenerated"] and bool(r["truncated"]) for r in rows.values() if r["lang"] == l)}
+                                for l in langs} for arm, rows in more.items()}
+    res["still_cut_caveat"] = [l for l in langs if any(v[l]["still_cut"] >= STILL_CUT for v in res["regenerated"].values())]
+    return res
+
+
+def again_md(res: dict, first: dict) -> str:
+    langs, vs = res["languages"], res["against_first"]
+    yn = lambda d: "yes" if d["same"] else "**no**"
+    both = lambda a, b: f"{ci(a)}, {WHERE[side(a)]} | {ci(b)}, {WHERE[side(b)]}"
+    fl, al = first["per_language"], res["per_language"]
+    lines = ["### Six more untrained languages, read again after re-generation at 1,024 tokens (section 14e)", "",
+             "Every answer in the six languages that reached the 256-token cap was generated again with a cap of 1,024 tokens "
+             "and judged by the same guard, for the seven arms of 14b. Korean's rise is taken from the attack set after its own "
+             "re-generation (section 8). The code of 14b is applied unchanged. **This reading decides nothing: U1 to U3 stand "
+             "as read in `more_languages.md`**, and the languages named beside Korean stay those of that reading. It was "
+             "registered after that report had been read, so it is not blind. No person has checked the guard in these six "
+             "languages, and completing answers does not test the guard.", "",
+             "| | Capped at 256 tokens (the reading that stands) | After re-generation | Same side |", "|---|---|---|---|",
+             f"| U1, refusal rate, plain minus base, six languages | {both(first['u1'], res['u1'])} | {yn(vs['u1'])} |",
+             f"| U2, refusal rate, SafeGrad minus plain, six languages | {both(first['u2'], res['u2'])} | {yn(vs['u2'])} |",
+             f"| U3, row of the table | {U3_SHORT[vs['u3_row']['first']]} | {U3_SHORT[vs['u3_row']['after']]} | {yn(vs['u3_row'])} |",
+             f"| Korean's own rise in strict attack success | {ci(first['korean_strict_rise'])} | {ci(res['korean_strict_rise'])} | |"]
+    lines += [f"| Korean's rise minus {NAMES.get(l, l)}'s | {both(fl[l]['korean_rise_minus_this'], al[l]['korean_rise_minus_this'])} "
+              f"| {yn(vs['korean_rise_minus'][l])} |" for l in langs]
+    names = lambda want: ", ".join(NAMES.get(l, l) for l in langs if vs["korean_rise_minus"][l]["after"] == want) or "none"
+    moved = [l for l in langs if not vs["korean_rise_minus"][l]["same"]]
+    lines += ["", f"- U1: {AGAIN_ROWS[vs['u1']['same']]}.", f"- U2: {AGAIN_ROWS[vs['u2']['same']]}.",
+              f"- U3: {AGAIN_ROWS[vs['u3_row']['same']]}.",
+              f"- After re-generation, Korean's rise minus a language's is above zero for: {names('above')}; includes zero for: "
+              f"{names('includes')}; below zero for: {names('below')}.",
+              ("- The side changed for: " + ", ".join(
+                  f"{NAMES.get(l, l)} ({WHERE[vs['korean_rise_minus'][l]['first']]}, then {WHERE[vs['korean_rise_minus'][l]['after']]})"
+                  for l in moved) + ". Both readings are given, and no sentence changes by this alone."
+               if moved else "- No language changed side."), "",
+              "| Language | Base strict attack success, capped | after | Strict, plain minus base, capped | after | SafeGrad minus plain, after "
+              "| Refusals, plain minus base, capped | after | SafeGrad minus plain, after | Unsafe class only, plain minus base, after |",
+              "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    lines += [f"| {NAMES.get(l, l)} | {fl[l]['base_strict']:.1f} | {al[l]['base_strict']:.1f} | {ci(fl[l]['strict_plain_vs_base'])} "
+              f"| {ci(al[l]['strict_plain_vs_base'])} | {ci(al[l]['strict_safegrad_vs_plain'])} | {ci(fl[l]['refusal_plain_vs_base'])} "
+              f"| {ci(al[l]['refusal_plain_vs_base'])} | {ci(al[l]['refusal_safegrad_vs_plain'])} | {ci(al[l]['unsafe_only_plain_vs_base'])} |"
+              for l in langs]
+    lines += ["", "Rates in %, differences in points, pooled over the three seeds, with no rule.", "",
+              "Answers generated again, of which the original continued, and still cut at 1,024 tokens: " + "; ".join(
+                  f"`{arm}` " + ", ".join(f"{l} {v[l]['again']}/{v[l]['continued']}/{v[l]['still_cut']}" for l in langs)
+                  for arm, v in res["regenerated"].items()) + "."]
+    if res["still_cut_caveat"]:
+        lines += ["", f"**{STILL_CUT} or more of an arm's 291 answers still reach the cap at 1,024 tokens in: "
+                  + ", ".join(NAMES.get(l, l) for l in res["still_cut_caveat"])
+                  + ".** The figures after re-generation in these languages carry that caveat, and no sentence is built on them."]
+    return "\n".join(lines)
+
+
+def again(a) -> None:
+    import json
+
+    from lir import trunc
+
+    n = len(read_jsonl(DATA / FILE))
+    more = {arm: after(arm, n) for arm in ARMS}
+    waiting = [arm for arm, rows in more.items() if rows is None]
+    if waiting:
+        print("pending, nothing written: not generated again in the six languages: " + ", ".join(waiting))
+        return
+    main_rows = {arm: trunc.after(arm, "attack") for arm in ARMS}
+    missing = [arm for arm, rows in main_rows.items() if rows is None]
+    if missing:
+        raise SystemExit("the attack set after re-generation (section 8) is not complete for: " + ", ".join(missing))
+    first = json.loads((OUT / "more_languages.json").read_text())
+    res = again_result(first, more, main_rows)
+    md = again_md(res, first)
+    write_json(OUT / "more_languages_regen.json", res)
+    (OUT / "more_languages_regen.md").write_text(md + "\n")
+    print(md)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["build", "evaluate", "report"])
-    ap.add_argument("--arm", help="evaluate: base, or a plain or SafeGrad run at seed 42, 1 or 2")
-    ap.add_argument("--before", type=int, default=0, help="evaluate: do not start at or after this time (epoch seconds)")
-    ap.add_argument("--dry-run", action="store_true", help="evaluate: say what would run and stop")
+    ap.add_argument("what", choices=["build", "evaluate", "report", "regen", "again"])
+    ap.add_argument("--arm", help="evaluate, regen: base, or a plain or SafeGrad run at seed 42, 1 or 2")
+    ap.add_argument("--before", type=int, default=0, help="evaluate, regen: do not start at or after this time (epoch seconds)")
+    ap.add_argument("--dry-run", action="store_true", help="evaluate, regen: say what would run and stop")
     a = ap.parse_args()
     if a.what == "build":
         build()
     elif a.what == "evaluate":
         evaluate(a)
+    elif a.what == "regen":
+        regen(a)
+    elif a.what == "again":
+        again(a)
     else:
         report(a)
 

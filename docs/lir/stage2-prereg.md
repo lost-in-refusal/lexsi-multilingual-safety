@@ -1304,6 +1304,41 @@ Cost: about two to three hours of laptop time for the training (our plain run to
 - The settings are enforced, not only recorded. Training does not start unless the configuration TRL received has the registered values (epochs, micro-batch, accumulation, learning rate, schedule, warm-up, weight decay, clipping, optimizer, seeds, no autocast, batch order, gradient checkpointing, no checkpoints, sequence limit, loss on the response only) and the device is the laptop's GPU. Checked without weights for both micro-batch settings: no value differs. The model named by its hub identifier loads offline from the cache, which holds the pinned revision.
 - The run script is `scripts/aligntune_run.sh`. A folder left by an attempt that did not finish is kept beside under another name. If the fallback is taken, the run record lists it among the differences.
 
+### 14e. The six further languages read again after re-generation at 1,024 tokens
+
+**Added Nov 23, 4:32 PM ET by Mingyu, after 14b was read and before any answer below was generated again.**
+
+Question: 14b was read on answers capped at 256 tokens, and base answers reached that cap far more often than the fine-tuned models' answers (23% to 66% of base answers by language, against 4% to 15% for plain). Do U1 to U3 come out the same when every capped answer is completed?
+
+Why. A cut answer is judged before it is finished. If base's cut answers turned unsafe once completed, the rises under plain in these languages would shrink, and with them the grounds for naming Vietnamese, Thai and Javanese beside Korean. Section 8 asked the same of the four languages of the main evaluation.
+
+What we know as this is written. This reading is not blind. We know everything in `more_languages.md` and in the note of 4:21 PM under 14b. We know the result of section 8: in the four main languages base's strict attack success fell a little after completion, and H1 to H3 held. 14b lists re-generation as not part of that block; this entry adds it as a separate reading. No answer in the six languages has been generated again.
+
+What is run. For each of the seven arms of 14b, every answer in the six languages that reached the 256-token cap is generated again with a cap of 1,024 new tokens, with the generation code and greedy decoding of section 8, and judged by the same guard. Counted from the files: 702 answers of base, 173, 133 and 162 of plain at seeds 42, 1 and 2, and 339, 316 and 341 of SafeGrad: 2,166 in all. Command: `python -m lir.morelangs regen --arm <arm>`, with output under `runs/morelangs-trunc/`. Nothing under `runs/morelangs/` is changed. Order: base, then plain and SafeGrad at seed 42, at seed 1 and at seed 2. The lines are queued behind the AlignTune run of 14d. An arm not started by Tuesday Nov 24, 9 PM ET is listed as not run.
+
+The reading. The code of 14b is applied unchanged to the answers after re-generation: a completed answer and its verdict replace the cut original, and complete answers stay as they were. Both sides of U3 are after re-generation: Korean's rise is taken from the attack-set answers that were generated again for section 8, which exist for the same seven arms. The statistics, the bootstrap and the three sides of an interval are those of 14b.
+
+**This reading decides nothing.** U1 to U3 stand as read under 14b, with the sentences they gave.
+
+| For each of U1, U2 and the row of U3 | What we report |
+| --- | --- |
+| The same side after re-generation (for U3: the same row) | the same on the capped answers and after re-generation |
+| A different side, or a different row | differs after re-generation: both readings are given wherever it is used, and the reading of 14b stands |
+
+The languages named beside Korean stay Vietnamese, Thai and Javanese, the languages of the registered reading, whatever this reading shows. For each of the six languages the side of Korean's rise minus that language's rise after re-generation is reported beside the first reading. Vietnamese's interval touched zero in the first reading, so its side can change on a few answers. A changed side, for it or for any other language, is reported with both readings and changes no sentence by itself. If after re-generation a language rose more than Korean (the interval is below zero), that is said wherever U3 is used.
+
+Answers still cut. If 30 or more of an arm's 291 answers in one language (more than 10%) still reach the cap at 1,024 tokens, the figures after re-generation in that language are given with that caveat, and no sentence is built on them.
+
+Shown beside, with no rule: for each language the base model's strict attack success before and after, the changes in strict attack success and in refusal rate with their intervals, and the guard's Unsafe class alone; for each arm and language how many answers were generated again, how many of them are the original continued, and how many still reach the cap.
+
+What it cannot show. No person has checked the guard in these six languages, and completing answers does not test the guard. There is still no XSTest and no task score in these languages.
+
+If it is not finished. The reading needs all seven arms. If one is missing it is not reported, and 14b stands with its limit on the cap as written.
+
+Cost: about three hours of laptop time, by the timings of section 8.
+
+Report: `python -m lir.morelangs again` writes `results/lir/stage2/more_languages_regen.md`. Its code is committed with this entry, before any answer in these languages is generated again.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

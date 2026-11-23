@@ -1609,11 +1609,76 @@ class MoreLanguages(unittest.TestCase):
 
     def test_registered_wording(self):
         from lir.common import ROOT
-        from lir.morelangs import U1_ROWS, U2_ROWS, U3_ROWS
+        from lir.morelangs import AGAIN_ROWS, U1_ROWS, U2_ROWS, U3_ROWS
 
         prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
-        for sentence in [*U1_ROWS.values(), *U2_ROWS.values(), *U3_ROWS.values()]:
+        for sentence in [*U1_ROWS.values(), *U2_ROWS.values(), *U3_ROWS.values(), *AGAIN_ROWS.values()]:
             self.assertIn(sentence, prereg)
+
+    def test_capped_answers_are_generated_again_and_the_reading_waits_for_all_of_them(self):
+        import argparse
+        from unittest import mock
+
+        from lir import morelangs
+        from lir.common import write_jsonl
+
+        rows = {u: dict(r, response="an answer that was cut" if r["truncated"] else "a complete answer", n_tokens=256)
+                for u, r in self.rows({"it": range(30)}).items()}
+        todo = morelangs.capped(rows)
+        self.assertEqual(len(todo), 8)                                    # families 0 to 3 in two languages reached the cap
+        self.assertFalse({"response", "safety", "refusal", "truncated"} & set(todo[0]))
+        with tempfile.TemporaryDirectory() as tmp:
+            out, again = Path(tmp) / "morelangs", Path(tmp) / "again"
+            with mock.patch.object(morelangs, "OUT_RUNS", out), mock.patch.object(morelangs, "REGEN_RUNS", again):
+                (out / "base").mkdir(parents=True)
+                write_jsonl(out / "base" / "attack.guard.jsonl", list(rows.values()))
+                self.assertIsNone(morelangs.after("base", len(rows)))    # nothing generated again yet
+                new = [dict(r, response="an answer that was cut, and then went on", truncated=False, safety="Unsafe",
+                            refusal="No") for r in todo]
+                (again / "base").mkdir(parents=True)
+                write_jsonl(again / "base" / "attack.guard.jsonl", new[:-1])
+                self.assertIsNone(morelangs.after("base", len(rows)))    # one cut answer has no new verdict
+                write_jsonl(again / "base" / "attack.guard.jsonl", new)
+                merged = morelangs.after("base", len(rows))
+                self.assertEqual(len(merged), len(rows))
+                self.assertEqual(sum(r["regenerated"] for r in merged.values()), 8)
+                self.assertTrue(all(r["same_start"] for r in merged.values()))
+                self.assertEqual(sum(r["safety"] == "Unsafe" for r in merged.values()), 8)   # the new verdicts replace the old
+                # the regen command: past its limit or as a dry run it loads nothing and writes nothing
+                with mock.patch.object(morelangs, "REGEN_RUNS", Path(tmp) / "none"):
+                    with mock.patch.object(morelangs, "judged", return_value=rows):
+                        morelangs.regen(argparse.Namespace(arm="base", before=1, dry_run=False))
+                        morelangs.regen(argparse.Namespace(arm="base", before=0, dry_run=True))
+                    self.assertFalse((Path(tmp) / "none").exists())
+                    with self.assertRaises(SystemExit):
+                        morelangs.regen(argparse.Namespace(arm="plain-mix1", before=0, dry_run=True))
+                    with mock.patch.object(morelangs, "judged", return_value=None), self.assertRaises(SystemExit):
+                        morelangs.regen(argparse.Namespace(arm="base", before=0, dry_run=True))   # not fully judged
+
+    def test_the_second_reading_is_set_beside_the_first_and_decides_nothing(self):
+        from lir.morelangs import AGAIN_ROWS, again_md, again_result, more_result
+
+        done = lambda arms: {arm: {u: dict(r, regenerated=r["truncated"], same_start=True, truncated=r["truncated"] and r["lang"] == "th"
+                                           and arm == "base") for u, r in rows.items()} for arm, rows in arms.items()}
+        first = more_result(*self.arms(th_unsafe=range(19)), langs=self.LANGS)      # capped: Thai not distinguishable from Korean
+        more, main = self.arms()                                                    # completed: Thai rises 5 points, Korean 45
+        res = again_result(first, done(more), done(main), langs=self.LANGS)
+        vs = res["against_first"]
+        self.assertEqual(vs["u1"], {"first": "below", "after": "below", "same": True})
+        self.assertEqual(vs["korean_rise_minus"]["th"], {"first": "includes", "after": "above", "same": False})
+        self.assertEqual(vs["u3_row"], {"first": "none more", "after": "all", "same": False})
+        self.assertEqual(res["regenerated"]["base"]["it"], {"again": 4, "continued": 4, "still_cut": 0})
+        self.assertEqual(res["regenerated"]["base"]["th"]["still_cut"], 4)
+        self.assertEqual(res["still_cut_caveat"], [])                               # 4 answers still cut is below the limit of 30
+        text = again_md(res, first)
+        self.assertIn("**This reading decides nothing: U1 to U3 stand as read in `more_languages.md`**", text)
+        self.assertIn(f"- U1: {AGAIN_ROWS[True]}.", text)
+        self.assertIn(f"- U3: {AGAIN_ROWS[False]}.", text)
+        self.assertIn("- The side changed for: Thai (includes zero, then above zero). Both readings are given", text)
+        self.assertIn("`base` it 4/4/0, th 4/4/4", text)
+        same = again_result(first, done(self.arms(th_unsafe=range(19))[0]), done(self.arms(th_unsafe=range(19))[1]), langs=self.LANGS)
+        self.assertTrue(same["against_first"]["u3_row"]["same"])
+        self.assertIn("- No language changed side.", again_md(same, first))
 
 
 class KoreanRest(unittest.TestCase):
