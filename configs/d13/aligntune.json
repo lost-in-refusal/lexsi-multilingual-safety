@@ -1,0 +1,38 @@
+{
+  "experiment": "D13",
+  "arm": "plain-aligntune",
+  "backend": "trl",
+  "model": "CohereLabs/tiny-aya-global",
+  "model_revision": "af89d219b53ed9b13b8a4645f9c8028973510324",
+  "dataset": "data/lir/bactrian_train.jsonl",
+  "expected_rows": 1800,
+  "epochs": 3,
+  "learning_rate": 0.0002,
+  "batch_size": 4,
+  "gradient_accumulation_steps": 8,
+  "max_seq_length": 1024,
+  "seed": 42,
+  "precision": "bf16",
+  "quantization": false,
+  "lora": {
+    "enabled": true,
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.0,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "completion_only_loss": true,
+  "assistant_only_loss": false,
+  "packing": false,
+  "curator_schema_gate": false,
+  "curator_clean": false,
+  "curator_dedup": "none"
+}
