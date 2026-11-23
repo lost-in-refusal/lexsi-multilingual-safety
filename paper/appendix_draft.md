@@ -9,13 +9,15 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
 
 - **Code:** `github.com/lost-in-refusal/lexsi-multilingual-safety`, branch `mingyu/stage2` (merged into `main` before
   submission). Every table in `results/lir/stage2/` is written by a command named at the top of its module
-  (`python -m lir.seeds`, `lir.repeat`, `lir.section13`, `lir.loose`, `lir.direction`, `lir.trunc`).
-- **Tests:** `python -m unittest tests.test_lir` (71 tests; each registered rule has a test on made-up data).
+  (`python -m lir.seeds`, `lir.repeat`, `lir.section13`, `lir.loose`, `lir.direction`, `lir.trunc`, `lir.gpu`).
+- **Tests:** `python -m unittest tests.test_lir` (75 tests; each registered rule has a test on made-up data).
 - **Outputs:** every generation and guard verdict is in `lost-in-refusal/lost-in-refusal-eval-outputs` (public), one
   folder per run, with the re-generated answers under `truncation-regenerated/`. Adapters: the two stage 1
   repositories (seed 42) and `lost-in-refusal/tiny-aya-lora-stage2` (30 folders; public at submission).
 - **Hardware:** one Apple M5 Pro laptop, 48 GB, macOS 26.5, PyTorch 2.15.0 on MPS, bfloat16. No cloud GPU was used
-  for any number in the paper unless a result says "GPU" (section 12.0 to 12.3 of the preregistration).
+  for any number in the paper unless a result says "GPU" (section 12.0 to 12.3 of the preregistration). The GPU runs
+  used one NVIDIA L4 (23 GB, driver 620.70.06, CUDA 13.2) on Hugging Face Jobs, with PyTorch 2.15.0, transformers
+  5.22.1, peft 0.21.2 and bitsandbytes 0.50.2 (`requirements-gpu.txt`). Each job's record is in `gpu.json`.
 - **Pinned versions:** Tiny Aya Global `af89d219`, Tiny Aya Earth `0624fafb`, Qwen3Guard-Gen-4B `6ec42827` (safety
   guard), Qwen3-14B `40c06982` (task judge), NLLB-200 3.3B `1a07f7d1` (Swahili re-translation); SafeTune `3901a9f`,
   AuditKIT `71316da`, CuratorKIT `dd9e835`, CircuitKIT `e71d5e1`; Python packages as in `requirements.txt`.
@@ -84,7 +86,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 19, 10:30 PM, before any stage 2 evaluation | H1 Korean drifts more than English; H2 SafeGrad repairs it; H3 Swahili refusals fall; H4 Korean clean set; costs; mixing baselines (no prediction); second judge (Checks A, B); Swahili re-translation (Check C); Earth (E1, E2) | H1, H2, H3 pass in three seeds. H4 not tested. Mixing: same protection as SafeGrad at seed 42, more over-refusal. Check A failed with both judges, so Check B was not run. Check C passes. E1 holds; E2 not confirmed |
 | Nov 20 | K1 no Korean rows; K2 Korean rise judged by a person; circuit node counts; truncation audit; harm categories; Aya (Y1 to Y3) | K1 row 1 in three seeds. K2 does not pass. Circuits hold at 3 of 5 sizes. Audit: headline unchanged. Y1, Y2 pass; Y3 fails |
 | Nov 21, 4:39 PM | Section 11: Aya and Earth at seeds 1 and 2; K1 after re-generation | All as on one seed, on both readings |
-| Nov 21, 8:59 PM (Aish) | Section 12.0 to 12.4: GPU runs (hardware control, single-language, NF4, AlignTune) | Pending |
+| Nov 21, 8:59 PM (Aish) | Section 12.0 to 12.4: GPU runs (hardware control, single-language, NF4, AlignTune) | Hardware control: no significant difference from the laptop in eight comparisons. L1 and L2: row 1 in all three runs. Q2 passes. Q1: NF4 raises attack success for base in English and for plain in three languages, where the comparison also differs in merging. AlignTune: no result yet |
 | Nov 22 (Mingyu) | Section 13a to 13h: single-language runs on the laptop; repair vector on Aya (V1); second readings; 519-row seeds (C1, C2); refusal direction (R1, R2); Unsafe-only reading; task score by answer length | 13a to 13d, 13g and 13h read; seeds, C1, C2, R1, R2 pending |
 
 Deviations and things a reader should know:
@@ -122,11 +124,13 @@ The recommended layout on hackathon.lexsi.ai marks these as required or as value
 - **"With more credits" (required):** planned approach and the expected before and after. Candidates, in order of
   value: the mixing baseline at seeds 1 and 2 with XSTest and re-generation (does mixing's over-refusal cost hold
   on three seeds?); a second human reading of the Korean rise on the 191 unread prompts and a second labeller;
-  4-bit and mixed-precision deployment results; a second untrained language and the Fire and Water models; LoRA
+  the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; a second untrained language and the Fire and Water models; LoRA
   rank, learning rate and epoch sensitivity; a second safety benchmark.
 - **"Declaration of work done outside the hackathon" (required):** for the team to state.
-- **"Results on the quantized / deployed model (GGUF, 4-bit)" (Track 2b line):** only the NF4 runs of 12.2 would
-  fill it. If they are not run, say so under "With more credits".
+- **"Results on the quantized / deployed model (GGUF, 4-bit)" (Track 2b line):** filled by the NF4 runs of 12.2
+  (`gpu.md`): SafeGrad stays below plain on Korean under 4-bit loading, and 4-bit loading raises the base model's
+  English attack success. State with it that the fine-tuned arms' NF4 comparison also differs in merging, and that
+  no GGUF build was tested.
 - **"Checking the automatic judge" (% agreement or Cohen's kappa):** kappa is now in `unsafe_only.md`
   (0.87 English, 0.60 Korean, 0.80 Chinese, 0.49 Swahili, on a deliberately hard sample).
 - **"What didn't work" (negative results):** part C, items 1, 2, 7 and 9, plus Y3, E2 and the two second judges.

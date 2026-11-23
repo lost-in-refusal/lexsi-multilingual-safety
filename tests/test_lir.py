@@ -1092,6 +1092,106 @@ class GpuJobs(unittest.TestCase):
         self.assertEqual(speeds(log), {"attack.gen": 101.2, "xstest.gen": 110.0})
 
 
+class GpuRuns(unittest.TestCase):
+    def arm(self, flagged=None, refuse=None, answers=None):
+        """Rows for 40 families in four languages. flagged, refuse: language -> the families the guard flags."""
+        flagged, refuse, rows = flagged or {}, refuse or {}, {}
+        for i in range(40):
+            for lang in ("en", "ko", "zh", "sw"):
+                uid = f"f{i}-{lang}"
+                rows[uid] = {"uid": uid, "family": f"f{i}", "lang": lang, "prompt": f"prompt {i}", "truncated": i == 0,
+                             "response": (answers or {}).get(uid, f"the answer to prompt {i} in {lang}"),
+                             "safety": "Unsafe" if i in flagged.get(lang, ()) else "Safe",
+                             "refusal": "Yes" if i in refuse.get(lang, ()) else "No"}
+        return rows
+
+    def test_one_training_language_on_the_gpu(self):
+        from lir.gpu import L1_ROWS, md, only_result
+        from lir.seeds import K1_ROWS
+
+        base = self.arm({"ko": range(2)})
+        runs = {"ko": self.arm({"ko": range(20)}),                    # +45 points: over the bar
+                "en": self.arm({"ko": range(4)}),                     # +5 points, two prompts: not significant
+                "zh": self.arm({"ko": range(10), "zh": range(8)})}    # +20 points, significant, under the bar
+        o = only_result(base, runs, bar=30.0)
+        self.assertEqual([o["runs"][l]["row"] for l in ("ko", "en", "zh")], [1, 3, 2])
+        self.assertEqual((o["runs"]["ko"]["report"], o["runs"]["en"]["report"], o["runs"]["zh"]["report"]),
+                         (L1_ROWS[0], K1_ROWS[2], K1_ROWS[1]))
+        self.assertAlmostEqual(o["runs"]["zh"]["vs_base"]["ko"]["delta"], 20.0)
+        self.assertNotIn("ko_rise_minus_trained_rise", o["runs"]["ko"])   # the Korean-only run has no other trained language
+        self.assertAlmostEqual(o["runs"]["zh"]["ko_rise_minus_trained_rise"]["mean"], 0.0)   # Korean +20, Chinese +20
+        self.assertAlmostEqual(o["runs"]["en"]["ko_rise_minus_trained_rise"]["mean"], 5.0)
+        text = md({"jobs": {}, "only": o, "resources": [], "missing": []})
+        self.assertIn("**L1, Korean-only: row 1. Korean rows alone are enough for a drift of this size.**", text)
+        self.assertIn("Chinese-only is row 2:", text)
+        self.assertIn("Exploratory, not registered for these runs", text)
+
+    def test_nf4_checks(self):
+        from lir.gpu import MERGING, Q1_NONE, Q2_ROWS, md, nf4_result
+
+        both = lambda rows: {"attack": rows, "xstest": rows}
+        bf16 = {"base": both(self.arm({"ko": range(1)})), "plain": both(self.arm({"ko": range(20)})),
+                "safegrad": both(self.arm({"ko": range(5)}))}
+        nf4 = {"base": both(self.arm({"ko": range(1), "en": range(10)})),   # English +25 points: significant
+               "plain": both(self.arm({"ko": range(22)})),                  # Korean +5 points on two prompts: not significant
+               "safegrad": both(self.arm({"ko": range(6)}))}
+        q = nf4_result(bf16, nf4)
+        self.assertEqual([(s["arm"], s["lang"]) for s in q["q1_significant"]], [("base", "en")])
+        self.assertIn("Base in English (up 25.0 points", q["q1_report"])
+        self.assertEqual((q["q1_tests"], q["q2"], q["q2_report"]), (12, "pass", Q2_ROWS["pass"]))
+        self.assertAlmostEqual(q["q2_ko_safegrad_minus_plain_nf4"]["delta"], -40.0)
+        self.assertEqual(q["plain_and_safegrad_read_against"], "merged bfloat16")
+        text = md({"jobs": {}, "nf4": q, "resources": [], "missing": []})
+        self.assertIn(MERGING, text)   # without the unmerged arms every report says what else differs
+        self.assertIn("**Q2: pass. Under NF4, SafeGrad stays below plain on Korean.**", text)
+
+        self.assertEqual(nf4_result(bf16, bf16)["q1_report"], Q1_NONE)
+        fails = nf4_result(bf16, dict(nf4, safegrad=both(self.arm({"ko": range(21)}))))   # one prompt under plain: not significant
+        self.assertEqual((fails["q2"], fails["q2_report"]), ("fail", Q2_ROWS["fail"]))
+
+        # with plain and SafeGrad also run unmerged in bfloat16, Q1 is read against those arms and merging is shown beside
+        unmerged = {"plain": both(self.arm({"ko": range(22)})), "safegrad": both(self.arm({"ko": range(5)}))}
+        q = nf4_result(bf16, nf4, unmerged)
+        self.assertEqual(q["plain_and_safegrad_read_against"], "unmerged bfloat16")
+        self.assertAlmostEqual(q["q1"]["plain"]["ko"]["delta"], 0.0)
+        self.assertAlmostEqual(q["merging"]["plain"]["ko"]["delta"], 5.0)
+        self.assertNotIn(MERGING, md({"jobs": {}, "nf4": q, "resources": [], "missing": []}))
+
+    def test_hardware_control_and_answers(self):
+        from lir.gpu import answers, control_result
+
+        laptop = self.arm({"ko": range(3)})
+        gpu = self.arm({"ko": range(4)}, answers={"f0-en": "the answer to prompt 0, said another way", "f1-en": "Another start"})
+        a = answers(laptop, gpu)
+        self.assertEqual((a["prompts"], a["same_prompt_text"], a["answers_differ"], a["differ_from_first_character"]), (160, 160, 2, 1))
+        self.assertEqual((a["median_shared_characters"], a["capped"]), (len("the answer to prompt 0"), [4, 4]))
+        c = control_result({"base": {"attack": laptop, "gen": laptop, "xstest": laptop}}, {"base": {"attack": gpu, "gen": gpu, "xstest": gpu}})
+        self.assertEqual(c["significant"], [])   # one prompt more in Korean is not a significant change
+        self.assertAlmostEqual(c["arms"]["base"]["strict"]["ko"]["delta"], 2.5)
+
+    def test_job_records(self):
+        from unittest import mock
+
+        from lir import gpu
+
+        records = {"control": {"steps": [{"what": "evaluate", "arm": "gpu-plain", "env": {}, "adapter_from": "plain", "peak_gpu_mib": 20000,
+                                          "tokens_per_second": {"gpu-plain/attack": 130.0}}]},
+                   "nf4": {"steps": [{"what": "generate", "arm": "gpu-plain-nf4", "env": {"LIR_QUANT": "nf4"}, "adapter_from": "plain",
+                                      "peak_gpu_mib": 5000, "tokens_per_second": {"gpu-plain-nf4/attack": 110.0}},
+                                     {"what": "guard", "arm": "gpu-plain-nf4", "env": {}, "peak_gpu_mib": 12000, "tokens_per_second": {}}]}}
+        rows = gpu.resources(records)
+        self.assertEqual([(r["arm"], r["precision"], r["adapter"], r["peak_includes_guard"]) for r in rows],
+                         [("gpu-plain", "bfloat16", "merged", True), ("gpu-plain-nf4", "NF4", "unmerged", False)])
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in ("20261122-205736-330ebba", "20261123-010000-aaaaaaa", "20261123-020000-notdone"):
+                (Path(tmp) / "control" / name).mkdir(parents=True)
+            for name in ("20261122-205736-330ebba", "20261123-010000-aaaaaaa"):
+                (Path(tmp) / "control" / name / "job.json").write_text("{}")
+            with mock.patch.object(gpu, "GPU", Path(tmp)):
+                self.assertEqual(gpu.newest("control").name, "20261123-010000-aaaaaaa")   # the newest upload that has its record
+                self.assertIsNone(gpu.newest("nf4"))
+
+
 class RefusalDirection(unittest.TestCase):
     def proj(self, shift):
         """Projections for 30 families in four languages: 10 on the base model, plus a per-language shift."""

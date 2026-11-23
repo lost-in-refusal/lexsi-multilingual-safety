@@ -39,6 +39,10 @@ To the private dataset `lost-in-refusal/lost-in-refusal-gpu-runs`, under `<job>/
 
 Nothing goes to the public outputs repository from a job. Results are copied there after they have been read.
 
+To read them: `python -m lir.gpu fetch` copies every job's answers, verdicts, records and logs (no adapters) from the
+staging dataset into `runs/gpu/`, and `python -m lir.gpu` writes `results/lir/stage2/gpu.md` with the readings of 12.0,
+12.1 and 12.2. Neither loads a model.
+
 ## Suggested order tonight
 
 `control`, then `nf4`, then `unmerged` if Aish agrees. NF4 is the only run that fills the organizers' write-up line

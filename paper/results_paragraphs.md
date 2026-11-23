@@ -1,6 +1,6 @@
 # Results paragraphs for the paper (D15, draft for Aish to edit in)
 
-Written Nov 22. One paragraph per deliverable, D1 to D8 and D12, each with its confidence label and the file its
+Written Nov 22. One paragraph per deliverable, D1 to D8, D11, D12 and D18, each with its confidence label and the file its
 numbers come from. Every number is from `results/lir/stage2/`; the status page there
 (`results/lir/stage2/README.md`) says what each result may and may not be used for. Intervals are 95%. Attack
 success is strict (guard says Unsafe or Controversial) unless a line says otherwise.
@@ -74,11 +74,12 @@ than the language the model was trained on: by 7.2 points more than English in t
 supports reading D1 as a weakness of Korean in this model and not as a footprint of the training language. It is
 one seed with 600 rows per run, and no test ranks the three runs. Counting only the guard's Unsafe class, the English-only comparison still holds (+5.5 points, +1.7 to +9.6) and the Chinese-only one does not (+3.4, -0.7 to +7.9), so the Chinese-only half depends on the guard's Controversial class.
 
-Note for Aish: these are laptop runs (section 13a). The GPU runs of your section 12.1 are a separate check
-against a GPU base. Seeds 1 and 2 of the laptop runs are running tonight and their table will be
+The three single-language runs were repeated on a cloud GPU (section 12.1, Hannah's jobs), each against the base model evaluated on that GPU: Korean rose 8.6 points with Korean rows only, 8.9 with English rows only and 11.3 with Chinese rows only, each significant and above the bar. That check was registered before the laptop runs but run after their results were known.
+
+Note for Aish: the laptop runs are section 13a (checks SL1 and SL2) and the GPU runs are your section 12.1 (L1 and L2). Seeds 1 and 2 of the laptop runs finish tonight and their table will be
 `single_language_seeds.md`.
 
-Source: `noko.md`, `truncation/k1.md`, `single_language.md`.
+Source: `noko.md`, `truncation/k1.md`, `single_language.md`, `gpu.md`.
 
 ## D7. Second dataset: Aya. Confidence: High for drift and repair; the Swahili part fails
 
@@ -103,6 +104,18 @@ against 13.1, 6.2 and 8.6), so that forecast is not confirmed. Tiny Aya Fire and
 Swahili is the only African language we evaluated.
 
 Source: `earth/seeds.md`, `earth/checks.md`.
+
+## D18. Hardware control. Confidence: Medium (one seed; a description with no pass rule)
+
+Every number above comes from one laptop. To check that the results do not depend on it, the base model and the seed 42 plain adapter were evaluated again on a cloud GPU (one NVIDIA L4) with the same code. Strict attack success moved by at most 1.4 points in any language, and none of the eight differences was significant (Korean: base 5.2% and 5.5%, plain 19.2% and 19.9%). The answers themselves were not the same text: 63% of the base model's and 46% of the plain model's differ between the two machines, almost always after an identical start, which is what greedy decoding in bfloat16 gives on hardware that rounds differently. Rates carry over between machines; single answers do not.
+
+Source: `gpu.md`.
+
+## D11. 4-bit loading (NF4). Confidence: Medium for the repair (one seed, preregistered, significant); Low for what NF4 does to the fine-tuned models
+
+Loaded in 4 bits (bitsandbytes NF4) on the GPU, SafeGrad stayed below plain fine-tuning on Korean: 11.0% against 22.7% strict attack success (-11.7 points, p < 0.001), which is the preregistered check. Quantization itself was not neutral. For the base model, English attack success rose from 5.5% to 11.0% (p = 0.002), the one change that stays significant after correcting for twelve tests; its Korean, Chinese and Swahili rates rose by 1.7 to 2.4 points, not significantly. For the plain fine-tune, English, Chinese and Swahili rose significantly (by 3.1 to 5.2 points), but there the 4-bit model also leaves its adapter unmerged where the bfloat16 model merges it, so the change cannot be put down to precision alone, and the control that would separate the two was not run. SafeGrad moved by 1.7 points or less in every language. Memory use was not measured in a way that isolates the model, so we report no saving.
+
+Source: `gpu.md`.
 
 ## D12. CircuitKIT across node counts. Confidence: Medium (holds at three of five sizes; seed 42; no intervals)
 
