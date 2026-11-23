@@ -20,7 +20,7 @@ runs the same `lir.train` and `lir.evaluate` as the laptop, and uploads everythi
 | `python -m lir.hfjob launch --job only-ko` | 12.1 | Trains plain LoRA on the 600 Korean rows, then evaluates | `plain-ko` |
 | `python -m lir.hfjob launch --job only-en`, `--job only-zh` | 12.1 | The same on the English or Chinese rows | `plain-en`, `plain-zh` |
 | `python -m lir.hfjob launch --job nf4` | 12.2 | SafeGrad in bfloat16, then base, plain and SafeGrad with NF4 base weights | `gpu-safegrad`, `gpu-base-nf4`, `gpu-plain-nf4`, `gpu-safegrad-nf4` |
-| `python -m lir.hfjob launch --job unmerged` | not registered | Plain and SafeGrad in bfloat16 with the adapter left unmerged | `gpu-plain-unmerged`, `gpu-safegrad-unmerged` |
+| `python -m lir.hfjob launch --job unmerged` | 12.2, review note of Nov 22 (needs Aish's agreement first) | Plain and SafeGrad in bfloat16 with the adapter left unmerged | `gpu-plain-unmerged`, `gpu-safegrad-unmerged` |
 
 Defaults: `--flavor l4x1`, `--timeout 3h`, `--namespace lost-in-refusal-lexsi`. Section 12.0 asks for one GPU type for
 every job, so change the flavor for all of them or none. Follow a job with `hf jobs logs <id>` and `hf jobs inspect <id>`.
@@ -39,6 +39,12 @@ To the private dataset `lost-in-refusal/lost-in-refusal-gpu-runs`, under `<job>/
 
 Nothing goes to the public outputs repository from a job. Results are copied there after they have been read.
 
+## Suggested order tonight
+
+`control`, then `nf4`, then `unmerged` if Aish agrees. NF4 is the only run that fills the organizers' write-up line
+"results on the quantized / deployed model (4-bit)". The three `only-*` jobs repeat fine-tunes the laptop already has
+(`single_language.md`), so they are the first to drop.
+
 ## Not covered, and three points on section 12 for Aish
 
 - **The task set is not run.** Sections 12.1 and 12.3 ask for it, but its judge (Qwen3-14B in bfloat16, about 30 GB)
@@ -47,7 +53,7 @@ Nothing goes to the public outputs repository from a job. Results are copied the
 - **Merged against unmerged.** `lir.evaluate` merges the adapter into the weights, on the laptop and in the control.
   Section 12.2 loads NF4 with the adapter unmerged. So NF4 minus bfloat16 for plain and SafeGrad also contains the
   difference between a merged and an unmerged adapter. The `unmerged` job measures that difference in bfloat16. It is
-  not registered: add it to 12.2 before running it, or state the confound.
+  written into 12.2 as a review note (Nov 22); run it once Aish agrees, or state the confound.
 - **The seed 42 adapters are the two stage 1 repositories** (`tiny-aya-global-bactrian-lora-plain` and `-safegrad`),
   not `tiny-aya-lora-stage2` as the brief says. The job downloads them from there at a pinned revision and stops if
   the weights do not have the hash of the file the laptop evaluated.
