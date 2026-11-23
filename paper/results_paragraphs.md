@@ -71,7 +71,7 @@ rows, three seeds), Korean rose 7.9, 8.9 and 7.2 points with English rows only, 
 rows only, each significant and above the bar. In the two runs that can tell a weak language from a trained one, Korean rose more
 than the language the model was trained on in every seed: pooled, by 7.6 points more than English in the English-only run (+3.7 to
 +11.7) and 7.9 more than Chinese in the Chinese-only run (+3.3 to +12.6); at seed 42 both also hold after re-generation. This
-supports reading D1 as a weakness of Korean in this model and not as a footprint of the training language. No test ranks the three runs, but one registered comparison separates them from a mixed set of the same size: English rows alone raised Korean 4.6 points less than a 519-row mixed set (-7.8 to -1.4), while Korean rows alone and Chinese rows alone were not detectably different from it. Counting only the guard's Unsafe class, both comparisons hold on three seeds (+5.7 points, +2.3 to +9.6, and +4.1, +0.2 to +8.0); read at seed 42 alone, the Chinese-only one does not (+3.4, -0.7 to +7.9).
+supports reading D1 as a weakness of Korean in this model. The training language still changes the size of the rise: English rows alone raised Korean 4.6 points less than a 519-row mixed set (-7.8 to -1.4), while Korean rows alone and Chinese rows alone were not detectably different from it. That comparison was registered after its seed 42 value had been seen. No other test ranks the three runs. Counting only the guard's Unsafe class, Korean still rises more than the trained language on three seeds in both runs (+5.7 points, +2.3 to +9.6, and +4.1, +0.2 to +8.0); read at seed 42 alone, the Chinese-only run does not show it (+3.4, -0.7 to +7.9).
 
 The three single-language runs were repeated on a cloud GPU (section 12.1, Hannah's jobs), each against the base model evaluated on that GPU: Korean rose 8.6 points with Korean rows only, 8.9 with English rows only and 11.3 with Chinese rows only, each significant and above the bar. That check was registered before the laptop runs but run after their results were known.
 
@@ -133,7 +133,7 @@ Source: `results.md`, `task_length.md`.
 
 ## D14. Judge validity. Confidence: a limitation, with one robustness table
 
-Every safety number comes from one automatic guard. Against 120 answers labelled blind by the team it agreed 28/30 in English, 24/30 in Korean and 27/30 in Chinese (Cohen's kappa 0.87, 0.60 and 0.80) and missed our 80% bar in Swahili (20/27, kappa 0.49); half of each sample is answers the guard flagged, so it is a hard sample. Two other guards we tried as second judges both missed the bar, and a blind human reading of 200 Korean answers found the rise in the expected direction but not significantly (5 against 1 on 94 prompts, p = 0.22). The guard has two flagged classes, Unsafe and Controversial, and our two human checks disagree about the second: labellers marked 18 of 24 Controversial answers unsafe in the first check and 0 of 4 in the second. We therefore computed every check again counting Unsafe only, with the procedure fixed in advance. Every three-seed check still passes (Korean-minus-English gap +8.8 points, +4.7 to +13.1; SafeGrad against plain -6.6, -9.2 to -4.4); among the single-seed checks, the Chinese-only training comparison does not.
+Every safety number comes from one automatic guard. Against 120 answers labelled blind by the team it agreed 28/30 in English, 24/30 in Korean and 27/30 in Chinese (Cohen's kappa 0.87, 0.60 and 0.80) and missed our 80% bar in Swahili (20/27, kappa 0.49); half of each sample is answers the guard flagged, so it is a hard sample. Two other guards we tried as second judges both missed the bar, and a blind human reading of 200 Korean answers found the rise in the expected direction but not significantly (5 against 1 on 94 prompts, p = 0.22). The guard has two flagged classes, Unsafe and Controversial, and our two human checks disagree about the second: labellers marked 18 of 24 Controversial answers unsafe in the first check and 0 of 4 in the second. We therefore computed every check again counting Unsafe only, with the procedure fixed in advance. Every three-seed check still passes (Korean-minus-English gap +8.8 points, +4.7 to +13.1; SafeGrad against plain -6.6, -9.2 to -4.4); the Chinese-only training comparison does not when it is read at seed 42 alone, and does on three seeds (+4.1 points, +0.2 to +8.0).
 
 Source: `second_judge_check.md`, `ko_drift.md`, `unsafe_only.md`.
 
@@ -141,7 +141,8 @@ Source: `second_judge_check.md`, `ko_drift.md`, `unsafe_only.md`.
 
 - D8 is no longer a single run: Earth holds on three seeds, on both readings.
 - D7 holds after re-generation as well.
-- D6: the three single-language runs exist on the laptop at seed 42, with a second reading after re-generation.
+- D6: the three single-language runs are on three seeds on the laptop (row 1 in all nine runs), with a second reading after re-generation at seed 42, and were repeated on a GPU at seed 42.
+- D11 and D18 are new: the hardware control and 4-bit loading ran on a GPU on Nov 22 (Hannah's jobs).
 - Not in the brief: the seed 42 repair vector, added with no training to the Aya adapters, lowered Korean attack
   success by about 5 points on both readings (registered before it ran), but it made answers about twice as long,
   and its over-refusal and task score were not measured. If it is used at all, it belongs in the appendix with

@@ -931,7 +931,7 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - SL1 on three seeds keeps row 1 in all nine runs under Unsafe only. Pooled Korean rise: +6.4 points [+3.8, +9.4] with English rows only, +8.0 [+4.9, +11.3] with Korean rows only and +8.7 [+5.6, +12.1] with Chinese rows only, against a bar of 4.98.
 - SL2 on three seeds keeps row 1 under Unsafe only: +5.7 [+2.3, +9.6] with English rows only and +4.1 [+0.2, +8.0] with Chinese rows only. The Chinese-only interval is close to zero.
 - The two checks that lose their pass are the ones named above, SL2 read at seed 42 alone, capped and re-generated. So the Chinese-only half of SL2 depends on the Controversial class at one seed and holds without it on three.
-- C1 and C2 have no pass rule, and each keeps its outcome under Unsafe only: C1 includes zero (-2.3 [-5.5, +0.8]); C2 is below zero with English rows only (-2.7 [-5.4, -0.1]) and includes zero with Korean rows only and Chinese rows only.
+- C1 and C2 have no pass rule, and each keeps its outcome under Unsafe only: C1 includes zero (-2.3 [-5.5, +0.8]); C2 is below zero with English rows only (-2.7 [-5.4, -0.1]) and includes zero with Korean rows only and Chinese rows only. C2 was seen at seed 42 before it was registered.
 - By the rule of this section the sentence is now: "20 of the 22 checks that pass on strict attack success also pass on Unsafe only. These do not, and depend on the Controversial class: SL2, seed 42, capped; SL2, seed 42, re-generated."
 
 ### 13h. Answer length and the task score
