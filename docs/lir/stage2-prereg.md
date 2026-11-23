@@ -510,6 +510,29 @@ Question: does loading the model in 4 bits change its safety, and does SafeGrad'
 - Over-refusal on XSTest under both precisions, no pass rule.
 - Mixed per-node quantization with CircuitKIT is not run here. It is exploratory and only if added to this file first.
 
+
+**Added Nov 22, after the D11 NF4 run.** The NF4 evaluation completed on a Hugging Face L4 GPU at seed 42. Base, plain LoRA, and SafeGrad were evaluated under NF4 on the same 1,164 attack prompts and 999 XSTest prompts. The run also evaluated SafeGrad in bfloat16. Strict attack success counts Unsafe or Controversial verdicts.
+
+- **Q1, NF4 versus bfloat16:** For SafeGrad, strict attack success changed from 5.2% to 6.9% in English (p = 0.267), 10.7% to 11.0% in Korean (p = 1.000), 9.3% to 10.3% in Chinese (p = 0.648), and remained 6.2% in Swahili (p = 1.000). None of these four paired comparisons was significant. The registered reading is that NF4 did not measurably change SafeGrad's safety at 291 prompts per language, not that it had no effect. Base and plain bfloat16 comparisons remain pending analysis of the D18 GPU control files.
+
+- **Q2, SafeGrad under NF4:** The registered outcome passes. Korean strict attack success was 22.7% (66/291) under plain NF4 and 11.0% (32/291) under SafeGrad NF4, a reduction of 11.7 percentage points (exact McNemar p < 0.001). SafeGrad's measured repair survived 4-bit loading. SafeGrad's Korean bfloat16 result was 10.7% (31/291), beside 11.0% under NF4.
+
+**Strict attack success under NF4:**
+
+| Arm | English | Korean | Chinese | Swahili |
+| --- | --- | --- | --- | --- |
+| Base NF4 | 11.0% | 7.9% | 9.6% | 7.2% |
+| Plain NF4 | 10.0% | 22.7% | 17.5% | 12.0% |
+| SafeGrad NF4 | 6.9% | 11.0% | 10.3% | 6.2% |
+
+**XSTest over-refusal under NF4:** Base: English 7.6%, Korean 8.8%, Chinese 6.4%, Swahili 5.6%. Plain: English 6.0%, Korean 4.0%, Chinese 3.2%, Swahili 1.2%. SafeGrad: English 6.4%, Korean 6.4%, Chinese 5.2%, Swahili 5.6%. These figures use the refusal verdicts, with 250 prompts per language except Swahili (249). No pass rule applies.
+
+**GPU resources:** Peak GPU memory was 18,822 MiB for base NF4, 20,864 MiB for plain NF4, 20,780 MiB for SafeGrad bfloat16, and 18,856 MiB for SafeGrad NF4. Attack-generation throughput was 219.2, 115.2, 166.0, and 145.5 tokens/second, respectively. These are per-arm measurements from the run record; bfloat16 base and plain resource comparisons remain to be added from D18.
+
+**Outcome:** Q2 passes. Q1 is partially evaluated: no significant SafeGrad bfloat16-versus-NF4 change was detected in any language, while the base and plain paired comparisons remain pending. All findings use one seed and model-judge verdicts.
+
+GPU job: `lir-nf4`, ID `6b03624d130a00b5aa813c6f`. Evaluation commit: `649ce27efdd40c4fcf685a10ce130834430cbbd2`. Confidence: Medium, pending completion of Q1 and verification of configuration equivalence.
+
 ### 12.3 A4. AlignTune
 
 Question: does a plain fine-tune run through Lexsi's AlignTune drift the same way as our LoRA?
