@@ -384,6 +384,8 @@ class Publish(unittest.TestCase):
                 (job / rel).write_text("x")
             (root / "control" / "no-record").mkdir(parents=True)   # a folder with no job record is left out
             (root / "control" / "no-record" / "attack.gen.jsonl").write_text("x")
+            (root / "d13" / "20261123-042154-6663ec9").mkdir(parents=True)   # a job the GPU report does not read is left out
+            (root / "d13" / "20261123-042154-6663ec9" / "job.json").write_text("x")
             (root / "revision.txt").write_text("abc\n")
             self.assertEqual(sorted(str(rel) for _, rel in gpu_files(root)),
                              ["gpu/nf4/20261122-215110-649ce27/gpu-base-nf4/attack.guard.jsonl",

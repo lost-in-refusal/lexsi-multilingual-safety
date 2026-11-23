@@ -209,12 +209,15 @@ def unfinished(arm_dir: Path) -> list[str]:
     return bad
 
 
+GPU_JOBS = ("control", "only-ko", "only-en", "only-zh", "nf4", "unmerged")   # the jobs that `python -m lir.gpu` reads
+
+
 def gpu_files(root: Path) -> list[tuple[Path, Path]]:
     """The result files of the Hugging Face GPU jobs (answers, verdicts, records and logs; no adapter weights), each
     with its path in the outputs repo. root is runs/gpu as `python -m lir.gpu fetch` leaves it. A job folder with
-    no job record is left out."""
+    no job record is left out, and so is a job that the GPU report does not read."""
     out = []
-    for job in sorted(p for p in root.glob("*/*") if (p / "job.json").exists()):
+    for job in sorted(p for p in root.glob("*/*") if (p / "job.json").exists() and p.parent.name in GPU_JOBS):
         out += [(p, Path("gpu") / p.relative_to(root)) for p in sorted(job.rglob("*"))
                 if p.is_file() and p.suffix in (".jsonl", ".json", ".log")]
     if out and (root / "revision.txt").exists():   # the revision of the staging dataset the files were read from

@@ -118,8 +118,8 @@ Deviations and things a reader should know:
    drop sits in the judge's accuracy score. The stage 1 sentence is withdrawn.
 10. **Not run, or cut.** Every laptop run registered for the evening of Nov 22 was launched before the freeze (9 PM
     ET) and finished. Not run: the two bfloat16 arms with the adapter left unmerged, which would separate 4-bit
-    loading from merging (12.2 review note; no upload by 10:10 PM); the AlignTune run (12.3; only its configuration
-    review is on record); the task set on the GPU (its judge does not fit an L4); seeds 1 and 2 of the GPU
+    loading from merging (12.2 review note; no upload by 11:44 PM); the AlignTune run (12.3; only its configuration
+    review is on record, and a 32-second check of one training batch on the GPU at 11:21 PM, after the freeze); the task set on the GPU (its judge does not fit an L4); seeds 1 and 2 of the GPU
     single-language runs; the mixing baseline at seeds 1 and 2; and a re-generation of the seed 1 and 2
     single-language answers, which was not registered. Cut earlier: the Korean clean set (H4), Check B and a third
     judge.
