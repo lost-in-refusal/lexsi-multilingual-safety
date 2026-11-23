@@ -1096,6 +1096,8 @@ Report: `python -m lir.repeat mix` writes `results/lir/stage2/mixing/seeds.md`. 
 - No interval, no test and no rule. The report now has every figure the entry lists.
 - The report after this line: `seeds.md`, sha256 `b02280d36a539dde54644252d1da8b2fdb2d11081f1cf4d5a28db78eda13aeaf`, and `seeds.json`, sha256 `af522f58c00a67c10a76814135d7643141193c3a727e3ad8b4f9c3d3148ffded`.
 
+**Corrected Nov 23, 1:12 PM ET by Mingyu.** The note of 1:05 PM says that neither arm "differed from SafeGrad in task score". Both M3 intervals include zero. That is no detected difference, and not a finding that the scores are the same. The note is left as written.
+
 ### 14b. Six more languages the model was never fine-tuned on
 
 **Added Nov 23, 4:26 AM ET by Mingyu, before any answer in these languages was generated.**

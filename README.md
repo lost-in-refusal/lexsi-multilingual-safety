@@ -56,7 +56,7 @@ Among what did not hold or was not tested (the status page has the full list):
   data as five copies left Korean attack success 2.7 points below SafeGrad's on two new seeds [−5.2, −0.5]; with
   the examples added once no difference was detected (−0.5 [−2.9, +1.9]). Both raised English over-refusal about
   5 points above SafeGrad's (+5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]). SafeGrad's advantage over mixing is that it
-  does not raise over-refusal. Run on Nov 23 under the deadline extension (section 14a of the preregistration).
+  over-refuses less than either mixing arm. Run on Nov 23 under the deadline extension (section 14a of the preregistration).
 - **Not run by the freeze:** the control that separates 4-bit loading from adapter merging, and the AlignTune run.
   The list is in the status page.
 
