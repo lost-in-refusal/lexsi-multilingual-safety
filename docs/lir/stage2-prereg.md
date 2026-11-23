@@ -667,6 +667,13 @@ The implementation and verification code are on branch `hannah/d13-aligntune` at
 - Not launched by the freeze, so listed as not run: the AlignTune run of 12.3. No `d13` job was uploaded before 9 PM. The first one started at 04:21:54 UTC on Nov 23 (11:21 PM ET), ran for 32 seconds at commit `6663ec9`, checked one training batch and started no training.
 - Also not run: the two bfloat16 arms with the adapter left unmerged (review note under 12.2; no upload), the task set (its judge does not fit an L4), and seeds 1 and 2 of the single-language runs, which 12.1 ties to a confirmed extension.
 
+**Added Nov 23, 2:49 AM ET by Mingyu, as a review note. The text above is unchanged.** Hannah's note under 12.3, merged into this branch today, records two verification attempts for AlignTune. My note of Nov 22, 11:49 PM lists one. This is how they fit together.
+
+- The job my note lists is her first attempt. Its record and log are in the staging dataset (`d13/20261123-042154-6663ec9`): commit `6663ec9`, started at 11:21 PM ET on Nov 22, 32 seconds. The log has TRL's warning that the tokenized prompt does not match the start of the tokenized prompt and completion (377 times), then "D13 training batch verification passed" and "No training started".
+- Her second attempt, at commit `99a6a45` (made at 11:39 PM), left no upload in the staging dataset, which is why my note does not list it. The dataset's last change is still the first attempt's upload (checked Nov 23, 2:47 AM). What the second attempt found, token IDs that differ from the baseline at row 0, is in her note. I have not read either job's own page, which my login cannot open.
+- Both attempts started after the freeze, and neither started training. The listing above stands: the AlignTune run of 12.3 was not launched, no adapter was trained and T1 was not tested.
+- If the run is taken up again, it needs a dated entry here before it starts, and 12.3 asks for every setting that differs from ours to be written down first. Besides the tokenization her note names, the environment on her branch (`requirements-d13.txt` on `hannah/d13-aligntune`) pins PyTorch 2.13.0 and TRL 1.7.1, where the laptop and the other GPU jobs used PyTorch 2.15.0.
+
 ## 13. Two blocks added on Nov 22
 
 **Added Nov 22, 8:20 PM ET: this section is now section 13, and three of its checks have new names.** It was written as section 12, the number Aish's section above already had, and it used the names L1, L2 and T1, which her section uses for other rules. Mingyu decided on Nov 22 to renumber this one, and those three checks were renamed in the same change. Aish's section is unchanged.
