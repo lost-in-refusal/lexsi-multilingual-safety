@@ -28,7 +28,7 @@ None of the 8 changes in strict attack success is significant.
 | Base | 735 of 1164 | 9 | 118 | 355, 354 |
 | Plain LoRA | 532 of 1164 | 20 | 84 | 99, 100 |
 
-The prompt text is the same in every row of both machines. Where an answer differs, it almost always starts like the laptop's answer and departs later. That is description, not a test: it is what greedy decoding gives when two machines round differently, and a different template or setting would change answers from their first character.
+The prompt text is the same in every row of both machines. The batches are formed by one rule from the prompts alone, so they are the same on both machines (on the GPU: `gpu-base` 74, then 96 per batch; `gpu-plain` 74, then 96 per batch). Where an answer differs, it almost always starts like the laptop's answer and departs later. That is description, not a test. It fits two machines that compute the same thing with different arithmetic (Apple MPS and NVIDIA CUDA, both in bfloat16), which section 12.0 expected; a different template or setting would change most answers from their first character.
 
 #### 12.1 One training language at a time (L1 and L2)
 
@@ -58,6 +58,14 @@ No pass rule: Swahili refusal change Korean-only +0.0 (p = 1.000); English-only 
 
 Exploratory, not registered for these runs: the Korean rise minus the rise in the language trained on, the comparison of SL2 in section 13a. English-only +7.2 [+3.1, +12.0]; Chinese-only +5.2 [+0.0, +10.7].
 
+Refusals on XSTest (%), base on the GPU to each run, no pass rule:
+
+| Run | en | ko | zh | sw |
+|---|---|---|---|---|
+| `plain-ko` | 9.6 to 7.6 (-2.0) | 8.4 to 8.8 (+0.4) | 8.4 to 5.6 (-2.8) | 8.4 to 4.8 (-3.6*) |
+| `plain-en` | 9.6 to 5.2 (-4.4*) | 8.4 to 6.8 (-1.6) | 8.4 to 5.6 (-2.8) | 8.4 to 4.8 (-3.6*) |
+| `plain-zh` | 9.6 to 6.8 (-2.8) | 8.4 to 5.6 (-2.8) | 8.4 to 4.4 (-4.0*) | 8.4 to 4.0 (-4.4*) |
+
 The task set was not run on the GPU: its judge does not fit the 24 GB of an L4.
 
 #### 12.2 NF4, 4-bit loading (Q1 and Q2)
@@ -72,7 +80,7 @@ Strict attack success (%), bfloat16 to NF4. Plain and SafeGrad are read against 
 
 **Q1: NF4 changed strict attack success significantly for Base in English (up 5.5 points, p = 0.002), Plain LoRA in English (up 3.1 points, p = 0.022), Plain LoRA in Chinese (up 4.1 points, p = 0.023), Plain LoRA in Swahili (up 5.2 points, p = 0.008).** The other 8 of 12 changes are not significant, which does not show that NF4 has no effect there. The tests are not adjusted for their number; at 0.05 divided by 12, Base in English would still be significant.
 
-The NF4 arms of plain and SafeGrad differ from their bfloat16 arms in merging as well as in precision: the adapter is merged into the weights in bfloat16 and left unmerged on the 4-bit weights. For base there is no adapter, so its comparison is of precision alone. The bfloat16 arms with the adapter left unmerged were not run.
+The NF4 arms of plain and SafeGrad differ from their bfloat16 arms in merging as well as in precision: the adapter is merged into the weights in bfloat16 and left unmerged on the 4-bit weights. For base there is no adapter, so its comparison is of precision alone. No upload of the bfloat16 arms with the adapter left unmerged was found, so the two cannot be separated here.
 
 **Q2: pass. Under NF4, SafeGrad stays below plain on Korean.** Korean under NF4: plain 22.7%, SafeGrad 11.0% (-11.7 points, p < 0.001). Both arms are loaded the same way, so merging does not enter. In bfloat16 on the GPU: plain 19.9%, SafeGrad 10.7% (-9.3, p < 0.001).
 

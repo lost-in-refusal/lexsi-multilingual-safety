@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 
 from lir.common import EVAL_LANGS, ROOT, RUNS, read_jsonl, write_json
@@ -63,6 +64,14 @@ def laptop_rows(arm: str, name: str = "attack.guard.jsonl") -> dict[str, dict] |
     return by_uid(RUNS / "eval" / arm / name)
 
 
+def batch_sizes(job: str, arm: str, name: str = "attack") -> list[int]:
+    """The batch sizes lir.generate printed for one set of one arm, in order, without repeats."""
+    folder = newest(job)
+    logs = sorted(folder.glob(f"logs/{arm}.*.log")) if folder else []
+    sizes = [int(x) for log in logs for x in re.findall(rf"\[{re.escape(arm)}/{name}\] \d+/\d+ bs=(\d+)", log.read_text())]
+    return [s for i, s in enumerate(sizes) if i == 0 or s != sizes[i - 1]]
+
+
 def versus(a: dict, b: dict, fn=STRICT) -> dict[str, dict]:
     """Per language: the rate of a, the rate of b, and b minus a on the same prompts with the exact McNemar p."""
     fa, fb = by_family(a, fn), by_family(b, fn)
@@ -89,9 +98,10 @@ def control_result(laptop: dict, gpu: dict) -> dict:
     return {"arms": arms, "significant": [[arm, l] for arm, r in arms.items() for l, v in r["strict"].items() if v["p"] < 0.05]}
 
 
-def only_result(base: dict, runs: dict[str, dict], bar: float = BAR) -> dict:
+def only_result(base: dict, runs: dict[str, dict], bar: float = BAR, xstest: tuple[dict, dict] | None = None) -> dict:
     """L1 and L2 of section 12.1. base: the attack verdicts of the base model on the GPU. runs: training language ->
-    attack verdicts of the run trained on that language alone. Korean is read with K1's three rows and the bar."""
+    attack verdicts of the run trained on that language alone. Korean is read with K1's three rows and the bar.
+    xstest: the same pair for XSTest, shown with no pass rule."""
     out = {}
     for lang, data in runs.items():
         vs = versus(base, data)
@@ -104,6 +114,8 @@ def only_result(base: dict, runs: dict[str, dict], bar: float = BAR) -> dict:
             fb, fd = by_family(base, STRICT), by_family(data, STRICT)
             ko_rise, own = diff(fb, fd, "ko"), diff(fb, fd, lang)
             out[lang]["ko_rise_minus_trained_rise"] = pooled([{f: ko_rise[f] - own[f] for f in ko_rise}])
+        if xstest:
+            out[lang]["over_refusal"] = versus(xstest[0], xstest[1][lang], REFUSAL)
     return {"bar": bar, "runs": out}
 
 
@@ -162,10 +174,12 @@ def result() -> dict:
         lap = {arm: three(laptop_rows, arm) for arm in CONTROL}
         gpu = {arm: three(gpu_rows, g, "control") for arm, g in CONTROL.items()}
         res["control"] = control_result(lap, gpu)
+        res["control"]["gpu_attack_batch_sizes"] = {g: batch_sizes("control", g) for g in CONTROL.values()}
         base = gpu["base"]["attack"]
         runs = {lang: gpu_rows(job, arm) for lang, (job, arm) in ONLY.items()}
         if all(v is not None for v in runs.values()):
-            res["only"] = only_result(base, runs)
+            res["only"] = only_result(base, runs, xstest=(gpu["base"]["xstest"], {lang: gpu_rows(job, arm, "xstest.guard.jsonl")
+                                                                                  for lang, (job, arm) in ONLY.items()}))
             lbase = laptop_rows("base")
             res["only"]["laptop_rows"] = {arm: versus(lbase, laptop_rows(arm)) for arm in LAPTOP_ROWS if laptop_rows(arm) is not None}
         else:
@@ -218,10 +232,14 @@ def md(res: dict) -> str:
             lines.append(f"| {ARM_NAMES[arm]} | {a['answers_differ']} of {a['prompts']} | {a['differ_from_first_character']} | "
                          f"{a['median_shared_characters']} | {a['capped'][0]}, {a['capped'][1]} |")
         same = all(r["answers"]["same_prompt_text"] == r["answers"]["prompts"] for r in c["arms"].values())
+        sizes = c.get("gpu_attack_batch_sizes", {})
         lines += ["", ("The prompt text is the same in every row of both machines. " if same else "The prompt text is not the same in every row. ")
-                  + "Where an answer differs, it almost always starts like the laptop's answer and departs later. That is "
-                  "description, not a test: it is what greedy decoding gives when two machines round differently, and a "
-                  "different template or setting would change answers from their first character."]
+                  + "The batches are formed by one rule from the prompts alone, so they are the same on both machines"
+                  + (" (on the GPU: " + "; ".join(f"`{g}` {', then '.join(map(str, s))} per batch" for g, s in sizes.items() if s) + ")" if any(sizes.values()) else "")
+                  + ". Where an answer differs, it almost always starts like the laptop's answer and departs later. That is "
+                  "description, not a test. It fits two machines that compute the same thing with different arithmetic (Apple "
+                  "MPS and NVIDIA CUDA, both in bfloat16), which section 12.0 expected; a different template or setting would "
+                  "change most answers from their first character."]
     if "only" in res:
         o = res["only"]
         lines += ["", "#### 12.1 One training language at a time (L1 and L2)", "",
@@ -243,8 +261,11 @@ def md(res: dict) -> str:
                 f"{NAMES[l]}-only {r['ko_unsafe_class_only']['delta']:+.1f} ({pv(r['ko_unsafe_class_only']['p'])})" for l, r in o["runs"].items()) + ".", "",
                   "Exploratory, not registered for these runs: the Korean rise minus the rise in the language trained on, "
                   "the comparison of SL2 in section 13a. " + "; ".join(
-                      f"{NAMES[l]}-only {ci(o['runs'][l]['ko_rise_minus_trained_rise'])}" for l in ("en", "zh")) + ".", "",
-                  "The task set was not run on the GPU: its judge does not fit the 24 GB of an L4."]
+                      f"{NAMES[l]}-only {ci(o['runs'][l]['ko_rise_minus_trained_rise'])}" for l in ("en", "zh")) + "."]
+        if all("over_refusal" in r for r in o["runs"].values()):
+            lines += ["", "Refusals on XSTest (%), base on the GPU to each run, no pass rule:", "", "| Run | en | ko | zh | sw |", "|---|---|---|---|---|"]
+            lines += [f"| `{ONLY[lang][1]}` | " + " | ".join(cell(r["over_refusal"][l]) for l in EVAL_LANGS) + " |" for lang, r in o["runs"].items()]
+        lines += ["", "The task set was not run on the GPU: its judge does not fit the 24 GB of an L4."]
     if "nf4" in res:
         q = res["nf4"]
         lines += ["", "#### 12.2 NF4, 4-bit loading (Q1 and Q2)", "",
@@ -260,7 +281,8 @@ def md(res: dict) -> str:
             lines += ["", "Merging, shown beside with no pass rule (unmerged minus merged, bfloat16): " + "; ".join(
                 f"{ARM_NAMES[arm]} " + ", ".join(f"{l} {v[l]['delta']:+.1f} ({pv(v[l]['p'])})" for l in EVAL_LANGS) for arm, v in q["merging"].items()) + "."]
         else:
-            lines += ["", MERGING + ". The bfloat16 arms with the adapter left unmerged were not run."]
+            lines += ["", MERGING + ". No upload of the bfloat16 arms with the adapter left unmerged was found, so the two "
+                      "cannot be separated here."]
         k, b = q["q2_ko_safegrad_minus_plain_nf4"], q["ko_safegrad_minus_plain_bf16"]
         lines += ["", f"**Q2: {q['q2']}. {q['q2_report']}.** Korean under NF4: plain {k['a']:.1f}%, SafeGrad {k['b']:.1f}% ({k['delta']:+.1f} points, "
                   f"{pv(k['p'])}). Both arms are loaded the same way, so merging does not enter. In bfloat16 on the GPU: plain {b['a']:.1f}%, "

@@ -525,7 +525,7 @@ Question: does a plain fine-tune run through Lexsi's AlignTune drift the same wa
 
 ## 13. Two blocks added on Nov 22
 
-**Added Nov 22, 8:20 PM ET: this section is now section 13, and three of its checks have new names.** It was written as section 12, the number Aish's section above already had, and it used the names L1, L2 and T1, which her section uses for other rules. Mingyu decided on Nov 22 to renumber this one and to rename those three checks. Aish's section is unchanged.
+**Added Nov 22, 8:20 PM ET: this section is now section 13, and three of its checks have new names.** It was written as section 12, the number Aish's section above already had, and it used the names L1, L2 and T1, which her section uses for other rules. Mingyu decided on Nov 22 to renumber this one, and those three checks were renamed in the same change. Aish's section is unchanged.
 
 - Parts 12a to 12h are now 13a to 13h, in the same order.
 - The checks L1, L2 and T1 of this section are now SL1, SL2 and V1. C1, C2, R1 and R2 keep their names. L1, L2 and T1 now mean Aish's checks in 12.1 and 12.3 only.

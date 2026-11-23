@@ -1113,8 +1113,10 @@ class GpuRuns(unittest.TestCase):
         runs = {"ko": self.arm({"ko": range(20)}),                    # +45 points: over the bar
                 "en": self.arm({"ko": range(4)}),                     # +5 points, two prompts: not significant
                 "zh": self.arm({"ko": range(10), "zh": range(8)})}    # +20 points, significant, under the bar
-        o = only_result(base, runs, bar=30.0)
+        xstest = (self.arm(refuse={"sw": range(10)}), {l: self.arm(refuse={"sw": range(2)}) for l in runs})
+        o = only_result(base, runs, bar=30.0, xstest=xstest)
         self.assertEqual([o["runs"][l]["row"] for l in ("ko", "en", "zh")], [1, 3, 2])
+        self.assertAlmostEqual(o["runs"]["en"]["over_refusal"]["sw"]["delta"], -20.0)
         self.assertEqual((o["runs"]["ko"]["report"], o["runs"]["en"]["report"], o["runs"]["zh"]["report"]),
                          (L1_ROWS[0], K1_ROWS[2], K1_ROWS[1]))
         self.assertAlmostEqual(o["runs"]["zh"]["vs_base"]["ko"]["delta"], 20.0)
@@ -1125,6 +1127,8 @@ class GpuRuns(unittest.TestCase):
         self.assertIn("**L1, Korean-only: row 1. Korean rows alone are enough for a drift of this size.**", text)
         self.assertIn("Chinese-only is row 2:", text)
         self.assertIn("Exploratory, not registered for these runs", text)
+        self.assertIn("Refusals on XSTest (%), base on the GPU to each run, no pass rule:", text)
+        self.assertNotIn("over_refusal", only_result(base, runs)["runs"]["ko"])   # XSTest is shown only when it is given
 
     def test_nf4_checks(self):
         from lir.gpu import MERGING, Q1_NONE, Q2_ROWS, md, nf4_result
@@ -1187,7 +1191,14 @@ class GpuRuns(unittest.TestCase):
                 (Path(tmp) / "control" / name).mkdir(parents=True)
             for name in ("20261122-205736-330ebba", "20261123-010000-aaaaaaa"):
                 (Path(tmp) / "control" / name / "job.json").write_text("{}")
+            logs = Path(tmp) / "control" / "20261123-010000-aaaaaaa" / "logs"
+            logs.mkdir()
+            line = "[gpu-base/{}] {}/1164 bs={} batch 1.0s | 100.0 tok/s overall\n"
+            (logs / "gpu-base.evaluate.log").write_text(line.format("attack", 74, 74) + line.format("attack", 170, 96)
+                                                        + line.format("attack", 266, 96) + line.format("xstest", 30, 30))
+            (logs / "gpu-base-nf4.evaluate.log").write_text(line.replace("gpu-base", "gpu-base-nf4").format("attack", 50, 50))
             with mock.patch.object(gpu, "GPU", Path(tmp)):
+                self.assertEqual(gpu.batch_sizes("control", "gpu-base"), [74, 96])   # another arm's log is not read
                 self.assertEqual(gpu.newest("control").name, "20261123-010000-aaaaaaa")   # the newest upload that has its record
                 self.assertIsNone(gpu.newest("nf4"))
 
