@@ -1,0 +1,28 @@
+{
+  "source": "DAMO-NLP-SG/MultiJail",
+  "revision": "93d65c778925d55973b9ff30c7bccc8545494eb6",
+  "source_sha256": "953132d40b8bf562f20bd9db0a9edf6a3564dc7362bd15a8bb649c8afd128ef4",
+  "languages": [
+    "it",
+    "vi",
+    "ar",
+    "th",
+    "bn",
+    "jv"
+  ],
+  "families": 291,
+  "same_families_as": "multijail_attack.jsonl",
+  "attack_set_sha256": "ded27d04d7b2f76e8fca8f2601231628232fe018f23dc92561c7719511e3b713",
+  "rows_per_lang": {
+    "it": 291,
+    "vi": 291,
+    "ar": 291,
+    "th": 291,
+    "bn": 291,
+    "jv": 291
+  },
+  "curation": "CuratorKIT TextCleaner (unicode NFKC, control chars, encoding artifacts)",
+  "files": {
+    "multijail_attack_more.jsonl": "50c1e5cddf89d5743845c92ffde0607a654eff4137b494f624f5e745f0e63542"
+  }
+}

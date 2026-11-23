@@ -1519,6 +1519,93 @@ class MixingSeeds(unittest.TestCase):
             self.assertIn(sentence, prereg)   # the report can only say what section 14a registered
 
 
+class MoreLanguages(unittest.TestCase):
+    """Section 14b: the attack families in further untrained languages, read on refusal rate."""
+    LANGS = ["it", "th"]
+
+    def rows(self, refuse, unsafe=None, langs=None):
+        """refuse, unsafe: language -> the families (of 40) with that verdict."""
+        unsafe = unsafe or {}
+        return {f"mj-{i}-{l}": {"uid": f"mj-{i}-{l}", "family": f"mj-{i}", "lang": l, "truncated": i < 4,
+                                "refusal": "Yes" if i in refuse.get(l, ()) else "No",
+                                "safety": "Unsafe" if i in unsafe.get(l, ()) else "Safe"}
+                for i in range(40) for l in (langs or self.LANGS)}
+
+    def arms(self, plain_refuse=range(10), safegrad_refuse=range(22), th_unsafe=range(3)):
+        more = {"base": self.rows({"it": range(30), "th": range(30)}, {"it": range(1), "th": range(1)})}
+        main = {"base": self.rows({}, {"ko": range(2)}, langs=["ko"])}
+        for plain, safegrad in (("plain", "safegrad"), ("plain-s1", "safegrad-s1"), ("plain-s2", "safegrad-s2")):
+            more[plain] = self.rows({"it": plain_refuse, "th": plain_refuse}, {"it": range(2), "th": th_unsafe})
+            more[safegrad] = self.rows({"it": safegrad_refuse, "th": safegrad_refuse}, {"it": range(1), "th": range(1)})
+            main[plain] = self.rows({}, {"ko": range(20)}, langs=["ko"])       # Korean rises 45 points on the attack set
+            main[safegrad] = self.rows({}, {"ko": range(8)}, langs=["ko"])
+        return more, main
+
+    def test_refusal_rate_decides_and_korean_is_compared_with_each_language(self):
+        from lir.morelangs import U1_ROWS, U2_ROWS, U3_ROWS, more_md, more_result
+
+        res = more_result(*self.arms(), langs=self.LANGS)
+        self.assertEqual((res["u1"]["side"], res["u2"]["side"]), ("below", "above"))
+        self.assertAlmostEqual(res["u1"]["mean"], -50.0)    # 30 of 40 refused under base, 10 under plain, in both languages
+        self.assertAlmostEqual(res["u2"]["mean"], 30.0)
+        self.assertEqual((res["u1_report"], res["u2_report"]), (U1_ROWS["below"], U2_ROWS["above"]))
+        self.assertAlmostEqual(res["per_language"]["th"]["strict_plain_vs_base"]["mean"], 5.0)
+        self.assertAlmostEqual(res["per_language"]["th"]["korean_rise_minus_this"]["mean"], 40.0)
+        self.assertEqual((res["u3"]["korean_rose_more_than_each"], res["u3_report"]), (True, U3_ROWS["all"]))
+        self.assertAlmostEqual(res["per_seed"][1]["it"]["refusal_plain_vs_base"]["delta"], -50.0)
+        self.assertAlmostEqual(res["truncated_share"]["base"]["it"], 10.0)
+        text = more_md(res)
+        self.assertIn(f"{U1_ROWS['below']}.**", text)
+        self.assertIn("**No person has checked the guard in these six languages**", text)
+
+        # Thai rises as much as Korean: the sentence about Korean is narrowed and Thai is named
+        res = more_result(*self.arms(th_unsafe=range(19)), langs=self.LANGS)
+        self.assertEqual((res["u3"]["korean_rose_more_than_each"], res["u3"]["as_much_or_more"], res["u3_report"]),
+                         (False, ["th"], U3_ROWS["not all"]))
+        self.assertIn("Rose as much or more, by the interval: Thai.", more_md(res))
+        # no change in refusals: the interval includes zero and nothing is claimed
+        res = more_result(*self.arms(plain_refuse=range(30), safegrad_refuse=range(30)), langs=self.LANGS)
+        self.assertEqual((res["u1"]["side"], res["u1_report"], res["u2"]["side"]), ("includes", U1_ROWS["includes"], "includes"))
+
+    def test_the_prompts_are_the_attack_families_in_the_other_languages(self):
+        from lir.common import DATA, read_jsonl
+        from lir.morelangs import FILE, MORE_LANGS, more_rows
+
+        csv_rows = [{"id": str(i), "source": "s", "tags": "['Theft']", **{l: f"{l} prompt {i}" for l in ["en", "ko"] + MORE_LANGS}} for i in range(6)]
+        rows = more_rows(csv_rows, {"mj-1", "mj-4"})
+        self.assertEqual(len(rows), 2 * len(MORE_LANGS))
+        self.assertEqual({r["family"] for r in rows}, {"mj-1", "mj-4"})
+        self.assertEqual([r["lang"] for r in rows[:len(MORE_LANGS)]], MORE_LANGS)       # languages in a fixed order within a family
+        self.assertEqual((rows[0]["instruction"], rows[0]["tags"], rows[0]["split"]), (f"it prompt {rows[0]['family'][3:]}", ["Theft"], "attack"))
+        new, old = read_jsonl(DATA / FILE), read_jsonl(DATA / "multijail_attack.jsonl")   # the committed file
+        self.assertEqual({r["family"] for r in new}, {r["family"] for r in old})
+        self.assertEqual(sorted({r["lang"] for r in new}), sorted(MORE_LANGS))
+        self.assertEqual(len(new), len(MORE_LANGS) * len({r["family"] for r in old}))
+        self.assertFalse({r["lang"] for r in new} & {r["lang"] for r in old})
+
+    def test_evaluation_stops_before_loading_a_model(self):
+        import argparse
+        from unittest import mock
+
+        from lir import morelangs
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(morelangs, "OUT_RUNS", Path(tmp) / "morelangs"):
+                morelangs.evaluate(argparse.Namespace(arm="base", before=1, dry_run=False))      # past its limit: not started
+                morelangs.evaluate(argparse.Namespace(arm="base", before=0, dry_run=True))           # a dry run says what would run
+                self.assertFalse((Path(tmp) / "morelangs").exists())                              # nothing was written
+                with self.assertRaises(SystemExit):
+                    morelangs.evaluate(argparse.Namespace(arm="plain-mix1", before=0, dry_run=True))   # not an arm of this block
+
+    def test_registered_wording(self):
+        from lir.common import ROOT
+        from lir.morelangs import U1_ROWS, U2_ROWS, U3_ROWS
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        for sentence in [*U1_ROWS.values(), *U2_ROWS.values(), *U3_ROWS.values()]:
+            self.assertIn(sentence, prereg)
+
+
 if __name__ == "__main__":
     unittest.main()
 
