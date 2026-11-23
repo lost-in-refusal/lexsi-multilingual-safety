@@ -146,6 +146,28 @@ everywhere. We name the sizes where it fails and do not claim it holds across no
 
 Source: `circuit_nodes.md`.
 
+## D13. The same fine-tune through AlignTune. Confidence: Medium (one run, one seed; preregistered, significant)
+
+Run through Lexsi's AlignTune instead of our own training code, the same plain fine-tune drifted the same way. Korean
+attack success rose from 5.2% to 18.6% (+13.4 points, p < 0.001), above the registered bar of 6.36 points; the plain run
+from our own trainer at the same seed reached 19.2% (difference -0.7 points, p = 0.815). Chinese rose 5.2 points
+(p = 0.014), English and Swahili did not move, and the Swahili refusal rate fell 10.7 points (p < 0.001), as in our own
+run. Over-refusal and task score were not detectably different from our plain run (task score 5.88 against 5.94,
+-0.06 points, -0.15 to +0.04). The Korean drift is not specific to our training code.
+
+Limits to keep with it: one run at one seed. No difference from our plain run was detected in any language, but that is
+not a test that the two training stacks are equivalent: they differ in library versions, in the optimizer
+implementation and in batch order and adapter initialisation, and no second run through AlignTune measures its own
+spread. Before training, all 1,800 rows were checked to have the token IDs of our own trainer. That needed one step of
+ours: AlignTune's data path hands the trainer plain strings, which would train with no chat template, so each row is
+wrapped as chat messages first. The run was made on the laptop. The size of the rise is the size the guard measures.
+
+Note for Aish: this is the run of your section 12.3. Hannah's attempts on the GPU stopped before training, Mingyu took
+it over, and it was registered again as 14d before it was queued, with the three sentences for T1 fixed there. You can
+amend that entry. It ran under the deadline extension.
+
+Source: `aligntune.md`.
+
 ## Refusal direction across seeds and training languages (not in the brief's list). Confidence: High for the Korean-English comparison (three seeds, preregistered, inside a margin fixed in advance); Medium for what it means
 
 Stage 1 found a direction in the base model's activations that separates harmful from harmless prompts in all four languages. Across three seeds, plain fine-tuning moved Korean and English attack prompts the same distance along it, as predicted: the difference is 0.08 units (-0.08 to +0.25), against a shift of about 3.5 units and a margin of 1 unit fixed in advance. Korean's larger drift is therefore not a larger movement along this direction. The single-language runs sharpen this. Trained on English alone, Korean moved less far than English (by 1.41 units, 1.28 to 1.54), and Korean was still the language whose attack success rose; trained on Chinese alone, Korean and Chinese moved the same distance to within the margin. SafeGrad moved every language about 60% as far as plain. This concerns one direction at one layer, found in English on the base model, and no judge is involved. It does not show why Korean loses more for the same movement, and refusal rates do not follow the shift language by language, so the projection is not a readout of a fine-tuned model's refusals.
@@ -175,6 +197,8 @@ Source: `second_judge_check.md`, `ko_drift.md`, `ko_rest.md`, `unsafe_only.md`. 
 ## What changed since the brief's table (Sat 9:45 PM)
 
 - New in D1 and D3 (Nov 23, under the deadline extension): six more languages the model was never fine-tuned on (section 14b). It changes one sentence. "Korean is hit hardest" now holds only among the four languages of the main evaluation: as the guard measures it, the rise in Thai, Javanese and Vietnamese could not be told apart from Korean's, and no language rose more. Any sentence that ranks Korean first, the title and the abstract included, needs that scope and those three names. It also widens D3: refusals fell on average over six more untrained languages, and SafeGrad kept more of them.
+
+- D13 is new (Nov 23, under the deadline extension): the plain fine-tune run through AlignTune, on the laptop (section 14d). Outcome row 1: Korean rose 13.4 points over base (p < 0.001; bar 6.36), against 14.1 for plain from our own trainer at the same seed. One run, one seed. A sentence that says the AlignTune run was not made is out of date.
 
 - D10 is new (Nov 23, under the deadline extension): the mixing baseline on two new seeds. It changes one argument. With five copies of the refusal examples, mixing protected Korean better than SafeGrad, so SafeGrad's advantage over the simple fix is in over-refusal only. Any sentence that puts SafeGrad ahead of mixing on protection has to go.
 

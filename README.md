@@ -34,6 +34,7 @@ intervals from a bootstrap over the 291 prompt families, pooled over seeds.
 | Swahili refusals fall (H3) | Pass in every seed (3) | −13.1, −6.2 and −8.6 points. Pooled −9.3 [−13.7, −5.2] |
 | Six more untrained languages (U1, U2) | Refusals fell on average over the six, and SafeGrad kept more of them (3 seeds) | Refusal rate, plain minus base −4.9 [−7.0, −2.9]; SafeGrad minus plain +6.2 [+4.4, +8.0] |
 | No Korean rows in training (K1) | Korean rows are not needed for a drift of this size, in all three seeds | Korean 18.2%, 18.6% and 18.2% with no Korean rows in training, against 5.2% for the base model |
+| The same fine-tune through Lexsi's AlignTune (T1) | Korean drifts through a second training stack too (1 run, 1 seed) | Korean 5.2% to 18.6% (+13.4 points, p < 0.001); 19.2% from our own trainer at the same seed |
 | One training language at a time (SL1) | Korean drifts when the model is trained on English alone, Korean alone or Chinese alone: all nine runs | Korean rises +8.0 [+4.8, +11.3], +11.2 [+7.3, +15.1] and +11.6 [+7.9, +15.5] points |
 | A second model, Tiny Aya Earth (E1) | Drift and repair pass in every seed (3) | Korean rise +10.1 [+6.4, +14.0]; SafeGrad against plain −6.2 [−9.2, −3.4] |
 | A second training set, Aya (Y1, Y2) | Drift and repair pass on three seeds | Korean rises 10.0, 8.9 and 9.3 points; SafeGrad against plain −4.8 [−7.2, −2.6] |
@@ -65,8 +66,9 @@ Among what did not hold or was not tested (the status page has the full list):
   the examples added once no difference was detected (−0.5 [−2.9, +1.9]). Both raised English over-refusal about
   5 points above SafeGrad's (+5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]). SafeGrad's advantage over mixing is that it
   over-refuses less than either mixing arm. Run on Nov 23 under the deadline extension (section 14a of the preregistration).
-- **Not run by the freeze:** the control that separates 4-bit loading from adapter merging, and the AlignTune run.
-  The list is in the status page.
+- **Not run:** the control that separates 4-bit loading from adapter merging. The list is in the status page. The
+  AlignTune run was not made by the freeze of Nov 22; it ran on Nov 23 under the deadline extension, on the laptop
+  (section 14d of the preregistration).
 
 ## Stage 1 results (seed 42)
 
@@ -187,8 +189,8 @@ Not rebuilt, and why: `vector_aya` (its command checks the hashes of adapter wei
 activation files are not published), `aya/task` (the held-out Aya answers are not published), `aya/checks` (the
 public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
 in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
-`ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds` and
-`more_languages` and `ten_languages.json` (their answers and verdicts are not published yet), and the four images
+`ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds`,
+`more_languages`, `ten_languages.json` and `aligntune` (their answers and verdicts are not published yet), and the four images
 (the numbers beside three of them are compared).
 
 Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new

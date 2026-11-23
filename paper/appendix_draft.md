@@ -102,7 +102,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 23, 3:58 AM (Mingyu), under the deadline extension | Section 14a: the mixing baseline at seeds 1 and 2 (M1 to M3), decided on the two new seeds | Five copies: mixing protected Korean better than SafeGrad (-2.7 points [-5.2, -0.5]). Examples added once: no detected difference (-0.5 [-2.9, +1.9]). Both arms: English over-refusal about 5 points above SafeGrad's (+5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]). Task score: no detected difference |
 | Nov 23, 4:26 AM (Mingyu), under the deadline extension | Section 14b: six more untrained languages (U1 to U3), evaluation only | U1: refusals fell on average over the six (-4.9 points [-7.0, -2.9]). U2: SafeGrad kept more refusals than plain (+6.2 [+4.4, +8.0]). U3: no further language rose more than Korean, and the rise in Vietnamese, Thai and Javanese could not be told apart from Korean's, so "hardest in Korean" holds among the four languages of the main evaluation only |
 | Nov 23, 4:45 AM (Mingyu), under the deadline extension | Section 14c: a second reading of the Korean rise by a person, on the 161 prompts not read before (K3) | K3 does not pass: 11 plain against 5 base answers marked unsafe on 145 prompts, p = 0.070 |
-| Nov 23, 2:25 PM (Mingyu), under the deadline extension | Section 14d: the plain run through AlignTune (the run of 12.3), moved to the laptop (T1, no prediction) | Not read when this was written |
+| Nov 23, 2:25 PM (Mingyu), under the deadline extension | Section 14d: the plain run through AlignTune (the run of 12.3), moved to the laptop (T1, no prediction) | T1, outcome row 1: Korean strict attack success rose 13.4 points over base (5.2% to 18.6%, p < 0.001; bar 6.36). Against plain from our own trainer at the same seed: -0.7 points (p = 0.815). One run, one seed |
 | Nov 23, 4:32 PM (Mingyu), under the deadline extension, after 14b was read | Section 14e: the six languages read again after every capped answer is generated again at 1,024 tokens. It decides nothing | Not read when this was written |
 
 Deviations and things a reader should know:
@@ -134,11 +134,11 @@ Deviations and things a reader should know:
    drop sits in the judge's accuracy score. The stage 1 sentence is withdrawn.
 10. **Not run, or cut.** Every laptop run registered for the evening of Nov 22 was launched before the freeze (9 PM
     ET) and finished. Not run: the two bfloat16 arms with the adapter left unmerged, which would separate 4-bit
-    loading from merging (12.2 review note; no upload by 11:44 PM); the AlignTune run (12.3; only its configuration
-    review is on record, and a 32-second check of one training batch on the GPU at 11:21 PM, after the freeze); the task set on the GPU (its judge does not fit an L4); seeds 1 and 2 of the GPU
+    loading from merging (12.2 review note; no upload by 11:44 PM); the task set on the GPU (its judge does not fit an L4); seeds 1 and 2 of the GPU
     single-language runs; and a re-generation of the seed 1 and 2
     single-language answers, which was not registered. The mixing baseline at seeds 1 and 2 was not launched by the
-    freeze either; it ran on Nov 23 under the deadline extension (section 14a, item 11). Cut earlier: the Korean clean set (H4), Check B and a third
+    freeze either; it ran on Nov 23 under the deadline extension (section 14a, item 11). The AlignTune run (12.3) was not made by the
+    freeze: two attempts on the GPU stopped before training. It ran on Nov 23 under the extension (section 14d, item 14). Cut earlier: the Korean clean set (H4), Check B and a third
     judge.
 11. **SafeGrad is not ahead of the simple fix on protection.** On two new seeds (section 14a), five copies of the
     refusal examples mixed into the training data left Korean attack success 2.7 points below SafeGrad's
@@ -155,6 +155,13 @@ Deviations and things a reader should know:
     judged. During a file check after the first arm, the base model's totals over the six languages together were
     printed (strict attack success 8.8%, refusal rate 60.5%). No figure by language and no figure of a fine-tuned
     arm was seen before the report, and no rule, code or arm changed afterwards (dated note under 14b).
+14. **The AlignTune run was made on the laptop, by another team member, with one step of ours in the data path.**
+    Section 12.3 put it on the GPU of the hardware control, run by Hannah. Her two attempts there stopped before
+    training at a token mismatch, which was a doubled start-of-text token. Section 14d moved the run to the laptop
+    before it was queued (Mingyu's token cannot launch GPU jobs for the team), so the comparison beside T1 is with
+    the plain run from our own trainer on the same laptop. AlignTune's data path hands the trainer plain strings,
+    with no chat template; each row is wrapped as chat messages between its data loading and its training call, and
+    all 1,800 rows were checked against our trainer's tokens before the first step. One run, one seed.
 
 ## D. What the organizers' write-up layout asks for that the draft does not have yet
 
