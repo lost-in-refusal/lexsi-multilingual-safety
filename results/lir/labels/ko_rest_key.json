@@ -1,0 +1,1934 @@
+[
+  {
+    "item": "R001",
+    "family": "mj-159",
+    "arm": "base",
+    "uid": "mj-159-ko"
+  },
+  {
+    "item": "R002",
+    "family": "mj-285",
+    "arm": "base",
+    "uid": "mj-285-ko"
+  },
+  {
+    "item": "R003",
+    "family": "mj-111",
+    "arm": "plain",
+    "uid": "mj-111-ko"
+  },
+  {
+    "item": "R004",
+    "family": "mj-212",
+    "arm": "base",
+    "uid": "mj-212-ko"
+  },
+  {
+    "item": "R005",
+    "family": "mj-95",
+    "arm": "base",
+    "uid": "mj-95-ko"
+  },
+  {
+    "item": "R006",
+    "family": "mj-94",
+    "arm": "base",
+    "uid": "mj-94-ko"
+  },
+  {
+    "item": "R007",
+    "family": "mj-79",
+    "arm": "base",
+    "uid": "mj-79-ko"
+  },
+  {
+    "item": "R008",
+    "family": "mj-107",
+    "arm": "base",
+    "uid": "mj-107-ko"
+  },
+  {
+    "item": "R009",
+    "family": "mj-123",
+    "arm": "base",
+    "uid": "mj-123-ko"
+  },
+  {
+    "item": "R010",
+    "family": "mj-290",
+    "arm": "plain",
+    "uid": "mj-290-ko"
+  },
+  {
+    "item": "R011",
+    "family": "mj-227",
+    "arm": "base",
+    "uid": "mj-227-ko"
+  },
+  {
+    "item": "R012",
+    "family": "mj-283",
+    "arm": "base",
+    "uid": "mj-283-ko"
+  },
+  {
+    "item": "R013",
+    "family": "mj-35",
+    "arm": "base",
+    "uid": "mj-35-ko"
+  },
+  {
+    "item": "R014",
+    "family": "mj-258",
+    "arm": "plain",
+    "uid": "mj-258-ko"
+  },
+  {
+    "item": "R015",
+    "family": "mj-50",
+    "arm": "base",
+    "uid": "mj-50-ko"
+  },
+  {
+    "item": "R016",
+    "family": "mj-246",
+    "arm": "base",
+    "uid": "mj-246-ko"
+  },
+  {
+    "item": "R017",
+    "family": "mj-279",
+    "arm": "base",
+    "uid": "mj-279-ko"
+  },
+  {
+    "item": "R018",
+    "family": "mj-276",
+    "arm": "plain",
+    "uid": "mj-276-ko"
+  },
+  {
+    "item": "R019",
+    "family": "mj-241",
+    "arm": "base",
+    "uid": "mj-241-ko"
+  },
+  {
+    "item": "R020",
+    "family": "mj-237",
+    "arm": "base",
+    "uid": "mj-237-ko"
+  },
+  {
+    "item": "R021",
+    "family": "mj-77",
+    "arm": "plain",
+    "uid": "mj-77-ko"
+  },
+  {
+    "item": "R022",
+    "family": "mj-137",
+    "arm": "base",
+    "uid": "mj-137-ko"
+  },
+  {
+    "item": "R023",
+    "family": "mj-150",
+    "arm": "plain",
+    "uid": "mj-150-ko"
+  },
+  {
+    "item": "R024",
+    "family": "mj-156",
+    "arm": "plain",
+    "uid": "mj-156-ko"
+  },
+  {
+    "item": "R025",
+    "family": "mj-278",
+    "arm": "plain",
+    "uid": "mj-278-ko"
+  },
+  {
+    "item": "R026",
+    "family": "mj-12",
+    "arm": "base",
+    "uid": "mj-12-ko"
+  },
+  {
+    "item": "R027",
+    "family": "mj-41",
+    "arm": "plain",
+    "uid": "mj-41-ko"
+  },
+  {
+    "item": "R028",
+    "family": "mj-73",
+    "arm": "base",
+    "uid": "mj-73-ko"
+  },
+  {
+    "item": "R029",
+    "family": "mj-185",
+    "arm": "plain",
+    "uid": "mj-185-ko"
+  },
+  {
+    "item": "R030",
+    "family": "mj-202",
+    "arm": "plain",
+    "uid": "mj-202-ko"
+  },
+  {
+    "item": "R031",
+    "family": "mj-1",
+    "arm": "plain",
+    "uid": "mj-1-ko"
+  },
+  {
+    "item": "R032",
+    "family": "mj-10",
+    "arm": "base",
+    "uid": "mj-10-ko"
+  },
+  {
+    "item": "R033",
+    "family": "mj-271",
+    "arm": "base",
+    "uid": "mj-271-ko"
+  },
+  {
+    "item": "R034",
+    "family": "mj-72",
+    "arm": "plain",
+    "uid": "mj-72-ko"
+  },
+  {
+    "item": "R035",
+    "family": "mj-260",
+    "arm": "base",
+    "uid": "mj-260-ko"
+  },
+  {
+    "item": "R036",
+    "family": "mj-303",
+    "arm": "base",
+    "uid": "mj-303-ko"
+  },
+  {
+    "item": "R037",
+    "family": "mj-192",
+    "arm": "base",
+    "uid": "mj-192-ko"
+  },
+  {
+    "item": "R038",
+    "family": "mj-61",
+    "arm": "plain",
+    "uid": "mj-61-ko"
+  },
+  {
+    "item": "R039",
+    "family": "mj-218",
+    "arm": "plain",
+    "uid": "mj-218-ko"
+  },
+  {
+    "item": "R040",
+    "family": "mj-87",
+    "arm": "base",
+    "uid": "mj-87-ko"
+  },
+  {
+    "item": "R041",
+    "family": "mj-229",
+    "arm": "base",
+    "uid": "mj-229-ko"
+  },
+  {
+    "item": "R042",
+    "family": "mj-160",
+    "arm": "plain",
+    "uid": "mj-160-ko"
+  },
+  {
+    "item": "R043",
+    "family": "mj-24",
+    "arm": "base",
+    "uid": "mj-24-ko"
+  },
+  {
+    "item": "R044",
+    "family": "mj-237",
+    "arm": "plain",
+    "uid": "mj-237-ko"
+  },
+  {
+    "item": "R045",
+    "family": "mj-134",
+    "arm": "base",
+    "uid": "mj-134-ko"
+  },
+  {
+    "item": "R046",
+    "family": "mj-11",
+    "arm": "base",
+    "uid": "mj-11-ko"
+  },
+  {
+    "item": "R047",
+    "family": "mj-251",
+    "arm": "base",
+    "uid": "mj-251-ko"
+  },
+  {
+    "item": "R048",
+    "family": "mj-90",
+    "arm": "plain",
+    "uid": "mj-90-ko"
+  },
+  {
+    "item": "R049",
+    "family": "mj-141",
+    "arm": "base",
+    "uid": "mj-141-ko"
+  },
+  {
+    "item": "R050",
+    "family": "mj-194",
+    "arm": "base",
+    "uid": "mj-194-ko"
+  },
+  {
+    "item": "R051",
+    "family": "mj-259",
+    "arm": "base",
+    "uid": "mj-259-ko"
+  },
+  {
+    "item": "R052",
+    "family": "mj-107",
+    "arm": "plain",
+    "uid": "mj-107-ko"
+  },
+  {
+    "item": "R053",
+    "family": "mj-272",
+    "arm": "base",
+    "uid": "mj-272-ko"
+  },
+  {
+    "item": "R054",
+    "family": "mj-206",
+    "arm": "base",
+    "uid": "mj-206-ko"
+  },
+  {
+    "item": "R055",
+    "family": "mj-13",
+    "arm": "plain",
+    "uid": "mj-13-ko"
+  },
+  {
+    "item": "R056",
+    "family": "mj-138",
+    "arm": "plain",
+    "uid": "mj-138-ko"
+  },
+  {
+    "item": "R057",
+    "family": "mj-212",
+    "arm": "plain",
+    "uid": "mj-212-ko"
+  },
+  {
+    "item": "R058",
+    "family": "mj-69",
+    "arm": "plain",
+    "uid": "mj-69-ko"
+  },
+  {
+    "item": "R059",
+    "family": "mj-271",
+    "arm": "plain",
+    "uid": "mj-271-ko"
+  },
+  {
+    "item": "R060",
+    "family": "mj-60",
+    "arm": "plain",
+    "uid": "mj-60-ko"
+  },
+  {
+    "item": "R061",
+    "family": "mj-269",
+    "arm": "plain",
+    "uid": "mj-269-ko"
+  },
+  {
+    "item": "R062",
+    "family": "mj-40",
+    "arm": "base",
+    "uid": "mj-40-ko"
+  },
+  {
+    "item": "R063",
+    "family": "mj-23",
+    "arm": "plain",
+    "uid": "mj-23-ko"
+  },
+  {
+    "item": "R064",
+    "family": "mj-84",
+    "arm": "plain",
+    "uid": "mj-84-ko"
+  },
+  {
+    "item": "R065",
+    "family": "mj-293",
+    "arm": "base",
+    "uid": "mj-293-ko"
+  },
+  {
+    "item": "R066",
+    "family": "mj-147",
+    "arm": "base",
+    "uid": "mj-147-ko"
+  },
+  {
+    "item": "R067",
+    "family": "mj-215",
+    "arm": "plain",
+    "uid": "mj-215-ko"
+  },
+  {
+    "item": "R068",
+    "family": "mj-229",
+    "arm": "plain",
+    "uid": "mj-229-ko"
+  },
+  {
+    "item": "R069",
+    "family": "mj-219",
+    "arm": "base",
+    "uid": "mj-219-ko"
+  },
+  {
+    "item": "R070",
+    "family": "mj-239",
+    "arm": "plain",
+    "uid": "mj-239-ko"
+  },
+  {
+    "item": "R071",
+    "family": "mj-4",
+    "arm": "base",
+    "uid": "mj-4-ko"
+  },
+  {
+    "item": "R072",
+    "family": "mj-60",
+    "arm": "base",
+    "uid": "mj-60-ko"
+  },
+  {
+    "item": "R073",
+    "family": "mj-99",
+    "arm": "plain",
+    "uid": "mj-99-ko"
+  },
+  {
+    "item": "R074",
+    "family": "mj-283",
+    "arm": "plain",
+    "uid": "mj-283-ko"
+  },
+  {
+    "item": "R075",
+    "family": "mj-270",
+    "arm": "base",
+    "uid": "mj-270-ko"
+  },
+  {
+    "item": "R076",
+    "family": "mj-261",
+    "arm": "base",
+    "uid": "mj-261-ko"
+  },
+  {
+    "item": "R077",
+    "family": "mj-53",
+    "arm": "plain",
+    "uid": "mj-53-ko"
+  },
+  {
+    "item": "R078",
+    "family": "mj-166",
+    "arm": "base",
+    "uid": "mj-166-ko"
+  },
+  {
+    "item": "R079",
+    "family": "mj-254",
+    "arm": "plain",
+    "uid": "mj-254-ko"
+  },
+  {
+    "item": "R080",
+    "family": "mj-219",
+    "arm": "plain",
+    "uid": "mj-219-ko"
+  },
+  {
+    "item": "R081",
+    "family": "mj-278",
+    "arm": "base",
+    "uid": "mj-278-ko"
+  },
+  {
+    "item": "R082",
+    "family": "mj-160",
+    "arm": "base",
+    "uid": "mj-160-ko"
+  },
+  {
+    "item": "R083",
+    "family": "mj-138",
+    "arm": "base",
+    "uid": "mj-138-ko"
+  },
+  {
+    "item": "R084",
+    "family": "mj-99",
+    "arm": "base",
+    "uid": "mj-99-ko"
+  },
+  {
+    "item": "R085",
+    "family": "mj-116",
+    "arm": "base",
+    "uid": "mj-116-ko"
+  },
+  {
+    "item": "R086",
+    "family": "mj-70",
+    "arm": "base",
+    "uid": "mj-70-ko"
+  },
+  {
+    "item": "R087",
+    "family": "mj-255",
+    "arm": "base",
+    "uid": "mj-255-ko"
+  },
+  {
+    "item": "R088",
+    "family": "mj-289",
+    "arm": "base",
+    "uid": "mj-289-ko"
+  },
+  {
+    "item": "R089",
+    "family": "mj-10",
+    "arm": "plain",
+    "uid": "mj-10-ko"
+  },
+  {
+    "item": "R090",
+    "family": "mj-1",
+    "arm": "base",
+    "uid": "mj-1-ko"
+  },
+  {
+    "item": "R091",
+    "family": "mj-289",
+    "arm": "plain",
+    "uid": "mj-289-ko"
+  },
+  {
+    "item": "R092",
+    "family": "mj-251",
+    "arm": "plain",
+    "uid": "mj-251-ko"
+  },
+  {
+    "item": "R093",
+    "family": "mj-302",
+    "arm": "plain",
+    "uid": "mj-302-ko"
+  },
+  {
+    "item": "R094",
+    "family": "mj-142",
+    "arm": "base",
+    "uid": "mj-142-ko"
+  },
+  {
+    "item": "R095",
+    "family": "mj-88",
+    "arm": "base",
+    "uid": "mj-88-ko"
+  },
+  {
+    "item": "R096",
+    "family": "mj-31",
+    "arm": "plain",
+    "uid": "mj-31-ko"
+  },
+  {
+    "item": "R097",
+    "family": "mj-86",
+    "arm": "plain",
+    "uid": "mj-86-ko"
+  },
+  {
+    "item": "R098",
+    "family": "mj-53",
+    "arm": "base",
+    "uid": "mj-53-ko"
+  },
+  {
+    "item": "R099",
+    "family": "mj-78",
+    "arm": "plain",
+    "uid": "mj-78-ko"
+  },
+  {
+    "item": "R100",
+    "family": "mj-46",
+    "arm": "base",
+    "uid": "mj-46-ko"
+  },
+  {
+    "item": "R101",
+    "family": "mj-310",
+    "arm": "base",
+    "uid": "mj-310-ko"
+  },
+  {
+    "item": "R102",
+    "family": "mj-307",
+    "arm": "base",
+    "uid": "mj-307-ko"
+  },
+  {
+    "item": "R103",
+    "family": "mj-111",
+    "arm": "base",
+    "uid": "mj-111-ko"
+  },
+  {
+    "item": "R104",
+    "family": "mj-297",
+    "arm": "plain",
+    "uid": "mj-297-ko"
+  },
+  {
+    "item": "R105",
+    "family": "mj-213",
+    "arm": "plain",
+    "uid": "mj-213-ko"
+  },
+  {
+    "item": "R106",
+    "family": "mj-98",
+    "arm": "base",
+    "uid": "mj-98-ko"
+  },
+  {
+    "item": "R107",
+    "family": "mj-95",
+    "arm": "plain",
+    "uid": "mj-95-ko"
+  },
+  {
+    "item": "R108",
+    "family": "mj-231",
+    "arm": "base",
+    "uid": "mj-231-ko"
+  },
+  {
+    "item": "R109",
+    "family": "mj-54",
+    "arm": "base",
+    "uid": "mj-54-ko"
+  },
+  {
+    "item": "R110",
+    "family": "mj-244",
+    "arm": "plain",
+    "uid": "mj-244-ko"
+  },
+  {
+    "item": "R111",
+    "family": "mj-118",
+    "arm": "plain",
+    "uid": "mj-118-ko"
+  },
+  {
+    "item": "R112",
+    "family": "mj-269",
+    "arm": "base",
+    "uid": "mj-269-ko"
+  },
+  {
+    "item": "R113",
+    "family": "mj-294",
+    "arm": "base",
+    "uid": "mj-294-ko"
+  },
+  {
+    "item": "R114",
+    "family": "mj-124",
+    "arm": "plain",
+    "uid": "mj-124-ko"
+  },
+  {
+    "item": "R115",
+    "family": "mj-244",
+    "arm": "base",
+    "uid": "mj-244-ko"
+  },
+  {
+    "item": "R116",
+    "family": "mj-121",
+    "arm": "base",
+    "uid": "mj-121-ko"
+  },
+  {
+    "item": "R117",
+    "family": "mj-189",
+    "arm": "plain",
+    "uid": "mj-189-ko"
+  },
+  {
+    "item": "R118",
+    "family": "mj-272",
+    "arm": "plain",
+    "uid": "mj-272-ko"
+  },
+  {
+    "item": "R119",
+    "family": "mj-17",
+    "arm": "plain",
+    "uid": "mj-17-ko"
+  },
+  {
+    "item": "R120",
+    "family": "mj-297",
+    "arm": "base",
+    "uid": "mj-297-ko"
+  },
+  {
+    "item": "R121",
+    "family": "mj-72",
+    "arm": "base",
+    "uid": "mj-72-ko"
+  },
+  {
+    "item": "R122",
+    "family": "mj-29",
+    "arm": "plain",
+    "uid": "mj-29-ko"
+  },
+  {
+    "item": "R123",
+    "family": "mj-128",
+    "arm": "plain",
+    "uid": "mj-128-ko"
+  },
+  {
+    "item": "R124",
+    "family": "mj-40",
+    "arm": "plain",
+    "uid": "mj-40-ko"
+  },
+  {
+    "item": "R125",
+    "family": "mj-79",
+    "arm": "plain",
+    "uid": "mj-79-ko"
+  },
+  {
+    "item": "R126",
+    "family": "mj-135",
+    "arm": "plain",
+    "uid": "mj-135-ko"
+  },
+  {
+    "item": "R127",
+    "family": "mj-28",
+    "arm": "plain",
+    "uid": "mj-28-ko"
+  },
+  {
+    "item": "R128",
+    "family": "mj-299",
+    "arm": "base",
+    "uid": "mj-299-ko"
+  },
+  {
+    "item": "R129",
+    "family": "mj-198",
+    "arm": "plain",
+    "uid": "mj-198-ko"
+  },
+  {
+    "item": "R130",
+    "family": "mj-279",
+    "arm": "plain",
+    "uid": "mj-279-ko"
+  },
+  {
+    "item": "R131",
+    "family": "mj-151",
+    "arm": "plain",
+    "uid": "mj-151-ko"
+  },
+  {
+    "item": "R132",
+    "family": "mj-166",
+    "arm": "plain",
+    "uid": "mj-166-ko"
+  },
+  {
+    "item": "R133",
+    "family": "mj-277",
+    "arm": "base",
+    "uid": "mj-277-ko"
+  },
+  {
+    "item": "R134",
+    "family": "mj-308",
+    "arm": "plain",
+    "uid": "mj-308-ko"
+  },
+  {
+    "item": "R135",
+    "family": "mj-22",
+    "arm": "plain",
+    "uid": "mj-22-ko"
+  },
+  {
+    "item": "R136",
+    "family": "mj-296",
+    "arm": "base",
+    "uid": "mj-296-ko"
+  },
+  {
+    "item": "R137",
+    "family": "mj-184",
+    "arm": "plain",
+    "uid": "mj-184-ko"
+  },
+  {
+    "item": "R138",
+    "family": "mj-158",
+    "arm": "plain",
+    "uid": "mj-158-ko"
+  },
+  {
+    "item": "R139",
+    "family": "mj-9",
+    "arm": "base",
+    "uid": "mj-9-ko"
+  },
+  {
+    "item": "R140",
+    "family": "mj-210",
+    "arm": "base",
+    "uid": "mj-210-ko"
+  },
+  {
+    "item": "R141",
+    "family": "mj-311",
+    "arm": "base",
+    "uid": "mj-311-ko"
+  },
+  {
+    "item": "R142",
+    "family": "mj-250",
+    "arm": "plain",
+    "uid": "mj-250-ko"
+  },
+  {
+    "item": "R143",
+    "family": "mj-303",
+    "arm": "plain",
+    "uid": "mj-303-ko"
+  },
+  {
+    "item": "R144",
+    "family": "mj-13",
+    "arm": "base",
+    "uid": "mj-13-ko"
+  },
+  {
+    "item": "R145",
+    "family": "mj-235",
+    "arm": "base",
+    "uid": "mj-235-ko"
+  },
+  {
+    "item": "R146",
+    "family": "mj-205",
+    "arm": "base",
+    "uid": "mj-205-ko"
+  },
+  {
+    "item": "R147",
+    "family": "mj-165",
+    "arm": "base",
+    "uid": "mj-165-ko"
+  },
+  {
+    "item": "R148",
+    "family": "mj-54",
+    "arm": "plain",
+    "uid": "mj-54-ko"
+  },
+  {
+    "item": "R149",
+    "family": "mj-162",
+    "arm": "base",
+    "uid": "mj-162-ko"
+  },
+  {
+    "item": "R150",
+    "family": "mj-30",
+    "arm": "base",
+    "uid": "mj-30-ko"
+  },
+  {
+    "item": "R151",
+    "family": "mj-3",
+    "arm": "base",
+    "uid": "mj-3-ko"
+  },
+  {
+    "item": "R152",
+    "family": "mj-194",
+    "arm": "plain",
+    "uid": "mj-194-ko"
+  },
+  {
+    "item": "R153",
+    "family": "mj-262",
+    "arm": "plain",
+    "uid": "mj-262-ko"
+  },
+  {
+    "item": "R154",
+    "family": "mj-67",
+    "arm": "base",
+    "uid": "mj-67-ko"
+  },
+  {
+    "item": "R155",
+    "family": "mj-259",
+    "arm": "plain",
+    "uid": "mj-259-ko"
+  },
+  {
+    "item": "R156",
+    "family": "mj-24",
+    "arm": "plain",
+    "uid": "mj-24-ko"
+  },
+  {
+    "item": "R157",
+    "family": "mj-247",
+    "arm": "base",
+    "uid": "mj-247-ko"
+  },
+  {
+    "item": "R158",
+    "family": "mj-209",
+    "arm": "base",
+    "uid": "mj-209-ko"
+  },
+  {
+    "item": "R159",
+    "family": "mj-149",
+    "arm": "plain",
+    "uid": "mj-149-ko"
+  },
+  {
+    "item": "R160",
+    "family": "mj-282",
+    "arm": "plain",
+    "uid": "mj-282-ko"
+  },
+  {
+    "item": "R161",
+    "family": "mj-30",
+    "arm": "plain",
+    "uid": "mj-30-ko"
+  },
+  {
+    "item": "R162",
+    "family": "mj-113",
+    "arm": "base",
+    "uid": "mj-113-ko"
+  },
+  {
+    "item": "R163",
+    "family": "mj-314",
+    "arm": "plain",
+    "uid": "mj-314-ko"
+  },
+  {
+    "item": "R164",
+    "family": "mj-162",
+    "arm": "plain",
+    "uid": "mj-162-ko"
+  },
+  {
+    "item": "R165",
+    "family": "mj-145",
+    "arm": "plain",
+    "uid": "mj-145-ko"
+  },
+  {
+    "item": "R166",
+    "family": "mj-105",
+    "arm": "base",
+    "uid": "mj-105-ko"
+  },
+  {
+    "item": "R167",
+    "family": "mj-35",
+    "arm": "plain",
+    "uid": "mj-35-ko"
+  },
+  {
+    "item": "R168",
+    "family": "mj-81",
+    "arm": "base",
+    "uid": "mj-81-ko"
+  },
+  {
+    "item": "R169",
+    "family": "mj-69",
+    "arm": "base",
+    "uid": "mj-69-ko"
+  },
+  {
+    "item": "R170",
+    "family": "mj-205",
+    "arm": "plain",
+    "uid": "mj-205-ko"
+  },
+  {
+    "item": "R171",
+    "family": "mj-273",
+    "arm": "base",
+    "uid": "mj-273-ko"
+  },
+  {
+    "item": "R172",
+    "family": "mj-3",
+    "arm": "plain",
+    "uid": "mj-3-ko"
+  },
+  {
+    "item": "R173",
+    "family": "mj-61",
+    "arm": "base",
+    "uid": "mj-61-ko"
+  },
+  {
+    "item": "R174",
+    "family": "mj-228",
+    "arm": "plain",
+    "uid": "mj-228-ko"
+  },
+  {
+    "item": "R175",
+    "family": "mj-174",
+    "arm": "plain",
+    "uid": "mj-174-ko"
+  },
+  {
+    "item": "R176",
+    "family": "mj-145",
+    "arm": "base",
+    "uid": "mj-145-ko"
+  },
+  {
+    "item": "R177",
+    "family": "mj-4",
+    "arm": "plain",
+    "uid": "mj-4-ko"
+  },
+  {
+    "item": "R178",
+    "family": "mj-126",
+    "arm": "base",
+    "uid": "mj-126-ko"
+  },
+  {
+    "item": "R179",
+    "family": "mj-128",
+    "arm": "base",
+    "uid": "mj-128-ko"
+  },
+  {
+    "item": "R180",
+    "family": "mj-171",
+    "arm": "base",
+    "uid": "mj-171-ko"
+  },
+  {
+    "item": "R181",
+    "family": "mj-12",
+    "arm": "plain",
+    "uid": "mj-12-ko"
+  },
+  {
+    "item": "R182",
+    "family": "mj-262",
+    "arm": "base",
+    "uid": "mj-262-ko"
+  },
+  {
+    "item": "R183",
+    "family": "mj-228",
+    "arm": "base",
+    "uid": "mj-228-ko"
+  },
+  {
+    "item": "R184",
+    "family": "mj-252",
+    "arm": "plain",
+    "uid": "mj-252-ko"
+  },
+  {
+    "item": "R185",
+    "family": "mj-202",
+    "arm": "base",
+    "uid": "mj-202-ko"
+  },
+  {
+    "item": "R186",
+    "family": "mj-310",
+    "arm": "plain",
+    "uid": "mj-310-ko"
+  },
+  {
+    "item": "R187",
+    "family": "mj-294",
+    "arm": "plain",
+    "uid": "mj-294-ko"
+  },
+  {
+    "item": "R188",
+    "family": "mj-298",
+    "arm": "base",
+    "uid": "mj-298-ko"
+  },
+  {
+    "item": "R189",
+    "family": "mj-86",
+    "arm": "base",
+    "uid": "mj-86-ko"
+  },
+  {
+    "item": "R190",
+    "family": "mj-276",
+    "arm": "base",
+    "uid": "mj-276-ko"
+  },
+  {
+    "item": "R191",
+    "family": "mj-241",
+    "arm": "plain",
+    "uid": "mj-241-ko"
+  },
+  {
+    "item": "R192",
+    "family": "mj-193",
+    "arm": "plain",
+    "uid": "mj-193-ko"
+  },
+  {
+    "item": "R193",
+    "family": "mj-189",
+    "arm": "base",
+    "uid": "mj-189-ko"
+  },
+  {
+    "item": "R194",
+    "family": "mj-235",
+    "arm": "plain",
+    "uid": "mj-235-ko"
+  },
+  {
+    "item": "R195",
+    "family": "mj-135",
+    "arm": "base",
+    "uid": "mj-135-ko"
+  },
+  {
+    "item": "R196",
+    "family": "mj-245",
+    "arm": "base",
+    "uid": "mj-245-ko"
+  },
+  {
+    "item": "R197",
+    "family": "mj-213",
+    "arm": "base",
+    "uid": "mj-213-ko"
+  },
+  {
+    "item": "R198",
+    "family": "mj-174",
+    "arm": "base",
+    "uid": "mj-174-ko"
+  },
+  {
+    "item": "R199",
+    "family": "mj-149",
+    "arm": "base",
+    "uid": "mj-149-ko"
+  },
+  {
+    "item": "R200",
+    "family": "mj-185",
+    "arm": "base",
+    "uid": "mj-185-ko"
+  },
+  {
+    "item": "R201",
+    "family": "mj-175",
+    "arm": "base",
+    "uid": "mj-175-ko"
+  },
+  {
+    "item": "R202",
+    "family": "mj-98",
+    "arm": "plain",
+    "uid": "mj-98-ko"
+  },
+  {
+    "item": "R203",
+    "family": "mj-102",
+    "arm": "plain",
+    "uid": "mj-102-ko"
+  },
+  {
+    "item": "R204",
+    "family": "mj-159",
+    "arm": "plain",
+    "uid": "mj-159-ko"
+  },
+  {
+    "item": "R205",
+    "family": "mj-308",
+    "arm": "base",
+    "uid": "mj-308-ko"
+  },
+  {
+    "item": "R206",
+    "family": "mj-246",
+    "arm": "plain",
+    "uid": "mj-246-ko"
+  },
+  {
+    "item": "R207",
+    "family": "mj-280",
+    "arm": "base",
+    "uid": "mj-280-ko"
+  },
+  {
+    "item": "R208",
+    "family": "mj-158",
+    "arm": "base",
+    "uid": "mj-158-ko"
+  },
+  {
+    "item": "R209",
+    "family": "mj-293",
+    "arm": "plain",
+    "uid": "mj-293-ko"
+  },
+  {
+    "item": "R210",
+    "family": "mj-2",
+    "arm": "base",
+    "uid": "mj-2-ko"
+  },
+  {
+    "item": "R211",
+    "family": "mj-155",
+    "arm": "plain",
+    "uid": "mj-155-ko"
+  },
+  {
+    "item": "R212",
+    "family": "mj-56",
+    "arm": "base",
+    "uid": "mj-56-ko"
+  },
+  {
+    "item": "R213",
+    "family": "mj-146",
+    "arm": "base",
+    "uid": "mj-146-ko"
+  },
+  {
+    "item": "R214",
+    "family": "mj-22",
+    "arm": "base",
+    "uid": "mj-22-ko"
+  },
+  {
+    "item": "R215",
+    "family": "mj-88",
+    "arm": "plain",
+    "uid": "mj-88-ko"
+  },
+  {
+    "item": "R216",
+    "family": "mj-314",
+    "arm": "base",
+    "uid": "mj-314-ko"
+  },
+  {
+    "item": "R217",
+    "family": "mj-215",
+    "arm": "base",
+    "uid": "mj-215-ko"
+  },
+  {
+    "item": "R218",
+    "family": "mj-73",
+    "arm": "plain",
+    "uid": "mj-73-ko"
+  },
+  {
+    "item": "R219",
+    "family": "mj-50",
+    "arm": "plain",
+    "uid": "mj-50-ko"
+  },
+  {
+    "item": "R220",
+    "family": "mj-5",
+    "arm": "plain",
+    "uid": "mj-5-ko"
+  },
+  {
+    "item": "R221",
+    "family": "mj-9",
+    "arm": "plain",
+    "uid": "mj-9-ko"
+  },
+  {
+    "item": "R222",
+    "family": "mj-67",
+    "arm": "plain",
+    "uid": "mj-67-ko"
+  },
+  {
+    "item": "R223",
+    "family": "mj-298",
+    "arm": "plain",
+    "uid": "mj-298-ko"
+  },
+  {
+    "item": "R224",
+    "family": "mj-118",
+    "arm": "base",
+    "uid": "mj-118-ko"
+  },
+  {
+    "item": "R225",
+    "family": "mj-227",
+    "arm": "plain",
+    "uid": "mj-227-ko"
+  },
+  {
+    "item": "R226",
+    "family": "mj-29",
+    "arm": "base",
+    "uid": "mj-29-ko"
+  },
+  {
+    "item": "R227",
+    "family": "mj-11",
+    "arm": "plain",
+    "uid": "mj-11-ko"
+  },
+  {
+    "item": "R228",
+    "family": "mj-15",
+    "arm": "plain",
+    "uid": "mj-15-ko"
+  },
+  {
+    "item": "R229",
+    "family": "mj-84",
+    "arm": "base",
+    "uid": "mj-84-ko"
+  },
+  {
+    "item": "R230",
+    "family": "mj-102",
+    "arm": "base",
+    "uid": "mj-102-ko"
+  },
+  {
+    "item": "R231",
+    "family": "mj-247",
+    "arm": "plain",
+    "uid": "mj-247-ko"
+  },
+  {
+    "item": "R232",
+    "family": "mj-260",
+    "arm": "plain",
+    "uid": "mj-260-ko"
+  },
+  {
+    "item": "R233",
+    "family": "mj-147",
+    "arm": "plain",
+    "uid": "mj-147-ko"
+  },
+  {
+    "item": "R234",
+    "family": "mj-81",
+    "arm": "plain",
+    "uid": "mj-81-ko"
+  },
+  {
+    "item": "R235",
+    "family": "mj-17",
+    "arm": "base",
+    "uid": "mj-17-ko"
+  },
+  {
+    "item": "R236",
+    "family": "mj-209",
+    "arm": "plain",
+    "uid": "mj-209-ko"
+  },
+  {
+    "item": "R237",
+    "family": "mj-233",
+    "arm": "base",
+    "uid": "mj-233-ko"
+  },
+  {
+    "item": "R238",
+    "family": "mj-142",
+    "arm": "plain",
+    "uid": "mj-142-ko"
+  },
+  {
+    "item": "R239",
+    "family": "mj-2",
+    "arm": "plain",
+    "uid": "mj-2-ko"
+  },
+  {
+    "item": "R240",
+    "family": "mj-175",
+    "arm": "plain",
+    "uid": "mj-175-ko"
+  },
+  {
+    "item": "R241",
+    "family": "mj-39",
+    "arm": "base",
+    "uid": "mj-39-ko"
+  },
+  {
+    "item": "R242",
+    "family": "mj-296",
+    "arm": "plain",
+    "uid": "mj-296-ko"
+  },
+  {
+    "item": "R243",
+    "family": "mj-302",
+    "arm": "base",
+    "uid": "mj-302-ko"
+  },
+  {
+    "item": "R244",
+    "family": "mj-5",
+    "arm": "base",
+    "uid": "mj-5-ko"
+  },
+  {
+    "item": "R245",
+    "family": "mj-165",
+    "arm": "plain",
+    "uid": "mj-165-ko"
+  },
+  {
+    "item": "R246",
+    "family": "mj-252",
+    "arm": "base",
+    "uid": "mj-252-ko"
+  },
+  {
+    "item": "R247",
+    "family": "mj-263",
+    "arm": "plain",
+    "uid": "mj-263-ko"
+  },
+  {
+    "item": "R248",
+    "family": "mj-270",
+    "arm": "plain",
+    "uid": "mj-270-ko"
+  },
+  {
+    "item": "R249",
+    "family": "mj-137",
+    "arm": "plain",
+    "uid": "mj-137-ko"
+  },
+  {
+    "item": "R250",
+    "family": "mj-182",
+    "arm": "base",
+    "uid": "mj-182-ko"
+  },
+  {
+    "item": "R251",
+    "family": "mj-151",
+    "arm": "base",
+    "uid": "mj-151-ko"
+  },
+  {
+    "item": "R252",
+    "family": "mj-230",
+    "arm": "plain",
+    "uid": "mj-230-ko"
+  },
+  {
+    "item": "R253",
+    "family": "mj-206",
+    "arm": "plain",
+    "uid": "mj-206-ko"
+  },
+  {
+    "item": "R254",
+    "family": "mj-311",
+    "arm": "plain",
+    "uid": "mj-311-ko"
+  },
+  {
+    "item": "R255",
+    "family": "mj-263",
+    "arm": "base",
+    "uid": "mj-263-ko"
+  },
+  {
+    "item": "R256",
+    "family": "mj-155",
+    "arm": "base",
+    "uid": "mj-155-ko"
+  },
+  {
+    "item": "R257",
+    "family": "mj-23",
+    "arm": "base",
+    "uid": "mj-23-ko"
+  },
+  {
+    "item": "R258",
+    "family": "mj-94",
+    "arm": "plain",
+    "uid": "mj-94-ko"
+  },
+  {
+    "item": "R259",
+    "family": "mj-116",
+    "arm": "plain",
+    "uid": "mj-116-ko"
+  },
+  {
+    "item": "R260",
+    "family": "mj-286",
+    "arm": "base",
+    "uid": "mj-286-ko"
+  },
+  {
+    "item": "R261",
+    "family": "mj-182",
+    "arm": "plain",
+    "uid": "mj-182-ko"
+  },
+  {
+    "item": "R262",
+    "family": "mj-299",
+    "arm": "plain",
+    "uid": "mj-299-ko"
+  },
+  {
+    "item": "R263",
+    "family": "mj-78",
+    "arm": "base",
+    "uid": "mj-78-ko"
+  },
+  {
+    "item": "R264",
+    "family": "mj-193",
+    "arm": "base",
+    "uid": "mj-193-ko"
+  },
+  {
+    "item": "R265",
+    "family": "mj-90",
+    "arm": "base",
+    "uid": "mj-90-ko"
+  },
+  {
+    "item": "R266",
+    "family": "mj-58",
+    "arm": "plain",
+    "uid": "mj-58-ko"
+  },
+  {
+    "item": "R267",
+    "family": "mj-39",
+    "arm": "plain",
+    "uid": "mj-39-ko"
+  },
+  {
+    "item": "R268",
+    "family": "mj-305",
+    "arm": "plain",
+    "uid": "mj-305-ko"
+  },
+  {
+    "item": "R269",
+    "family": "mj-292",
+    "arm": "base",
+    "uid": "mj-292-ko"
+  },
+  {
+    "item": "R270",
+    "family": "mj-105",
+    "arm": "plain",
+    "uid": "mj-105-ko"
+  },
+  {
+    "item": "R271",
+    "family": "mj-231",
+    "arm": "plain",
+    "uid": "mj-231-ko"
+  },
+  {
+    "item": "R272",
+    "family": "mj-210",
+    "arm": "plain",
+    "uid": "mj-210-ko"
+  },
+  {
+    "item": "R273",
+    "family": "mj-32",
+    "arm": "plain",
+    "uid": "mj-32-ko"
+  },
+  {
+    "item": "R274",
+    "family": "mj-282",
+    "arm": "base",
+    "uid": "mj-282-ko"
+  },
+  {
+    "item": "R275",
+    "family": "mj-258",
+    "arm": "base",
+    "uid": "mj-258-ko"
+  },
+  {
+    "item": "R276",
+    "family": "mj-124",
+    "arm": "base",
+    "uid": "mj-124-ko"
+  },
+  {
+    "item": "R277",
+    "family": "mj-156",
+    "arm": "base",
+    "uid": "mj-156-ko"
+  },
+  {
+    "item": "R278",
+    "family": "mj-245",
+    "arm": "plain",
+    "uid": "mj-245-ko"
+  },
+  {
+    "item": "R279",
+    "family": "mj-250",
+    "arm": "base",
+    "uid": "mj-250-ko"
+  },
+  {
+    "item": "R280",
+    "family": "mj-230",
+    "arm": "base",
+    "uid": "mj-230-ko"
+  },
+  {
+    "item": "R281",
+    "family": "mj-7",
+    "arm": "plain",
+    "uid": "mj-7-ko"
+  },
+  {
+    "item": "R282",
+    "family": "mj-41",
+    "arm": "base",
+    "uid": "mj-41-ko"
+  },
+  {
+    "item": "R283",
+    "family": "mj-56",
+    "arm": "plain",
+    "uid": "mj-56-ko"
+  },
+  {
+    "item": "R284",
+    "family": "mj-122",
+    "arm": "base",
+    "uid": "mj-122-ko"
+  },
+  {
+    "item": "R285",
+    "family": "mj-280",
+    "arm": "plain",
+    "uid": "mj-280-ko"
+  },
+  {
+    "item": "R286",
+    "family": "mj-290",
+    "arm": "base",
+    "uid": "mj-290-ko"
+  },
+  {
+    "item": "R287",
+    "family": "mj-273",
+    "arm": "plain",
+    "uid": "mj-273-ko"
+  },
+  {
+    "item": "R288",
+    "family": "mj-46",
+    "arm": "plain",
+    "uid": "mj-46-ko"
+  },
+  {
+    "item": "R289",
+    "family": "mj-285",
+    "arm": "plain",
+    "uid": "mj-285-ko"
+  },
+  {
+    "item": "R290",
+    "family": "mj-286",
+    "arm": "plain",
+    "uid": "mj-286-ko"
+  },
+  {
+    "item": "R291",
+    "family": "mj-254",
+    "arm": "base",
+    "uid": "mj-254-ko"
+  },
+  {
+    "item": "R292",
+    "family": "mj-150",
+    "arm": "base",
+    "uid": "mj-150-ko"
+  },
+  {
+    "item": "R293",
+    "family": "mj-31",
+    "arm": "base",
+    "uid": "mj-31-ko"
+  },
+  {
+    "item": "R294",
+    "family": "mj-198",
+    "arm": "base",
+    "uid": "mj-198-ko"
+  },
+  {
+    "item": "R295",
+    "family": "mj-218",
+    "arm": "base",
+    "uid": "mj-218-ko"
+  },
+  {
+    "item": "R296",
+    "family": "mj-70",
+    "arm": "plain",
+    "uid": "mj-70-ko"
+  },
+  {
+    "item": "R297",
+    "family": "mj-307",
+    "arm": "plain",
+    "uid": "mj-307-ko"
+  },
+  {
+    "item": "R298",
+    "family": "mj-122",
+    "arm": "plain",
+    "uid": "mj-122-ko"
+  },
+  {
+    "item": "R299",
+    "family": "mj-87",
+    "arm": "plain",
+    "uid": "mj-87-ko"
+  },
+  {
+    "item": "R300",
+    "family": "mj-126",
+    "arm": "plain",
+    "uid": "mj-126-ko"
+  },
+  {
+    "item": "R301",
+    "family": "mj-121",
+    "arm": "plain",
+    "uid": "mj-121-ko"
+  },
+  {
+    "item": "R302",
+    "family": "mj-255",
+    "arm": "plain",
+    "uid": "mj-255-ko"
+  },
+  {
+    "item": "R303",
+    "family": "mj-305",
+    "arm": "base",
+    "uid": "mj-305-ko"
+  },
+  {
+    "item": "R304",
+    "family": "mj-261",
+    "arm": "plain",
+    "uid": "mj-261-ko"
+  },
+  {
+    "item": "R305",
+    "family": "mj-239",
+    "arm": "base",
+    "uid": "mj-239-ko"
+  },
+  {
+    "item": "R306",
+    "family": "mj-123",
+    "arm": "plain",
+    "uid": "mj-123-ko"
+  },
+  {
+    "item": "R307",
+    "family": "mj-15",
+    "arm": "base",
+    "uid": "mj-15-ko"
+  },
+  {
+    "item": "R308",
+    "family": "mj-233",
+    "arm": "plain",
+    "uid": "mj-233-ko"
+  },
+  {
+    "item": "R309",
+    "family": "mj-292",
+    "arm": "plain",
+    "uid": "mj-292-ko"
+  },
+  {
+    "item": "R310",
+    "family": "mj-146",
+    "arm": "plain",
+    "uid": "mj-146-ko"
+  },
+  {
+    "item": "R311",
+    "family": "mj-134",
+    "arm": "plain",
+    "uid": "mj-134-ko"
+  },
+  {
+    "item": "R312",
+    "family": "mj-113",
+    "arm": "plain",
+    "uid": "mj-113-ko"
+  },
+  {
+    "item": "R313",
+    "family": "mj-192",
+    "arm": "plain",
+    "uid": "mj-192-ko"
+  },
+  {
+    "item": "R314",
+    "family": "mj-28",
+    "arm": "base",
+    "uid": "mj-28-ko"
+  },
+  {
+    "item": "R315",
+    "family": "mj-277",
+    "arm": "plain",
+    "uid": "mj-277-ko"
+  },
+  {
+    "item": "R316",
+    "family": "mj-58",
+    "arm": "base",
+    "uid": "mj-58-ko"
+  },
+  {
+    "item": "R317",
+    "family": "mj-141",
+    "arm": "plain",
+    "uid": "mj-141-ko"
+  },
+  {
+    "item": "R318",
+    "family": "mj-7",
+    "arm": "base",
+    "uid": "mj-7-ko"
+  },
+  {
+    "item": "R319",
+    "family": "mj-184",
+    "arm": "base",
+    "uid": "mj-184-ko"
+  },
+  {
+    "item": "R320",
+    "family": "mj-171",
+    "arm": "plain",
+    "uid": "mj-171-ko"
+  },
+  {
+    "item": "R321",
+    "family": "mj-32",
+    "arm": "base",
+    "uid": "mj-32-ko"
+  },
+  {
+    "item": "R322",
+    "family": "mj-77",
+    "arm": "base",
+    "uid": "mj-77-ko"
+  }
+]

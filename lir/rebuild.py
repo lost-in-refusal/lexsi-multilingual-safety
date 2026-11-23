@@ -91,7 +91,7 @@ NOT_REBUILT = [
     (("swahili_nllb.json", "swahili_nllb_seeds.json"),
      "written by `python -m lir.nllb backtranslate`, which runs the translation model and the guard. The back-translations are "
      "published; the step that judges them is not run again here"),
-    (("ko_drift.md", "second_judge_check.md"),
+    (("ko_drift.md", "ko_rest.md", "second_judge_check.md"),
      "a person's labels and the write-up of the two second-judge checks; their inputs are in results/lir/labels"),
     (("mixing/seeds.json", "mixing/seeds.md"),
      "`python -m lir.repeat mix` reads the mixing runs at seeds 1 and 2, whose answers and verdicts are not published yet"),

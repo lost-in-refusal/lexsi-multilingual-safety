@@ -46,7 +46,8 @@ Among what did not hold or was not tested (the status page has the full list):
 - **One safety judge.** A second judge failed our agreement check (80% per language on 120 human labels) with both
   models we tried, so no headline number is confirmed by a second judge.
 - **A person's reading of the Korean rise (K2) did not pass:** 5 plain answers against 1 base answer marked unsafe
-  on 94 prompts, p = 0.22.
+  on 94 prompts, p = 0.22. A second reading on the 161 Korean prompts nobody had read (K3) did not pass either:
+  11 against 5 on 145 prompts, p = 0.070. One labeller, seed 42.
 - **On the Aya training set the Swahili refusal drop did not carry over (Y3 fails):** −3.4, −3.1 and −1.4 points,
   pooled −2.6 [−6.9, +1.5]. The Swahili finding rests on Bactrian-X.
 - **The Korean clean set (H4) was not tested,** because its human check failed.
@@ -179,7 +180,7 @@ Not rebuilt, and why: `vector_aya` (its command checks the hashes of adapter wei
 activation files are not published), `aya/task` (the held-out Aya answers are not published), `aya/checks` (the
 public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
 in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
-`ko_drift.md` and `second_judge_check.md` (a person's labels and a write-up), and the three images (the numbers
+`ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), and the three images (the numbers
 beside them are compared).
 
 Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new

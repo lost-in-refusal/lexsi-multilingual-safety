@@ -100,15 +100,17 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 21, 8:59 PM (Aish) | Section 12.0 to 12.4: GPU runs (hardware control, single-language, NF4, AlignTune) | Hardware control: no significant difference from the laptop in eight comparisons. L1 and L2: row 1 in all three runs. Q2 passes. Q1: NF4 raises attack success for base in English and for plain in three languages, where the comparison also differs in merging. AlignTune: no result yet |
 | Nov 22 (Mingyu) | Section 13a to 13h: single-language runs on the laptop; repair vector on Aya (V1); second readings; 519-row seeds (C1, C2); refusal direction (R1, R2); Unsafe-only reading; task score by answer length | SL1 and SL2: row 1 on three seeds. V1 passes on both readings. C1 includes zero; C2 is below zero for English rows only (seen at seed 42 before it was registered). Unsafe-only: 20 of 22 passes kept. Task score: not a length effect. R1: Korean and English moved the same distance, as predicted. R2: with English rows only Korean moved less far than English; with Chinese rows only Korean and Chinese moved the same distance |
 | Nov 23, 3:58 AM (Mingyu), under the deadline extension | Section 14a: the mixing baseline at seeds 1 and 2 (M1 to M3), decided on the two new seeds | Five copies: mixing protected Korean better than SafeGrad (-2.7 points [-5.2, -0.5]). Examples added once: no detected difference (-0.5 [-2.9, +1.9]). Both arms: English over-refusal about 5 points above SafeGrad's (+5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]). Task score: no detected difference |
-| Nov 23, 4:26 AM and 4:45 AM (Mingyu), under the deadline extension | Section 14b: six more untrained languages (U1 to U3). Section 14c: a second reading of the Korean rise by a person (K3) | Not read when this was written |
+| Nov 23, 4:26 AM (Mingyu), under the deadline extension | Section 14b: six more untrained languages (U1 to U3) | Not read when this was written |
+| Nov 23, 4:45 AM (Mingyu), under the deadline extension | Section 14c: a second reading of the Korean rise by a person, on the 161 prompts not read before (K3) | K3 does not pass: 11 plain against 5 base answers marked unsafe on 145 prompts, p = 0.070 |
 
 Deviations and things a reader should know:
 
 1. **H4 was never tested.** The human check of the Korean training rows failed, so the cleaned set could not be
    built. Korean data quality cannot be ruled out as a contributor; K1 and the single-language runs are the nearest
    evidence.
-2. **The human check of the Korean rise (K2) did not pass** (5 against 1 unsafe answers on 94 prompts, p = 0.22),
-   and both second judges missed the agreement bar. Every safety number is one guard's.
+2. **Neither human check of the Korean rise passed** (K2: 5 against 1 unsafe answers on 94 prompts, p = 0.22; K3, on
+   the 161 prompts not read before: 11 against 5 on 145 prompts, p = 0.070; one labeller, seed 42; how the K3 sheet
+   came back is on record in section 14c), and both second judges missed the agreement bar. Every safety number is one guard's.
 3. **Some checks were registered after a first result was known:** seeds 1 and 2 of K1 after its seed 42 run; the
    three-seed rules for Aya and Earth after seed 42; the second reading of the repair vector (13c) after its capped
    result; C2 after its seed 42 value had been seen. Each registration says what was known.
@@ -148,7 +150,8 @@ The recommended layout on hackathon.lexsi.ai marks these as required or as value
 
 - **"With more credits" (required):** planned approach and the expected before and after. Candidates, in order of
   value: a re-generation of the mixing arms at 1,024 tokens and a direct test of five copies against one (the mixing
-  baseline itself ran at seeds 1 and 2 under the extension); a human reading of the Korean rise on the 161 Korean prompts no person has read (100 were read for K2 and 30 in stage 1) and a second labeller;
+  baseline itself ran at seeds 1 and 2 under the extension); a second labeller for the Korean reading (one person has read 261 of the 291 Korean prompts at seed 42 in two
+  checks, and neither reached significance);
   the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; a second untrained language and the Fire and Water models; LoRA
   rank, learning rate and epoch sensitivity; a second safety benchmark.
 - **"Declaration of work done outside the hackathon" (required):** for the team to state.

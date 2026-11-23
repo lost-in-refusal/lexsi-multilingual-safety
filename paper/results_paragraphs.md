@@ -147,9 +147,9 @@ Source: `mixing/seeds.md`; `mixing/results.md` for seed 42; section 14a of the p
 
 ## D14. Judge validity. Confidence: a limitation, with one robustness table
 
-Every safety number comes from one automatic guard. Against 120 answers labelled blind by the team it agreed 28/30 in English, 24/30 in Korean and 27/30 in Chinese (Cohen's kappa 0.87, 0.60 and 0.80) and missed our 80% bar in Swahili (20/27, kappa 0.49); half of each sample is answers the guard flagged, so it is a hard sample. Two other guards we tried as second judges both missed the bar, and a blind human reading of 200 Korean answers found the rise in the expected direction but not significantly (5 against 1 on 94 prompts, p = 0.22). The guard has two flagged classes, Unsafe and Controversial, and our two human checks disagree about the second: labellers marked 18 of 24 Controversial answers unsafe in the first check and 0 of 4 in the second. We therefore computed every check again counting Unsafe only, with the procedure fixed in advance. Every three-seed check still passes (Korean-minus-English gap +8.8 points, +4.7 to +13.1; SafeGrad against plain -6.6, -9.2 to -4.4); the Chinese-only training comparison does not when it is read at seed 42 alone, and does on three seeds (+4.1 points, +0.2 to +8.0).
+Every safety number comes from one automatic guard. Against 120 answers labelled blind by the team it agreed 28/30 in English, 24/30 in Korean and 27/30 in Chinese (Cohen's kappa 0.87, 0.60 and 0.80) and missed our 80% bar in Swahili (20/27, kappa 0.49); half of each sample is answers the guard flagged, so it is a hard sample. Two other guards we tried as second judges both missed the bar, and a human reading of 200 Korean answers with the arm hidden found the rise in the expected direction but not significantly (5 against 1 on 94 prompts, p = 0.22). A second reading by the same person, on the 161 Korean prompts not read before, did not reach significance either (11 against 5 on 145 prompts, p = 0.070). The guard has two flagged classes, Unsafe and Controversial, and our two human checks disagree about the second: labellers marked 18 of 24 Controversial answers unsafe in the first check and 0 of 4 in the second. We therefore computed every check again counting Unsafe only, with the procedure fixed in advance. Every three-seed check still passes (Korean-minus-English gap +8.8 points, +4.7 to +13.1; SafeGrad against plain -6.6, -9.2 to -4.4); the Chinese-only training comparison does not when it is read at seed 42 alone, and does on three seeds (+4.1 points, +0.2 to +8.0).
 
-Source: `second_judge_check.md`, `ko_drift.md`, `unsafe_only.md`.
+Source: `second_judge_check.md`, `ko_drift.md`, `ko_rest.md`, `unsafe_only.md`. How the K3 sheet came back is on record in section 14c of the preregistration.
 
 ## What changed since the brief's table (Sat 9:45 PM)
 
@@ -164,5 +164,6 @@ Source: `second_judge_check.md`, `ko_drift.md`, `unsafe_only.md`.
   success by about 5 points on both readings (registered before it ran), but it made answers about twice as long,
   and its over-refusal and task score were not measured. If it is used at all, it belongs in the appendix with
   those limits (`vector_aya.md`).
-- The Korean rise judged by a person (5 plain against 1 base answer unsafe on 94 prompts, p = 0.22) still does
-  not pass, and both second judges missed the 80% bar. The size of every rise above is the size the guard measures.
+- The Korean rise judged by a person does not pass in either of two readings (K2: 5 plain against 1 base answer unsafe on
+  94 prompts, p = 0.22; K3, Nov 23, on the 161 prompts not read before: 11 against 5 on 145 prompts, p = 0.070), and
+  both second judges missed the 80% bar. The size of every rise above is the size the guard measures.
