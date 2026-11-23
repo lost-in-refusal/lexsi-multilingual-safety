@@ -106,7 +106,10 @@ STAGE2_ADAPTERS = ["plain-s1", "safegrad-s1", "plain-s2", "safegrad-s2", "plain-
                    # sections 11 and 13 of the preregistration, Nov 21 and 22
                    "aya-plain-s1", "aya-safegrad-s1", "aya-plain-s2", "aya-safegrad-s2", "earth-plain-s1", "earth-safegrad-s1",
                    "earth-plain-s2", "earth-safegrad-s2", "plain-only-en", "plain-only-ko", "plain-only-zh",
-                   "aya-plain-s1-vec", "aya-plain-s2-vec", "aya-plain-vec"]
+                   "aya-plain-s1-vec", "aya-plain-s2-vec", "aya-plain-vec",
+                   # seeds 1 and 2 of the single-language runs and of the 519-row run (sections 13a and 13e), Nov 22
+                   "plain-only-en-s1", "plain-only-ko-s1", "plain-only-zh-s1", "plain-only-en-s2", "plain-only-ko-s2", "plain-only-zh-s2",
+                   "plain-ayasize-s1", "plain-ayasize-s2"]
 
 
 def _relative(x):
@@ -177,7 +180,10 @@ STAGE2_LATER = ["plain-s1-vec", "plain-s2-vec", "plain-noko-s1", "plain-noko-s2"
                 # sections 11 and 13 of the preregistration, Nov 21 and 22. Attack set only
                 "aya-plain-s1", "aya-safegrad-s1", "aya-plain-s2", "aya-safegrad-s2", "earth-plain-s1", "earth-safegrad-s1",
                 "earth-plain-s2", "earth-safegrad-s2", "plain-only-en", "plain-only-ko", "plain-only-zh",
-                "aya-plain-s1-vec", "aya-plain-s2-vec", "aya-plain-vec"]
+                "aya-plain-s1-vec", "aya-plain-s2-vec", "aya-plain-vec",
+                # seeds 1 and 2 of the single-language runs and of the 519-row run (sections 13a and 13e). Attack set only
+                "plain-only-en-s1", "plain-only-ko-s1", "plain-only-zh-s1", "plain-only-en-s2", "plain-only-ko-s2", "plain-only-zh-s2",
+                "plain-ayasize-s1", "plain-ayasize-s2"]
 STAGE1_ARMS = ["base", "plain", "safegrad"]  # already in the repo; their capped answers were generated again too
 
 
@@ -203,9 +209,22 @@ def unfinished(arm_dir: Path) -> list[str]:
     return bad
 
 
+def gpu_files(root: Path) -> list[tuple[Path, Path]]:
+    """The result files of the Hugging Face GPU jobs (answers, verdicts, records and logs; no adapter weights), each
+    with its path in the outputs repo. root is runs/gpu as `python -m lir.gpu fetch` leaves it. A job folder with
+    no job record is left out."""
+    out = []
+    for job in sorted(p for p in root.glob("*/*") if (p / "job.json").exists()):
+        out += [(p, Path("gpu") / p.relative_to(root)) for p in sorted(job.rglob("*"))
+                if p.is_file() and p.suffix in (".jsonl", ".json", ".log")]
+    if out and (root / "revision.txt").exists():   # the revision of the staging dataset the files were read from
+        out.append((root / "revision.txt", Path("gpu") / "staging_revision.txt"))
+    return out
+
+
 def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool, aya_task: bool = False) -> None:
-    """Add stage 2 outputs to the outputs repo: arm folders, re-generated answers, the NLLB re-translations and
-    the committed stage 2 tables. The answers to the held-out Aya prompts go up only with aya_task, because
+    """Add stage 2 outputs to the outputs repo: arm folders, re-generated answers, the NLLB re-translations, the
+    result files of the GPU jobs and the committed stage 2 tables. The answers to the held-out Aya prompts go up only with aya_task, because
     each row quotes an Aya prompt and its reference answer.
 
     Nothing already in the repo is removed, and only the README card and files whose content changed are
@@ -253,6 +272,10 @@ def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool, aya_task: boo
                 dest = t / "stage2" / Path(rel).relative_to(res)
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy(ROOT / rel, dest)
+        gpu = gpu_files(RUNS / "gpu") if f"{res}/gpu.md" in tracked.stdout.splitlines() else []   # once their table is committed
+        for src, rel in gpu:
+            (t / rel).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(src, t / rel)
         shutil.copy(CARDS / "evals.md", t / "README.md")
         no_home_paths(t)
         files = sorted(p for p in t.rglob("*") if p.is_file())
@@ -261,6 +284,7 @@ def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool, aya_task: boo
         print("arms:", ", ".join(arms))
         print("re-generated answers:", ", ".join(again) or "none yet", "| Aya task answers:",
               (", ".join(aya) or "none yet") if aya_task else "left out (--aya-task adds them)")
+        print("GPU jobs:", ", ".join(sorted({rel.parts[1] for _, rel in gpu if len(rel.parts) > 2})) or "none")
         if waiting:
             print("not finished, left out:", ", ".join(waiting))
         if dry_run:

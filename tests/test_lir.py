@@ -372,6 +372,25 @@ class Publish(unittest.TestCase):
             (d / "task.judge.jsonl").write_text("{}\n")
             self.assertEqual(unfinished(d), [])
 
+    def test_gpu_job_files(self):
+        from lir.publish import gpu_files
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            job = root / "nf4" / "20261122-215110-649ce27"
+            for rel in ("job.json", "logs/gpu-base-nf4.evaluate.log", "gpu-base-nf4/attack.guard.jsonl",
+                        "gpu-base-nf4/run/adapter/adapter_model.safetensors"):
+                (job / rel).parent.mkdir(parents=True, exist_ok=True)
+                (job / rel).write_text("x")
+            (root / "control" / "no-record").mkdir(parents=True)   # a folder with no job record is left out
+            (root / "control" / "no-record" / "attack.gen.jsonl").write_text("x")
+            (root / "revision.txt").write_text("abc\n")
+            self.assertEqual(sorted(str(rel) for _, rel in gpu_files(root)),
+                             ["gpu/nf4/20261122-215110-649ce27/gpu-base-nf4/attack.guard.jsonl",
+                              "gpu/nf4/20261122-215110-649ce27/job.json",
+                              "gpu/nf4/20261122-215110-649ce27/logs/gpu-base-nf4.evaluate.log", "gpu/staging_revision.txt"])
+            self.assertEqual(gpu_files(root / "control"), [])   # no adapter weights, and nothing without a record
+
     def test_regenerated_arms(self):
         import json
         from unittest import mock

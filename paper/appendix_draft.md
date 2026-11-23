@@ -10,7 +10,7 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
 - **Code:** `github.com/lost-in-refusal/lexsi-multilingual-safety`, branch `mingyu/stage2` (merged into `main` before
   submission). Every table in `results/lir/stage2/` is written by a command named at the top of its module
   (`python -m lir.seeds`, `lir.repeat`, `lir.section13`, `lir.loose`, `lir.direction`, `lir.trunc`, `lir.gpu`).
-- **Tests:** `python -m unittest tests.test_lir` (75 tests; each registered rule has a test on made-up data).
+- **Tests:** `python -m unittest tests.test_lir` (76 tests; each registered rule has a test on made-up data).
 - **Outputs:** every generation and guard verdict is in `lost-in-refusal/lost-in-refusal-eval-outputs` (public), one
   folder per run, with the re-generated answers under `truncation-regenerated/`. Adapters: the two stage 1
   repositories (seed 42) and `lost-in-refusal/tiny-aya-lora-stage2` (30 folders; public at submission).
