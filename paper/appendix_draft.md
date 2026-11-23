@@ -157,5 +157,5 @@ The recommended layout on hackathon.lexsi.ai marks these as required or as value
   where safety lives, inference-time steering (2b). The repair vector is a weight-space repair without retraining
   (2b); if it is listed, list it as exploratory with its limits.
 - **Final deliverable:** the site says finalists are judged on "a video presentation or slides". The brief says the
-  paper is primary and the video optional. Confirm with Ram that a paper without slides is a valid final
+  paper is primary and the video optional. Mingyu reported on Nov 23 that a paper without slides is a valid final
   submission.

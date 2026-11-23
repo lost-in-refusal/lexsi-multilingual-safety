@@ -992,6 +992,70 @@ Not uploaded to Hugging Face when this was written: the answers, verdicts and ad
 - With no rule: the difference is about the same in the other groups (plain -0.42 for answers at 50% to 80% of the base length and -0.36 for answers under half; SafeGrad -0.45 and -0.41). The few answers that are longer than the base model's score much lower (-2.46 and -2.36, on 29 and 31 answers). Accuracy is the sub-score that falls most (plain: -0.59 in English, -1.21 in Korean, -1.09 in Chinese) and fluency barely moves. The fine-tuned answers are about as long as the references (median 521 characters against 549 in English) and a third as long as the base model's (1,619). Within the base model's own answers, length and score are almost unrelated (rank correlation +0.06, +0.18 and +0.15).
 - So stage 1's reading, that the judge scores shorter answers lower, is not supported and is not repeated.
 
+## 14. Runs under the deadline extension
+
+**Added Nov 23, 3:58 AM ET by Mingyu, before any run below was started.**
+
+**The extension.** Mingyu reported on Nov 23 that the organisers have confirmed the deadline extension. The confirmed date and hour are not on record in this file; they are added here when we have them in writing. Sections 12.4 and 13a stopped new launches after Sunday Nov 22, 9 PM ET "unless the extension is confirmed". From this note on a run may be launched again, on one condition: it has a dated entry in this section before it starts. The runs listed as not run under 12.4 and in the status page stay listed that way until they have such an entry.
+
+### 14a. The mixing baseline at seeds 1 and 2
+
+Question: at seed 42, adding the 47 refusal examples to the training data protected Korean as well as SafeGrad and raised over-refusal. Is that also so at other seeds?
+
+Why. Section 3 compared mixing with SafeGrad on one seed, and the result is marked as one seed wherever it is used. The paper's cost argument rests on it: mixing buys the same protection and pays for it in over-refusal, and SafeGrad does not.
+
+What we know as this is written:
+
+- Seed 42 on all three sets (`results/lir/stage2/mixing/results.md`). Korean strict attack success is 9.3% with the examples once and 8.9% with five copies, against 10.7% for SafeGrad; neither difference is significant. English over-refusal is 14.0% and 13.2% against 7.6%, and Chinese 8.8% and 9.2% against 5.6%; all four are significant, and Korean and Swahili are not. Task score is 5.95 and 5.94 against 5.82.
+- SafeGrad at seeds 1 and 2 on all three sets. Its English over-refusal there is 8.8% and 10.8%, above the 7.6% of seed 42.
+- No mixing run exists at seed 1 or 2.
+
+Runs. Plain LoRA with the settings of every plain run, at seeds 1 and 2, on the two training files of section 3, unchanged:
+
+- `plain-mix1-s1` and `plain-mix1-s2`: `data/lir/bactrian_train_mix1.jsonl`, 1,847 rows (the 47 examples once).
+- `plain-mix5-s1` and `plain-mix5-s2`: `data/lir/bactrian_train_mix5.jsonl`, 2,035 rows (five copies).
+
+Each is evaluated on the attack set, XSTest and the Bactrian-X task set, with the usual caps and judges.
+
+Order and limit. Through the laptop queue in this order: `plain-mix1-s1`, `plain-mix1-s2`, `plain-mix5-s1`, `plain-mix5-s2`, so that the first mixing arm is complete before the second starts. A run not launched by Tuesday Nov 24, 9 PM ET is listed as not run. Each mixing arm is read once both of its new runs are fully judged. If only one arm is complete, the block is read for that arm and says so.
+
+Comparison. Each new run against SafeGrad at the same seed (`safegrad-s1`, `safegrad-s2`) on the same prompts. The decision uses seeds 1 and 2 only, because seed 42 has been seen. For each quantity below, the difference per prompt is averaged over the two seeds and a bootstrap over prompts (5,000 draws) gives a 95% interval, the method of the pooled results in section 1. The figure pooled over seeds 42, 1 and 2 is given beside it as an estimate and decides nothing.
+
+**M1, protection.** Korean strict attack success, mixing minus SafeGrad, over the 291 prompt families.
+
+| Interval on seeds 1 and 2 | What we write |
+| --- | --- |
+| Above zero | SafeGrad protected Korean better than this mixing arm |
+| Includes zero | No detected difference in Korean attack success between this mixing arm and SafeGrad. We do not write that the two are the same |
+| Below zero | This mixing arm protected Korean better than SafeGrad |
+
+**M2, the cost in over-refusal.** English over-refusal on XSTest, mixing minus SafeGrad, over the 250 English prompts. English is where the rise was largest at seed 42, in both arms.
+
+| Interval on seeds 1 and 2 | What we write |
+| --- | --- |
+| Above zero | Mixing raised English over-refusal above SafeGrad's on two new seeds: seen at seed 42 and confirmed on two new seeds |
+| Includes zero | The over-refusal cost of mixing seen at seed 42 was not confirmed on new seeds. This is not a finding that mixing costs nothing |
+| Below zero | On the new seeds mixing over-refused less than SafeGrad in English, so the cost seen at seed 42 did not hold |
+
+Power, stated before the runs. M2 has 250 prompts per seed, and SafeGrad's English over-refusal at seeds 1 and 2 is already above its seed 42 value. An interval that includes zero is a likely outcome even if mixing does cost over-refusal.
+
+**M3, task score.** Task score (1 to 7), mixing minus SafeGrad, over the 300 task prompts.
+
+What this means for section 3, for each mixing arm. Section 3's two sentences are unchanged. Its "no worse" is fixed here as: for over-refusal, M2's interval is not above zero; for task score, M3's interval is not below zero.
+
+| M1 | M2 | M3 | What we write |
+| --- | --- | --- | --- |
+| Above zero | any | any | Section 3's second sentence: SafeGrad adds protection beyond mixing. M2 and M3 are given beside it |
+| Not above zero | Above zero | any | The simple fix does not match SafeGrad here: no loss of protection was detected, and it costs over-refusal in English |
+| Not above zero | Not above zero | Not below zero | Section 3's first sentence, for these seeds: the simple fix matches SafeGrad here. Where an interval includes zero we say that no difference was detected. We no longer write that mixing pays for its protection in over-refusal without the words "at seed 42" |
+| Not above zero | Not above zero | Below zero | Mixing cost task score against SafeGrad on the new seeds, and section 3's first sentence does not apply |
+
+Reported beside these, with no rule: over-refusal in Korean, Chinese and Swahili and the four-language mean; the refusal rate on the attack set; each mixing arm against base on Korean attack success and on English over-refusal; every per-seed difference with its exact McNemar test; M1 on the guard's Unsafe class alone; the two mixing arms averaged; and M1 to M3 pooled over seeds 42, 1 and 2.
+
+Not part of this block: generating capped answers again at 1,024 tokens. No mixing arm has been generated again, seed 42 included, so this block is read on capped answers, the reading that decides everywhere in this file.
+
+Report: `python -m lir.repeat mix` writes `results/lir/stage2/mixing/seeds.md`. Its code is committed before the first new verdict exists; the first run's evaluation starts about 75 minutes after its training does. It stops if a run record does not show the registered model, seed and training file.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
