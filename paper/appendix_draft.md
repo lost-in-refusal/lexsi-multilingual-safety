@@ -26,10 +26,11 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
   accumulation steps (effective batch 32); 171 optimizer steps for the 1,800-row set; sequence limit 1,024 tokens.
 - **Decoding:** greedy, Tiny Aya's default chat template with its default system preamble, at most 256 new tokens
   for attack and XSTest prompts and 1,024 for task prompts.
-- **Compute:** 33 fine-tunes have a run record, 29.9 hours of training in all (a 1,800-row plain run takes about 75
-  minutes, SafeGrad about 88; a 600-row run about 25). The stage 2 queue had run for about 60 laptop hours by the
-  evening of Nov 22: about 21 hours of training, 13 of evaluation, 3 of combined train-and-evaluate steps, 10 of
-  re-generation at 1,024 tokens, 2 of task judging and 10 of other steps (probes, translation, second-judge checks).
+- **Compute:** 36 laptop fine-tunes have a run record, 31.5 hours of training in all (a 1,800-row plain run takes
+  about 75 minutes, SafeGrad about 88; a 600-row run about 25). The stage 2 queue ran for about 64 laptop hours up
+  to the freeze: about 21 hours of training, 13 of evaluation, 6 of combined train-and-evaluate steps, 10 of
+  re-generation at 1,024 tokens, and 12 of task judging and other steps (probes, translation, second-judge checks).
+  The GPU runs took 5.8 hours of one L4 in five jobs; a 600-row fine-tune took about 17 minutes there.
 - **Seeds:** 42, 1 and 2. The base model is evaluated once. Rows marked one seed are single runs.
 
 ## B. Method details to state in the paper
@@ -115,7 +116,13 @@ Deviations and things a reader should know:
 9. **Stage 1 explained the task-score drop by shorter answers. That does not hold.** With length groups fixed in
    advance (13h), answers as long as the base model's still score lower (plain -0.39 points, SafeGrad -0.67), and the
    drop sits in the judge's accuracy score. The stage 1 sentence is withdrawn.
-10. **Not run, or cut:** [fill in after the freeze: the GPU runs that were not launched by Nov 22, 9 PM].
+10. **Not run, or cut.** Every laptop run registered for the evening of Nov 22 was launched before the freeze (9 PM
+    ET) and finished. Not run: the two bfloat16 arms with the adapter left unmerged, which would separate 4-bit
+    loading from merging (12.2 review note; no upload by 10:10 PM); the AlignTune run (12.3; only its configuration
+    review is on record); the task set on the GPU (its judge does not fit an L4); seeds 1 and 2 of the GPU
+    single-language runs; the mixing baseline at seeds 1 and 2; and a re-generation of the seed 1 and 2
+    single-language answers, which was not registered. Cut earlier: the Korean clean set (H4), Check B and a third
+    judge.
 
 ## D. What the organizers' write-up layout asks for that the draft does not have yet
 
