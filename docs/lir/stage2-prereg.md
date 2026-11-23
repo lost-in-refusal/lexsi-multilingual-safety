@@ -483,6 +483,16 @@ GPU job: `lir-control`, ID `6b0356e0130a00b5aa8123e2`. Evaluation commit: `330eb
 
 Confidence: Medium, because the comparisons use one seed and model-judge verdicts, and generation configuration equivalence remains to be verified.
 
+**Added Nov 22, 8:53 PM ET by Mingyu, as a review note. Hannah's note above is unchanged.** `python -m lir.gpu` computes the numbers above again from the files the job uploaded (`results/lir/stage2/gpu.md`), and every one of them matches. On the point the note leaves open, whether the two machines ran the same configuration:
+
+- The prompt text is identical in all 1,164 attack rows and all 999 XSTest rows of both machines.
+- The batches are the same. `lir/generate.py` forms them from the prompts alone, by a rule that has not changed since the file was first committed on Nov 6, and the logs of both machines show 74 and then 96 prompts per batch on the attack set.
+- The library versions are the same: `requirements.txt` has not changed since Nov 6 and pins the versions in the job record (PyTorch 2.15.0, transformers 5.22.1, peft 0.21.2, tokenizers 0.23.3).
+- The plain adapter is the same file. The job ran before the job script pinned a revision (commit `4b51497`, 6:41 PM), but the adapter repository has had no commit since Nov 6, so the job downloaded the revision that is pinned now.
+- Of the answers that differ, 9 of 735 (base) and 20 of 532 (plain) differ from their first character. The others start like the laptop's answer (median shared start 118 and 84 characters) and depart later, and the token counts differ because the answers do.
+
+So what differs is the machine: Apple MPS on the laptop and NVIDIA CUDA in the job, both computing in bfloat16. That is the difference 12.0 set out to measure. This is description. No test separates it from a difference nobody has found.
+
 ### 12.1 A2. Training language and drift
 
 Question: which training language moves safety in which language?
@@ -524,6 +534,12 @@ Question: which training language moves safety in which language?
 All three single-language runs meet the registered Korean threshold, including the runs without Korean training rows. The Chinese-only run also significantly increased strict attack success in English and Chinese. These are single-seed findings; the additional language comparisons have no registered pass rule.
 
 All three runs used training/evaluation commit `649ce27efdd40c4fcf685a10ce130834430cbbd2`. The D18 GPU base control was used for the paired comparisons. Confidence: Medium, because the results are statistically significant on Korean but are limited to one seed and model-judge verdicts.
+
+**Added Nov 22, 8:53 PM ET by Mingyu, as a review note. Hannah's note above is unchanged.** Computed again with `python -m lir.gpu`; every number matches. Three things to read with it:
+
+- These runs were not blind. The same three fine-tunes had been trained and read on the laptop (section 13a, results known from Nov 22, 5:07 AM), and the first GPU run started at 4:30 PM that day. Against the laptop's base model the laptop's Korean rises were +12.0 (Korean rows), +7.9 (English rows) and +11.3 (Chinese rows).
+- They are the same fine-tunes on a second machine: each run record names the training file with the same hash as the laptop's file for that language, 600 rows, 57 steps, seed 42, and the final training loss agrees to three decimals (1.195, 1.681 and 1.658 for English, Korean and Chinese).
+- Of the evaluation listed above, the task set was not run: its judge does not fit an L4. XSTest was run and is in `gpu.md` with no pass rule: refusals on safe prompts fall in eleven of the twelve cells.
 
 ### 12.2 A3. NF4 quantization and safety
 
@@ -590,6 +606,15 @@ GPU job: `lir-nf4`, ID `6b03624d130a00b5aa813c6f`. D18 GPU job: `lir-control`, I
 D11 evaluation commit: `649ce27efdd40c4fcf685a10ce130834430cbbd2`. D18 evaluation commit: `330ebbab5860f8f8a891451f90b63c7e7d28a140`.
 
 Confidence: Medium, because comparisons use one seed and model-judge verdicts, and configuration equivalence across the evaluation runs remains to be verified.
+
+**Added Nov 22, 8:53 PM ET by Mingyu, as a review note. Hannah's note above is unchanged.** Computed again with `python -m lir.gpu`; every number matches. The review note of 6:50 PM above says what a report of Q1 and Q2 has to state when the two unmerged bfloat16 arms are not run. They had no upload when this was written, so:
+
+- For plain and SafeGrad, the NF4 arm differs from the bfloat16 arm in merging as well as in precision. The three significant rises for plain (English, Chinese, Swahili) can therefore not be put down to 4-bit loading alone.
+- For base there is no adapter, so its rise in English (5.5% to 11.0%, p = 0.0025) is a change of precision alone. It is also the only one of the twelve changes that stays significant at 0.05 divided by twelve.
+- Q2 compares two NF4 arms that are loaded the same way, so merging does not enter it.
+- The peak GPU memory in the resource table is the peak of a whole evaluation step. Both jobs ran at commits (`330ebba`, `649ce27`) in which generation and the guard ran in one process, so every figure includes the guard model and none shows what Tiny Aya needs. The split into two steps came later (`4b51497`). The table cannot support a memory saving from 4-bit loading.
+- Tokens per second were measured during generation alone. They depend on how long an arm's answers are, so they compare the two precisions of one arm and not one arm with another.
+- Eleven of the twelve changes under NF4 are upward and one is zero. That is description; no test was registered for it.
 
 ### 12.3 A4. AlignTune
 
