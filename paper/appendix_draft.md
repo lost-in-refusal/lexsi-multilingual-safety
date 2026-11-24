@@ -36,8 +36,10 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
   accumulation steps (effective batch 32); 171 optimizer steps for the 1,800-row set; sequence limit 1,024 tokens.
 - **Decoding:** greedy, Tiny Aya's default chat template with its default system preamble, at most 256 new tokens
   for attack and XSTest prompts and 1,024 for task prompts.
-- **Compute:** 36 laptop fine-tunes have a run record, 31.5 hours of training in all (a 1,800-row plain run takes
-  about 75 minutes, SafeGrad about 88; a 600-row run about 25). The stage 2 queue ran for about 64 laptop hours up
+- **Compute:** as of Nov 24, 1:30 AM ET, 42 laptop fine-tunes have a run record, 39.8 hours of training in all, and
+  three more are queued (section 14h); the count is redone at the final number audit. A 1,800-row plain run takes
+  about 78 minutes on average (75.7, 82.2 and 75.7 at the three seeds), SafeGrad about 88, and a 600-row run about
+  25. The stage 2 queue ran for about 64 laptop hours up
   to the freeze: about 21 hours of training, 13 of evaluation, 6 of combined train-and-evaluate steps, 10 of
   re-generation at 1,024 tokens, and 12 of task judging and other steps (probes, translation, second-judge checks).
   The GPU runs took 5.8 hours of one L4 in five jobs; a 600-row fine-tune took about 17 minutes there.
