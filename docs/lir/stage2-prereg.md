@@ -1363,6 +1363,56 @@ Cost: about three hours of laptop time, by the timings of section 8.
 
 Report: `python -m lir.morelangs again` writes `results/lir/stage2/more_languages_regen.md`. Its code is committed with this entry, before any answer in these languages is generated again.
 
+### 14g. The mixing baseline read again after re-generation at 1,024 tokens
+
+**Added Nov 23, 7:35 PM ET by Mingyu, after 14a was read and before any answer below was generated again.** The letter 14f is left for the control of the NF4 runs of 12.2, which is drafted and not registered.
+
+Question. M1 of 14a changed an argument of ours: with five copies of the refusal examples in the training data, Korean attack success came out below SafeGrad's (-2.7 points [-5.2, -0.5]), and with the examples added once no difference was detected (-0.5 [-2.9, +1.9]). Both were read on answers capped at 256 tokens, and the report of 14a ends with "Not done: no mixing arm, seed 42 included, has been generated again at 1,024 tokens." Do M1 and M2 come out on the same side when every capped answer is completed?
+
+Why it is not blind. 14a was read on Nov 23, at 8:37 AM and 1:05 PM, and every figure of it is known. So this reading cannot decide anything.
+
+What is generated. Every answer of the six mixing runs on the attack set and XSTest that reached the 256-token cap, 1,300 answers:
+
+| Run | Attack answers | XSTest answers |
+| --- | ---: | ---: |
+| `plain-mix1-s1` | 82 | 117 |
+| `plain-mix5-s1` | 91 | 131 |
+| `plain-mix1-s2` | 81 | 140 |
+| `plain-mix5-s2` | 76 | 133 |
+| `plain-mix1` (seed 42) | 79 | 133 |
+| `plain-mix5` (seed 42) | 91 | 146 |
+
+They are generated with `python -m lir.trunc regen`, the command of section 8, unchanged: a cap of 1,024 tokens, the same guard, and nothing under `runs/eval` is touched. SafeGrad at the three seeds and base were generated again under section 8 and are taken from there. The task set is not generated again, so M3 stays the figure of 14a.
+
+How it is read. `python -m lir.repeat mix-again` applies the code of 14a (`mix_result`) unchanged to the answers after re-generation and sets each figure beside the first reading: M1 (Korean strict attack success, mixing minus SafeGrad, seeds 1 and 2), M2 (English over-refusal, the same seeds) and the sentence for section 3, for each arm. Seed 42 is shown as in 14a and decides nothing.
+
+**This reading decides nothing.** M1 to M3 stand as read in `mixing/seeds.md`, and so do the sentences 14a gave for section 3.
+
+| For M1 and for M2 of each arm: the interval after re-generation | What we write |
+| --- | --- |
+| On the same side of zero as in 14a | the same on the capped answers and after re-generation |
+| On another side | differs after re-generation: both readings are given wherever it is used, and the reading of 14a stands |
+
+- If M1 of the five-copies arm is no longer below zero after re-generation, "five copies protected Korean better than SafeGrad" is written with both readings wherever it is used.
+- If M1 of the one-copy arm moves below or above zero after re-generation, that is said wherever the comparison is used. It does not become a result of 14a.
+- If 30 or more of the answers a check reads in one run still reach the cap at 1,024 tokens (of its 291 Korean attack answers for M1, of its 250 English XSTest answers for M2), the second reading is given with that caveat.
+
+Beside, with no rule:
+
+- Five copies against one, at the same seed on the same prompts, seeds 1 and 2: Korean strict attack success and English over-refusal, five copies minus one, on the capped answers and after re-generation. 14a did not test the two arms against each other. Both have been read against SafeGrad, so the size of this difference can be guessed (about -2 points in Korean). It is an estimate and decides nothing. Its value has not been looked at when this is written: a test run of the new code computed it on the capped answers and did not print it.
+- M1 on the guard's Unsafe class alone and M2 in the other three languages, after re-generation.
+- For each run, how many Korean attack answers and English XSTest answers were generated again, how many continue the capped answer, and how many still reach the cap.
+
+What it needs. Both runs of an arm at seeds 1 and 2 generated again in full on both sets. An arm without that is listed as not read again, and the other arm is read alone. The four runs at seeds 1 and 2 are generated first, then the two at seed 42. A run not started by Tuesday Nov 24, 9 PM ET is listed as not run.
+
+What we know as this is written: every result in this file up to here, among them both arms of 14a at three seeds, 14b and 14d. The re-generation of 14e is running. No answer of a mixing run has been generated again.
+
+Not waited for. The team asks Ram on Tuesday morning in which order to use the rest of the extension. This entry does not wait for his answer, because the laptop is free on Monday night. It costs laptop time only.
+
+Cost: 1,300 answers, about one and a half hours, through the laptop queue behind 14e.
+
+Report: `python -m lir.repeat mix-again` writes `results/lir/stage2/mixing/seeds_regen.md`. Its code and tests are committed with this entry, before any answer of a mixing run is generated again.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

@@ -5,6 +5,7 @@
   python -m lir.repeat k1       # K1 on re-generated answers -> results/lir/stage2/truncation/k1.{json,md}
   python -m lir.repeat earth    # E1 on three seeds          -> results/lir/stage2/earth/seeds.{json,md}
   python -m lir.repeat mix      # M1 to M3 of section 14a    -> results/lir/stage2/mixing/seeds.{json,md}
+  python -m lir.repeat mix-again   # 14a again after re-generation (14g) -> results/lir/stage2/mixing/seeds_regen.{json,md}
 
 Each command reads files only. It prints "pending" and writes nothing until every arm of its block is fully judged,
 and it stops if a run record does not show the model, seed, training file and refusal examples that were registered.
@@ -562,6 +563,127 @@ def mix(a) -> None:
     write(OUT / "mixing" / "seeds", res, mix_md(res))
 
 
+# ---------------------------------------------------------------- 14g, the mixing baseline read again after re-generation
+
+MIX_AGAIN_ROWS = {True: "the same on the capped answers and after re-generation",
+                  False: "differs after re-generation: both readings are given wherever it is used, and the reading of 14a stands"}
+MIX_STILL_CUT = 30   # answers of one run that a check reads (Korean attack, English XSTest) still cut at 1,024 tokens
+
+
+def copies_result(att: dict[str, dict], xs: dict[str, dict], one: dict[int, str], five: dict[int, str],
+                  new: tuple[int, ...] = MIX_NEW) -> dict:
+    """Five copies of the refusal examples against one, at the same seed on the same prompts, pooled over the new
+    seeds: Korean strict attack success and English over-refusal, five copies minus one. Beside, with no rule."""
+    ko = pooled([diff(by_family(att[one[s]], STRICT), by_family(att[five[s]], STRICT), "ko") for s in new])
+    en = pooled([diff(by_family(xs[one[s]], REFUSAL), by_family(xs[five[s]], REFUSAL), "en") for s in new])
+    return {"ko_strict": dict(ko, side=side(ko)), "en_over_refusal": dict(en, side=side(en))}
+
+
+def mix_again_result(first: dict, att0: dict[str, dict], xs0: dict[str, dict], att1: dict[str, dict], xs1: dict[str, dict],
+                     task: dict[str, dict], arms: dict[str, dict[int, str]] = MIX, safegrad: dict[int, str] | None = None,
+                     new: tuple[int, ...] = MIX_NEW) -> dict:
+    """Section 14g. The code of 14a, unchanged, on the answers after re-generation (att1, xs1: run -> rows merged by
+    trunc.merge), set beside the first reading. It decides nothing: `first` is the reading that stands. The task set
+    is not generated again, so M3 is the figure of the first reading."""
+    safegrad = safegrad or {seed: pair[1] for seed, pair in SEEDS.items()}
+    res = mix_result(att1, xs1, task, arms, safegrad, new)
+    for arm, r in res["arms"].items():
+        f = first["arms"][arm]
+        vs = {"m1": {"first": f["m1"]["side"], "after": r["m1"]["side"]},
+              "m2": {"first": f["m2"]["side"], "after": r["m2"]["side"]},
+              "section3": {"first": f["section3_report"], "after": r["section3_report"]}}
+        for d in vs.values():
+            d["same"] = d["first"] == d["after"]
+        r["against_first"] = vs
+    count = lambda rows, lang: {"answers": sum(r["lang"] == lang for r in rows.values()),
+                                "again": sum(r["regenerated"] for r in rows.values() if r["lang"] == lang),
+                                "continued": sum(r["regenerated"] and r["same_start"] for r in rows.values() if r["lang"] == lang),
+                                "still_cut": sum(r["regenerated"] and bool(r["truncated"]) for r in rows.values() if r["lang"] == lang)}
+    runs = [run for arm in res["arms"] for s, run in arms[arm].items() if s in res["arms"][arm]["seeds"]]
+    runs += [safegrad[s] for s in safegrad if any(s in res["arms"][arm]["seeds"] for arm in res["arms"])]
+    res["regenerated"] = {run: {"ko_attack": count(att1[run], "ko"), "en_xstest": count(xs1[run], "en")} for run in runs}
+    res["still_cut_caveat"] = [f"{run}: {what}" for run, v in res["regenerated"].items() for what, c in v.items()
+                               if c["still_cut"] >= MIX_STILL_CUT]
+    names = list(arms)
+    if len(names) == 2 and all(a in res["arms"] for a in names):   # five copies against one, beside, with no rule
+        one, five = arms[names[0]], arms[names[1]]
+        if all(one[s] in att0 and five[s] in att0 and one[s] in xs0 and five[s] in xs0 for s in new):
+            res["five_against_one"] = {"capped": copies_result(att0, xs0, one, five, new),
+                                       "after": copies_result(att1, xs1, one, five, new)}
+    return res
+
+
+def mix_again_md(res: dict, first: dict) -> str:
+    new = " and ".join(str(s) for s in res["new_seeds"])
+    yn = lambda d: "yes" if d["same"] else "**no**"
+    both = lambda a, b: f"{ci(a)}, {WHERE[side(a)]} | {ci(b)}, {WHERE[side(b)]}"
+    lines = ["### The mixing baseline, read again after re-generation at 1,024 tokens (section 14g)", "",
+             "Every answer of the mixing runs on the attack set and XSTest that reached the 256-token cap was generated again "
+             "with a cap of 1,024 tokens and judged by the same guard. SafeGrad and base are taken after their own "
+             "re-generation (section 8). The code of 14a is applied unchanged. **This reading decides nothing: M1 to M3 stand "
+             "as read in `mixing/seeds.md`.** It was registered after that report had been read, so it is not blind. "
+             f"The decision seeds are {new}, as in 14a. Intervals are 95%, from a bootstrap over prompts with each prompt's "
+             "difference averaged over the seeds.", ""]
+    if res["waiting"]:
+        lines += ["**Read for " + ", ".join(f"`{a}`" for a in res["arms"]) + " only.** Not generated again in full at the new seeds: "
+                  + ", ".join(f"`{a}`" for a in res["waiting"]) + ".", ""]
+    for arm, r in res["arms"].items():
+        f, vs = first["arms"][arm], r["against_first"]
+        lines += [f"#### `{arm}`: {MIX_NAMES.get(arm, arm)}", "",
+                  "| | Capped at 256 tokens (the reading that stands) | After re-generation | Same |", "|---|---|---|---|",
+                  f"| M1, Korean strict attack success, mixing minus SafeGrad, seeds {new} | {both(f['m1'], r['m1'])} | {yn(vs['m1'])} |",
+                  f"| M2, English over-refusal, mixing minus SafeGrad, seeds {new} | {both(f['m2'], r['m2'])} | {yn(vs['m2'])} |",
+                  f"| The sentence for section 3 | {f['section3_report']} | {r['section3_report']} | {yn(vs['section3'])} |", "",
+                  f"- M1: {MIX_AGAIN_ROWS[vs['m1']['same']]}.", f"- M2: {MIX_AGAIN_ROWS[vs['m2']['same']]}.",
+                  f"- M3, the task score, is not read again: the task set is not part of the re-generation. It stays {ci2(f['m3'])}, "
+                  f"{WHERE[f['m3']['side']]}.", "",
+                  "| Seed | Decides | Korean strict attack success, SafeGrad | Mixing | Difference | English over-refusal, SafeGrad | Mixing | Difference |",
+                  "|---|---|---:|---:|---:|---:|---:|---:|"]
+        for s, row in r["seeds"].items():
+            k, o = row["ko_strict"], row["over_refusal"]["en"]
+            lines.append(f"| {s} | {'yes' if row['new'] else 'no, seen before'} | {k['safegrad']:.1f} | {k['mixing']:.1f} | {k['delta']:+.1f}{star(k)} ({pv(k['p'])}) "
+                         f"| {o['safegrad']:.1f} | {o['mixing']:.1f} | {o['delta']:+.1f}{star(o)} ({pv(o['p'])}) |")
+        lines += ["", "After re-generation. * = p < 0.05, exact McNemar on the same prompts. Rates in %, differences in points.", "",
+                  f"- Beside, no rule, after re-generation. M1 on the guard's Unsafe class alone: {ci(r['beside']['m1_unsafe_only'])}. "
+                  "Over-refusal in the other languages, mixing minus SafeGrad: "
+                  + "; ".join(f"{l} {ci(d)}" for l, d in r["beside"]["over_refusal"].items()) + ".", ""]
+    if "five_against_one" in res:
+        c, a = res["five_against_one"]["capped"], res["five_against_one"]["after"]
+        lines += [f"Five copies against one, at the same seed on the same prompts, seeds {new}. Beside, with no rule, and computed "
+                  "after both arms had been read against SafeGrad. Korean strict attack success, five copies minus one: "
+                  f"{ci(c['ko_strict'])} on the capped answers, {ci(a['ko_strict'])} after re-generation. English over-refusal: "
+                  f"{ci(c['en_over_refusal'])} and {ci(a['en_over_refusal'])}.", ""]
+    lines += ["Answers generated again, of those that continue the capped answer, and still cut at 1,024 tokens:", "",
+              "| Run | Korean attack answers: again | continue | still cut | English XSTest answers: again | continue | still cut |",
+              "|---|---:|---:|---:|---:|---:|---:|"]
+    for run, v in res["regenerated"].items():
+        k, e = v["ko_attack"], v["en_xstest"]
+        lines.append(f"| `{run}` | {k['again']} of {k['answers']} | {k['continued']} | {k['still_cut']} | {e['again']} of {e['answers']} | {e['continued']} | {e['still_cut']} |")
+    lines += ["", ("Still cut at 1,024 tokens in " + str(MIX_STILL_CUT) + " or more of the answers a check reads: "
+                   + "; ".join(res["still_cut_caveat"]) + ". The second reading is given with that caveat.") if res["still_cut_caveat"]
+              else f"No run has {MIX_STILL_CUT} or more of the answers a check reads still cut at 1,024 tokens.", "",
+              runs_note(res["runs"])]
+    return "\n".join(lines)
+
+
+def mix_again(a) -> None:
+    safegrad = {seed: pair[1] for seed, pair in SEEDS.items()}
+    runs = ["base"] + list(safegrad.values()) + [run for arm in MIX.values() for run in arm.values()]
+    sizes = {"attack": len(read_jsonl(DATA / "multijail_attack.jsonl")), "xstest": len(load("base", "xstest")),
+             "task": len(load(safegrad[42], "task"))}
+    att0, xs0, task = (judged(runs, name, sizes[name]) for name in ("attack", "xstest", "task"))
+    att1 = {run: rows for run in runs if (rows := trunc.after(run, "attack")) is not None}
+    xs1 = {run: rows for run in runs if (rows := trunc.after(run, "xstest")) is not None}
+    first = json.loads((OUT / "mixing" / "seeds.json").read_text())
+    res = mix_again_result(first, att0, xs0, att1, xs1, task)
+    if not res["arms"]:
+        print("pending, nothing written: no mixing arm has both new runs generated again in full on the attack set and XSTest")
+        return
+    done = [MIX[arm][s] for arm in res["arms"] for s in res["arms"][arm]["seeds"]]
+    res["runs"] = run_lines(done + [safegrad[s] for s in safegrad])
+    write(OUT / "mixing" / "seeds_regen", res, mix_again_md(res, first))
+
+
 def write(stem, res: dict, md: str) -> None:
     stem.parent.mkdir(parents=True, exist_ok=True)
     write_json(stem.with_suffix(".json"), res)
@@ -571,9 +693,9 @@ def write(stem, res: dict, md: str) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["aya", "k1", "earth", "mix"])
+    ap.add_argument("what", choices=["aya", "k1", "earth", "mix", "mix-again"])
     a = ap.parse_args()
-    {"aya": aya, "k1": k1, "earth": earth, "mix": mix}[a.what](a)
+    {"aya": aya, "k1": k1, "earth": earth, "mix": mix, "mix-again": mix_again}[a.what](a)
 
 
 if __name__ == "__main__":
