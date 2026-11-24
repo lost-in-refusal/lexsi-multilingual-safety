@@ -113,6 +113,9 @@ NOT_REBUILT = [
     (("second_benchmark_regen.json", "second_benchmark_regen.md"),
      "`python -m lir.xsunsafe again` reads the answers of the ten arms to the unsafe prompts of XSTest that were generated "
      "again, and their verdicts, which are not published yet"),
+    (("quantization_gate.json", "quantization_gate.md"),
+     "`python -m lir.quantize gate` loads the model once for every plan it measures, in the environment with CircuitKIT "
+     "and optimum-quanto"),
     (("quantization_plan.json",),
      "`python -m lir.quantize plan` reads the stage 1 score files and loads no model, but it needs CircuitKIT, which is "
      "not in this repository, in an environment of its own"),

@@ -1855,6 +1855,19 @@ Order and cost. The gate: `bf16`, `int4` and up to 16 measurements of mixed plan
 
 The commands, the plan file and their tests (`lir/quantize.py`, `tests/test_quantize.py`) are committed with this section, before the gate runs.
 
+**Added Nov 24, 4:32 PM ET by Mingyu, after the gate and before any arm is queued.**
+
+- What ran. Queue line 279, `python -m lir.quantize gate`, from 3:26 PM to 4:31 PM on Nov 24, return code 0, at commit `c24be82` with no uncommitted change. It measured 14 models: `bf16`, `int4`, and the circuit plan and the three random plans at 3 tier sizes. No attack prompt was answered and no guard read anything. The twenty short answers per model are kept in `runs/quant/gate.json` and were not read.
+- The limit. The perplexity of `bf16` is 6.21, so a model passes at 12.43 or below.
+- `int4`: 6.49, 1.04 times that of `bf16`. It passes.
+- With 7, 15 and 14 layers at 8, 4 and 2 bits: the circuit plan 15.92 (2.56 times), the random plans 23.83 (3.84), 51.91 (8.35), 22.82 (3.67). Passing: none; the size is not used.
+- With 5, 21 and 10 layers at 8, 4 and 2 bits: the circuit plan 10.72 (1.72 times), the random plans 12.33 (1.98), 18.09 (2.91), 13.37 (2.15). Passing: `circuit`, `random-0`; the size is not used.
+- With 3, 27 and 6 layers at 8, 4 and 2 bits: the circuit plan 7.81 (1.26 times), the random plans 9.12 (1.47), 9.04 (1.45), 8.95 (1.44). All four pass.
+- **By the table: "The plans with 3 layers at 8 bits, 27 at 4 bits and 6 at 2 bits pass the gate and are the ones evaluated."**
+- The arms are therefore `bf16`, `int4`, and `circuit`, `random-0`, `random-2` and `random-4` with 3 layers at 8 bits, 27 at 4 bits and 6 at 2 bits. At that size the three random plans agree with the circuit plan in 43, 44, 40 of the 72 layer slots.
+- Beside, with no rule. At every tier size measured the circuit plan's perplexity was the lowest of the four plans. Section 15 has no test for that, and three random plans are three plans.
+- The gate's files as read: `results/lir/stage2/quantization_gate.md`, sha256 `d12514f27e3e701be4dcc2d758b47799096f7971ccabe738d253522755044655`, and `quantization_gate.json`, sha256 `184687eaaa9f8b76e0ffea2c2d37ba19163d9f19f647a37658268926df646933`, committed with this note as the queue wrote them.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
