@@ -1377,6 +1377,12 @@ Report: `python -m lir.morelangs again` writes `results/lir/stage2/more_language
 - The report as read: `results/lir/stage2/more_languages_regen.md`, sha256 `849e50f8858f401c81d59a822e5269994a5f7240c7191b85b73f1cb6dc0b8529`, and `more_languages_regen.json`, sha256 `63a9b5092a99dfb6a3c69860564114b4ecc0995f8d20630e31bb2ae5872a15b6`, committed with this note as the queue wrote them.
 - Not uploaded to Hugging Face when this was written: the answers generated again and their verdicts.
 
+**Added Nov 23, 9:27 PM ET by Mingyu: one correction to the note above and one addition.**
+
+- Correction. The note says no verdict of this block was opened before the report existed. More exactly: no verdict was printed or looked at. The file check that ran as each line ended called the merging code (`lir.morelangs.after`), which loads the verdict files, and it printed only the number of answers, the number of verdicts and whether the merge worked.
+- Addition: the tests per seed. The note above compared the pooled intervals of the two readings. The JSON also holds 54 exact McNemar tests per seed (three seeds, six languages; refusals under plain against base, refusals under SafeGrad against plain, and strict attack success under plain against base), with no rule and not adjusted for their number. Five are on a different side of p = 0.05 than on the capped answers. Bengali, strict attack success, plain against base, at every seed: +2.4 (p = 0.349), +0.7 (p = 0.878) and +1.7 (p = 0.533) capped; +6.2 (p = 0.006), +4.5 (p = 0.047) and +6.2 (p = 0.006) after re-generation. Arabic, the same test at seed 42: +3.8 (p = 0.080) capped and +4.8 (p = 0.020) after. Bengali, refusals under plain against base at seed 1, the test named in the note under 14b: +4.8 (p = 0.024) capped and +3.8 (p = 0.099) after.
+- What is done with them. The same as with the four pooled intervals: no sentence is built on them, and where the capped sentence about Bengali refusals at seed 1 is used, the figure after re-generation is given beside it. The line "Every refusal-rate interval by language is on the same side in both readings" is about the pooled intervals.
+
 ### 14g. The mixing baseline read again after re-generation at 1,024 tokens
 
 **Added Nov 23, 7:35 PM ET by Mingyu, after 14a was read and before any answer below was generated again.** The letter 14f is left for the control of the NF4 runs of 12.2, which is drafted and not registered.
