@@ -1664,6 +1664,62 @@ Report: `python -m lir.xsunsafe report` writes `results/lir/stage2/second_benchm
 - The report as read: `results/lir/stage2/second_benchmark.md`, sha256 `274431b9a0678b3b875b95f120d37449da4180f79af15def3c631af8b18e3c7a`, and `second_benchmark.json`, sha256 `873acb23debcc06d399105aa71ea8a6ba75ae4255ffd7f0cd7c0187dd0d0570f`, committed with this note as the queue wrote them, together with the prompts file and its manifest.
 - Not uploaded to Hugging Face when this was written: the prompts, the answers and the verdicts.
 
+### 14j. The second safety benchmark read again after re-generation at 1,024 tokens
+
+**Added Nov 24, 10:23 AM ET by Mingyu, after 14i was read and before any answer below was generated again.**
+
+Question. X1 to X4 of 14i were read on answers capped at 256 tokens, and the report of 14i ends with "Not done on this benchmark: ... generating capped answers again at 1,024 tokens". On these prompts the base model's answers reach the cap far more often than the fine-tuned models' do: 35.5% of its Korean answers, against 3.5% to 6.5% for the three plain runs. The guard reads a capped answer as far as it goes, so X1 compares arms whose answers were cut at different rates. Do X1 to X4 come out on the same side when every capped answer is completed?
+
+Why it is not blind. 14i was read on Nov 24 at 10:15 AM, and every figure of it is known. So this reading cannot decide anything.
+
+What is generated. Every answer of the ten arms of 14i that reached the 256-token cap, 652 answers:
+
+| Arm | English | Korean | Chinese | Swahili | All |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `base` | 19 | 71 | 46 | 49 | 185 |
+| `plain` | 2 | 13 | 2 | 35 | 52 |
+| `safegrad` | 11 | 18 | 8 | 35 | 72 |
+| `plain-s1` | 0 | 9 | 4 | 25 | 38 |
+| `safegrad-s1` | 8 | 20 | 8 | 27 | 63 |
+| `plain-s2` | 2 | 7 | 2 | 30 | 41 |
+| `safegrad-s2` | 9 | 19 | 14 | 34 | 76 |
+| `plain-mix5` | 3 | 13 | 5 | 19 | 40 |
+| `plain-mix5-s1` | 0 | 9 | 7 | 27 | 43 |
+| `plain-mix5-s2` | 3 | 15 | 7 | 17 | 42 |
+
+They are generated with `python -m lir.xsunsafe regen --arm <arm>`: the prompt of each capped answer, greedy decoding, a cap of 1,024 tokens, the same guard. The output goes under `runs/xsunsafe-trunc/`, and nothing under `runs/xsunsafe` is touched. An answer that was not cut keeps its first answer and its first verdict. The command and its tests are committed with this entry; a dry run of it printed the counts in the table and generated nothing.
+
+How it is read. `python -m lir.xsunsafe again` applies the code of 14i (`result`) unchanged to the answers after re-generation and sets each of X1 to X4 beside the first reading, in `results/lir/stage2/second_benchmark_regen.md`. The files of 14i are not written again.
+
+**This reading decides nothing.** X1 to X4 stand as read in `second_benchmark.md`, and so do their four sentences.
+
+| For each of X1 to X4: the interval after re-generation | What we write |
+| --- | --- |
+| On the same side of zero as in 14i | the same on the capped answers and after re-generation |
+| On another side | differs after re-generation: both readings are given wherever it is used, and the reading of 14i stands |
+
+- The side of every interval is compared with 14i's, whatever X1 does. The code of 14i prints no sentence for X3 and X4 when X1 is not above zero; here their intervals are still set beside the first reading.
+- If X1 is no longer above zero we write: "After re-generation the Korean rise on the second benchmark is not above zero: X1 is given with both readings wherever it is used, and X3 and X4 are given with the note that on completed answers the rise they take back was not detected."
+- If 20 or more of the 200 answers that a check reads in one arm and language still reach the cap at 1,024 tokens, that check's second reading is given with that caveat. X1 reads the Korean answers of base and the three plain runs; X2 reads their Korean and English answers; X3 the Korean answers of the plain and SafeGrad runs; X4 the Korean answers of the plain and five-copies runs. (In 14e and 14g the line was 30 of 291.)
+
+What we know as this is written. Everything in 14i and its note: the four intervals, the table, the per-seed figures, and how many answers of each arm reached the cap. After the report of 14i existed, the guard files were opened to recount the Korean and English strict rates per arm, and one Korean row of the base model was printed: the first 60 characters of its answer, and its verdict. No answer has been generated again, and nothing is known about what a completed answer says or how the guard reads it. We do not predict a side. On MultiJail the checks that were read a second time came out the same; that is no finding about this benchmark.
+
+What it can and cannot show.
+
+- It shows whether the four sides depend on where the answers were cut. It does not test the guard, which no person has checked on these answers, or the translations.
+- A completed answer may still be cut at 1,024 tokens. The report counts those, per arm and language.
+- A check that differs gets both readings wherever it is used. It does not become a result of 14i, and it does not undo one.
+
+What we will not write. What 14i lists: that the drift or a repair generalises; a comparison of sizes with MultiJail; that one repair is the better one; anything about Chinese or Swahili beyond the table. And nothing on why a figure moved between the two readings.
+
+Shown beside, with no rule: the table of 14i for each language on both readings; Korean per seed after re-generation with exact McNemar tests; five copies minus SafeGrad in Korean on both readings; and for each arm and language how many answers were generated again, how many continue the capped answer, and how many still reach the cap.
+
+What it needs. X1 to X3 are read again once base and the six plain and SafeGrad runs are generated again in full. X4 needs the three mixing runs as well and is listed as not read again without them. The order is base, plain and SafeGrad seed by seed, then the three mixing runs, so that X1 to X3 can be read if the block stops early. An arm not started by Tuesday Nov 24, 9 PM ET is listed as not run.
+
+Order and cost. Through the laptop queue, which has been idle since 10:04 AM: ten lines and the report. In 14g, 1,300 answers took 94 minutes; these 652 should take about an hour.
+
+Aish can amend this entry before the report is read.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

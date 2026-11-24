@@ -2226,3 +2226,100 @@ class SecondBenchmark(unittest.TestCase):
         prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
         for sentence in [*X1_ROWS.values(), *X2_ROWS.values(), *X3_ROWS.values(), *X4_ROWS.values(), NOT_READ]:
             self.assertIn(sentence, prereg)   # the report can only say what section 14i registered
+
+    # ---- section 14j: the same block read again after re-generation
+
+    def merged(self, d, still_cut=()):
+        """Rows as lir.trunc.merge returns them. The arms in still_cut have every Korean answer generated again and
+        still at the cap."""
+        return {arm: {u: dict(r, regenerated=arm in still_cut and r["lang"] == "ko", same_start=True,
+                              truncated=arm in still_cut and r["lang"] == "ko") for u, r in rows.items()}
+                for arm, rows in d.items()}
+
+    def test_only_the_cut_answers_are_generated_again(self):
+        from lir.xsunsafe import ANSWER_FIELDS, capped
+
+        rows = {"a": {"uid": "a", "family": "f1", "lang": "ko", "prompt": "p", "response": "r", "n_tokens": 256, "truncated": True,
+                      "safety": "Safe", "categories": [], "refusal": "No", "guard_raw": "x"},
+                "b": {"uid": "b", "family": "f2", "lang": "ko", "prompt": "q", "response": "r", "n_tokens": 12, "truncated": False,
+                      "safety": "Safe", "categories": [], "refusal": "Yes", "guard_raw": "x"}}
+        todo = capped(rows)
+        self.assertEqual(todo, [{"uid": "a", "family": "f1", "lang": "ko", "prompt": "p"}])   # no answer and no verdict goes along
+        self.assertFalse(set(todo[0]) & set(ANSWER_FIELDS))
+
+    def test_an_arm_is_read_again_only_when_exactly_its_cut_answers_have_a_new_verdict(self):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        from lir import xsunsafe
+        from lir.common import write_jsonl
+
+        rows = [{"uid": f"u{i}", "family": f"f{i}", "lang": "ko", "response": "the start of an answer", "truncated": i < 2,
+                 "safety": "Safe", "refusal": "No"} for i in range(4)]
+        new = lambda uid, **kw: dict(uid=uid, family="f", lang="ko", response="the start of an answer, and its end",
+                                     truncated=False, safety="Unsafe", refusal="No", **kw)
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            with mock.patch.object(xsunsafe, "OUT_RUNS", tmp / "first"), mock.patch.object(xsunsafe, "REGEN_RUNS", tmp / "again"):
+                (tmp / "first" / "base").mkdir(parents=True)
+                (tmp / "again" / "base").mkdir(parents=True)
+                write_jsonl(tmp / "first" / "base" / "unsafe.guard.jsonl", rows)
+                self.assertIsNone(xsunsafe.after("base", 4))                              # nothing generated again yet
+                for part in ([new("u0")], [new("u0"), new("u1"), new("u2")], [new("u0"), new("u0")],
+                             [new("u0"), dict(new("u1"), safety=None)]):
+                    write_jsonl(tmp / "again" / "base" / "unsafe.guard.jsonl", part)
+                    self.assertIsNone(xsunsafe.after("base", 4))                          # one missing, one too many, twice, unjudged
+                write_jsonl(tmp / "again" / "base" / "unsafe.guard.jsonl", [new("u0"), new("u1")])
+                got = xsunsafe.after("base", 4)
+                self.assertEqual([got[u]["regenerated"] for u in ("u0", "u1", "u2", "u3")], [True, True, False, False])
+                self.assertEqual((got["u0"]["safety"], got["u2"]["safety"]), ("Unsafe", "Safe"))
+                self.assertTrue(got["u0"]["same_start"])
+                self.assertEqual(xsunsafe.read_jsonl(tmp / "first" / "base" / "unsafe.guard.jsonl"), rows)   # the first reading is not touched
+
+    def test_the_second_reading_sets_sides_beside_the_first_and_decides_nothing(self):
+        from lir.xsunsafe import AGAIN_ROWS, MIX, X1_MOVED, again_md, again_result, result
+
+        first = result(self.data(), mix=MIX)
+        res = again_result(first, self.merged(self.data()), mix=MIX)
+        self.assertEqual({k: v["same"] for k, v in res["against_first"].items()}, {"x1": True, "x2": True, "x3": True, "x4": True})
+        self.assertIsNone(res["x1_moved_report"])
+        self.assertEqual(res["still_cut_caveat"], {"x1": [], "x2": [], "x3": [], "x4": []})
+        md = again_md(res, first)
+        self.assertIn("This reading decides nothing", md)
+        self.assertEqual(md.count(AGAIN_ROWS[True]), 4)
+        self.assertNotIn(AGAIN_ROWS[False], md)
+        self.assertNotIn(X1_MOVED, md)
+
+    def test_a_rise_that_is_gone_after_re_generation_is_said_and_every_side_is_still_compared(self):
+        from lir.xsunsafe import AGAIN_ROWS, MIX, X1_MOVED, again_md, again_result, result
+
+        first = result(self.data(), mix=MIX)
+        res = again_result(first, self.merged(self.data(plain=(), safegrad=(), mixing=())), mix=MIX)   # completed, nobody is unsafe
+        self.assertEqual(res["against_first"]["x1"], {"first": "above", "after": "includes", "same": False})
+        self.assertIsNone(res["x3_report"])                              # 14i's code reads no repair without a rise
+        self.assertEqual(res["against_first"]["x3"], {"first": "below", "after": "includes", "same": False})   # 14j compares it all the same
+        self.assertEqual(res["against_first"]["x4"]["same"], False)
+        self.assertEqual(res["x1_moved_report"], X1_MOVED)
+        md = again_md(res, first)
+        self.assertIn(X1_MOVED, md)
+        self.assertIn(AGAIN_ROWS[False], md)
+        self.assertIn("X4 is not read again", again_md(res, first, ["plain-mix5-s2"]))
+
+    def test_answers_still_cut_at_the_longer_cap_put_a_caveat_on_the_checks_that_read_them(self):
+        from lir.xsunsafe import MIX, STILL_CUT, again_md, again_result, result
+
+        self.assertEqual(STILL_CUT, 20)                                  # of 200, as 30 of 291 was in 14e and 14g
+        first = result(self.data(), mix=MIX)
+        res = again_result(first, self.merged(self.data(), still_cut=("safegrad-s1",)), mix=MIX)   # 20 Korean answers still cut
+        self.assertEqual(res["regenerated"]["safegrad-s1"]["ko"], {"again": 20, "continued": 20, "still_cut": 20})
+        self.assertEqual(res["still_cut_caveat"], {"x1": [], "x2": [], "x3": ["safegrad-s1 ko"], "x4": []})
+        self.assertIn("X3 after re-generation carries a caveat", again_md(res, first))
+
+    def test_registered_wording_of_the_second_reading(self):
+        from lir.common import ROOT
+        from lir.xsunsafe import AGAIN_ROWS, X1_MOVED
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        for sentence in [*AGAIN_ROWS.values(), X1_MOVED]:
+            self.assertIn(sentence, prereg)   # the second reading can only say what section 14j registered
