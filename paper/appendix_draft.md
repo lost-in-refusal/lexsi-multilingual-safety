@@ -110,7 +110,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 23, 4:32 PM (Mingyu), under the deadline extension, after 14b was read | Section 14e: the six languages read again after every capped answer is generated again at 1,024 tokens. It decides nothing | U1, U2 and the row of U3 are the same after re-generation: U1 -4.7 [-6.7, -2.7], U2 +6.3 [+4.5, +8.0], and Korean's rise minus each language's kept its side. Beside, with no rule: in Bengali the guard's strict attack success under plain is above base after re-generation (+5.6 [+1.7, +9.3]; +1.6 [-2.5, +5.6] capped) |
 | Nov 23, 7:35 PM (Mingyu), under the deadline extension, after 14a was read | Section 14g: the mixing baseline read again after every capped answer of the six mixing runs is generated again at 1,024 tokens. It decides nothing | M1 and M2 are the same after re-generation for both arms. Korean against SafeGrad: five copies -2.6 [-5.0, -0.5], the examples once -0.3 [-2.7, +1.9]. English over-refusal against SafeGrad: +5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]. Beside, with no rule: five copies against one, -2.2 [-4.1, -0.5] in Korean |
 | Nov 23, 7:40 PM (Mingyu), under the deadline extension | Section 14h: plain at seed 42 with the learning rate and the number of epochs each halved and doubled (S1 and S2; S3 for the task score was added on Nov 23 at 11:22 PM, before any run was evaluated; no prediction tested) | Read on Nov 24: S1 rows 1, 1, 1, 1 (the drift appeared at all four settings), S2 above zero at all four, S3 below zero at all four; our forecast that the weaker runs would drift less did not hold |
-| Nov 23, 11:42 PM (Mingyu), under the deadline extension | Section 14i: a second safety benchmark, the 200 unsafe prompts of XSTest in four languages (X1 to X4), evaluation only | Not read when this was written |
+| Nov 23, 11:42 PM (Mingyu), under the deadline extension | Section 14i: a second safety benchmark, the 200 unsafe prompts of XSTest in four languages (X1 to X4), evaluation only | Read on Nov 24: X1 and X2 above zero; X3 and X4, read because X1 is above zero, below zero. The Korean drift and both repairs show on the second benchmark |
 
 Deviations and things a reader should know:
 
@@ -182,7 +182,8 @@ The recommended layout on hackathon.lexsi.ai marks these as required or as value
   baseline itself ran at seeds 1 and 2 under the extension); a second labeller for the Korean reading (one person has read 261 of the 291 Korean prompts at seed 42 in two
   checks, and neither reached significance);
   the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; in the six further untrained languages, a person's check of the guard, a re-translation check as for Swahili, and over-refusal and task sets; the Fire and Water models; LoRA
-  rank sensitivity, and more seeds at each learning rate and number of epochs; a second safety benchmark.
+  rank sensitivity, and more seeds at each learning rate and number of epochs; on the second safety benchmark, a
+  person's check of the guard and of the translations, and the capped answers generated again.
 - **"Declaration of work done outside the hackathon" (required):** for the team to state.
 - **"Results on the quantized / deployed model (GGUF, 4-bit)" (Track 2b line):** filled by the NF4 runs of 12.2
   (`gpu.md`): SafeGrad stays below plain on Korean under 4-bit loading, and 4-bit loading raises the base model's

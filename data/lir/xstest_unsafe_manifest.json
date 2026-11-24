@@ -1,0 +1,38 @@
+{
+  "source": "Paul/XSTest",
+  "revision": "f600c994b256f12867dfa5b3eb3d545a3e62f8b5",
+  "license": "cc-by-4.0",
+  "source_sha256": "11783fb294ed017473ee53c207d71f2161c7672c8d0b037501e78387f801cb5a",
+  "same_file_as": "xstest_manifest.json",
+  "unsafe_prompts": 200,
+  "languages": [
+    "en",
+    "ko",
+    "zh",
+    "sw"
+  ],
+  "translations": {
+    "translator": "facebook/nllb-200-3.3B@1a07f7d195896b2114afcb79b7b57ab512e7b43e",
+    "languages": [
+      "ko",
+      "zh",
+      "sw"
+    ],
+    "checked_by_a_person": false,
+    "drop_rule": "empty, no Hangul (ko), no Chinese character (zh), or the English unchanged (sw)"
+  },
+  "rows_per_lang": {
+    "en": 200,
+    "ko": 200,
+    "zh": 200,
+    "sw": 200
+  },
+  "dropped": {
+    "ko": [],
+    "zh": [],
+    "sw": []
+  },
+  "files": {
+    "xstest_unsafe.jsonl": "162adff83134a6bd34a472e4605f48d3077e9796553c64fb5441ab25d9cefa69"
+  }
+}

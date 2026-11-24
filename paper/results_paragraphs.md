@@ -200,6 +200,15 @@ The drift does not depend on our learning rate or number of epochs. We repeated 
 - The rule for the task score (S3) was added to the entry after the first of the four runs had started training and before any of them was evaluated.
 - Source: `results/lir/stage2/sensitivity.md` and `sensitivity.json`; the dated note under section 14h of the preregistration.
 
+## A second safety benchmark (section 14i; not in the brief's list). Confidence: Medium (three seeds, preregistered, all four checks pass; machine-translated prompts, and a guard no person has checked on them)
+
+The drift and both repairs also show on a safety benchmark from another source. On the 200 unsafe prompts of XSTest, machine-translated into Korean, Chinese and Swahili, plain fine-tuning raised Korean strict attack success by +10.5 [+5.8, +15.3] points over base (6.0% for base; 21.0%, 14.5% and 14.0% at the three seeds), and Korean rose more than English (+8.7 [+3.5, +13.8]). Both repairs kept Korean below plain fine-tuning on this benchmark, which their refusal examples do not come from: SafeGrad by -7.2 [-10.7, -3.8], and mixing in five copies of the refusal examples by -8.5 [-12.2, -4.8].
+
+- Limits to keep with it: the prompts are machine translations that no person has checked, and no person has checked the guard on these answers; 200 prompts; answers capped at 256 tokens and not generated again (35.5% of the base model's Korean answers reach the cap, against 3.5% to 6.5% of the plain runs').
+- X3 is a pooled result: SafeGrad against plain is -12.5 (p < 0.001), -4.5 (p = 0.093) and -4.5 (p = 0.064) at seeds 42, 1 and 2. Not "at every seed".
+- Not written, by the entry: "generalises"; sizes compared with MultiJail; a ranking of the two repairs (five copies minus SafeGrad -1.3 [-3.8, +1.2], with no rule); anything about Chinese or Swahili beyond the table. The table's Chinese row rose +11.8 [+7.7, +16.3] under plain, and no rule covers it.
+- Source: `results/lir/stage2/second_benchmark.md` and `second_benchmark.json`; the dated note under section 14i of the preregistration.
+
 ## D9. Costs: task score. Confidence: High that there is a cost; the cause is not established
 
 Both fine-tunes score below the base model on the 300 held-out task prompts in every seed: averaged over three seeds, English goes from 6.61 to 6.37 under plain and 6.31 under SafeGrad, Korean from 6.10 to 5.51 and 5.49, Chinese from 6.25 to 5.79 and 5.74 (1 to 7 scale, Qwen3-14B judge). SafeGrad adds little to the cost of fine-tuning itself. The drop is not explained by shorter answers. With length groups fixed in advance, answers about as long as the base model's still score lower (plain -0.39 points, -0.81 to -0.05; SafeGrad -0.67, -1.10 to -0.30), and the drop is the same size for answers under half the length. It sits in the judge's accuracy score (-0.6 in English, -1.2 in Korean, -1.1 in Chinese) and not in fluency. The fine-tuned models answer at the length of the references they were trained on, a third of the base model's length.

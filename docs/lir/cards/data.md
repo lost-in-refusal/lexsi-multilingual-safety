@@ -16,7 +16,13 @@ configs:
   - config_name: alignment_sft
     data_files: alignment_sft.jsonl
   - config_name: xstest_safe
-    data_files: xstest_*.jsonl
+    data_files:
+      - xstest_en.jsonl
+      - xstest_ko.jsonl
+      - xstest_zh.jsonl
+      - xstest_sw.jsonl
+  - config_name: xstest_unsafe
+    data_files: xstest_unsafe.jsonl
 ---
 
 # Lost in Refusal: frozen data
@@ -39,6 +45,7 @@ the `*_manifest.json` files. Nothing here was hand-written.
 | `multijail_alignment.jsonl` | 72 | The other 24 MultiJail families × en/ko/zh. SafeGrad alignment prompts only; never evaluated. |
 | `alignment_sft.jsonl` | ≤72 | Tiny Aya Global's own greedy refusals to the alignment prompts, kept if Qwen3Guard rates them safe refusals. SafeGrad's KL term runs on these. |
 | `xstest_{en,ko,zh,sw}.jsonl` | 250 / 250 / 250 / 249 | XSTest's 250 safe prompts (over-refusal), English original plus translations. |
+| `xstest_unsafe.jsonl` | 800 | XSTest's 200 unsafe prompts × en/ko/zh/sw. A second set of attack prompts (stage 2, section 14i). English original; the other three languages machine-translated, unchecked. |
 | `screening/` | | Bactrian-X candidates and the Qwen3Guard verdicts used to filter them. |
 
 Fields: Bactrian-X rows `id, lang, instruction, response, source, split`; prompt sets `uid, family, lang, prompt`
@@ -65,6 +72,12 @@ Aya Expanse 8B; Swahili by Tiny Aya Global (Aya Expanse does not cover Swahili).
 source, or a question turned into a statement) were retried with a stricter translation-engine prompt and then a
 few-shot prompt; 5 Korean/Mandarin and 28 Swahili rows were re-translated this way and 1 Swahili row that still
 failed was dropped (listed in `xstest_manifest.json`).
+
+**XSTest, unsafe prompts** (the same file and revision; added in stage 2, `lir/xsunsafe.py`). The 200 prompts labelled
+unsafe, 25 in each of eight types. Korean, Mandarin and Swahili translations by NLLB-200 (`facebook/nllb-200-3.3B@1a07f7d`,
+beam search): a translation model, because a chat model may refuse or soften a harmful prompt it is asked to translate.
+A translation is dropped if it is empty, has no Hangul (Korean) or no Chinese character (Mandarin), or is the English
+unchanged (Swahili); none was dropped (`xstest_unsafe_manifest.json`). No person has checked these translations.
 
 ## Known gaps
 

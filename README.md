@@ -76,6 +76,12 @@ Among what did not hold or was not tested (the status page has the full list):
   base at seed 42, each p < 0.001, and Korean rose more than English every time. The task score fell below base at all
   four settings (−0.61, −0.39, −0.66 and −0.35 points). One run and one seed per setting; no setting is a fix, and we
   write no trend: we expected the weaker runs to drift less, and the run with half the epochs rose most.
+- **The drift and both repairs show on a second safety benchmark (section 14i, read Nov 24).** On the 200 unsafe prompts
+  of XSTest in four languages, plain fine-tuning raised Korean attack success by 10.5 points [+5.8, +15.3] over base,
+  pooled over three seeds, and Korean rose more than English (+8.7 [+3.5, +13.8]). SafeGrad and mixing in five copies of
+  the refusal examples each kept Korean below plain fine-tuning (−7.2 [−10.7, −3.8] and −8.5 [−12.2, −4.8]) on a
+  benchmark their refusal examples do not come from. The prompts are machine-translated, and no person has checked them
+  or the guard on them; answers are capped at 256 tokens and were not generated again.
 - **Not run:** the control that separates 4-bit loading from adapter merging. The list is in the status page. The
   AlignTune run was not made by the freeze of Nov 22; it ran on Nov 23 under the deadline extension, on the laptop
   (section 14d of the preregistration).
@@ -200,7 +206,7 @@ activation files are not published), `aya/task` (the held-out Aya answers are no
 public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
 in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
 `ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds`, `mixing/seeds_regen`,
-`more_languages`, `more_languages_regen`, `ten_languages.json`, `aligntune` and `sensitivity` (their answers and verdicts are not published yet), and the four images
+`more_languages`, `more_languages_regen`, `ten_languages.json`, `aligntune`, `sensitivity` and `second_benchmark` (their answers and verdicts are not published yet), and the four images
 (the numbers beside three of them are compared).
 
 Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new
