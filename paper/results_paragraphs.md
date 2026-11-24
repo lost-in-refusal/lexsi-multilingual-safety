@@ -82,12 +82,13 @@ fine-tuned ones. We generated every capped answer of base, plain and SafeGrad ag
 seeds, and judged them again. The three main checks pass before and after: the Korean rise averages +12.7 points
 before and +13.2 after, SafeGrad against plain is -8.4 and -8.6, and the Swahili refusal change is -9.3 and -10.0.
 The same second reading was made for the runs with no Korean rows, for Tiny Aya Earth on three seeds, for the Aya
-runs, for the single-language runs and for the six further untrained languages, each registered before its answers
+runs, for the single-language runs, for the six further untrained languages and for the mixing runs, each registered
+before its answers
 were generated again, and each came out the same (in the six languages some figures with no rule crossed zero,
 most of them in Bengali: see D1). The headline does not depend on the 256-token cap.
 
 Source: `truncation/report.md`, `truncation/k1.md`, `earth/seeds.md`, `aya/seeds.md`, `single_language.md`,
-`more_languages_regen.md`.
+`more_languages_regen.md`, `mixing/seeds_regen.md`.
 
 ## D5. Harm categories. Confidence: Medium (descriptive, no test between categories)
 
@@ -199,9 +200,11 @@ Source: `results.md`, `task_length.md`.
 
 We compared SafeGrad with the simplest alternative: adding the same 47 refusal examples to the training data, once (141 views over training) or as five copies (705 views, close to the 684 SafeGrad uses). Each mixing run is read against SafeGrad at the same seed on the same prompts, and seeds 1 and 2 decide. With five copies, the simple fix protected Korean better than SafeGrad: Korean strict attack success was 2.7 points lower (-5.2 to -0.5; 6.2% against 8.2% at seed 1 and 6.2% against 9.6% at seed 2). With the examples added once, no difference was detected (-0.5 points, -2.9 to +1.9). Both arms raised over-refusal of safe English prompts above SafeGrad's, by 5.2 points (+2.8 to +8.0) and 5.0 points (+2.6 to +7.6), while SafeGrad's own English over-refusal is not distinguishable from the base model's in any seed. No difference in task score was detected (+0.02 and +0.04 on the 1 to 7 scale; both intervals include zero). So SafeGrad's advantage over the simple fix is that it over-refuses less than either mixing arm. It is not better protection.
 
-Not to be written from this: that SafeGrad protects better than mixing; "holds on three seeds"; that more copies protect more (the two arms were not tested against each other); that mixing brings Korean back to the base model's level. Answers are capped at 256 tokens and no mixing arm was generated again. One guard.
+Read again after re-generation (section 14g, read Nov 23; registered after the first reading, so not blind; it decides nothing). Every answer of the six mixing runs that reached the 256-token cap was generated again at 1,024 tokens. Both checks came out the same for both arms: with five copies Korean attack success was 2.6 points below SafeGrad's (-5.0 to -0.5), with the examples once no difference was detected (-0.3 points, -2.7 to +1.9), and English over-refusal stayed 5.2 and 5.0 points above SafeGrad's. Beside it, with no rule and computed after both arms had been read: five copies left Korean attack success 2.2 points below one copy (-4.1 to -0.5, on both readings), with no detected difference in English over-refusal (+0.2, -0.8 to +1.4). That is an estimate, not a registered test of the two arms.
 
-Source: `mixing/seeds.md`; `mixing/results.md` for seed 42; section 14a of the preregistration.
+Not to be written from this: that SafeGrad protects better than mixing; "holds on three seeds"; that more copies protect more (the two arms were not tested against each other); that mixing brings Korean back to the base model's level. The checks were decided on answers capped at 256 tokens. One guard.
+
+Source: `mixing/seeds.md`, `mixing/seeds_regen.md`; `mixing/results.md` for seed 42; sections 14a and 14g of the preregistration.
 
 ## D14. Judge validity. Confidence: a limitation, with one robustness table
 
@@ -214,6 +217,8 @@ Source: `second_judge_check.md`, `ko_drift.md`, `ko_rest.md`, `unsafe_only.md`. 
 - New in D1 and D3 (Nov 23, under the deadline extension): six more languages the model was never fine-tuned on (section 14b). It changes one sentence. "Korean is hit hardest" now holds only among the four languages of the main evaluation: as the guard measures it, the rise in Thai, Javanese and Vietnamese could not be told apart from Korean's, and no language rose more. Any sentence that ranks Korean first, the title and the abstract included, needs that scope and those three names. It also widens D3: refusals fell on average over six more untrained languages, and SafeGrad kept more of them.
 
 - D1, D3 and D4 (Nov 23, 9:15 PM): the six languages were read again after every capped answer was generated again at 1,024 tokens (section 14e; not blind; it decides nothing). U1 to U3 came out the same and no sentence changes. Some figures with no rule crossed zero, three in Bengali and one in Arabic; the one the text touches is Bengali's attack success under plain, above base after re-generation (+5.6 points, +1.7 to +9.3). A sentence that says no answer in the six languages was generated again is out of date, and "no change was detected in Bengali" now needs "on the capped answers".
+
+- D10 and D4 (Nov 23, 10:49 PM): the mixing runs were read again after every capped answer was generated again at 1,024 tokens (section 14g; not blind; it decides nothing). M1 and M2 came out the same for both arms and no sentence changes. New beside it, with no rule: five copies against one, -2.2 points in Korean (-4.1 to -0.5). A sentence that says no mixing arm was generated again is out of date.
 
 - D13 is new (Nov 23, under the deadline extension): the plain fine-tune run through AlignTune, on the laptop (section 14d). Outcome row 1: Korean rose 13.4 points over base (p < 0.001; bar 6.36), against 14.1 for plain from our own trainer at the same seed. One run, one seed. A sentence that says the AlignTune run was not made is out of date.
 

@@ -68,7 +68,9 @@ Among what did not hold or was not tested (the status page has the full list):
   data as five copies left Korean attack success 2.7 points below SafeGrad's on two new seeds [−5.2, −0.5]; with
   the examples added once no difference was detected (−0.5 [−2.9, +1.9]). Both raised English over-refusal about
   5 points above SafeGrad's (+5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]). SafeGrad's advantage over mixing is that it
-  over-refuses less than either mixing arm. Run on Nov 23 under the deadline extension (section 14a of the preregistration).
+  over-refuses less than either mixing arm. Run on Nov 23 under the deadline extension (section 14a of the preregistration). Read
+  again after the capped answers were generated again at 1,024 tokens (section 14g; not blind; it decides nothing),
+  both checks came out the same for both arms (five copies −2.6 [−5.0, −0.5]; once −0.3 [−2.7, +1.9]).
 - **Not run:** the control that separates 4-bit loading from adapter merging. The list is in the status page. The
   AlignTune run was not made by the freeze of Nov 22; it ran on Nov 23 under the deadline extension, on the laptop
   (section 14d of the preregistration).
@@ -192,7 +194,7 @@ Not rebuilt, and why: `vector_aya` (its command checks the hashes of adapter wei
 activation files are not published), `aya/task` (the held-out Aya answers are not published), `aya/checks` (the
 public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
 in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
-`ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds`,
+`ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds`, `mixing/seeds_regen`,
 `more_languages`, `more_languages_regen`, `ten_languages.json` and `aligntune` (their answers and verdicts are not published yet), and the four images
 (the numbers beside three of them are compared).
 

@@ -104,7 +104,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 23, 4:45 AM (Mingyu), under the deadline extension | Section 14c: a second reading of the Korean rise by a person, on the 161 prompts not read before (K3) | K3 does not pass: 11 plain against 5 base answers marked unsafe on 145 prompts, p = 0.070 |
 | Nov 23, 2:25 PM (Mingyu), under the deadline extension | Section 14d: the plain run through AlignTune (the run of 12.3), moved to the laptop (T1, no prediction) | T1, outcome row 1: Korean strict attack success rose 13.4 points over base (5.2% to 18.6%, p < 0.001; bar 6.36). Against plain from our own trainer at the same seed: -0.7 points (p = 0.815). One run, one seed |
 | Nov 23, 4:32 PM (Mingyu), under the deadline extension, after 14b was read | Section 14e: the six languages read again after every capped answer is generated again at 1,024 tokens. It decides nothing | U1, U2 and the row of U3 are the same after re-generation: U1 -4.7 [-6.7, -2.7], U2 +6.3 [+4.5, +8.0], and Korean's rise minus each language's kept its side. Beside, with no rule: in Bengali the guard's strict attack success under plain is above base after re-generation (+5.6 [+1.7, +9.3]; +1.6 [-2.5, +5.6] capped) |
-| Nov 23, 7:35 PM (Mingyu), under the deadline extension, after 14a was read | Section 14g: the mixing baseline read again after every capped answer of the six mixing runs is generated again at 1,024 tokens. It decides nothing | Not read when this was written |
+| Nov 23, 7:35 PM (Mingyu), under the deadline extension, after 14a was read | Section 14g: the mixing baseline read again after every capped answer of the six mixing runs is generated again at 1,024 tokens. It decides nothing | M1 and M2 are the same after re-generation for both arms. Korean against SafeGrad: five copies -2.6 [-5.0, -0.5], the examples once -0.3 [-2.7, +1.9]. English over-refusal against SafeGrad: +5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]. Beside, with no rule: five copies against one, -2.2 [-4.1, -0.5] in Korean |
 | Nov 23, 7:40 PM (Mingyu), under the deadline extension | Section 14h: plain at seed 42 with the learning rate and the number of epochs each halved and doubled (S1 and S2; no prediction tested) | Not read when this was written |
 
 Deviations and things a reader should know:
@@ -147,6 +147,8 @@ Deviations and things a reader should know:
     [-5.2, -0.5], and with the examples added once no difference was detected. Both arms raised English
     over-refusal about 5 points above SafeGrad's. SafeGrad's advantage is in over-refusal only. Seed 42 was seen
     before the rules were written, so two seeds decide; the two arms were not tested against each other.
+    Read again after the capped answers were generated again at 1,024 tokens (section 14g, not blind), both checks
+    came out the same for both arms.
 12. **"Hardest in Korean" holds among four languages, not ten.** In six more languages with no training rows
     (section 14b) the guard's attack success rose in Thai (+11.7 points [+8.1, +15.3]), Javanese (+9.4
     [+5.4, +13.5]) and Vietnamese (+8.1 [+5.0, +11.6]), and those rises could not be told apart from Korean's

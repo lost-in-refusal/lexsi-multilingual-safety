@@ -95,6 +95,9 @@ NOT_REBUILT = [
      "a person's labels and the write-up of the two second-judge checks; their inputs are in results/lir/labels"),
     (("mixing/seeds.json", "mixing/seeds.md"),
      "`python -m lir.repeat mix` reads the mixing runs at seeds 1 and 2, whose answers and verdicts are not published yet"),
+    (("mixing/seeds_regen.json", "mixing/seeds_regen.md"),
+     "`python -m lir.repeat mix-again` reads the mixing runs' answers generated again at 1,024 tokens, which are not "
+     "published yet"),
     (("more_languages.json", "more_languages.md", "ten_languages.json"),
      "`python -m lir.morelangs report` and `figure` read the answers and verdicts in the six further languages, which are not "
      "published yet"),
