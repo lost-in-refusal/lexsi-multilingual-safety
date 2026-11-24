@@ -1484,6 +1484,11 @@ Cost: about 5.7 hours of training (38, 76, 76 and 152 minutes by the plain run's
 
 Report: `python -m lir.sensitivity report` writes `results/lir/stage2/sensitivity.md`. The report code, the run script (`scripts/sensitivity_run.sh`) and their tests are committed with this entry.
 
+**Added Nov 23, 7:47 PM ET by Mingyu, before any of the four runs started.** Two additions to the entry above. Its text is left as written.
+
+- A run that trains to the end and diverged. The entry has no row for it, and a diverged run would read as "did not rise significantly". The rule, on the training loss alone: a run has diverged if any logged training loss is not a number, or if the mean loss over the last tenth of its optimizer steps is above the mean over its first tenth. In the runs made so far the loss falls from about 1.7 to about 1.2 between those two tenths. A diverged run is listed as diverged, with its figures beside and no S1 row or S2 sentence of its own. The two sentences for the four runs together are then not used: the other runs are reported one by one with their own rows, and we write at which setting the training diverged.
+- Checked without any of the runs: the report's check of the run records passes on the record of `plain` as it is on disk, and the records the current trainer writes have every field it compares.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
