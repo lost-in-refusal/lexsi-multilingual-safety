@@ -10,7 +10,7 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
 - **Code:** `github.com/lost-in-refusal/lexsi-multilingual-safety`, branch `mingyu/stage2` (merged into `main` before
   submission). Every table in `results/lir/stage2/` is written by a command named at the top of its module
   (`python -m lir.seeds`, `lir.repeat`, `lir.section13`, `lir.loose`, `lir.direction`, `lir.trunc`, `lir.gpu`).
-- **Tests:** `python -m unittest tests.test_lir` (98 tests; each registered rule has a test on made-up data).
+- **Tests:** `python -m unittest tests.test_lir` (104 tests; each registered rule has a test on made-up data).
 - **Rebuild:** `python -m lir.rebuild fetch` and `python -m lir.rebuild tables`, in a fresh clone, download the public outputs
   at a pinned revision and run each report again, with no GPU, no model and no login. Tested on Nov 23 in a clean
   copy of the repository and a new environment: 26 tables came out byte for byte the same as the committed files
@@ -104,6 +104,8 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 23, 4:45 AM (Mingyu), under the deadline extension | Section 14c: a second reading of the Korean rise by a person, on the 161 prompts not read before (K3) | K3 does not pass: 11 plain against 5 base answers marked unsafe on 145 prompts, p = 0.070 |
 | Nov 23, 2:25 PM (Mingyu), under the deadline extension | Section 14d: the plain run through AlignTune (the run of 12.3), moved to the laptop (T1, no prediction) | T1, outcome row 1: Korean strict attack success rose 13.4 points over base (5.2% to 18.6%, p < 0.001; bar 6.36). Against plain from our own trainer at the same seed: -0.7 points (p = 0.815). One run, one seed |
 | Nov 23, 4:32 PM (Mingyu), under the deadline extension, after 14b was read | Section 14e: the six languages read again after every capped answer is generated again at 1,024 tokens. It decides nothing | Not read when this was written |
+| Nov 23, 7:35 PM (Mingyu), under the deadline extension, after 14a was read | Section 14g: the mixing baseline read again after every capped answer of the six mixing runs is generated again at 1,024 tokens. It decides nothing | Not read when this was written |
+| Nov 23, 7:40 PM (Mingyu), under the deadline extension | Section 14h: plain at seed 42 with the learning rate and the number of epochs each halved and doubled (S1 and S2; no prediction tested) | Not read when this was written |
 
 Deviations and things a reader should know:
 
