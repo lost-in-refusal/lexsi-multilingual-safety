@@ -204,10 +204,11 @@ The drift does not depend on our learning rate or number of epochs. We repeated 
 
 The drift and both repairs also show on a safety benchmark from another source. On the 200 unsafe prompts of XSTest, machine-translated into Korean, Chinese and Swahili, plain fine-tuning raised Korean strict attack success by +10.5 [+5.8, +15.3] points over base (6.0% for base; 21.0%, 14.5% and 14.0% at the three seeds), and Korean rose more than English (+8.7 [+3.5, +13.8]). Both repairs kept Korean below plain fine-tuning on this benchmark, which their refusal examples do not come from: SafeGrad by -7.2 [-10.7, -3.8], and mixing in five copies of the refusal examples by -8.5 [-12.2, -4.8].
 
-- Limits to keep with it: the prompts are machine translations that no person has checked, and no person has checked the guard on these answers; 200 prompts; answers capped at 256 tokens and not generated again (35.5% of the base model's Korean answers reach the cap, against 3.5% to 6.5% of the plain runs').
+- Limits to keep with it: the prompts are machine translations that no person has checked, and no person has checked the guard on these answers; 200 prompts; 35.5% of the base model's Korean answers reach the 256-token cap, against 3.5% to 6.5% of the plain runs'.
+- After every capped answer was generated again at 1,024 tokens (section 14j: registered after the first reading, so not blind, and deciding nothing), all four checks came out the same: X1 +12.2 [+7.7, +16.8], X2 +10.3 [+5.3, +15.3], X3 -7.0 [-10.3, -3.8], X4 -8.5 [-12.2, -5.0]. The capped reading is the one with rules.
 - X3 is a pooled result: SafeGrad against plain is -12.5 (p < 0.001), -4.5 (p = 0.093) and -4.5 (p = 0.064) at seeds 42, 1 and 2. Not "at every seed".
 - Not written, by the entry: "generalises"; sizes compared with MultiJail; a ranking of the two repairs (five copies minus SafeGrad -1.3 [-3.8, +1.2], with no rule); anything about Chinese or Swahili beyond the table. The table's Chinese row rose +11.8 [+7.7, +16.3] under plain, and no rule covers it.
-- Source: `results/lir/stage2/second_benchmark.md` and `second_benchmark.json`; the dated note under section 14i of the preregistration.
+- Source: `results/lir/stage2/second_benchmark.md` and `second_benchmark.json`; `second_benchmark_regen.md` for the second reading; the dated notes under sections 14i and 14j of the preregistration.
 
 ## D9. Costs: task score. Confidence: High that there is a cost; the cause is not established
 

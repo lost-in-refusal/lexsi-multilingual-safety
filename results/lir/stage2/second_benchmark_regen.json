@@ -1,0 +1,628 @@
+{
+  "languages": [
+    "en",
+    "ko",
+    "zh",
+    "sw"
+  ],
+  "seeds": [
+    42,
+    1,
+    2
+  ],
+  "prompts": 200,
+  "x1": {
+    "mean": 12.166666666666664,
+    "ci95": [
+      7.666666666666666,
+      16.833333333333332
+    ],
+    "families": 200,
+    "side": "above"
+  },
+  "x1_report": "Plain fine-tuning also raised Korean attack success on a second safety benchmark, the unsafe prompts of XSTest",
+  "x2": {
+    "mean": 10.333333333333332,
+    "ci95": [
+      5.333333333333333,
+      15.333333333333332
+    ],
+    "families": 200,
+    "side": "above"
+  },
+  "x2_report": "On the second benchmark Korean rose more than English",
+  "repairs_read": true,
+  "not_read_report": null,
+  "x3": {
+    "mean": -7.0,
+    "ci95": [
+      -10.333333333333332,
+      -3.833333333333333
+    ],
+    "families": 200,
+    "side": "below"
+  },
+  "x3_report": "SafeGrad kept Korean attack success below plain fine-tuning on a benchmark that its refusal examples do not come from",
+  "mix_seeds": [
+    42,
+    1,
+    2
+  ],
+  "x4": {
+    "mean": -8.5,
+    "ci95": [
+      -12.166666666666666,
+      -5.0
+    ],
+    "families": 200,
+    "side": "below"
+  },
+  "x4_report": "Mixing five copies of the refusal examples into the training data kept Korean attack success below plain fine-tuning on a benchmark that the examples do not come from",
+  "mixing_minus_safegrad_ko": {
+    "mean": -1.5,
+    "ci95": [
+      -3.833333333333333,
+      0.6666666666666666
+    ],
+    "families": 200,
+    "side": "includes"
+  },
+  "per_language": {
+    "en": {
+      "prompts": 200,
+      "base_strict": 1.0,
+      "base_refusal": 85.0,
+      "strict_plain_vs_base": {
+        "mean": 1.833333333333333,
+        "ci95": [
+          -0.6666666666666667,
+          4.333333333333333
+        ],
+        "families": 200
+      },
+      "strict_safegrad_vs_plain": {
+        "mean": -2.0,
+        "ci95": [
+          -4.5,
+          0.33333333333333337
+        ],
+        "families": 200
+      },
+      "refusal_plain_vs_base": {
+        "mean": -3.833333333333334,
+        "ci95": [
+          -7.833333333333332,
+          0.16666666666666669
+        ],
+        "families": 200
+      },
+      "unsafe_only_plain_vs_base": {
+        "mean": 1.1666666666666665,
+        "ci95": [
+          -1.1666666666666667,
+          3.5000000000000004
+        ],
+        "families": 200
+      },
+      "strict_mixing_vs_plain": {
+        "mean": -2.5,
+        "ci95": [
+          -4.666666666666667,
+          -0.8333333333333334
+        ],
+        "families": 200
+      }
+    },
+    "ko": {
+      "prompts": 200,
+      "base_strict": 4.0,
+      "base_refusal": 70.5,
+      "strict_plain_vs_base": {
+        "mean": 12.166666666666664,
+        "ci95": [
+          7.666666666666666,
+          16.833333333333332
+        ],
+        "families": 200
+      },
+      "strict_safegrad_vs_plain": {
+        "mean": -7.0,
+        "ci95": [
+          -10.333333333333332,
+          -3.833333333333333
+        ],
+        "families": 200
+      },
+      "refusal_plain_vs_base": {
+        "mean": -5.5,
+        "ci95": [
+          -10.166666666666666,
+          -1.0
+        ],
+        "families": 200
+      },
+      "unsafe_only_plain_vs_base": {
+        "mean": 7.666666666666666,
+        "ci95": [
+          4.0,
+          11.333333333333334
+        ],
+        "families": 200
+      },
+      "strict_mixing_vs_plain": {
+        "mean": -8.5,
+        "ci95": [
+          -12.166666666666666,
+          -5.0
+        ],
+        "families": 200
+      }
+    },
+    "zh": {
+      "prompts": 200,
+      "base_strict": 3.5,
+      "base_refusal": 78.5,
+      "strict_plain_vs_base": {
+        "mean": 11.833333333333336,
+        "ci95": [
+          7.666666666666666,
+          16.333333333333332
+        ],
+        "families": 200
+      },
+      "strict_safegrad_vs_plain": {
+        "mean": -5.166666666666666,
+        "ci95": [
+          -8.666666666666666,
+          -2.0
+        ],
+        "families": 200
+      },
+      "refusal_plain_vs_base": {
+        "mean": -8.833333333333334,
+        "ci95": [
+          -13.333333333333334,
+          -4.5
+        ],
+        "families": 200
+      },
+      "unsafe_only_plain_vs_base": {
+        "mean": 7.0,
+        "ci95": [
+          3.833333333333333,
+          10.5
+        ],
+        "families": 200
+      },
+      "strict_mixing_vs_plain": {
+        "mean": -8.833333333333334,
+        "ci95": [
+          -12.5,
+          -5.5
+        ],
+        "families": 200
+      }
+    },
+    "sw": {
+      "prompts": 200,
+      "base_strict": 3.5,
+      "base_refusal": 66.0,
+      "strict_plain_vs_base": {
+        "mean": 1.333333333333333,
+        "ci95": [
+          -1.0,
+          3.6666666666666665
+        ],
+        "families": 200
+      },
+      "strict_safegrad_vs_plain": {
+        "mean": -0.9999999999999999,
+        "ci95": [
+          -3.3333333333333335,
+          1.3333333333333335
+        ],
+        "families": 200
+      },
+      "refusal_plain_vs_base": {
+        "mean": -10.833333333333336,
+        "ci95": [
+          -15.333333333333336,
+          -6.166666666666667
+        ],
+        "families": 200
+      },
+      "unsafe_only_plain_vs_base": {
+        "mean": 1.333333333333333,
+        "ci95": [
+          -0.5,
+          3.166666666666666
+        ],
+        "families": 200
+      },
+      "strict_mixing_vs_plain": {
+        "mean": -2.666666666666666,
+        "ci95": [
+          -4.833333333333333,
+          -0.6666666666666666
+        ],
+        "families": 200
+      }
+    }
+  },
+  "per_seed": {
+    "42": {
+      "ko_plain": 20.5,
+      "ko_safegrad": 8.5,
+      "plain_vs_base": {
+        "delta": 16.5,
+        "p": 3.608874976634979e-08,
+        "n": 200
+      },
+      "safegrad_vs_plain": {
+        "delta": -12.0,
+        "p": 3.032386302947998e-06,
+        "n": 200
+      },
+      "ko_mixing": 8.5,
+      "mixing_vs_plain": {
+        "delta": -12.0,
+        "p": 8.430331945419312e-06,
+        "n": 200
+      }
+    },
+    "1": {
+      "ko_plain": 14.5,
+      "ko_safegrad": 9.5,
+      "plain_vs_base": {
+        "delta": 10.5,
+        "p": 0.00010371580719947815,
+        "n": 200
+      },
+      "safegrad_vs_plain": {
+        "delta": -5.0,
+        "p": 0.052478790283203125,
+        "n": 200
+      },
+      "ko_mixing": 7.0,
+      "mixing_vs_plain": {
+        "delta": -7.5,
+        "p": 0.002599477767944336,
+        "n": 200
+      }
+    },
+    "2": {
+      "ko_plain": 13.5,
+      "ko_safegrad": 9.5,
+      "plain_vs_base": {
+        "delta": 9.5,
+        "p": 0.000310748815536499,
+        "n": 200
+      },
+      "safegrad_vs_plain": {
+        "delta": -4.0,
+        "p": 0.076812744140625,
+        "n": 200
+      },
+      "ko_mixing": 7.5,
+      "mixing_vs_plain": {
+        "delta": -6.0,
+        "p": 0.007537841796875,
+        "n": 200
+      }
+    }
+  },
+  "truncated_share": {
+    "base": {
+      "en": 0.0,
+      "ko": 0.5,
+      "zh": 0.5,
+      "sw": 0.0
+    },
+    "plain": {
+      "en": 0.0,
+      "ko": 0.0,
+      "zh": 0.5,
+      "sw": 0.5
+    },
+    "safegrad": {
+      "en": 0.0,
+      "ko": 0.0,
+      "zh": 0.5,
+      "sw": 0.0
+    },
+    "plain-s1": {
+      "en": 0.0,
+      "ko": 0.5,
+      "zh": 1.0,
+      "sw": 0.0
+    },
+    "safegrad-s1": {
+      "en": 0.0,
+      "ko": 0.5,
+      "zh": 0.0,
+      "sw": 0.0
+    },
+    "plain-s2": {
+      "en": 0.0,
+      "ko": 0.0,
+      "zh": 0.5,
+      "sw": 0.5
+    },
+    "safegrad-s2": {
+      "en": 0.0,
+      "ko": 0.0,
+      "zh": 0.0,
+      "sw": 0.0
+    },
+    "plain-mix5": {
+      "en": 0.0,
+      "ko": 0.0,
+      "zh": 0.5,
+      "sw": 0.0
+    },
+    "plain-mix5-s1": {
+      "en": 0.0,
+      "ko": 0.0,
+      "zh": 1.0,
+      "sw": 0.0
+    },
+    "plain-mix5-s2": {
+      "en": 0.0,
+      "ko": 0.0,
+      "zh": 1.0,
+      "sw": 0.0
+    }
+  },
+  "against_first": {
+    "x1": {
+      "first": "above",
+      "after": "above",
+      "same": true
+    },
+    "x2": {
+      "first": "above",
+      "after": "above",
+      "same": true
+    },
+    "x3": {
+      "first": "below",
+      "after": "below",
+      "same": true
+    },
+    "x4": {
+      "first": "below",
+      "after": "below",
+      "same": true
+    }
+  },
+  "x1_moved_report": null,
+  "regenerated": {
+    "base": {
+      "en": {
+        "again": 19,
+        "continued": 10,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 71,
+        "continued": 50,
+        "still_cut": 1
+      },
+      "zh": {
+        "again": 46,
+        "continued": 11,
+        "still_cut": 1
+      },
+      "sw": {
+        "again": 49,
+        "continued": 30,
+        "still_cut": 0
+      }
+    },
+    "plain": {
+      "en": {
+        "again": 2,
+        "continued": 2,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 13,
+        "continued": 6,
+        "still_cut": 0
+      },
+      "zh": {
+        "again": 2,
+        "continued": 1,
+        "still_cut": 1
+      },
+      "sw": {
+        "again": 35,
+        "continued": 16,
+        "still_cut": 1
+      }
+    },
+    "safegrad": {
+      "en": {
+        "again": 11,
+        "continued": 4,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 18,
+        "continued": 7,
+        "still_cut": 0
+      },
+      "zh": {
+        "again": 8,
+        "continued": 4,
+        "still_cut": 1
+      },
+      "sw": {
+        "again": 35,
+        "continued": 19,
+        "still_cut": 0
+      }
+    },
+    "plain-s1": {
+      "en": {
+        "again": 0,
+        "continued": 0,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 9,
+        "continued": 1,
+        "still_cut": 1
+      },
+      "zh": {
+        "again": 4,
+        "continued": 3,
+        "still_cut": 2
+      },
+      "sw": {
+        "again": 25,
+        "continued": 5,
+        "still_cut": 0
+      }
+    },
+    "safegrad-s1": {
+      "en": {
+        "again": 8,
+        "continued": 4,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 20,
+        "continued": 10,
+        "still_cut": 1
+      },
+      "zh": {
+        "again": 8,
+        "continued": 1,
+        "still_cut": 0
+      },
+      "sw": {
+        "again": 27,
+        "continued": 16,
+        "still_cut": 0
+      }
+    },
+    "plain-s2": {
+      "en": {
+        "again": 2,
+        "continued": 0,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 7,
+        "continued": 2,
+        "still_cut": 0
+      },
+      "zh": {
+        "again": 2,
+        "continued": 1,
+        "still_cut": 1
+      },
+      "sw": {
+        "again": 30,
+        "continued": 9,
+        "still_cut": 1
+      }
+    },
+    "safegrad-s2": {
+      "en": {
+        "again": 9,
+        "continued": 2,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 19,
+        "continued": 9,
+        "still_cut": 0
+      },
+      "zh": {
+        "again": 14,
+        "continued": 5,
+        "still_cut": 0
+      },
+      "sw": {
+        "again": 34,
+        "continued": 21,
+        "still_cut": 0
+      }
+    },
+    "plain-mix5": {
+      "en": {
+        "again": 3,
+        "continued": 0,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 13,
+        "continued": 11,
+        "still_cut": 0
+      },
+      "zh": {
+        "again": 5,
+        "continued": 2,
+        "still_cut": 1
+      },
+      "sw": {
+        "again": 19,
+        "continued": 12,
+        "still_cut": 0
+      }
+    },
+    "plain-mix5-s1": {
+      "en": {
+        "again": 0,
+        "continued": 0,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 9,
+        "continued": 5,
+        "still_cut": 0
+      },
+      "zh": {
+        "again": 7,
+        "continued": 4,
+        "still_cut": 2
+      },
+      "sw": {
+        "again": 27,
+        "continued": 18,
+        "still_cut": 0
+      }
+    },
+    "plain-mix5-s2": {
+      "en": {
+        "again": 3,
+        "continued": 1,
+        "still_cut": 0
+      },
+      "ko": {
+        "again": 15,
+        "continued": 5,
+        "still_cut": 0
+      },
+      "zh": {
+        "again": 7,
+        "continued": 2,
+        "still_cut": 2
+      },
+      "sw": {
+        "again": 17,
+        "continued": 11,
+        "still_cut": 0
+      }
+    }
+  },
+  "still_cut_caveat": {
+    "x1": [],
+    "x2": [],
+    "x3": [],
+    "x4": []
+  },
+  "mixing_arms_waiting": []
+}

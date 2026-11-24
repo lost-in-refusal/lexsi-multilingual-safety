@@ -110,6 +110,9 @@ NOT_REBUILT = [
     (("second_benchmark.json", "second_benchmark.md"),
      "`python -m lir.xsunsafe report` reads the answers of ten arms to the unsafe prompts of XSTest and their verdicts, "
      "which are not published yet"),
+    (("second_benchmark_regen.json", "second_benchmark_regen.md"),
+     "`python -m lir.xsunsafe again` reads the answers of the ten arms to the unsafe prompts of XSTest that were generated "
+     "again, and their verdicts, which are not published yet"),
     (("aligntune.json", "aligntune.md"),
      "`python -m lir.train_aligntune report` reads the answers and verdicts of the run through AlignTune and its training record, "
      "which are not published yet"),
