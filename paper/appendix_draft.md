@@ -70,7 +70,9 @@ These are the places where our runs differ from a tool's default, or where a rea
 
 - Used for the aggregated tables. Its paired-bootstrap p-value is not used: it sits near 0.5 for any non-zero
   effect because the bootstrap is not centred (item 14). Rates are tested with an exact McNemar test on the same
-  prompts and pooled figures with a bootstrap over the 291 prompt families (5,000 draws).
+  prompts and pooled figures with a bootstrap over the 291 prompt families (5,000 draws). Each family's value is
+  averaged over the seeds first, so a pooled interval covers the sampling of prompt families for the seeds we ran.
+  It does not include the spread between training seeds; the per-seed values are reported for that.
 
 ### CuratorKIT and CircuitKIT
 
