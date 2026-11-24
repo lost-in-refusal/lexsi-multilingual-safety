@@ -24,7 +24,17 @@ the main evaluation (English, Korean, Chinese, Swahili), with Vietnamese, Thai a
 distinguishable from Korean. It is not a statement about the ten languages, and it is not a finding that the three
 rose as much as Korean. H1, Korean against English, is unchanged.
 
-Source: `seeds.md`, `drift_by_language.json`, `more_languages.md`. Figure: `ten_languages.png` (the drift figure over all ten languages).
+Read again after re-generation (section 14e, read Nov 23; registered after the first reading, so not blind; it
+decides nothing). Every answer in the six languages that reached the 256-token cap was generated again at 1,024
+tokens. Korean's rise minus each language's stayed on the same side of zero: larger than Italian, Arabic and
+Bengali, not distinguishable from Vietnamese, Thai and Javanese, and none larger than Korean. One figure with no
+rule moved: in Bengali the guard's attack success under plain is then above base (+5.6 points, +1.7 to +9.3,
+against +1.6, -2.5 to +5.6, on the capped answers). We do not write that as a Bengali drift: the reading is not
+blind, no person has checked the guard in Bengali, most re-generated answers are a different answer to the same
+prompt, and Korean's rise is larger than Bengali's on both readings (+7.6 points, +2.4 to +12.9, after
+re-generation).
+
+Source: `seeds.md`, `drift_by_language.json`, `more_languages.md`, `more_languages_regen.md`. Figure: `ten_languages.png` (the drift figure over all ten languages).
 
 ## D2. SafeGrad repair. Confidence: High for the direction
 
@@ -57,10 +67,12 @@ more refusals than plain (+4.4 to +8.0). Both checks are averages. By language t
 (-16.0 points), Thai (-7.4) and Italian (-4.9) and was not detected in Javanese, Arabic or Bengali, so the sentence
 is "on average over six more languages", never "in every untrained language". Limits: no person has checked the
 guard in these languages; base answers reach the 256-token cap far more often than fine-tuned answers (23% to 66%
-by language against 4% to 15%) and none was generated again; over-refusal and task score were not measured there;
+by language against 4% to 15%), and when every capped answer was generated again at 1,024 tokens (section 14e, a
+second reading that is not blind and decides nothing) both averages came out the same (-4.7, -6.7 to -2.7, and
++6.3, +4.5 to +8.0); over-refusal and task score were not measured there;
 and these are the Bactrian-X adapters only.
 
-Source: `seeds.md`, `swahili_nllb_seeds.json`, `aya/seeds.md`, `more_languages.md`.
+Source: `seeds.md`, `swahili_nllb_seeds.json`, `aya/seeds.md`, `more_languages.md`, `more_languages_regen.md`.
 
 ## D4. Truncation audit. Confidence: High
 
@@ -69,10 +81,12 @@ fine-tuned ones. We generated every capped answer of base, plain and SafeGrad ag
 seeds, and judged them again. The three main checks pass before and after: the Korean rise averages +12.7 points
 before and +13.2 after, SafeGrad against plain is -8.4 and -8.6, and the Swahili refusal change is -9.3 and -10.0.
 The same second reading was made for the runs with no Korean rows, for Tiny Aya Earth on three seeds, for the Aya
-runs and for the single-language runs, each registered before its answers were generated again, and each came out
-the same. The headline does not depend on the 256-token cap.
+runs, for the single-language runs and for the six further untrained languages, each registered before its answers
+were generated again, and each came out the same (in the six languages one figure with no rule moved, in Bengali:
+see D1). The headline does not depend on the 256-token cap.
 
-Source: `truncation/report.md`, `truncation/k1.md`, `earth/seeds.md`, `aya/seeds.md`, `single_language.md`.
+Source: `truncation/report.md`, `truncation/k1.md`, `earth/seeds.md`, `aya/seeds.md`, `single_language.md`,
+`more_languages_regen.md`.
 
 ## D5. Harm categories. Confidence: Medium (descriptive, no test between categories)
 
@@ -197,6 +211,8 @@ Source: `second_judge_check.md`, `ko_drift.md`, `ko_rest.md`, `unsafe_only.md`. 
 ## What changed since the brief's table (Sat 9:45 PM)
 
 - New in D1 and D3 (Nov 23, under the deadline extension): six more languages the model was never fine-tuned on (section 14b). It changes one sentence. "Korean is hit hardest" now holds only among the four languages of the main evaluation: as the guard measures it, the rise in Thai, Javanese and Vietnamese could not be told apart from Korean's, and no language rose more. Any sentence that ranks Korean first, the title and the abstract included, needs that scope and those three names. It also widens D3: refusals fell on average over six more untrained languages, and SafeGrad kept more of them.
+
+- D1, D3 and D4 (Nov 23, 9:15 PM): the six languages were read again after every capped answer was generated again at 1,024 tokens (section 14e; not blind; it decides nothing). U1 to U3 came out the same and no sentence changes. One figure with no rule moved: Bengali's attack success under plain is above base after re-generation (+5.6 points, +1.7 to +9.3). A sentence that says no answer in the six languages was generated again is out of date, and "no change was detected in Bengali" now needs "on the capped answers".
 
 - D13 is new (Nov 23, under the deadline extension): the plain fine-tune run through AlignTune, on the laptop (section 14d). Outcome row 1: Korean rose 13.4 points over base (p < 0.001; bar 6.36), against 14.1 for plain from our own trainer at the same seed. One run, one seed. A sentence that says the AlignTune run was not made is out of date.
 

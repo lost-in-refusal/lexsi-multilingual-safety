@@ -98,6 +98,9 @@ NOT_REBUILT = [
     (("more_languages.json", "more_languages.md", "ten_languages.json"),
      "`python -m lir.morelangs report` and `figure` read the answers and verdicts in the six further languages, which are not "
      "published yet"),
+    (("more_languages_regen.json", "more_languages_regen.md"),
+     "`python -m lir.morelangs again` reads the answers generated again in the six further languages and their verdicts, "
+     "which are not published yet"),
     (("aligntune.json", "aligntune.md"),
      "`python -m lir.train_aligntune report` reads the answers and verdicts of the run through AlignTune and its training record, "
      "which are not published yet"),

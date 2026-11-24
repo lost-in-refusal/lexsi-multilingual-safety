@@ -103,7 +103,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 23, 4:26 AM (Mingyu), under the deadline extension | Section 14b: six more untrained languages (U1 to U3), evaluation only | U1: refusals fell on average over the six (-4.9 points [-7.0, -2.9]). U2: SafeGrad kept more refusals than plain (+6.2 [+4.4, +8.0]). U3: no further language rose more than Korean, and the rise in Vietnamese, Thai and Javanese could not be told apart from Korean's, so "hardest in Korean" holds among the four languages of the main evaluation only |
 | Nov 23, 4:45 AM (Mingyu), under the deadline extension | Section 14c: a second reading of the Korean rise by a person, on the 161 prompts not read before (K3) | K3 does not pass: 11 plain against 5 base answers marked unsafe on 145 prompts, p = 0.070 |
 | Nov 23, 2:25 PM (Mingyu), under the deadline extension | Section 14d: the plain run through AlignTune (the run of 12.3), moved to the laptop (T1, no prediction) | T1, outcome row 1: Korean strict attack success rose 13.4 points over base (5.2% to 18.6%, p < 0.001; bar 6.36). Against plain from our own trainer at the same seed: -0.7 points (p = 0.815). One run, one seed |
-| Nov 23, 4:32 PM (Mingyu), under the deadline extension, after 14b was read | Section 14e: the six languages read again after every capped answer is generated again at 1,024 tokens. It decides nothing | Not read when this was written |
+| Nov 23, 4:32 PM (Mingyu), under the deadline extension, after 14b was read | Section 14e: the six languages read again after every capped answer is generated again at 1,024 tokens. It decides nothing | U1, U2 and the row of U3 are the same after re-generation: U1 -4.7 [-6.7, -2.7], U2 +6.3 [+4.5, +8.0], and Korean's rise minus each language's kept its side. Beside, with no rule: in Bengali the guard's strict attack success under plain is above base after re-generation (+5.6 [+1.7, +9.3]; +1.6 [-2.5, +5.6] capped) |
 | Nov 23, 7:35 PM (Mingyu), under the deadline extension, after 14a was read | Section 14g: the mixing baseline read again after every capped answer of the six mixing runs is generated again at 1,024 tokens. It decides nothing | Not read when this was written |
 | Nov 23, 7:40 PM (Mingyu), under the deadline extension | Section 14h: plain at seed 42 with the learning rate and the number of epochs each halved and doubled (S1 and S2; no prediction tested) | Not read when this was written |
 
@@ -151,8 +151,9 @@ Deviations and things a reader should know:
     (section 14b) the guard's attack success rose in Thai (+11.7 points [+8.1, +15.3]), Javanese (+9.4
     [+5.4, +13.5]) and Vietnamese (+8.1 [+5.0, +11.6]), and those rises could not be told apart from Korean's
     (+12.7 [+8.9, +16.7]). No language rose more than Korean. No person has checked the guard in the six added
-    languages, base answers there are cut at the 256-token cap far more often than fine-tuned answers, and none was
-    generated again.
+    languages, base answers there are cut at the 256-token cap far more often than fine-tuned answers; a
+    second reading after they were generated again at 1,024 tokens (section 14e, not blind) gave the same three
+    outcomes, and with no rule Bengali's attack success under plain was then above base (+5.6 [+1.7, +9.3]).
 13. **The six-language block was not read strictly once.** Its rule was one reading when all seven arms were
     judged. During a file check after the first arm, the base model's totals over the six languages together were
     printed (strict attack success 8.8%, refusal rate 60.5%). No figure by language and no figure of a fine-tuned

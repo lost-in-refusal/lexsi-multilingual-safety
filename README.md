@@ -32,7 +32,7 @@ intervals from a bootstrap over the 291 prompt families, pooled over seeds.
 | Korean drifts more than English (H1) | Pass in every seed (3) | Korean strict attack success rises 14.1, 10.3 and 13.7 points. Korean-minus-English gap +11.8 [+6.8, +16.7] |
 | SafeGrad repairs it (H2) | Pass in every seed (3) | Korean, SafeGrad against plain: −8.6, −7.2 and −9.3 points. Pooled −8.4 [−11.3, −5.5] |
 | Swahili refusals fall (H3) | Pass in every seed (3) | −13.1, −6.2 and −8.6 points. Pooled −9.3 [−13.7, −5.2] |
-| Six more untrained languages (U1, U2) | Refusals fell on average over the six, and SafeGrad kept more of them (3 seeds) | Refusal rate, plain minus base −4.9 [−7.0, −2.9]; SafeGrad minus plain +6.2 [+4.4, +8.0] |
+| Six more untrained languages (U1, U2) | Refusals fell on average over the six, and SafeGrad kept more of them (3 seeds) | Refusal rate, plain minus base −4.9 [−7.0, −2.9]; SafeGrad minus plain +6.2 [+4.4, +8.0]; the same after the capped answers were generated again (−4.7 [−6.7, −2.7] and +6.3 [+4.5, +8.0]) |
 | No Korean rows in training (K1) | Korean rows are not needed for a drift of this size, in all three seeds | Korean 18.2%, 18.6% and 18.2% with no Korean rows in training, against 5.2% for the base model |
 | The same fine-tune through Lexsi's AlignTune (T1) | Korean drifts through a second training stack too (1 run, 1 seed) | Korean 5.2% to 18.6% (+13.4 points, p < 0.001); 19.2% from our own trainer at the same seed |
 | One training language at a time (SL1) | Korean drifts when the model is trained on English alone, Korean alone or Chinese alone: all nine runs | Korean rises +8.0 [+4.8, +11.3], +11.2 [+7.3, +15.1] and +11.6 [+7.9, +15.5] points |
@@ -55,7 +55,10 @@ Among what did not hold or was not tested (the status page has the full list):
   guard's attack success rose in Thai (+11.7 [+8.1, +15.3]), Javanese (+9.4 [+5.4, +13.5]) and Vietnamese
   (+8.1 [+5.0, +11.6]), and those rises could not be told apart from Korean's (+12.7 [+8.9, +16.7]). No language
   rose more than Korean. The fall in refusals above is an average: it was not detected in Javanese, Arabic or
-  Bengali. No person has checked the guard in the six added languages.
+  Bengali. No person has checked the guard in the six added languages. Read again after every capped answer there
+  was generated again at 1,024 tokens (section 14e; not blind; it decides nothing), the three checks came out the
+  same. With no rule, Bengali's attack success under plain was then above base (+5.6 [+1.7, +9.3], against
+  +1.6 [−2.5, +5.6] capped); Korean's rise is larger than Bengali's on both readings.
 - **On the Aya training set the Swahili refusal drop did not carry over (Y3 fails):** −3.4, −3.1 and −1.4 points,
   pooled −2.6 [−6.9, +1.5]. The Swahili finding rests on Bactrian-X.
 - **The Korean clean set (H4) was not tested,** because its human check failed.
@@ -190,7 +193,7 @@ activation files are not published), `aya/task` (the held-out Aya answers are no
 public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
 in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
 `ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds`,
-`more_languages`, `ten_languages.json` and `aligntune` (their answers and verdicts are not published yet), and the four images
+`more_languages`, `more_languages_regen`, `ten_languages.json` and `aligntune` (their answers and verdicts are not published yet), and the four images
 (the numbers beside three of them are compared).
 
 Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new
