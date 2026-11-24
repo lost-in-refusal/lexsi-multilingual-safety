@@ -1868,6 +1868,44 @@ The commands, the plan file and their tests (`lir/quantize.py`, `tests/test_quan
 - Beside, with no rule. At every tier size measured the circuit plan's perplexity was the lowest of the four plans. Section 15 has no test for that, and three random plans are three plans.
 - The gate's files as read: `results/lir/stage2/quantization_gate.md`, sha256 `d12514f27e3e701be4dcc2d758b47799096f7971ccabe738d253522755044655`, and `quantization_gate.json`, sha256 `184687eaaa9f8b76e0ffea2c2d37ba19163d9f19f647a37658268926df646933`, committed with this note as the queue wrote them.
 
+### 15a. The circuit plan against random plans of the same shape, on perplexity
+
+**Added Nov 24, 4:38 PM ET by Mingyu, after the gate of section 15 was read and while its first arm was being evaluated. No plan of this block has been measured, and no file of an arm of section 15 has been opened.**
+
+Question. In the gate the circuit plan had the lowest perplexity of the four plans at each of the three tier sizes tried. Three random plans are three plans. Does the model keep a lower perplexity under the circuit plan than under random plans of the same shape, when there are many of them?
+
+Why it is run, and what that does to the test. The gate's table prompted this block. The circuit plan's perplexity against its three random plans': 15.92 against 23.83, 51.91, 22.82 with 7, 15 and 14 layers at 8, 4 and 2 bits; 10.72 against 12.33, 18.09, 13.37 with 5, 21 and 10; 7.81 against 9.12, 9.04, 8.95 with 3, 27 and 6. A test on new plans alone would overstate the evidence, because the circuit plan has already been seen to beat three. So the gate's three random plans are counted with the new ones.
+
+The plans. At a tier size: the circuit plan; 43 random plans of CircuitKIT, the gate's three (seeds 0, 2 and 4) and 40 more with seeds 6, 8 and so on to 84, which share no draw with one another; and, beside, the reversed plan, the circuit's own ranking upside down, with the lowest-ranked layers at 8 bits and the highest-ranked at 2. Every plan is exactly 4.0 bits over the quantized weights.
+
+Measurement. `python -m lir.quantrank measure --size <size>` applies each plan and writes it out as in section 15, then measures the gate's perplexity with the gate's code and text (the reference answers of the 300 held-out task prompts, given the prompt). No attack prompt is answered, no guard reads anything, and no short answers are generated. The circuit plan and the gate's three random plans are measured again in this run, and the values of this run are the ones compared; the gate's values are shown beside them.
+
+Sizes. 3, 27 and 6 layers, the size of the arms of section 15, decides and is measured first. 7, 15 and 14 layers, the first size of section 15, at which no plan passed the gate, is measured second and shown beside with its count and its p, and has no sentence.
+
+**R1.** At 3, 27 and 6 layers: the number of the 43 random plans whose perplexity is at or below the circuit plan's. If the circuit plan were one more random plan, every rank among the 44 would be as likely as any other, so p is that number plus one, over 44.
+
+| p | What we write |
+| --- | --- |
+| Below 0.05, which is at most one of the 43 at or below the circuit plan | At the same 4.0 bits, the model kept a lower perplexity under the circuit plan than under random plans of the same shape |
+| 0.05 or above | The circuit plan's perplexity could not be told apart from that of random plans of the same shape |
+
+What it can and cannot show.
+
+- Perplexity is not safety. R1 does not stand in for Q1 or Q2, and the table of section 15 still governs any claim that the circuit plan protects safety.
+- The plans differ in where the 8-bit layers go as well as the 2-bit ones. R1 does not say which of the two matters.
+- No ranking that knows nothing of refusal is compared, such as one by the size of the weights or by the position of a layer. So a pass shows that the circuit's ranking carries information about which layers bear fewer bits, not that the refusal circuit in particular does.
+- One model, one text in three languages, one quantizer with no calibration, and tier sizes chosen as section 15 says.
+
+What we will not write. That circuit-guided quantization is safer, from R1. That the circuit plan is the best plan: it is compared with random plans only.
+
+What we know as this is written. The gate's whole table, given above and in `quantization_gate.md`, and the check of 3:22 PM. Nothing on any new plan. The first arm of section 15, `bf16`, started at 4:33 PM, and no file of it has been opened. We expect R1 to pass: at the deciding size the circuit plan was below each of its three random plans by more than 1.1.
+
+If it is not finished. A plan not started by Wednesday Nov 25, 6 PM ET is not measured, and a size without all 44 values is listed as not read.
+
+Order and cost. Behind the arms of section 15 in the laptop queue: 45 measurements for each size at about four minutes each, about three hours a size. Then `python -m lir.quantrank report`, which writes `results/lir/stage2/quantization_ranks.md`.
+
+The command and its tests (`lir/quantrank.py`, `tests/test_quantrank.py`) are committed with this entry. `lir/quantize.py` is not changed.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

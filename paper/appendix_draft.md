@@ -113,6 +113,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 23, 11:42 PM (Mingyu), under the deadline extension | Section 14i: a second safety benchmark, the 200 unsafe prompts of XSTest in four languages (X1 to X4), evaluation only | Read on Nov 24: X1 and X2 above zero; X3 and X4, read because X1 is above zero, below zero. The Korean drift and both repairs show on the second benchmark |
 | Nov 24, 10:23 AM (Mingyu), under the deadline extension, after 14i was read | Section 14j: the second benchmark read again after every capped answer is generated again at 1,024 tokens. It decides nothing | Read on Nov 24: X1 to X4 each the same on the capped answers and after re-generation |
 | Nov 24, 3:23 PM (Mingyu), under the deadline extension | Section 15: circuit-guided mixed-precision quantization of the base model at 4.0 bits, on the laptop. A gate on perplexity picks the tier size; Q0 (uniform 4-bit against bfloat16), Q1 and Q2 (the circuit plan against uniform 4-bit and against random plans, read only if Q0 is above zero) and Q3 (task score). The quantized weights are evaluated written out, and size is arithmetic | Not read when this was written |
+| Nov 24, 4:38 PM (Mingyu), under the deadline extension, after the gate of section 15 was read | Section 15a: the perplexity of the circuit plan against 43 random plans of the same shape, the gate's three and 40 new ones (R1, a rank test). No attack prompt and no guard: it says nothing about safety | Not read when this was written |
 
 Deviations and things a reader should know:
 
