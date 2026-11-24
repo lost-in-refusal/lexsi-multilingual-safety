@@ -192,6 +192,14 @@ Stage 1 found a direction in the base model's activations that separates harmful
 
 Source: `refusal_direction.md`; stage 1's `results/lir/probe.json` for the direction.
 
+## Learning rate and epochs (section 14h; not in the brief's list). Confidence: Medium (one run and one seed per setting; preregistered; significant in all four runs)
+
+The drift does not depend on our learning rate or number of epochs. We repeated the plain fine-tune at seed 42 with the learning rate halved and doubled, and with half and twice the epochs. Korean strict attack success rose from 5.2% to 18.2%, 21.6%, 26.1% and 16.5% (+13.1, +16.5, +21.0 and +11.3 points, each p < 0.001), each time by at least the registered bar, and Korean rose more than English at all four settings (Korean rise minus English rise +11.0 [+5.5, +16.5], +13.4 [+8.2, +18.9], +16.2 [+10.7, +21.6] and +10.0 [+4.8, +15.1]). A milder setting did not remove the task-score cost: halving the learning rate or the number of epochs left the task score below the base model's (-0.61 [-0.77, -0.44] and -0.66 [-0.82, -0.48]), and so did the two stronger settings (-0.39 [-0.52, -0.25] and -0.35 [-0.48, -0.23]).
+
+- Limits to keep with it: one run and one seed per setting; no SafeGrad run at these settings; the LoRA rank was not varied; capped answers, nothing generated again. No setting is written as a fix, and no trend is written: we expected the weaker runs to drift less, and the run with half the epochs rose most. No test compares the four runs, and the three plain seeds with our settings rose 14.1, 10.3 and 13.7 points.
+- The rule for the task score (S3) was added to the entry after the first of the four runs had started training and before any of them was evaluated.
+- Source: `results/lir/stage2/sensitivity.md` and `sensitivity.json`; the dated note under section 14h of the preregistration.
+
 ## D9. Costs: task score. Confidence: High that there is a cost; the cause is not established
 
 Both fine-tunes score below the base model on the 300 held-out task prompts in every seed: averaged over three seeds, English goes from 6.61 to 6.37 under plain and 6.31 under SafeGrad, Korean from 6.10 to 5.51 and 5.49, Chinese from 6.25 to 5.79 and 5.74 (1 to 7 scale, Qwen3-14B judge). SafeGrad adds little to the cost of fine-tuning itself. The drop is not explained by shorter answers. With length groups fixed in advance, answers about as long as the base model's still score lower (plain -0.39 points, -0.81 to -0.05; SafeGrad -0.67, -1.10 to -0.30), and the drop is the same size for answers under half the length. It sits in the judge's accuracy score (-0.6 in English, -1.2 in Korean, -1.1 in Chinese) and not in fluency. The fine-tuned models answer at the length of the references they were trained on, a third of the base model's length.

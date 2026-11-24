@@ -104,6 +104,9 @@ NOT_REBUILT = [
     (("more_languages_regen.json", "more_languages_regen.md"),
      "`python -m lir.morelangs again` reads the answers generated again in the six further languages and their verdicts, "
      "which are not published yet"),
+    (("sensitivity.json", "sensitivity.md"),
+     "`python -m lir.sensitivity report` reads the four runs with the learning rate or the number of epochs changed, whose "
+     "answers and verdicts are not published yet"),
     (("aligntune.json", "aligntune.md"),
      "`python -m lir.train_aligntune report` reads the answers and verdicts of the run through AlignTune and its training record, "
      "which are not published yet"),

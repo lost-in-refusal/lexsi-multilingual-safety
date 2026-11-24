@@ -36,8 +36,8 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
   accumulation steps (effective batch 32); 171 optimizer steps for the 1,800-row set; sequence limit 1,024 tokens.
 - **Decoding:** greedy, Tiny Aya's default chat template with its default system preamble, at most 256 new tokens
   for attack and XSTest prompts and 1,024 for task prompts.
-- **Compute:** as of Nov 24, 1:30 AM ET, 42 laptop fine-tunes have a run record, 39.8 hours of training in all, and
-  three more are queued (section 14h); the count is redone at the final number audit. A 1,800-row plain run takes
+- **Compute:** as of Nov 24, 8:10 AM ET, 45 laptop fine-tunes have a run record, 44.1 hours of training in all (the four
+  runs of section 14h included); the count is redone at the final number audit. A 1,800-row plain run takes
   about 78 minutes on average (75.7, 82.2 and 75.7 at the three seeds), SafeGrad about 88, and a 600-row run about
   25. The stage 2 queue ran for about 64 laptop hours up
   to the freeze: about 21 hours of training, 13 of evaluation, 6 of combined train-and-evaluate steps, 10 of
@@ -109,7 +109,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 23, 2:25 PM (Mingyu), under the deadline extension | Section 14d: the plain run through AlignTune (the run of 12.3), moved to the laptop (T1, no prediction) | T1, outcome row 1: Korean strict attack success rose 13.4 points over base (5.2% to 18.6%, p < 0.001; bar 6.36). Against plain from our own trainer at the same seed: -0.7 points (p = 0.815). One run, one seed |
 | Nov 23, 4:32 PM (Mingyu), under the deadline extension, after 14b was read | Section 14e: the six languages read again after every capped answer is generated again at 1,024 tokens. It decides nothing | U1, U2 and the row of U3 are the same after re-generation: U1 -4.7 [-6.7, -2.7], U2 +6.3 [+4.5, +8.0], and Korean's rise minus each language's kept its side. Beside, with no rule: in Bengali the guard's strict attack success under plain is above base after re-generation (+5.6 [+1.7, +9.3]; +1.6 [-2.5, +5.6] capped) |
 | Nov 23, 7:35 PM (Mingyu), under the deadline extension, after 14a was read | Section 14g: the mixing baseline read again after every capped answer of the six mixing runs is generated again at 1,024 tokens. It decides nothing | M1 and M2 are the same after re-generation for both arms. Korean against SafeGrad: five copies -2.6 [-5.0, -0.5], the examples once -0.3 [-2.7, +1.9]. English over-refusal against SafeGrad: +5.2 [+2.8, +8.0] and +5.0 [+2.6, +7.6]. Beside, with no rule: five copies against one, -2.2 [-4.1, -0.5] in Korean |
-| Nov 23, 7:40 PM (Mingyu), under the deadline extension | Section 14h: plain at seed 42 with the learning rate and the number of epochs each halved and doubled (S1 and S2; S3 for the task score was added on Nov 23 at 11:22 PM, before any run was evaluated; no prediction tested) | Not read when this was written |
+| Nov 23, 7:40 PM (Mingyu), under the deadline extension | Section 14h: plain at seed 42 with the learning rate and the number of epochs each halved and doubled (S1 and S2; S3 for the task score was added on Nov 23 at 11:22 PM, before any run was evaluated; no prediction tested) | Read on Nov 24: S1 rows 1, 1, 1, 1 (the drift appeared at all four settings), S2 above zero at all four, S3 below zero at all four; our forecast that the weaker runs would drift less did not hold |
 | Nov 23, 11:42 PM (Mingyu), under the deadline extension | Section 14i: a second safety benchmark, the 200 unsafe prompts of XSTest in four languages (X1 to X4), evaluation only | Not read when this was written |
 
 Deviations and things a reader should know:
@@ -182,7 +182,7 @@ The recommended layout on hackathon.lexsi.ai marks these as required or as value
   baseline itself ran at seeds 1 and 2 under the extension); a second labeller for the Korean reading (one person has read 261 of the 291 Korean prompts at seed 42 in two
   checks, and neither reached significance);
   the unmerged bfloat16 control for the NF4 runs, GGUF builds and mixed-precision deployment; in the six further untrained languages, a person's check of the guard, a re-translation check as for Swahili, and over-refusal and task sets; the Fire and Water models; LoRA
-  rank, learning rate and epoch sensitivity; a second safety benchmark.
+  rank sensitivity, and more seeds at each learning rate and number of epochs; a second safety benchmark.
 - **"Declaration of work done outside the hackathon" (required):** for the team to state.
 - **"Results on the quantized / deployed model (GGUF, 4-bit)" (Track 2b line):** filled by the NF4 runs of 12.2
   (`gpu.md`): SafeGrad stays below plain on Korean under 4-bit loading, and 4-bit loading raises the base model's

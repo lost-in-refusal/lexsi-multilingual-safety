@@ -71,6 +71,11 @@ Among what did not hold or was not tested (the status page has the full list):
   over-refuses less than either mixing arm. Run on Nov 23 under the deadline extension (section 14a of the preregistration). Read
   again after the capped answers were generated again at 1,024 tokens (section 14g; not blind; it decides nothing),
   both checks came out the same for both arms (five copies −2.6 [−5.0, −0.5]; once −0.3 [−2.7, +1.9]).
+- **The drift is not a product of our learning rate or number of epochs (section 14h, read Nov 24).** With the learning
+  rate halved or doubled, or half or twice the epochs, Korean attack success rose 13.1, 16.5, 21.0 and 11.3 points over
+  base at seed 42, each p < 0.001, and Korean rose more than English every time. The task score fell below base at all
+  four settings (−0.61, −0.39, −0.66 and −0.35 points). One run and one seed per setting; no setting is a fix, and we
+  write no trend: we expected the weaker runs to drift less, and the run with half the epochs rose most.
 - **Not run:** the control that separates 4-bit loading from adapter merging. The list is in the status page. The
   AlignTune run was not made by the freeze of Nov 22; it ran on Nov 23 under the deadline extension, on the laptop
   (section 14d of the preregistration).
@@ -195,7 +200,7 @@ activation files are not published), `aya/task` (the held-out Aya answers are no
 public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
 in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
 `ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds`, `mixing/seeds_regen`,
-`more_languages`, `more_languages_regen`, `ten_languages.json` and `aligntune` (their answers and verdicts are not published yet), and the four images
+`more_languages`, `more_languages_regen`, `ten_languages.json`, `aligntune` and `sensitivity` (their answers and verdicts are not published yet), and the four images
 (the numbers beside three of them are compared).
 
 Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new
