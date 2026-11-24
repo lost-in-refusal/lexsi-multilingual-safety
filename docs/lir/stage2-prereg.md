@@ -1524,6 +1524,39 @@ Report: `python -m lir.sensitivity report` writes `results/lir/stage2/sensitivit
 - A run that trains to the end and diverged. The entry has no row for it, and a diverged run would read as "did not rise significantly". The rule, on the training loss alone: a run has diverged if any logged training loss is not a number, or if the mean loss over the last tenth of its optimizer steps is above the mean over its first tenth. In the runs made so far the loss falls from about 1.7 to about 1.2 between those two tenths. A diverged run is listed as diverged, with its figures beside and no S1 row or S2 sentence of its own. The two sentences for the four runs together are then not used: the other runs are reported one by one with their own rows, and we write at which setting the training diverged.
 - Checked without any of the runs: the report's check of the run records passes on the record of `plain` as it is on disk, and the records the current trainer writes have every field it compares.
 
+**Added Nov 23, 11:22 PM ET by Mingyu, before any run of this block has been evaluated: a rule for the task score (S3).**
+
+Why now. An outside review of our status, read on the evening of Nov 23, asked whether the fall in task score comes from fine-tuning too hard, and whether a milder setting keeps the task score while Korean still drifts. The entry above evaluates the task set for every run and lists the task score against base as "beside, with no rule". This addition gives it a rule. No code changes: the report already computes each run's task score against base with its interval (`task_score.vs_base`).
+
+What exists as this is written. The first run, `plain-lr-half`, is training, at step 73 of 171. No run of this block has been evaluated: no answer of one exists on any set, and `runs/eval` has no folder for one. We have seen the first run's logged training loss up to that step (about 2.1 at the start, 1.84 now). We know the plain run with our settings at seed 42: a task score of 5.94 against 6.32 for base, -0.38 points [-0.52, -0.25] on the 300 prompts. We know that both fine-tunes score below base at every seed (section 1), also at matched answer length (13h).
+
+S3, for each run. The run's task score minus the base model's on the 300 task prompts, with the 95% bootstrap interval over prompts.
+
+| The interval | What we report |
+| --- | --- |
+| Below zero | the task score fell below the base model's at this setting |
+| Includes zero | no fall in task score was detected at this setting, given with its interval |
+| Above zero | the task score rose above the base model's at this setting |
+
+S3 across, read on the two milder runs only (`plain-lr-half` and `plain-ep-half`), each with its S1 row:
+
+| The two milder runs | What we write |
+| --- | --- |
+| Both intervals below zero | Halving the learning rate or the number of epochs did not remove the task-score cost: both milder runs scored below the base model |
+| At least one interval not below zero, in a run whose S1 row is 1 or 2 | At that setting Korean attack success rose significantly and no fall in task score was detected: the drift appeared without a detected task-score cost there. The setting and the interval are named |
+| At least one interval not below zero, and every such run has S1 row 3 | At that setting neither a Korean rise nor a fall in task score was detected. That run may have learned little, and it does not separate the drift from the task-score cost |
+
+The two stronger runs (`plain-lr-double` and `plain-ep-double`) are read with the first table only.
+
+What we will not write from S3:
+
+- That a milder setting avoids the loss, or that it is a setting to use. Each setting has one seed, and an interval that includes zero is a non-detection: at this sample size the interval is about 0.14 points wide on each side.
+- A trend over the four runs, or a comparison of the task score between two of them. No test compares them.
+- A cause for the fall in task score.
+- Anything about SafeGrad at these settings. No SafeGrad run exists there.
+
+The task score is one automatic judge's score. A run that diverged by the rule above has no S3 row. If a milder run is missing or diverged, S3 across is not used and the other runs keep their rows. The task score against `plain` stays beside, with no rule. Aish can amend this before the report is read.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
