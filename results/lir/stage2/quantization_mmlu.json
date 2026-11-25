@@ -1,0 +1,172 @@
+{
+  "arms_read": [
+    "bf16",
+    "circuit",
+    "int4",
+    "random-0",
+    "random-2",
+    "random-4"
+  ],
+  "arms_left_out": [],
+  "accuracy": {
+    "bf16": {
+      "en": 59.0,
+      "ko": 55.5,
+      "zh": 54.75,
+      "sw": 48.75,
+      "all": 54.5
+    },
+    "circuit": {
+      "en": 41.0,
+      "ko": 37.5,
+      "zh": 38.5,
+      "sw": 31.25,
+      "all": 37.0625
+    },
+    "int4": {
+      "en": 58.25,
+      "ko": 51.5,
+      "zh": 50.0,
+      "sw": 45.0,
+      "all": 51.1875
+    },
+    "random-0": {
+      "en": 42.25,
+      "ko": 31.25,
+      "zh": 29.5,
+      "sw": 32.0,
+      "all": 33.75
+    },
+    "random-2": {
+      "en": 49.75,
+      "ko": 41.25,
+      "zh": 41.75,
+      "sw": 38.0,
+      "all": 42.6875
+    },
+    "random-4": {
+      "en": 49.75,
+      "ko": 43.75,
+      "zh": 45.5,
+      "sw": 41.75,
+      "all": 45.1875
+    }
+  },
+  "questions_shared_across_languages": true,
+  "letter_mass": {
+    "bf16": 0.981679875,
+    "circuit": 0.76280575,
+    "int4": 0.9767438749999999,
+    "random-0": 0.60860575,
+    "random-2": 0.9196340625,
+    "random-4": 0.8383858125
+  },
+  "vs_bf16": {
+    "circuit": {
+      "mean": -17.4375,
+      "ci95": [
+        -21.5,
+        -13.4375
+      ],
+      "families": 400
+    },
+    "int4": {
+      "mean": -3.3125,
+      "ci95": [
+        -5.5,
+        -1.25
+      ],
+      "families": 400
+    },
+    "random-0": {
+      "mean": -20.75,
+      "ci95": [
+        -25.3125,
+        -16.1875
+      ],
+      "families": 400
+    },
+    "random-2": {
+      "mean": -11.8125,
+      "ci95": [
+        -15.625,
+        -7.875
+      ],
+      "families": 400
+    },
+    "random-4": {
+      "mean": -9.3125,
+      "ci95": [
+        -12.625,
+        -5.9375
+      ],
+      "families": 400
+    }
+  },
+  "b1": {
+    "mean": -14.125,
+    "ci95": [
+      -18.1875,
+      -10.125
+    ],
+    "families": 400,
+    "side": "below",
+    "report": "The circuit plan scored below uniform 4-bit on Global-MMLU-Lite"
+  },
+  "circuit_minus_random": {
+    "random-0": {
+      "mean": 3.3125,
+      "ci95": [
+        -0.6875,
+        7.5
+      ],
+      "families": 400
+    },
+    "random-2": {
+      "mean": -5.625,
+      "ci95": [
+        -9.625,
+        -1.7500000000000002
+      ],
+      "families": 400
+    },
+    "random-4": {
+      "mean": -8.125,
+      "ci95": [
+        -12.125,
+        -4.0
+      ],
+      "families": 400
+    }
+  },
+  "job": {
+    "folder": "20261125-022435-01c70c1",
+    "commit": "01c70c13e1be227ae405f1c26e7bd98ffde6da19",
+    "gpu": [
+      "NVIDIA L4, 620.70.06, 23034 MiB"
+    ],
+    "flavor": "l4x1",
+    "libraries": {
+      "torch": "2.15.0",
+      "transformers": "5.22.1",
+      "peft": "0.21.2",
+      "accelerate": "1.15.0",
+      "bitsandbytes": "0.50.2",
+      "safetensors": "0.8.0",
+      "tokenizers": "0.23.3",
+      "huggingface_hub": "2.4.0",
+      "numpy": "2.5.4"
+    },
+    "quantization": {
+      "optimum-quanto": "0.2.7",
+      "circuitkit_commit": "e71d5e17fe6e2abfde47ec9a7fbaf31649601b78"
+    },
+    "files_sha256": {
+      "en": "0a29e91730a7c018080780b7f4b6a08bd0cd0441b33b9a57d7583277ac91eab2",
+      "ko": "4b8ee37baee8e7fb18cdecc7f39e766d5894948dabc33b54e7f99907e5ea05f3",
+      "zh": "87e148156e95948db761c5759e33ca5e1a81ffa8c9163edf58a4c42c86c28299",
+      "sw": "1f252c4f04a0078a09a7f1203bcd54c28757016071d115d769aa492ab27e0f11"
+    },
+    "finished_utc": "20261125-025749"
+  }
+}

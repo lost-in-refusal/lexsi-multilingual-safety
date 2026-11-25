@@ -122,6 +122,9 @@ NOT_REBUILT = [
     (("quantization.json", "quantization.md"),
      "`python -m lir.quantize report` reads the answers, verdicts and task scores of the six arms of section 15, which are "
      "not published yet"),
+    (("quantization_mmlu.json", "quantization_mmlu.md"),
+     "`python -m lir.mmlu report` reads the answers of the Hugging Face job of section 15b, which are in the private staging "
+     "dataset and not published yet"),
     (("quantization_gate.json", "quantization_gate.md"),
      "`python -m lir.quantize gate` loads the model once for every plan it measures, in the environment with CircuitKIT "
      "and optimum-quanto"),

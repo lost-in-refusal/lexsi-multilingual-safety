@@ -2031,6 +2031,15 @@ The job and its reader (`lir/mmlu.py`), the pins and their tests are committed w
 
 **Added Nov 24, 9:31 PM ET by Mingyu, when the job was launched.** The job was submitted on Nov 24 at 9:22 PM ET from commit `01c70c1` on one NVIDIA L4 (`l4x1`) with a limit of two hours: `6b06465ad0582cfbbefd7402`. At that moment the report of section 15 did not exist and the laptop was evaluating `random-2`. No output of the job has been read.
 
+**Added Nov 24, 11:11 PM ET by Mingyu, after the job had finished and after section 15 was read.** The job completed on one NVIDIA L4 at commit `01c70c1` (upload `mmlu/20261125-022435-01c70c1`), with optimum-quanto 0.2.7 and CircuitKIT at `e71d5e1` in its record, and each of the six arms answered all 1,600 questions. It did not fail and was launched once. The four languages hold the same 400 questions, so a question's four languages are one unit. `python -m lir.mmlu report` ran once, at 11:12 PM, after the report of section 15 had been read.
+
+- **B1: below zero.** The circuit plan scored below uniform 4-bit on Global-MMLU-Lite: -14.1 points [-18.2, -10.1] over the four languages.
+- Beside Q3, as registered: Q3 and B1 point the same way. The circuit plan is below uniform 4-bit on the task score and on this benchmark.
+- Beside, with no rule. Accuracy over the four languages: `bf16` 54.5%, `int4` 51.2% (-3.3 [-5.5, -1.2] against `bf16`), `circuit` 37.1% (-17.4 [-21.5, -13.4]), `random-0` 33.8%, `random-2` 42.7%, `random-4` 45.2%. The circuit plan minus each random plan: +3.3 [-0.7, +7.5], -5.6 [-9.6, -1.8] and -8.1 [-12.1, -4.0]. So on this benchmark the circuit plan is not above the random plans: it is below two of the three. On the task score and on perplexity it was above all three. This is stated wherever the circuit plan is compared with random plans.
+- The mean probability on the four letters is 0.98 for `bf16` and `int4`, 0.76 for `circuit`, and 0.61, 0.92 and 0.84 for the random plans. Under `circuit` and `random-0` the model often wants to write something other than a letter, and their scores say less.
+- Recounted from the answer files with separate code: -14.1 [-18.2, -10.1] on 400 questions.
+- Limits, as registered: one multiple-choice benchmark read by one token; the arms were built in the cloud by the same code and are not the laptop's runs; the base model only. The files as read: `quantization_mmlu.md`, sha256 `00db81cc8ef2a26e6e8fa5f4d782c08aa71058efc7ecbcc5b3810ea691e0f3c4`, and `quantization_mmlu.json`, sha256 `9460fb6620161841fe533007b1f4e59eca759e3c9be9a24de6b2fd5270639af9`.
+
 ## 16. The main experiment on a model outside the Tiny Aya family
 
 **Added Nov 24, 8:48 PM ET by Mingyu, before any job of this section was launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.** Aish can amend this section before the runs are read.

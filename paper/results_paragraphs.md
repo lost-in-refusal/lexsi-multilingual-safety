@@ -249,7 +249,11 @@ model 6.35), and every random plan of the same shape scored lower still (3.69 to
 
 What can be said beside it, with no rule: against random plans of the same shape the circuit plan had lower attack
 success (-5.8 [-7.6, -3.9]) and a higher task score, and it had the lowest perplexity of four plans at every tier size
-in the gate. The rank test of section 15a asks that question of perplexity on 43 random plans.
+in the gate. The rank test of section 15a asks that question of perplexity on 43 random plans. On Global-MMLU-Lite, a benchmark with no judge
+(section 15b), the picture is different: the circuit plan scored 14.1 points [10.1, 18.2] below uniform 4-bit (37.1%
+against 51.2%; unquantized 54.5%), which agrees with the task score, and it was below two of the three random plans
+(42.7% and 45.2%; the third 33.8%). So the circuit plan is not shown to be better than random plans across measures
+(`quantization_mmlu.md`).
 
 Limits to state with it: the quantized weights were evaluated written out, so nothing about speed or memory; one
 quantizer (optimum-quanto, no calibration) and one tier size, chosen by a gate on perplexity; the base model only.
