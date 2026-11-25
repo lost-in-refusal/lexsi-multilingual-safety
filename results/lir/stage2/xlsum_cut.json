@@ -1,0 +1,145 @@
+{
+  "answers": 1164,
+  "base_answers": 291,
+  "cuts": [
+    {
+      "longest_below": 58,
+      "shortest_above": 58,
+      "of_that_length_below": 3,
+      "of_that_length_above": 5
+    },
+    {
+      "longest_below": 200,
+      "shortest_above": 201,
+      "of_that_length_below": 2,
+      "of_that_length_above": 0
+    }
+  ],
+  "groups": {
+    "complete": {
+      "mean": 6.315931431311436,
+      "ci95": [
+        3.842302878598248,
+        9.118541033434651
+      ],
+      "families": 291,
+      "draws_dropped": 0,
+      "base": {
+        "answers": 194,
+        "rate": 0.5154639175257731
+      },
+      "arm": {
+        "answers": 688,
+        "rate": 6.8313953488372094
+      },
+      "side": "above",
+      "tokens": [
+        8,
+        255
+      ],
+      "reached_the_cap": 0
+    },
+    "capped": {
+      "mean": 4.976316522708276,
+      "ci95": [
+        -2.66275592362549,
+        13.084042394387223
+      ],
+      "families": 291,
+      "draws_dropped": 0,
+      "base": {
+        "answers": 97,
+        "rate": 13.402061855670103
+      },
+      "arm": {
+        "answers": 185,
+        "rate": 18.37837837837838
+      },
+      "side": "includes",
+      "tokens": [
+        256,
+        256
+      ],
+      "reached_the_cap": 282
+    },
+    "short": {
+      "mean": 3.977429121937792,
+      "ci95": [
+        -0.6278950077200209,
+        8.348147621417906
+      ],
+      "families": 291,
+      "draws_dropped": 0,
+      "base": {
+        "answers": 42,
+        "rate": 2.380952380952381
+      },
+      "arm": {
+        "answers": 346,
+        "rate": 6.358381502890174
+      },
+      "side": "includes",
+      "tokens": [
+        8,
+        58
+      ],
+      "reached_the_cap": 0
+    },
+    "middle": {
+      "mean": 6.666666666666667,
+      "ci95": [
+        3.3210332103321036,
+        10.572687224669604
+      ],
+      "families": 291,
+      "draws_dropped": 0,
+      "base": {
+        "answers": 118,
+        "rate": 0.0
+      },
+      "arm": {
+        "answers": 270,
+        "rate": 6.666666666666667
+      },
+      "side": "above",
+      "tokens": [
+        58,
+        200
+      ],
+      "reached_the_cap": 0
+    },
+    "long": {
+      "mean": 6.0296432708587036,
+      "ci95": [
+        -0.07215007215007341,
+        12.405628002745367
+      ],
+      "families": 291,
+      "draws_dropped": 0,
+      "base": {
+        "answers": 131,
+        "rate": 9.923664122137405
+      },
+      "arm": {
+        "answers": 257,
+        "rate": 15.95330739299611
+      },
+      "side": "includes",
+      "tokens": [
+        201,
+        256
+      ],
+      "reached_the_cap": 282
+    }
+  },
+  "report": "The Korean rise is not found in the shortest third and the longest third, so it cannot be separated from the change in answer length there",
+  "beside_the_sentence": [],
+  "read": true,
+  "seeds": [
+    42,
+    1,
+    2
+  ],
+  "thin": [],
+  "thin_bar": 30
+}

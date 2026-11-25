@@ -134,6 +134,12 @@ NOT_REBUILT = [
     (("xlsum_premise.json",),
      "`python -m lir.xlsum premise` reads the ROUGE-L and task scores of the base run and of plain at seed 42 of section 20, "
      "which are in the private staging dataset"),
+    (("xlsum.json", "xlsum.md"),
+     "`python -m lir.xlsum report` reads the answers, verdicts and scores of the seven runs of section 20, which are in the "
+     "private staging dataset: the answers quote news articles, and only scores are published"),
+    (("xlsum_cut.json", "xlsum_cut.md"),
+     "`python -m lir.xlsumcut` reads the Korean attack verdicts of the base run and the plain runs of section 20, which are in "
+     "the private staging dataset"),
     (("third_judge_check.md",),
      "`python -m lir.judge3 check-a` reads the verdicts of the Hugging Face job of section 17, which are in the private staging "
      "dataset; the judge's verdicts on the 120 labelled answers are in results/lir/labels"),

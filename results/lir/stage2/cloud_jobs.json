@@ -1,28 +1,28 @@
 {
   "by_gpu": {
+    "l40sx1": {
+      "jobs": 14,
+      "completed": 12,
+      "running_hours": 6.17,
+      "list_price_dollars": 11.11
+    },
     "l4x1": {
       "jobs": 13,
       "completed": 11,
       "running_hours": 12.64,
       "list_price_dollars": 10.11
     },
-    "l40sx1": {
-      "jobs": 13,
-      "completed": 12,
-      "running_hours": 6.17,
-      "list_price_dollars": 11.11
-    },
     "a100-large": {
-      "jobs": 1,
-      "completed": 1,
-      "running_hours": 0.35,
-      "list_price_dollars": 0.88
+      "jobs": 11,
+      "completed": 11,
+      "running_hours": 4.17,
+      "list_price_dollars": 10.43
     }
   },
-  "jobs": 27,
-  "running_hours": 19.16,
-  "list_price_dollars": 22.1,
-  "read_utc": "2026-11-25 15:10",
+  "jobs": 38,
+  "running_hours": 22.98,
+  "list_price_dollars": 31.65,
+  "read_utc": "2026-11-25 22:59",
   "namespace": "lost-in-refusal-lexsi",
   "prices": {
     "l4x1": 0.8,
@@ -30,6 +30,14 @@
     "a100-large": 2.5
   },
   "job_list": [
+    {
+      "id": "6b071f8ad91f621b9308a094",
+      "name": "lir-xlsum-build",
+      "flavor": "l40sx1",
+      "stage": "CANCELED",
+      "started_utc": null,
+      "running_secs": null
+    },
     {
       "id": "6b0356e0130a00b5aa8123e2",
       "name": "lir-control",
@@ -245,6 +253,86 @@
       "stage": "COMPLETED",
       "started_utc": "2026-11-25 12:37",
       "running_secs": 1267
+    },
+    {
+      "id": "6b07507ad91f621b9308fd46",
+      "name": "lir-xlsum-build",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 21:18",
+      "running_secs": 311
+    },
+    {
+      "id": "6b075265b6a90bbe997e7fd6",
+      "name": "lir-xlsum-base",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 21:26",
+      "running_secs": 1049
+    },
+    {
+      "id": "6b075272b6a90bbe997e7ffc",
+      "name": "lir-xlsum-plain-s42",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 21:29",
+      "running_secs": 1818
+    },
+    {
+      "id": "6b075ac4d91f621b93090fe5",
+      "name": "lir-xlsum-judge",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 22:01",
+      "running_secs": 385
+    },
+    {
+      "id": "6b075cb8d91f621b930912de",
+      "name": "lir-xlsum-safegrad-s2",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 22:10",
+      "running_secs": 1937
+    },
+    {
+      "id": "6b075cb8b6a90bbe997e8f14",
+      "name": "lir-xlsum-safegrad-s1",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 22:10",
+      "running_secs": 1947
+    },
+    {
+      "id": "6b075cb7d91f621b930912d9",
+      "name": "lir-xlsum-safegrad-s42",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 22:10",
+      "running_secs": 1902
+    },
+    {
+      "id": "6b075cb7d91f621b930912d7",
+      "name": "lir-xlsum-plain-s2",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 22:10",
+      "running_secs": 1834
+    },
+    {
+      "id": "6b075cb6d91f621b930912d3",
+      "name": "lir-xlsum-plain-s1",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 22:10",
+      "running_secs": 1782
+    },
+    {
+      "id": "6b076498d91f621b930921db",
+      "name": "lir-xlsum-judge",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 22:43",
+      "running_secs": 781
     }
   ]
 }

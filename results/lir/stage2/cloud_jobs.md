@@ -1,16 +1,17 @@
 ### Cloud GPU time (Hugging Face Jobs)
 
-From the job records of the `lost-in-refusal-lexsi` account, read on 2026-11-25 15:10 UTC. Running time is what the record gives for each job; every job is counted, also the ones that failed or were stopped. Cost is running time at the list price of the GPU type, not the invoice.
+From the job records of the `lost-in-refusal-lexsi` account, read on 2026-11-25 22:59 UTC. Running time is what the record gives for each job; every job is counted, also the ones that failed or were stopped. Cost is running time at the list price of the GPU type, not the invoice.
 
 | GPU type | Jobs | Completed | Running hours | List price an hour | Cost at list price |
 |---|---:|---:|---:|---:|---:|
-| `a100-large` | 1 | 1 | 0.35 | $2.50 | $0.88 |
-| `l40sx1` | 13 | 12 | 6.17 | $1.80 | $11.11 |
+| `a100-large` | 11 | 11 | 4.17 | $2.50 | $10.43 |
+| `l40sx1` | 14 | 12 | 6.17 | $1.80 | $11.11 |
 | `l4x1` | 13 | 11 | 12.64 | $0.80 | $10.11 |
-| all | 27 | | 19.16 | | $22.10 |
+| all | 38 | | 22.98 | | $31.65 |
 
 | Job | GPU type | Started (UTC) | End | Running minutes |
 |---|---|---|---|---:|
+| `lir-xlsum-build` | `l40sx1` |  | canceled | 0.0 |
 | `lir-control` | `l4x1` | 2026-11-22 20:56 | completed | 65.6 |
 | `lir-only-ko` | `l4x1` | 2026-11-22 21:28 | completed | 50.5 |
 | `lir-nf4` | `l4x1` | 2026-11-22 21:49 | completed | 136.9 |
@@ -38,3 +39,13 @@ From the job records of the `lost-in-refusal-lexsi` account, read on 2026-11-25 
 | `lir-granite41-noko-s1` | `l40sx1` | 2026-11-25 05:50 | completed | 21.7 |
 | `lir-granite41-task` | `l40sx1` | 2026-11-25 05:57 | completed | 58.6 |
 | `lir-judge3-labels` | `a100-large` | 2026-11-25 12:37 | completed | 21.1 |
+| `lir-xlsum-build` | `a100-large` | 2026-11-25 21:18 | completed | 5.2 |
+| `lir-xlsum-base` | `a100-large` | 2026-11-25 21:26 | completed | 17.5 |
+| `lir-xlsum-plain-s42` | `a100-large` | 2026-11-25 21:29 | completed | 30.3 |
+| `lir-xlsum-judge` | `a100-large` | 2026-11-25 22:01 | completed | 6.4 |
+| `lir-xlsum-safegrad-s2` | `a100-large` | 2026-11-25 22:10 | completed | 32.3 |
+| `lir-xlsum-safegrad-s1` | `a100-large` | 2026-11-25 22:10 | completed | 32.5 |
+| `lir-xlsum-safegrad-s42` | `a100-large` | 2026-11-25 22:10 | completed | 31.7 |
+| `lir-xlsum-plain-s2` | `a100-large` | 2026-11-25 22:10 | completed | 30.6 |
+| `lir-xlsum-plain-s1` | `a100-large` | 2026-11-25 22:10 | completed | 29.7 |
+| `lir-xlsum-judge` | `a100-large` | 2026-11-25 22:43 | completed | 13.0 |
