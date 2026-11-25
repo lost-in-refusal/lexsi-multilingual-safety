@@ -213,7 +213,7 @@ last row since.
 Not rebuilt, and why:
 
 - An input is not published. `vector_aya` (its command checks the hashes of adapter weights), `refusal_direction`
-  (the activation files), `aya/task` (the held-out Aya answers), `dose` and `dose_seeds` (the arms of sections 19 and 19b are not uploaded), `cloud_jobs` (the account's job records need a login), `xlsum_premise.json`, `xlsum` and `xlsum_cut` (the runs of section 20 are in the private staging dataset; only their scores are published), `third_judge_check.md` (the third judge's verdicts
+  (the activation files), `aya/task` (the held-out Aya answers), `dose` and `dose_seeds` (the arms of sections 19 and 19b are not uploaded), `cloud_jobs` (the account's job records need a login), `xlsum_premise.json`, `xlsum`, `xlsum_cut` and `xlsum_mix` (the runs of sections 20 and 20b are in the private staging dataset; only their scores are published), `third_judge_check.md` (the third judge's verdicts
   are in the private staging dataset) and `granite41/person.md`, `second_reader_tiny.md` and `second_reader_granite.md` (each command reads its key from a folder that is not
   published; a copy of the key is in `results/lir/labels`).
 - The command needs a model or another package. `swahili_nllb.json` and `swahili_nllb_seeds.json` (written by a step

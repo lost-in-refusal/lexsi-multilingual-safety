@@ -13,16 +13,16 @@
       "list_price_dollars": 10.11
     },
     "a100-large": {
-      "jobs": 11,
-      "completed": 11,
-      "running_hours": 4.17,
-      "list_price_dollars": 10.43
+      "jobs": 15,
+      "completed": 15,
+      "running_hours": 5.89,
+      "list_price_dollars": 14.72
     }
   },
-  "jobs": 38,
-  "running_hours": 22.98,
-  "list_price_dollars": 31.65,
-  "read_utc": "2026-11-25 22:59",
+  "jobs": 42,
+  "running_hours": 24.7,
+  "list_price_dollars": 35.94,
+  "read_utc": "2026-11-25 23:53",
   "namespace": "lost-in-refusal-lexsi",
   "prices": {
     "l4x1": 0.8,
@@ -333,6 +333,38 @@
       "stage": "COMPLETED",
       "started_utc": "2026-11-25 22:43",
       "running_secs": 781
+    },
+    {
+      "id": "6b076b01b6a90bbe997ea66b",
+      "name": "lir-xlsum-mix5-s2",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 23:11",
+      "running_secs": 1893
+    },
+    {
+      "id": "6b076b01d91f621b93092c7f",
+      "name": "lir-xlsum-mix5-s1",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 23:11",
+      "running_secs": 1894
+    },
+    {
+      "id": "6b076b00d91f621b93092c7b",
+      "name": "lir-xlsum-mix5-s42",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 23:11",
+      "running_secs": 1872
+    },
+    {
+      "id": "6b07728ab6a90bbe997eb194",
+      "name": "lir-xlsum-judge",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 23:43",
+      "running_secs": 514
     }
   ]
 }
