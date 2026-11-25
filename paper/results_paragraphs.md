@@ -223,6 +223,21 @@ seed 42, so the caveat of the Nov 22 reading, that the 4-bit arms also differed 
 Limits to state with it: bitsandbytes NF4 with the adapter in bfloat16 on top (not an adapter merged and then
 quantized, and not GGUF); one GPU type; guard verdicts on answers capped at 256 tokens; no task score.
 
+## A model outside the Tiny Aya family (section 16; the first item of "with more credits"). Confidence: Medium (three seeds, preregistered, all three checks clear; one model; capped answers with no second reading)
+
+The same training code and data on IBM Granite 4.1 3B, a model from another family, gave the same pattern. Plain
+fine-tuning raised strict attack success by +10.1 points [+7.6, +12.6] over three seeds and English, Korean and Chinese
+(G1). Korean again rose more than English: the Korean rise minus the English rise is +20.8 [+15.1, +26.3] (G2); Korean
+went from 19.2% to about 40% while English did not move (+0.2 [-2.2, +2.7]). SafeGrad left attack success below plain
+by -13.7 [-16.1, -11.4] (G3), and in Korean returned it to the base model's level (-4.1 [-8.6, +0.2] against base)
+(`granite41/seeds.md`).
+
+What has to be said with it. One model of one other family: this is not "holds across models", and no test compares
+its sizes with Tiny Aya's. Granite's template has no system prompt, five Korean training rows were dropped as too long,
+its card does not list Swahili (left out of the checks), and the runs were on a cloud GPU. The base model's answers
+reached the 256-token cap far more often than the fine-tuned models' (Korean 73% against 22 to 38%), and no reading
+after re-generation exists for this model, so the result is on capped answers. Guard verdicts only.
+
 ## D9. Costs: task score. Confidence: High that there is a cost; the cause is not established
 
 Both fine-tunes score below the base model on the 300 held-out task prompts in every seed: averaged over three seeds, English goes from 6.61 to 6.37 under plain and 6.31 under SafeGrad, Korean from 6.10 to 5.51 and 5.49, Chinese from 6.25 to 5.79 and 5.74 (1 to 7 scale, Qwen3-14B judge). SafeGrad adds little to the cost of fine-tuning itself. The drop is not explained by shorter answers. With length groups fixed in advance, answers about as long as the base model's still score lower (plain -0.39 points, -0.81 to -0.05; SafeGrad -0.67, -1.10 to -0.30), and the drop is the same size for answers under half the length. It sits in the judge's accuracy score (-0.6 in English, -1.2 in Korean, -1.1 in Chinese) and not in fluency. The fine-tuned models answer at the length of the references they were trained on, a third of the base model's length.
