@@ -2385,6 +2385,49 @@ How it runs. Two jobs on a Hugging Face GPU with 80 GB (`a100-large`; the weight
 
 **Added Nov 25, 7:40 AM ET by Mingyu, when the first job was launched.** The entry above is headed 7:40 AM; it was pushed at 7:37 AM (`d0854a2`), and the heading was written a few minutes ahead of the clock. The label job (`--part labels`: the set-up test, then the 150 label rows) was submitted at 7:38 AM from that commit on one A100 with 80 GB, job `6b06d695b6a90bbe997d2f4e`. Nothing it wrote has been read.
 
+## 18. Analyses of stored answers that the outside reviews asked for
+
+**Added Nov 25, 7:45 AM ET by Mingyu, before any of them is computed. No model is run and no new answer is generated: every analysis reads answers, verdicts and marks that are already stored.**
+
+Why. Three outside reviews of the paper copy (section 17 says who) asked what the stored data already hold on four questions: whether the first guard errs differently on the base and the fine-tuned model, whether the Korean rise is the answers' form and not harm, whether Korean is special, and whether the repair comparison is complete. Each analysis is written down here before it is computed, and every one is reported. None has a pass rule except 18b and 18c, whose sentences are fixed below. All of it is exploratory in the sense of the rules at the end of this file: it was prompted by reviews of results we know.
+
+What we know as this is written. Every registered result above. One figure of 18b, seen at 7:39 AM while the fields of the stored files were being checked: at seed 42, over the four languages together, the guard labels 56 of the base model's 999 answers to the safe prompts Unsafe or Controversial, and 107 of the plain run's. Nothing by language, nothing at seeds 1 and 2, nothing of 18a or 18c to 18i beyond what the reports above print.
+
+**18a. The guard against the person, by run.** For K2, K3 and 16d and for the 120 labels: the 2 by 2 table of the guard's strict reading against the person's mark for the base answers and for the plain answers apart, with unsure marks counted beside, and the share of answers the person marked unsafe that the guard flagged and of answers the person marked safe that it passed, for each run. For K2 and K3 the guard's count of base against plain is given on the prompts the person's test used (both answers marked yes or no) and on all prompts of the sheet, named apart: the paper copy quotes the second beside the first.
+
+**18b. The guard on harmless prompts.** XSTest's safe prompts (250 a language, 249 in Swahili) were answered by every run, and the guard gave each answer its safety label as well as its refusal label. The quantity: the share of those answers the guard labels Unsafe or Controversial, plain minus base, over three seeds, with a bootstrap over the prompts, for each language, on Tiny Aya. A judge that reacts only to harm should move little on harmless prompts.
+
+| Korean, plain minus base, on the safe prompts | What we write |
+| --- | --- |
+| Interval above zero | The guard also flagged more of the fine-tuned model's Korean answers to harmless prompts, so a part of the Korean rise on the attack prompts, up to that size, may be the guard's reaction to the fine-tuned answers and not harm |
+| Interval includes zero | On harmless prompts the guard did not flag the fine-tuned model's Korean answers detectably more often than the base model's |
+| Interval below zero | On harmless prompts the guard flagged fewer of the fine-tuned model's Korean answers than of the base model's |
+
+Beside, with no rule: the same for English, Chinese and Swahili and for SafeGrad; the Korean change minus the English change; the same shares among the answers the guard calls no refusal, because a refusal is always labelled safe and the base model refuses more; the guard's Unsafe class alone; the same on the model outside the Tiny Aya family; and the Korean rise on the attack prompts with the Korean change on the safe prompts taken off it, both resampled.
+
+**18c. Answer length and the cap.** The Korean attack answers of base and plain at the three seeds, split by whether the answer reached the 256-token cap, and into three groups of equal size by the answer's length in tokens over the base and plain answers together. The quantity: plain minus base in strict attack success inside each group, pooled over seeds with a bootstrap over prompt families.
+
+| The Korean rise inside the groups | What we write |
+| --- | --- |
+| Above zero among complete answers and in each of the three length groups | The Korean rise is there among answers of the same length and among answers that were not cut |
+| Anything else | The Korean rise is not found in (the groups where the interval includes zero), so it cannot be separated from the change in answer length there |
+
+A group is defined by the answer, which the fine-tune changes, so this compares different prompts in the two runs and is a description, not a control; the re-generation of sections 9 and 13 is the registered answer to the cap.
+
+**18d. The guard's Unsafe class alone on the model outside the Tiny Aya family.** G1 to G3 by section 16's code with only Unsafe counted, and the Korean and English rates by run.
+
+**18e. The repair comparison in full.** For plain, SafeGrad and the two mixing arms at seeds 42, 1 and 2: strict attack success and over-refusal in each of the four languages, the task score, optimizer steps and training minutes, as rates and not only as differences, with seed 42 marked as seen before the mixing rules were written.
+
+**18f. Korean against the other languages.** On MultiJail over three seeds: the Korean rise minus the Chinese rise, with its interval. On the second benchmark (14i): the same. U3 of section 13 already compares Korean with the six further languages and is quoted, not recomputed.
+
+**18g. Task score and answer length by language.** For base, plain and SafeGrad over three seeds: the task score and the median answer length on the held-out task prompts in English, Korean and Chinese apart.
+
+**18h. Drift against the task score over the five training settings.** The table of section 14h with the default run: Korean rise, English rise, task score against base, training loss. A description of five runs at one seed; no trend is tested.
+
+**18i. The rank test of 15a on the 40 new plans alone.** The number of the 40 plans the gate had not shown (seeds 6 to 84) at or below the circuit plan's perplexity, and that number plus one over 41, at both sizes. 15a's own p counts the gate's three and is not replaced.
+
+The command (`python -m lir.reviewtables`) writes `results/lir/stage2/review_tables.json` and `.md`. It is committed after this entry and before its output is read.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
