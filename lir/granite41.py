@@ -538,7 +538,9 @@ TASK_NOT_READ = "T1 and T2 are not read: they need every task answer of the base
 
 
 def task_command(commit: str, flavor: str = "l40sx1", timeout: str = "2h", dry_run: bool = False) -> list[str]:
-    return again_command(commit, flavor, timeout, dry_run)[:-1] + [again_command(commit)[-1].replace("job-again", "job-task")]
+    cmd = again_command(commit, flavor, timeout, dry_run)
+    cmd[cmd.index("--name") + 1] = f"lir-{TASK_JOB}"   # the job's display name
+    return cmd[:-1] + [cmd[-1].replace("job-again", "job-task")]
 
 
 def job_task(a) -> None:

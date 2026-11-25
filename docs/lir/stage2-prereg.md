@@ -2220,6 +2220,8 @@ Cost and reading. One job with a limit of two hours, about $2. `python -m lir.gp
 
 The jobs and the readers of 16b and 16c (`lir/hfjob.py`, `lir/granite41.py`) and their tests are committed with these entries.
 
+**Added Nov 25, 12:05 AM ET by Mingyu, when the jobs of 16b and 16c were launched.** All four were submitted on Nov 25 at 12:04 AM ET from commit `541e5bf` on one NVIDIA L40S each, with a limit of two hours: `granite41-noko-s42` (`6b066c691460ffe1d5e9cc17`), `granite41-noko-s1` (`6b066c691460ffe1d5e9cc1c`), `granite41-noko-s2` (`6b066c691460ffe1d5e9cc1e`), and the task job of 16c (`6b066c6a1460ffe1d5e9cc20`). The task job carries the display name of the re-generation job of 16a, a mistake in the launch command; its command is `lir.granite41 job-task`, and it uploads under `granite41-task/`. The mistake is corrected for later launches and changes nothing that is measured. The re-generation job of 16a was still running. No output of any of them has been read.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

@@ -2492,6 +2492,7 @@ class OtherFamilyFollowUps(unittest.TestCase):
         self.assertIn("--dry-run", cmd)
         self.assertIn("LIR_MODEL=granite41 python -m lir.granite41 job-task", cmd[-1])
         self.assertEqual(cmd[cmd.index("--flavor") + 1], "l40sx1")
+        self.assertEqual(cmd[cmd.index("--name") + 1], "lir-granite41-task")
 
     def test_registered_wording(self):
         from lir.common import ROOT
