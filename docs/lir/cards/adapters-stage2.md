@@ -45,13 +45,22 @@ The seed 42 runs on Tiny Aya Global are in their own repositories from stage 1:
 | `plain-only-en-s1`, `plain-only-ko-s1`, `plain-only-zh-s1`, `plain-only-en-s2`, `plain-only-ko-s2`, `plain-only-zh-s2` | Global | The same three single-language files | 600 | 1 and 2 | Plain LoRA |
 | `plain-ayasize-s1`, `plain-ayasize-s2` | Global | `bactrian_train_ayasize.jsonl`, as for `plain-ayasize` | 519 | 1 and 2 | Plain LoRA |
 | `aya-plain-s1-vec`, `aya-plain-s2-vec`, `aya-plain-vec` | Global | None | | | No training. The same seed 42 difference (from the Bactrian-X adapters), added to the Aya plain adapter of seed 1, 2 or 42. Rank 48. Registered before it was run. These models write answers about twice as long as the plain ones |
+| `plain-mix1-s1`, `plain-mix1-s2` | Global | `bactrian_train_mix1.jsonl`, as for `plain-mix1` | 1,847 | 1, 2 | Plain LoRA |
+| `plain-mix5-s1`, `plain-mix5-s2` | Global | `bactrian_train_mix5.jsonl`, as for `plain-mix5` | 2,035 | 1, 2 | Plain LoRA |
+| `plain-lr-half`, `plain-lr-double` | Global | `bactrian_train.jsonl` | 1,800 | 42 | Plain LoRA with the peak learning rate halved (1e-4) and doubled (4e-4) |
+| `plain-ep-half`, `plain-ep-double` | Global | `bactrian_train.jsonl` | 1,800 | 42 | Plain LoRA for half the epochs (1.5) and twice the epochs (6) |
+| `plain-aligntune` | Global | `bactrian_train.jsonl` | 1,800 | 42 | Plain LoRA with the usual settings, trained through Lexsi's AlignTune and its TRL backend in place of our training script |
 
 The file with no Korean rows has 1,748 rows. One was over the length limit and was dropped, so those runs trained
 on 1,747.
 
-Every trained run uses the settings of the stage 1 adapters: LoRA r=16, alpha 32, on all attention and MLP
-projections; 3 epochs; peak learning rate 2e-4, cosine with 3% warmup; effective batch 32. Trained on an Apple M5
-Pro with PyTorch MPS.
+The settings of the stage 1 adapters are: LoRA r=16, alpha 32, on all attention and MLP projections; 3 epochs; peak
+learning rate 2e-4, cosine with 3% warmup; effective batch 32. Every trained run uses them, with these exceptions.
+`plain-lr-half` and `plain-lr-double` have a peak learning rate of 1e-4 and 4e-4, and `plain-ep-half` and
+`plain-ep-double` train for 1.5 and 6 epochs; each changes that one setting and nothing else. `plain-aligntune` has
+the same settings and data and was not trained by our script (`lir/train.py`): it went through AlignTune
+0.1.36.dev39 and `trl.SFTTrainer` (trl 1.7.1, torch 2.13). Its `run.json` lists the settings passed on and what
+differs from our script. All runs were trained on an Apple M5 Pro with PyTorch MPS.
 
 ## What is in a folder
 
@@ -68,6 +77,18 @@ The tokenizer is the base model's and is not repeated here.
 The training files are in `data/lir/` of the
 [code repository](https://github.com/lost-in-refusal/lexsi-multilingual-safety). The Aya training file is there and
 not on Hugging Face.
+
+## Adapters that are not here
+
+Twelve adapters were trained on a cloud GPU, in Hugging Face Jobs, and not on the laptop. They exist and are not
+released yet, here or anywhere else:
+
+- `plain-ko`, `plain-en`, `plain-zh`: plain LoRA on one training language on Tiny Aya Global. The folders
+  `plain-only-ko`, `plain-only-en` and `plain-only-zh` here are separate laptop runs of the same recipe.
+- Nine adapters of IBM Granite 4.1 3B (`ibm-granite/granite-4.1-3b`), a model outside the Tiny Aya family: plain
+  LoRA, SafeGrad, and plain LoRA with no Korean row, each at seeds 42, 1 and 2.
+
+Their answers, verdicts, run records and training logs are in the evaluation outputs under `gpu/`.
 
 ## Results
 
