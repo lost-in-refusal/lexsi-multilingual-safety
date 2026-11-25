@@ -120,6 +120,8 @@ NOT_REBUILT = [
     (("review_tables.json", "review_tables.md"),
      "`python -m lir.reviewtables` reads the training records of the mixing runs at seeds 1 and 2 for its table of runs "
      f"(18e), and they are not published: {RECORDS_TO}. The answers, verdicts, marks and scores it reads are published"),
+    (("cloud_jobs.json", "cloud_jobs.md"),
+     "`python -m lir.cloudhours` reads the job records of the organisation's Hugging Face account, which need a login with access"),
     (("third_judge_check.md",),
      "`python -m lir.judge3 check-a` reads the verdicts of the Hugging Face job of section 17, which are in the private staging "
      "dataset; the judge's verdicts on the 120 labelled answers are in results/lir/labels"),

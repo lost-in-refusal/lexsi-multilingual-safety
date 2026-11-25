@@ -1,0 +1,250 @@
+{
+  "by_gpu": {
+    "l4x1": {
+      "jobs": 13,
+      "completed": 11,
+      "running_hours": 12.64,
+      "list_price_dollars": 10.11
+    },
+    "l40sx1": {
+      "jobs": 13,
+      "completed": 12,
+      "running_hours": 6.17,
+      "list_price_dollars": 11.11
+    },
+    "a100-large": {
+      "jobs": 1,
+      "completed": 1,
+      "running_hours": 0.35,
+      "list_price_dollars": 0.88
+    }
+  },
+  "jobs": 27,
+  "running_hours": 19.16,
+  "list_price_dollars": 22.1,
+  "read_utc": "2026-11-25 15:10",
+  "namespace": "lost-in-refusal-lexsi",
+  "prices": {
+    "l4x1": 0.8,
+    "l40sx1": 1.8,
+    "a100-large": 2.5
+  },
+  "job_list": [
+    {
+      "id": "6b0356e0130a00b5aa8123e2",
+      "name": "lir-control",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-22 20:56",
+      "running_secs": 3936
+    },
+    {
+      "id": "6b035e658d268c0fbd22bce9",
+      "name": "lir-only-ko",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-22 21:28",
+      "running_secs": 3033
+    },
+    {
+      "id": "6b03624d130a00b5aa813c6f",
+      "name": "lir-nf4",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-22 21:49",
+      "running_secs": 8216
+    },
+    {
+      "id": "6b036be2130a00b5aa8154ab",
+      "name": "lir-only-zh",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-22 22:25",
+      "running_secs": 3044
+    },
+    {
+      "id": "6b036bc48d268c0fbd22da58",
+      "name": "lir-only-en",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-22 22:25",
+      "running_secs": 3103
+    },
+    {
+      "id": "6b03be68130a00b5aa820c70",
+      "name": "lir-d13",
+      "flavor": "l4x1",
+      "stage": "ERROR",
+      "started_utc": "2026-11-23 04:19",
+      "running_secs": 177
+    },
+    {
+      "id": "6b03c3ae130a00b5aa821a33",
+      "name": "lir-d13",
+      "flavor": "l4x1",
+      "stage": "ERROR",
+      "started_utc": "2026-11-23 05:01",
+      "running_secs": 169
+    },
+    {
+      "id": "6b0634511460ffe1d5e9719c",
+      "name": "lir-unmerged-s2",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 01:05",
+      "running_secs": 4270
+    },
+    {
+      "id": "6b0634511460ffe1d5e9719a",
+      "name": "lir-nf4-s1",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 01:05",
+      "running_secs": 4381
+    },
+    {
+      "id": "6b0634521460ffe1d5e9719e",
+      "name": "lir-nf4-s2",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 01:17",
+      "running_secs": 4424
+    },
+    {
+      "id": "6b063450d0582cfbbefd5806",
+      "name": "lir-unmerged",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 01:34",
+      "running_secs": 4298
+    },
+    {
+      "id": "6b0634501460ffe1d5e97196",
+      "name": "lir-unmerged-s1",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 01:46",
+      "running_secs": 4330
+    },
+    {
+      "id": "6b06465ad0582cfbbefd7402",
+      "name": "lir-mmlu",
+      "flavor": "l4x1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 02:22",
+      "running_secs": 2126
+    },
+    {
+      "id": "6b063eeed0582cfbbefd6899",
+      "name": "lir-granite41-base",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 02:22",
+      "running_secs": 609
+    },
+    {
+      "id": "6b06483c1460ffe1d5e99500",
+      "name": "lir-granite41-plain-s2",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 02:32",
+      "running_secs": 1459
+    },
+    {
+      "id": "6b06483c1460ffe1d5e994fc",
+      "name": "lir-granite41-plain-s42",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 02:32",
+      "running_secs": 1384
+    },
+    {
+      "id": "6b06483cd0582cfbbefd77a4",
+      "name": "lir-granite41-plain-s1",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 02:44",
+      "running_secs": 1395
+    },
+    {
+      "id": "6b06490bd0582cfbbefd7888",
+      "name": "lir-granite41-safegrad-s42",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 02:47",
+      "running_secs": 1522
+    },
+    {
+      "id": "6b065099d0582cfbbefd857c",
+      "name": "lir-granite41-safegrad-s1",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 03:13",
+      "running_secs": 1508
+    },
+    {
+      "id": "6b065099d0582cfbbefd857f",
+      "name": "lir-granite41-safegrad-s2",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 03:17",
+      "running_secs": 1579
+    },
+    {
+      "id": "6b065eed1460ffe1d5e9b720",
+      "name": "lir-granite41-regen",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 04:25",
+      "running_secs": 3928
+    },
+    {
+      "id": "6b066c6a1460ffe1d5e9cc20",
+      "name": "lir-granite41-regen",
+      "flavor": "l40sx1",
+      "stage": "ERROR",
+      "started_utc": "2026-11-25 05:05",
+      "running_secs": 1342
+    },
+    {
+      "id": "6b066c691460ffe1d5e9cc1e",
+      "name": "lir-granite41-noko-s2",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 05:36",
+      "running_secs": 1312
+    },
+    {
+      "id": "6b066c691460ffe1d5e9cc17",
+      "name": "lir-granite41-noko-s42",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 05:39",
+      "running_secs": 1342
+    },
+    {
+      "id": "6b066c691460ffe1d5e9cc1c",
+      "name": "lir-granite41-noko-s1",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 05:50",
+      "running_secs": 1304
+    },
+    {
+      "id": "6b0672611460ffe1d5e9da62",
+      "name": "lir-granite41-task",
+      "flavor": "l40sx1",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 05:57",
+      "running_secs": 3518
+    },
+    {
+      "id": "6b06d695b6a90bbe997d2f4e",
+      "name": "lir-judge3-labels",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-25 12:37",
+      "running_secs": 1267
+    }
+  ]
+}
