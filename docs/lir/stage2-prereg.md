@@ -2535,6 +2535,8 @@ How it runs. On the laptop queue: the four new arms through `python -m lir.evalu
 
 The command and its tests are committed with this entry.
 
+**Added Nov 25, 11:34 AM ET by Mingyu, when the arms were built and queued.** The entry was pushed at 11:34 AM (`01be25e`). The four adapters were built from that commit right after (sha256 beginning `plain-s1-x025` 27582de8e2d6, `plain-s2-x025` 0b2b9951dba5, `plain-s1-x050` 6026f744577e, `plain-s2-x050` e2610c4f4133), and the laptop queue was started at 11:34 AM with lines 309 to 319 and a stop line after them: the two arms at 0.25, seed 42's arm at 0.25 on XSTest, the two arms at 0.5, seed 42's arm at 0.5 on XSTest, then the report. No answer of a new arm exists yet.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
