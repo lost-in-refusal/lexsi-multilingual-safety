@@ -1,0 +1,28 @@
+{
+  "policy_sha256": "fe5e455490ee9b197870c240988178611e4757de3ecf353622564ae1c6e349bb",
+  "files": {
+    "labels": "4c449ba3f3b7dd8c594320b902cc871497c5be82a5e4bb21031c6a94ece9955a",
+    "arms": "149551d93e0c58c9ec6d0613b5a11593ee4218f869c9ab129b9d14bce0703fcb"
+  },
+  "rows": {
+    "labels": 150,
+    "arms": 16296
+  },
+  "answers_sha256": {
+    "base": "32e82bffbd5b28c5af645da9f8c2d4a2721e5cd63779b5b1a335b6640429ecb8",
+    "plain": "b2929ebb960a38b2c9d046209a937fb60ea1f0ce2ef62bbff6b76f6b8f751e67",
+    "safegrad": "fce0b59bb5de92453cad9384f0b91ac0313aae0aa1842fd96c52916064e88a3e",
+    "plain-s1": "2bb14e5c2cde5d14dfb7d010cb7f11aea72d1af7b5a1d8357bb47c51d53cac53",
+    "safegrad-s1": "ec0bda284dfe5a6e271a1c70871292c2010cfad2b85ebda30c82eaa984fe86a6",
+    "plain-s2": "0190a884dd3c99ec9a7f4e2053855643907411d913192166c2fea05eec84a0d1",
+    "safegrad-s2": "507c3861f2662ca55e3a420228a9c4c26266b4980c8741d2bedd52475165fde0",
+    "granite41-base": "a21bac2364370682c2fbe740fd351a05352c6d9fc6b2d07170eadde200649d79",
+    "granite41-plain-s42": "3f603ee63adc3b7ecefb667831b38db6c241b4b3c49072fe3c5f5aa390bc60b8",
+    "granite41-safegrad-s42": "0d4ecf40d5f4ab6006a1246f41c64a56fbca45d98d46b96dd3d1ad581583d647",
+    "granite41-plain-s1": "169f98c36d9d7b84ac335f800af2733b59de43c07e45dc618e61fee68e239649",
+    "granite41-safegrad-s1": "326bdcfcd6ef065bbfbc7a4f5a58e7cbdb1dbee1d127be3f0bedce49d948aca0",
+    "granite41-plain-s2": "af44da1fa404de584477733a369458ef89a0278fd3933909756758a7ff5da6c1",
+    "granite41-safegrad-s2": "eeaee49dcc26d343b26fb2a1deab734d688730545fcc7e13456aae0fe6515ac5"
+  },
+  "staging_revision": "c3aac88385ce4661338a2284230ed873ad3ce451"
+}

@@ -93,6 +93,9 @@ NOT_REBUILT = [
      "published; the step that judges them is not run again here"),
     (("ko_drift.md", "ko_rest.md", "second_judge_check.md"),
      "a person's labels and the write-up of the two second-judge checks; their inputs are in results/lir/labels"),
+    (("third_judge_inputs.json",),
+     "`python -m lir.judge3 inputs` writes the hashes of the answers the third judge reads, some of which are in the private "
+     "staging dataset and not published yet"),
     (("granite41/person.md",),
      "`python -m lir.granite_reading score` reads a person's marks and the answers and verdicts of two runs of section 16, "
      "which are in the private staging dataset and not published yet; the marks and the key are in results/lir/labels"),
