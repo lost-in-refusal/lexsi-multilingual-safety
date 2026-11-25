@@ -131,6 +131,9 @@ NOT_REBUILT = [
      "records, which are on the laptop and not published"),
     (("cloud_jobs.json", "cloud_jobs.md"),
      "`python -m lir.cloudhours` reads the job records of the organisation's Hugging Face account, which need a login with access"),
+    (("xlsum_premise.json",),
+     "`python -m lir.xlsum premise` reads the ROUGE-L and task scores of the base run and of plain at seed 42 of section 20, "
+     "which are in the private staging dataset"),
     (("third_judge_check.md",),
      "`python -m lir.judge3 check-a` reads the verdicts of the Hugging Face job of section 17, which are in the private staging "
      "dataset; the judge's verdicts on the 120 labelled answers are in results/lir/labels"),

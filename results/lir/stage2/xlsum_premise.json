@@ -1,0 +1,41 @@
+{
+  "outcome": "go",
+  "go": true,
+  "report": "The fine-tune improved its own task (+8.05 [+6.80, +9.31]) and still answered general requests (task score 5.80 against 6.29 for the base model): the other runs are made",
+  "rouge_l_plain_minus_base": {
+    "mean": 8.053146612311794,
+    "ci95": [
+      6.795725074459411,
+      9.30660631520485
+    ],
+    "prompts": 300
+  },
+  "improved": true,
+  "task_score": {
+    "plain": 5.805,
+    "base": 6.2941666666666665,
+    "prompts_scored_in_both": 300,
+    "broken": false,
+    "bar": 1.0
+  },
+  "runs": {
+    "xlsum-base": {
+      "upload": "20261125-212812-2f69714",
+      "commit": "2f697141d4983049227be678fce1fc960965bc5a",
+      "judge_upload": "20261125-220301-df1a4e4",
+      "task_answers_unscored": 0
+    },
+    "xlsum-plain-s42": {
+      "upload": "20261125-213133-2f69714",
+      "commit": "2f697141d4983049227be678fce1fc960965bc5a",
+      "judge_upload": "20261125-220301-df1a4e4",
+      "task_answers_unscored": 0
+    }
+  },
+  "input_revision": "9882d792a2756c59762a55af9c5e0fcc08b75aaa",
+  "input_sha256": {
+    "train": "616cf4dc25f80f5a1f3f6bad0df4407be50778cb6390e77992fc9d19f5b85c5e",
+    "heldout": "88f34db083b60c45a8bae8ace3b3371723a3addbf2d989be50da3f9ca0f7500f"
+  },
+  "staging_revision": "27a85d51b1070761d344bd3c8f48670c4ba35101"
+}
