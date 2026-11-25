@@ -21,7 +21,7 @@ Against the bfloat16 model, four languages together, with no rule. Strict attack
 
 Each mixed plan against uniform 4-bit, strict attack success, four languages together, with no rule: `circuit` +3.0 [+1.1, +5.0]; `random-0` +13.1 [+10.7, +15.6]; `random-2` +11.5 [+9.3, +13.7]; `random-4` +1.7 [+0.0, +3.4].
 
-Task score (1 to 5, 300 held-out task prompts, one judge model): `bf16` 6.35; `int4` 6.09; `circuit` 4.78; `random-0` 3.69; `random-2` 4.00; `random-4` 4.15. Against the bfloat16 model: `int4` -0.25 [-0.38, -0.14]; `circuit` -1.57 [-1.78, -1.36]; `random-0` -2.66 [-2.91, -2.42]; `random-2` -2.35 [-2.58, -2.11]; `random-4` -2.20 [-2.44, -1.95].
+Task score (1 to 7, 300 held-out task prompts, one judge model): `bf16` 6.35; `int4` 6.09; `circuit` 4.78; `random-0` 3.69; `random-2` 4.00; `random-4` 4.15. Against the bfloat16 model: `int4` -0.25 [-0.38, -0.14]; `circuit` -1.57 [-1.78, -1.36]; `random-0` -2.66 [-2.91, -2.42]; `random-2` -2.35 [-2.58, -2.11]; `random-4` -2.20 [-2.44, -1.95].
 
 Over-refusal on the safe XSTest prompts (%): English `bf16` 9.6, `int4` 8.4, `circuit` 18.8, `random-0` 17.2, `random-2` 12.4, `random-4` 12.4; Korean `bf16` 7.6, `int4` 10.0, `circuit` 28.4, `random-0` 49.6, `random-2` 25.6, `random-4` 29.2; Chinese `bf16` 8.8, `int4` 8.4, `circuit` 20.8, `random-0` 27.2, `random-2` 15.6, `random-4` 21.2; Swahili `bf16` 7.6, `int4` 8.4, `circuit` 10.0, `random-0` 16.9, `random-2` 12.4, `random-4` 12.0.
 

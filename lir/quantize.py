@@ -631,7 +631,7 @@ def report_md(res: dict, gate_res: dict | None = None, sizes: dict | None = None
         lines += ["", "Each mixed plan against uniform 4-bit, strict attack success, four languages together, with no rule: "
                   + "; ".join(f"`{a}` {ci(d)}" for a, d in res["each_vs_int4"].items()) + "."]
     if "task_score" in res:
-        lines += ["", "Task score (1 to 5, 300 held-out task prompts, one judge model): " + "; ".join(
+        lines += ["", "Task score (1 to 7, 300 held-out task prompts, one judge model): " + "; ".join(
             f"`{a}` {v:.2f}" for a, v in res["task_score"].items()) + "."
             + (" Against the bfloat16 model: " + "; ".join(f"`{a}` {ci2(d)}" for a, d in res["task_vs_bf16"].items()) + "."
                if "task_vs_bf16" in res else "")]
