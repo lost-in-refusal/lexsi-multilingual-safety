@@ -1997,6 +1997,17 @@ Order and cost. Behind the arms of section 15 in the laptop queue: 45 measuremen
 
 The command and its tests (`lir/quantrank.py`, `tests/test_quantrank.py`) are committed with this entry. `lir/quantize.py` is not changed.
 
+**Added Nov 25, 5:33 AM ET by Mingyu, after the report was written.** R1 passes.
+
+- What ran. Both sizes in full, 45 plans each (the circuit plan, 43 random plans with seeds 0 to 84, the reversed plan), every one at exactly 4.0 bits, on the laptop at commit `b290801`: 3, 27 and 6 layers from Nov 24, 11:05 PM to Nov 25, 2:56 AM, then 7, 15 and 14 layers until 5:29 AM, then the report. Every plan was started before the limit of the entry.
+- R1, with 3, 27 and 6 layers: the circuit plan's perplexity is 7.81, and none of the 43 random plans is at or below it. The nearest is 8.19; they run to 12.61 with a median of 9.19. p = 1/44 = 0.023. The first row applies: "At the same 4.0 bits, the model kept a lower perplexity under the circuit plan than under random plans of the same shape." The reversed plan gives 17.75, above every random plan.
+- Beside, with no sentence, with 7, 15 and 14 layers: the circuit plan 15.92, none of the 43 at or below it (they run from 18.52 to 84.66, median 30.26), p = 0.023. The reversed plan gives 59.06; 8 random plans are above it.
+- The circuit plan and the gate's three random plans, measured again in this run, give the gate's values to two decimals at both sizes. The unquantized model's perplexity is 6.21 and uniform 4-bit's 6.49, both below every mixed plan.
+- Recounted with separate code from the file of measurements after the report was on screen: the same counts, values and p; 45 different plans at each size, none of the random plans equal to the circuit plan, the same tier sizes and the same 41,411 tokens for all.
+- What sections 15 and 15b found, which were read before this and stand beside it. Uniform 4-bit is better than the circuit plan on every measure taken: perplexity 6.49 against 7.81, task score 6.09 against 4.78, Global-MMLU-Lite 51.2% against 37.1%. On Global-MMLU-Lite the circuit plan is below two of its three random plans (37.1% against 33.8%, 42.7% and 45.2%), so the lower perplexity did not carry over to that benchmark. On the task score it is above the three (4.78 against 3.69, 4.00 and 4.15), with no rule for that comparison.
+- As registered. Perplexity is not safety. R1 does not stand in for Q1 or Q2, which were not read, and no protection by the circuit plan is claimed. R1 does not say whether the place of the 8-bit or of the 2-bit layers matters, and no ranking that knows nothing of refusal was compared, so it shows that the circuit's ranking carries information about which layers bear fewer bits and not that the refusal circuit in particular does.
+- The files: `results/lir/stage2/quantization_ranks.json` and `.md`, as the queue wrote them.
+
 ### 15b. Global-MMLU-Lite on the arms of section 15
 
 **Added Nov 24, 9:20 PM ET by Mingyu, while the arms of section 15 are still being evaluated on the laptop. The report of section 15 does not exist, no file of an arm has been read beyond the row counts of the unquantized arm, and no question of the benchmark has been answered by any model of ours.**

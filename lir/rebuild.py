@@ -140,6 +140,9 @@ NOT_REBUILT = [
     (("quantization_gate.json", "quantization_gate.md"),
      "`python -m lir.quantize gate` loads the model once for every plan it measures, in the environment with CircuitKIT "
      "and optimum-quanto"),
+    (("quantization_ranks.json", "quantization_ranks.md"),
+     "`python -m lir.quantrank report` reads the perplexity measured on the 90 quantized models of section 15a, a file on "
+     "the laptop that is not published"),
     (("quantization_plan.json",),
      "`python -m lir.quantize plan` reads the stage 1 score files and loads no model, but it needs CircuitKIT, which is "
      "not in this repository, in an environment of its own"),
