@@ -2506,6 +2506,62 @@ class OtherFamilyFollowUps(unittest.TestCase):
             self.assertIn(sentence, c)
 
 
+class GranitePerson(unittest.TestCase):
+    """Section 16d: the Korean rise on the model outside the Tiny Aya family, judged by a person."""
+
+    def answers(self):
+        from lir.common import DATA, read_jsonl
+
+        fams = sorted({r["family"] for r in read_jsonl(DATA / "multijail_attack.jsonl") if r["lang"] == "ko"})
+        return {arm: {f: {"uid": f"{f}-ko", "prompt": f"prompt {f}", "response": f"{arm} answer to {f}"} for f in fams} for arm in ("base", "plain")}
+
+    def test_the_sample_is_fixed_and_hides_the_arm(self):
+        from lir.granite_reading import ARMS, PROMPTS, SEED, items
+
+        self.assertEqual((PROMPTS, SEED, list(ARMS)), (150, 20261125, ["base", "plain"]))
+        self.assertEqual(ARMS, {"base": "granite41-base", "plain": "granite41-plain-s42"})
+        rows = items(self.answers())
+        self.assertEqual(len(rows), 300)
+        self.assertEqual([r["item"] for r in rows[:2]], ["G001", "G002"])
+        by = {}
+        for r in rows:
+            by.setdefault(r["family"], []).append(r["arm"])
+        self.assertEqual(len(by), 150)
+        self.assertTrue(all(sorted(v) == ["base", "plain"] for v in by.values()))       # each prompt once from each model
+        self.assertFalse(any(a["family"] == b["family"] for a, b in zip(rows, rows[1:])))   # never neighbours
+        self.assertEqual(rows, items(self.answers()))                                      # the seed fixes the draw and the order
+        self.assertEqual(set(rows[0]), {"item", "family", "arm", "uid", "prompt_ko", "prompt_en", "response"})
+
+    def test_the_registered_sentence_for_each_outcome(self):
+        from lir.granite_reading import ROWS, person_md, report
+        from lir.labelpack import ko_drift_result
+
+        key = [{"item": f"G{i}{arm[0]}", "family": f"f{i}", "arm": arm, "uid": f"f{i}-ko"} for i in range(40) for arm in ("base", "plain")]
+        def labels(base_yes, plain_yes):
+            return {k["item"]: "yes" if int(k["family"][1:]) in (base_yes if k["arm"] == "base" else plain_yes) else "no" for k in key}
+        guard = {k["item"]: False for k in key}
+        up = ko_drift_result(labels(range(2), range(14)), key, guard)        # 2 against 14 of 40
+        self.assertEqual((up["passes"], report(up)), (True, ROWS["pass"]))
+        flat = ko_drift_result(labels(range(2), range(4)), key, guard)       # 2 against 4: not significant
+        self.assertEqual((flat["passes"], report(flat)), (False, ROWS["fail"]))
+        down = ko_drift_result(labels(range(14), range(2)), key, guard)
+        self.assertEqual(report(down), ROWS["reversed"])
+        up.update(prompts=40, guard_strict_on_sample={"base": 0, "plain": 0}, report=report(up),
+                  by_guard_class={c: {"yes": 0, "no": 0, "unsure": 0} for c in ("Unsafe", "Controversial", "Safe")})
+        text = person_md(up, ["someone"])
+        self.assertIn("**The check passes. " + ROWS["pass"] + ".**", text)
+        self.assertIn("2 base answers and 14 plain answers were marked unsafe", text)
+
+    def test_registered_wording(self):
+        from lir.common import ROOT
+        from lir.granite_reading import PROMPTS, ROWS, SEED
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        section = prereg[prereg.index("### 16d."):]
+        for sentence in (*ROWS.values(), str(SEED), f"{PROMPTS} of the 291"):
+            self.assertIn(sentence, section)
+
+
 if __name__ == "__main__":
     unittest.main()
 
