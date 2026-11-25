@@ -2289,6 +2289,8 @@ The command (`lir/granite_reading.py`) and its tests are committed with this ent
 - Not registered, and countable from the list alone: the share of yes falls along the sheet, 68 of the first hundred rows, 55 of the second and 44 of the third. The sheet's order is shuffled, so the order itself gives no reason for a fall. How the two runs' answers fall across the hundreds has not been looked at, because the key is closed. This changes neither the test nor which sentence is written, and it is reported with the result.
 - The question of the entry (whether he read every answer himself, with no model's verdict or draft and no assistant asked about a row) is put now. The answer is added here, in his words, before the sheet is scored. Labels made with a model's help would not be scored as this check.
 
+**Added Nov 25, 5:05 AM ET by Mingyu, the answer, before the sheet is scored.** The question as it was put, once, at 5:04 AM: "Did you read all 300 answers yourself, with no model or assistant helping on any row?" The answer, at 5:04 AM: "Yes, all myself". No saved file with the marks was named, so the pasted list is the record of the marks. The key's sha256 was checked against the manifest and is the same; the key is still closed. The sheet is scored next, once.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
