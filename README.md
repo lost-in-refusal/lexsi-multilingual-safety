@@ -154,10 +154,10 @@ Full tables: [`results/lir/results.md`](results/lir/results.md) (vs base) and
 |---|---|
 | Demo (static Space) | [lost-in-refusal/lost-in-refusal-demo](https://huggingface.co/spaces/lost-in-refusal/lost-in-refusal-demo) |
 | Frozen datasets | [lost-in-refusal/lost-in-refusal-data](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-data) |
-| Every generation and judge verdict, stages 1 and 2 (held-out Aya answers excepted) | [lost-in-refusal/lost-in-refusal-eval-outputs](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-eval-outputs) |
+| Generations and judge verdicts, stages 1 and 2 (what is left out is listed under Reproduce) | [lost-in-refusal/lost-in-refusal-eval-outputs](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-eval-outputs) |
 | Plain LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-plain](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-plain) |
 | SafeGrad LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad) |
-| Stage 2 adapters (38 folders) | `lost-in-refusal/tiny-aya-lora-stage2`, public since Nov 25, 2026 |
+| Stage 2 adapters (47 folders) | `lost-in-refusal/tiny-aya-lora-stage2`, public since Nov 25, 2026 |
 
 ## Pipeline: four Lexsi tools, chained
 
@@ -173,13 +173,14 @@ refusal projection) and a causal steering check (`lir/steer.py`).
 
 ## Reproduce
 
-The datasets, the stage 1 adapters and every generation and judge verdict of both stages are on Hugging Face under
-[lost-in-refusal](https://huggingface.co/lost-in-refusal), with three exceptions: the answers to the held-out Aya
-prompts (they quote Aya rows; their scores are published), the activation files behind the refusal-direction table,
-and the files of the third judge of section 17. The stage 2 adapter repository was made public on Nov 25, 2026 with
-the adapters trained up to Nov 22. The nine adapters trained after Nov 22 are not in it yet, and neither are their
-training records, which is why five reports are not rebuilt below. The adapters trained on a cloud GPU are not in it
-either. The Aya training file is in `data/lir/` of this repository and not on Hugging Face.
+The datasets, the stage 1 adapters and the generations and judge verdicts behind the tables of both stages are on
+Hugging Face under [lost-in-refusal](https://huggingface.co/lost-in-refusal), with four exceptions: the answers to
+the held-out Aya prompts (they quote Aya rows; their scores are published), the activation files behind the
+refusal-direction table, the files of the third judge of section 17, and the answers and verdicts of the arms of
+sections 19 and 19b, which are not uploaded. The stage 2 adapter repository is public since Nov 25, 2026 and holds 47
+adapters with their training records; the nine trained after Nov 22 were added on Nov 25 at 5:02 PM ET. The adapters
+trained on a cloud GPU are not released. The Aya training file is in `data/lir/` of this repository and not on
+Hugging Face.
 
 ### Rebuild the stage 2 tables from the published files
 
@@ -200,21 +201,20 @@ What it covers depends on what is installed and readable:
 |---|---:|---|
 | The two packages above | 43, from 22 commands | H1 to H3 on three seeds, the numbers of three figures, Earth's checks, the truncation audit (counts, report, split), harm categories, task score by answer length, the Unsafe-only reading, the repair vector, the circuit comparison. From the folders added on Nov 25: the six further languages and the second benchmark, each as first read and after re-generation; the quantization arms, their rank test and Global-MMLU-Lite; on Granite 4.1, the runs with no Korean row and the task score |
 | AuditKIT as well (no dependencies; clone and `pip install -e vendor/AuditKIT` at the commit below) | 53, from 27 commands | The five per-arm tables written with AuditKIT's statistics (`results.md` in `stage2/`, `mixing/`, `earth/`, `aya/`, `vector/`) |
-| The training records as well (`python -m lir.rebuild records`; no weights) | 67, from 34 commands | K1 on three seeds, Aya and Earth on three seeds, K1 after re-generation, the single-language tables, training time |
+| The training records as well (`python -m lir.rebuild records`; no weights) | 77, from 39 commands | K1 on three seeds, Aya and Earth on three seeds, K1 after re-generation, the single-language tables, training time; the mixing runs at seeds 1 and 2, as first read and after re-generation; the four runs with the learning rate or the number of epochs changed; the run through AlignTune; the review tables |
 
 The records of the stage 2 runs are in the adapter repository, which is public since Nov 25, 2026, so the last row
-needs no login either. That repository holds the runs made up to Nov 22. The records of the nine laptop runs made
-since are not in it yet: the mixing runs at seeds 1 and 2, the run through AlignTune, and the four runs with the
-learning rate or the number of epochs changed.
+needs no login either. Its pinned revision is the upload of Nov 25, 5:02 PM ET (`d79340e8`, 47 folders), which added
+the nine laptop runs made after Nov 22: the mixing runs at seeds 1 and 2, the run through AlignTune, and the four runs
+with the learning rate or the number of epochs changed. Five reports read a record of one of them, and they are in the
+last row since.
 
 Not rebuilt, and why:
 
 - An input is not published. `vector_aya` (its command checks the hashes of adapter weights), `refusal_direction`
   (the activation files), `aya/task` (the held-out Aya answers), `dose` and `dose_seeds` (the arms of sections 19 and 19b are not uploaded), `cloud_jobs` (the account's job records need a login), `third_judge_check.md` (the third judge's verdicts
   are in the private staging dataset) and `granite41/person.md` (its command reads its key from a folder that is not
-  published; a copy of the key is in `results/lir/labels`). `mixing/seeds`, `mixing/seeds_regen`, `sensitivity`,
-  `aligntune` and `review_tables`: their answers and verdicts are published, but each command also reads the
-  training record of one of the nine runs above.
+  published; a copy of the key is in `results/lir/labels`).
 - The command needs a model or another package. `swahili_nllb.json` and `swahili_nllb_seeds.json` (written by a step
   that runs the translation model and the guard), `quantization_gate` (loads the model for every plan it measures)
   and `quantization_plan.json` (needs CircuitKIT).
@@ -230,7 +230,7 @@ Not rebuilt, and why:
   hashes) and the four images (the numbers beside them are compared).
 
 Tested on Nov 25, 2026 on one machine (macOS, Python 3.12.13), in a clean clone of the repository and with no
-login: all three rows came out as stated, and changing one verdict in the downloaded files changed 36 of the 67
+login: all three rows came out as stated, and changing one verdict in the downloaded files changed 44 of the 77
 tables. No new environment was made for this test: it ran in the project's environment, with Python set to find
 only the packages a row names and what they require. A new environment with only those packages was last tried on
 Nov 23, at the revision of that day. Other Python versions and operating systems were not tried.

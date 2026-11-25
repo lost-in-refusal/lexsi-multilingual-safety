@@ -1795,10 +1795,19 @@ class Rebuild(unittest.TestCase):
         self.assertLessEqual({"truncation/counts.md", "truncation/report.md", "truncation/report.json", "truncation/split.md",
                               "truncation/split.json"}, set(tables))
         # a table that copies the staging revision or writes a set's order does not come back the same, so it is not listed as rebuilt
-        self.assertFalse({"lir.nf4seeds", "lir.granite_reading", "lir.judge3", "lir.sensitivity", "lir.train_aligntune", "lir.reviewtables"}
-                         & {a[0] for a in args})
+        self.assertFalse({"lir.nf4seeds", "lir.granite_reading", "lir.judge3", "lir.dose", "lir.cloudhours"} & {a[0] for a in args})
         self.assertEqual([a for a in args if a[0] == "lir.granite41"], [["lir.granite41", "noko"], ["lir.granite41", "task"]])
-        self.assertEqual([a for a in args if a[0] == "lir.repeat"], [["lir.repeat", "aya"], ["lir.repeat", "k1"], ["lir.repeat", "earth"]])
+        # the five reports that read a record of one of the nine runs added to the adapter repository on Nov 25: each needs the
+        # records, `mix-again` comes after the `mix` whose table it reads, and the review tables after the three reports they read
+        five = [["lir.repeat", "mix"], ["lir.repeat", "mix-again"], ["lir.sensitivity", "report"], ["lir.train_aligntune", "report"],
+                ["lir.reviewtables"]]
+        self.assertEqual([c["args"] for c in COMMANDS if c["args"] in five], five)
+        self.assertEqual({c.get("needs") for c in COMMANDS if c["args"] in five}, {"records"})
+        self.assertLessEqual({"mixing/seeds.md", "mixing/seeds_regen.md", "sensitivity.md", "aligntune.md", "review_tables.md"}, set(tables))
+        for before in (["lir.morelangs", "report"], ["lir.quantrank", "report"], ["lir.sensitivity", "report"]):
+            self.assertLess(args.index(before), args.index(["lir.reviewtables"]))
+        self.assertEqual([a for a in args if a[0] == "lir.repeat"],
+                         [["lir.repeat", "aya"], ["lir.repeat", "k1"], ["lir.repeat", "earth"], ["lir.repeat", "mix"], ["lir.repeat", "mix-again"]])
         # the tables of the folders added on Nov 25 that come back the same, and `again` after the `report` whose table it reads
         self.assertLessEqual({"more_languages.md", "ten_languages.json", "more_languages_regen.md", "second_benchmark.md",
                               "second_benchmark_regen.md", "quantization.md", "quantization_ranks.md", "quantization_mmlu.md",
@@ -1815,10 +1824,11 @@ class Rebuild(unittest.TestCase):
         import re
 
         from lir.common import ROOT
-        from lir.rebuild import COMMANDS, NOT_REBUILT, OUTPUTS_REV
+        from lir.rebuild import ADAPTERS_REV, COMMANDS, NOT_REBUILT, OUTPUTS_REV
 
         text = (ROOT / "README.md").read_text()
         part = text[text.index("### Rebuild the stage 2 tables"):text.index("### Stage 1 table")]
+        self.assertIn(f"`{ADAPTERS_REV[:8]}`", part)   # the revision the training records are read at
         want, tables, commands = [], 0, 0
         for need in (None, "auditkit", "records"):   # each row of the README's table adds one requirement
             cmds = [c for c in COMMANDS if c.get("needs") == need]

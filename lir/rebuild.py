@@ -18,8 +18,8 @@ its own (the README gives the commit). A command whose package or input is missi
 
 `records` reads the seed 42 records from the two public stage 1 adapter repositories and the others from the stage 2
 adapter repository, which has been public since Nov 25, 2026. If it cannot be read, the reports that check a
-training record are skipped and named. That repository holds the runs made up to Nov 22. The records of the nine
-laptop runs made since are not in it, so the five reports that read one of them are in NOT_REBUILT.
+training record are skipped and named. Its pinned revision is the upload of Nov 25, 5:02 PM ET, which added the nine
+laptop runs made after Nov 22 (47 folders), so the five reports that read one of their records are in COMMANDS.
 
 NOT_REBUILT names every other table with the reason: an input that is not published, a package or a model its
 command needs, or what the command writes from the published files that the committed file does not hold.
@@ -40,7 +40,7 @@ from lir.common import HF_ORG, ROOT, RUNS
 OUTPUTS = f"{HF_ORG}/lost-in-refusal-eval-outputs"
 OUTPUTS_REV = "cf19782b9445b2aa56f3ab069fe269888d39a3f6"    # the upload of Nov 25, 2026 (979 files)
 ADAPTERS = f"{HF_ORG}/tiny-aya-lora-stage2"
-ADAPTERS_REV = "292f8ba92163b3a2ac58ce625046f16516d0c70b"   # the upload of Nov 23, 2026
+ADAPTERS_REV = "d79340e8e5cae22266eb0cd5210cf81671297d37"   # the upload of Nov 25, 2026 (47 folders)
 STAGE1 = {"plain": (f"{HF_ORG}/tiny-aya-global-bactrian-lora-plain", "0e57114e1804beb4c81a3afad0076d9733067010"),   # seed 42, public
           "safegrad": (f"{HF_ORG}/tiny-aya-global-bactrian-lora-safegrad", "8b2687f885d388e4a3a370fb04252a21c3f13e99")}
 RECORD_FILES = ("run.json", "train_log.jsonl", "surgery_log.jsonl")
@@ -92,11 +92,17 @@ COMMANDS = [
     {"args": ["lir.repeat", "earth"], "tables": ["earth/seeds.json", "earth/seeds.md"], "needs": "records"},
     {"args": ["lir.section13", "only"], "tables": ["single_language.json", "single_language.md"], "needs": "records"},
     {"args": ["lir.section13", "seeds"], "tables": ["single_language_seeds.json", "single_language_seeds.md"], "needs": "records"},
+    # With the records of the nine runs added to the adapter repository on Nov 25, 2026. `mix-again` reads the table of
+    # `mix`, and `lir.reviewtables` reads tables that `lir.morelangs`, `lir.quantrank` and `lir.sensitivity` write before it.
+    {"args": ["lir.repeat", "mix"], "tables": ["mixing/seeds.json", "mixing/seeds.md"], "needs": "records"},
+    {"args": ["lir.repeat", "mix-again"], "tables": ["mixing/seeds_regen.json", "mixing/seeds_regen.md"], "needs": "records"},
+    {"args": ["lir.sensitivity", "report"], "tables": ["sensitivity.json", "sensitivity.md"], "needs": "records"},
+    {"args": ["lir.train_aligntune", "report"], "tables": ["aligntune.json", "aligntune.md"], "needs": "records"},
+    {"args": ["lir.reviewtables"], "tables": ["review_tables.json", "review_tables.md"], "needs": "records"},
 ]
 
 # Every other file in results/lir/stage2 (the status page aside), and why no command above rebuilds it. Where a
 # reason says how a rebuilt file differs, the command was run on the published files on Nov 25, 2026.
-RECORDS_TO = "the adapter repository holds the runs made up to Nov 22"
 NOT_REBUILT = [
     (("vector_aya.json", "vector_aya.md"),
      "`python -m lir.section13 vector` checks the hashes of the adapters the edit was built from, so it needs the adapter weights"),
@@ -117,9 +123,6 @@ NOT_REBUILT = [
      "published; the step that judges them is not run again here"),
     (("ko_drift.md", "ko_rest.md", "second_judge_check.md"),
      "a person's labels and the write-up of the two second-judge checks; their inputs are in results/lir/labels"),
-    (("review_tables.json", "review_tables.md"),
-     "`python -m lir.reviewtables` reads the training records of the mixing runs at seeds 1 and 2 for its table of runs "
-     f"(18e), and they are not published: {RECORDS_TO}. The answers, verdicts, marks and scores it reads are published"),
     (("dose.json", "dose.md"),
      "`python -m lir.dose report` reads the answers, verdicts and task scores of the five arms of section 19 and their adapters' "
      "records, which are on the laptop and not published"),
@@ -139,16 +142,6 @@ NOT_REBUILT = [
      "`python -m lir.granite_reading score` reads its key from runs/humancheck, a folder that is not published, and also "
      "writes two files in results/lir/labels. The answers and verdicts it reads are published, and the marks and a copy "
      "of the key are in results/lir/labels"),
-    (("mixing/seeds.json", "mixing/seeds.md"),
-     "`python -m lir.repeat mix` checks the training records of the mixing runs at seeds 1 and 2 (`plain-mix1-s1`, "
-     f"`plain-mix1-s2`, `plain-mix5-s1`, `plain-mix5-s2`), and they are not published: {RECORDS_TO}. Their answers and "
-     "verdicts are published"),
-    (("mixing/seeds_regen.json", "mixing/seeds_regen.md"),
-     "`python -m lir.repeat mix-again` reads the same four training records as `python -m lir.repeat mix`, which are not "
-     "published. The answers generated again and their verdicts are published"),
-    (("sensitivity.json", "sensitivity.md"),
-     "`python -m lir.sensitivity report` checks the training records of the four runs with the learning rate or the number "
-     f"of epochs changed, and they are not published: {RECORDS_TO}. Their answers and verdicts are published"),
     (("granite41/seeds_regen.json", "granite41/seeds_regen.md"),
      "`python -m lir.granite41 again` writes the languages of its `per_lang` counts in the order of a Python set, which is "
      "not the same from one run of the command to the next. The .md comes out the same, and the .json holds the same "
@@ -168,9 +161,6 @@ NOT_REBUILT = [
     (("quantization_plan.json",),
      "`python -m lir.quantize plan` reads the stage 1 score files and loads no model, but it needs CircuitKIT, which is "
      "not in this repository, in an environment of its own"),
-    (("aligntune.json", "aligntune.md"),
-     "`python -m lir.train_aligntune report` reads the training record of the run through AlignTune, and it is not "
-     f"published: {RECORDS_TO}. The run's answers and verdicts are published"),
     (("drift_by_language.png", "korean_by_setting.png", "harm_categories.png", "ten_languages.png"),
      "images are not compared; the numbers beside them are"),
 ]
