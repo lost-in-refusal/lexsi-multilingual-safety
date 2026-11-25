@@ -1,11 +1,14 @@
 """Rebuild the stage 2 tables from the published files, in a fresh clone of this repository.
 
-  python -m lir.rebuild fetch      # the public outputs at a pinned revision -> runs/ (no login, about 220 MB)
+  python -m lir.rebuild fetch      # the public outputs at a pinned revision -> runs/ (no login, about 455 MB)
   python -m lir.rebuild records    # the training records, no weights -> runs/<arm>/
   python -m lir.rebuild tables     # runs each report whose inputs are there and compares its tables with the committed ones
 
 `fetch` is for a clone with no runs/ folder. It stops if runs/eval exists, so it cannot touch the folder the runs
-were made in, and the other two commands only work in a folder that `fetch` made.
+were made in, and the other two commands only work in a folder that `fetch` made. The pinned revision is the upload
+of Nov 25, 2026. Besides the arm folders it holds the answers generated again, the result files of the Hugging Face
+GPU jobs, the six further languages, the unsafe prompts of XSTest and the quantization arms, and `layout` puts each
+where its report reads it.
 
 `tables` deletes each table before the command that writes it runs, so a command that writes nothing cannot pass.
 A table counts as rebuilt only if it comes back byte for byte the same as the committed file. The report commands
@@ -15,7 +18,11 @@ its own (the README gives the commit). A command whose package or input is missi
 
 `records` reads the seed 42 records from the two public stage 1 adapter repositories and the others from the stage 2
 adapter repository, which has been public since Nov 25, 2026. If it cannot be read, the reports that check a
-training record are skipped and named.
+training record are skipped and named. That repository holds the runs made up to Nov 22. The records of the nine
+laptop runs made since are not in it, so the five reports that read one of them are in NOT_REBUILT.
+
+NOT_REBUILT names every other table with the reason: an input that is not published, a package or a model its
+command needs, or what the command writes from the published files that the committed file does not hold.
 """
 from __future__ import annotations
 
@@ -31,7 +38,7 @@ from pathlib import Path
 from lir.common import HF_ORG, ROOT, RUNS
 
 OUTPUTS = f"{HF_ORG}/lost-in-refusal-eval-outputs"
-OUTPUTS_REV = "dd4400715312dd9a200cf0c8f072dd291a9c76a2"    # the upload of Nov 23, 2026
+OUTPUTS_REV = "cf19782b9445b2aa56f3ab069fe269888d39a3f6"    # the upload of Nov 25, 2026 (979 files)
 ADAPTERS = f"{HF_ORG}/tiny-aya-lora-stage2"
 ADAPTERS_REV = "292f8ba92163b3a2ac58ce625046f16516d0c70b"   # the upload of Nov 23, 2026
 STAGE1 = {"plain": (f"{HF_ORG}/tiny-aya-global-bactrian-lora-plain", "0e57114e1804beb4c81a3afad0076d9733067010"),   # seed 42, public
@@ -62,11 +69,20 @@ COMMANDS = [
     {"args": ["lir.harm"], "tables": ["harm_categories.json", "harm_categories.md"]},
     {"args": ["lir.harm", "--regenerated"], "tables": ["harm_categories_regenerated.json", "harm_categories_regenerated.md"]},
     {"args": ["lir.trunc", "count"], "tables": ["truncation/counts.json", "truncation/counts.md"]},
-    {"args": ["lir.trunc", "report"], "tables": ["truncation/report.json", "truncation/report.md"]},
-    {"args": ["lir.truncsplit"], "tables": ["truncation/split.json", "truncation/split.md"]},
     {"args": ["lir.tasklen"], "tables": ["task_length.json", "task_length.md"]},
     {"args": ["lir.loose"], "tables": ["unsafe_only.json", "unsafe_only.md"]},
     {"args": ["lir.circuits", "nodes"], "tables": ["circuit_nodes.json", "circuit_nodes.md"]},
+    # From the folders added on Nov 25, 2026. A command named `again` reads the table of the `report` before it.
+    {"args": ["lir.morelangs", "report"], "tables": ["more_languages.json", "more_languages.md"]},
+    {"args": ["lir.morelangs", "figure"], "tables": ["ten_languages.json"], "images": ["ten_languages.png"]},
+    {"args": ["lir.morelangs", "again"], "tables": ["more_languages_regen.json", "more_languages_regen.md"]},
+    {"args": ["lir.xsunsafe", "report"], "tables": ["second_benchmark.json", "second_benchmark.md"]},
+    {"args": ["lir.xsunsafe", "again"], "tables": ["second_benchmark_regen.json", "second_benchmark_regen.md"]},
+    {"args": ["lir.quantize", "report"], "tables": ["quantization.json", "quantization.md"]},
+    {"args": ["lir.quantrank", "report"], "tables": ["quantization_ranks.json", "quantization_ranks.md"]},
+    {"args": ["lir.mmlu", "report"], "tables": ["quantization_mmlu.json", "quantization_mmlu.md"]},
+    {"args": ["lir.granite41", "noko"], "tables": ["granite41/noko.json", "granite41/noko.md"]},
+    {"args": ["lir.granite41", "task"], "tables": ["granite41/task.json", "granite41/task.md"]},
     {"args": ["lir.seeds", "--control", "plain-noko", "plain-noko-s1", "plain-noko-s2"], "tables": ["noko.json", "noko.md"], "needs": "records"},
     {"args": ["lir.seeds", "--times"], "tables": ["train_time.json", "train_time.md"], "needs": "records"},
     {"args": ["lir.repeat", "aya"], "tables": ["aya/seeds.json", "aya/seeds.md"], "needs": "records"},
@@ -76,16 +92,27 @@ COMMANDS = [
     {"args": ["lir.section13", "seeds"], "tables": ["single_language_seeds.json", "single_language_seeds.md"], "needs": "records"},
 ]
 
-# Every other file in results/lir/stage2 (the status page aside), and why no command above rebuilds it.
+# Every other file in results/lir/stage2 (the status page aside), and why no command above rebuilds it. Where a
+# reason says how a rebuilt file differs, the command was run on the published files on Nov 25, 2026.
+RECORDS_TO = "the adapter repository holds the runs made up to Nov 22"
 NOT_REBUILT = [
     (("vector_aya.json", "vector_aya.md"),
      "`python -m lir.section13 vector` checks the hashes of the adapters the edit was built from, so it needs the adapter weights"),
     (("refusal_direction.json", "refusal_direction.md"),
      "`python -m lir.direction` reads the activation files, which are not published"),
     (("gpu.json", "gpu.md"),
-     "`python -m lir.gpu` reads Q1 of section 12.2 against the bfloat16 arms with the adapter left unmerged as soon as the "
-     "files of job `unmerged` are in runs/gpu, and names the staging revision it finds there; the committed table is the "
-     "reading of Nov 23, made before that job ran, and the unmerged arms are read in nf4_seeds.md (section 14f)"),
+     "`python -m lir.gpu` reads Q1 of section 12.2 against the bfloat16 arms with the adapter left unmerged when the files "
+     "of job `unmerged` are in runs/gpu, which they are since the upload of Nov 25, and names the staging revision it finds "
+     "there. The committed table is the reading of Nov 23, made before that job ran, so the command now writes another "
+     "table; the unmerged arms are read in nf4_seeds.md (section 14f)"),
+    (("truncation/report.json", "truncation/report.md"),
+     "`python -m lir.trunc report` reads every arm of its list whose capped answers were generated again. Since the upload "
+     "of Nov 25 that includes `plain-mix1` and `plain-mix5` (section 14g), so the command now adds the rows of those two "
+     "arms. The committed table is the reading of Nov 21, made before they were generated again; every line of it comes "
+     "out the same"),
+    (("truncation/split.json", "truncation/split.md"),
+     "`python -m lir.truncsplit` reads the same arms as `python -m lir.trunc report`, so it too now adds the rows of "
+     "`plain-mix1` and `plain-mix5` to a table of Nov 21; every line of the committed table comes out the same"),
     (("aya/task.json", "aya/task.md"),
      "`python -m lir.aya taskreport` reads the answers to the held-out Aya prompts, which are not published because they quote Aya rows"),
     (("aya/checks.json", "aya/checks.md"),
@@ -97,91 +124,81 @@ NOT_REBUILT = [
     (("ko_drift.md", "ko_rest.md", "second_judge_check.md"),
      "a person's labels and the write-up of the two second-judge checks; their inputs are in results/lir/labels"),
     (("review_tables.json", "review_tables.md"),
-     "`python -m lir.reviewtables` reads answers, verdicts, a person's marks and task scores of many runs, some of which are in "
-     "the private staging dataset or not published yet"),
+     "`python -m lir.reviewtables` reads the training records of the mixing runs at seeds 1 and 2 for its table of runs "
+     f"(18e), and they are not published: {RECORDS_TO}. The answers, verdicts, marks and scores it reads are published"),
     (("third_judge_check.md",),
      "`python -m lir.judge3 check-a` reads the verdicts of the Hugging Face job of section 17, which are in the private staging "
      "dataset; the judge's verdicts on the 120 labelled answers are in results/lir/labels"),
     (("third_judge_inputs.json",),
-     "`python -m lir.judge3 inputs` writes the hashes of the answers the third judge reads, some of which are in the private "
-     "staging dataset and not published yet"),
+     "`python -m lir.judge3 inputs` writes its hashes under runs/judge3 and not into this folder, and the committed copy "
+     "also names the revision of the private staging dataset that the upload of the two input files returned. From the "
+     "published answers the command gives the same hashes"),
     (("granite41/person.md",),
-     "`python -m lir.granite_reading score` reads a person's marks and the answers and verdicts of two runs of section 16, "
-     "which are in the private staging dataset and not published yet; the marks and the key are in results/lir/labels"),
+     "`python -m lir.granite_reading score` reads its key from runs/humancheck, a folder that is not published, and also "
+     "writes two files in results/lir/labels. The answers and verdicts it reads are published, and the marks and a copy "
+     "of the key are in results/lir/labels"),
     (("mixing/seeds.json", "mixing/seeds.md"),
-     "`python -m lir.repeat mix` reads the mixing runs at seeds 1 and 2, whose answers and verdicts are not published yet"),
+     "`python -m lir.repeat mix` checks the training records of the mixing runs at seeds 1 and 2 (`plain-mix1-s1`, "
+     f"`plain-mix1-s2`, `plain-mix5-s1`, `plain-mix5-s2`), and they are not published: {RECORDS_TO}. Their answers and "
+     "verdicts are published"),
     (("mixing/seeds_regen.json", "mixing/seeds_regen.md"),
-     "`python -m lir.repeat mix-again` reads the mixing runs' answers generated again at 1,024 tokens, which are not "
-     "published yet"),
-    (("more_languages.json", "more_languages.md", "ten_languages.json"),
-     "`python -m lir.morelangs report` and `figure` read the answers and verdicts in the six further languages, which are not "
-     "published yet"),
-    (("more_languages_regen.json", "more_languages_regen.md"),
-     "`python -m lir.morelangs again` reads the answers generated again in the six further languages and their verdicts, "
-     "which are not published yet"),
+     "`python -m lir.repeat mix-again` reads the same four training records as `python -m lir.repeat mix`, which are not "
+     "published. The answers generated again and their verdicts are published"),
     (("sensitivity.json", "sensitivity.md"),
-     "`python -m lir.sensitivity report` reads the four runs with the learning rate or the number of epochs changed, whose "
-     "answers and verdicts are not published yet"),
-    (("second_benchmark.json", "second_benchmark.md"),
-     "`python -m lir.xsunsafe report` reads the answers of ten arms to the unsafe prompts of XSTest and their verdicts, "
-     "which are not published yet"),
-    (("second_benchmark_regen.json", "second_benchmark_regen.md"),
-     "`python -m lir.xsunsafe again` reads the answers of the ten arms to the unsafe prompts of XSTest that were generated "
-     "again, and their verdicts, which are not published yet"),
-    (("granite41/noko.json", "granite41/noko.md"),
-     "`python -m lir.granite41 noko` reads the answers, verdicts and run records of the Hugging Face jobs of section 16b, which "
-     "are in the private staging dataset and not published yet"),
-    (("granite41/task.json", "granite41/task.md"),
-     "`python -m lir.granite41 task` reads the task answers and scores of the Hugging Face job of section 16c, which are in the "
-     "private staging dataset and not published yet"),
+     "`python -m lir.sensitivity report` checks the training records of the four runs with the learning rate or the number "
+     f"of epochs changed, and they are not published: {RECORDS_TO}. Their answers and verdicts are published"),
     (("granite41/seeds_regen.json", "granite41/seeds_regen.md"),
-     "`python -m lir.granite41 again` reads the answers of section 16 that were generated again by the job of section 16a, and "
-     "their verdicts, which are in the private staging dataset and not published yet"),
+     "`python -m lir.granite41 again` writes the languages of its `per_lang` counts in the order of a Python set, which is "
+     "not the same from one run of the command to the next. The .md comes out the same, and the .json holds the same "
+     "numbers with those keys in another order"),
     (("granite41/seeds.json", "granite41/seeds.md"),
-     "`python -m lir.granite41` reads the answers, verdicts and run records of the Hugging Face jobs of section 16, which are "
-     "in the private staging dataset and not published yet"),
+     "`python -m lir.granite41` copies the revision of the private staging dataset that runs/gpu was read from, and the "
+     "published files name another one than the committed table (`7c210da3`, not `9070ad38`). It also writes the three "
+     "languages of the refusal set in the order of a Python set. The .md comes out the same, and the .json differs in "
+     "that field and that order"),
     (("nf4_seeds.json", "nf4_seeds.md"),
-     "`python -m lir.nf4seeds` reads the answers and verdicts of the Hugging Face jobs of section 14f, which are in the "
-     "private staging dataset and not published yet"),
-    (("quantization.json", "quantization.md"),
-     "`python -m lir.quantize report` reads the answers, verdicts and task scores of the six arms of section 15, which are "
-     "not published yet"),
-    (("quantization_mmlu.json", "quantization_mmlu.md"),
-     "`python -m lir.mmlu report` reads the answers of the Hugging Face job of section 15b, which are in the private staging "
-     "dataset and not published yet"),
+     "`python -m lir.nf4seeds` copies the revision of the private staging dataset that runs/gpu was read from, and the "
+     "published files name another one than the committed table (`7c210da3`, not `9ae17d8a`). The .md comes out the same "
+     "and the .json differs in that one field"),
     (("quantization_gate.json", "quantization_gate.md"),
      "`python -m lir.quantize gate` loads the model once for every plan it measures, in the environment with CircuitKIT "
      "and optimum-quanto"),
-    (("quantization_ranks.json", "quantization_ranks.md"),
-     "`python -m lir.quantrank report` reads the perplexity measured on the 90 quantized models of section 15a, a file on "
-     "the laptop that is not published"),
     (("quantization_plan.json",),
      "`python -m lir.quantize plan` reads the stage 1 score files and loads no model, but it needs CircuitKIT, which is "
      "not in this repository, in an environment of its own"),
     (("aligntune.json", "aligntune.md"),
-     "`python -m lir.train_aligntune report` reads the answers and verdicts of the run through AlignTune and its training record, "
-     "which are not published yet"),
+     "`python -m lir.train_aligntune report` reads the training record of the run through AlignTune, and it is not "
+     f"published: {RECORDS_TO}. The run's answers and verdicts are published"),
     (("drift_by_language.png", "korean_by_setting.png", "harm_categories.png", "ten_languages.png"),
      "images are not compared; the numbers beside them are"),
 ]
 
 
+# Folders of the outputs repository that are not arm folders -> the folder under runs/ their reports read. Each is
+# copied as it is, sub-folders included. It is `stage_stage2`, `gpu_files` and FAMILIES of lir.publish read backwards.
+FOLDERS = {"truncation-regenerated": "trunc", "gpu": "gpu", "judge-check-backtranslations": "swcheck",
+           "more-languages": "morelangs", "more-languages-regenerated": "morelangs-trunc",
+           "xstest-unsafe": "xsunsafe", "xstest-unsafe-regenerated": "xsunsafe-trunc", "quantization": "quant"}
+
+
 def layout(hub: Path, runs: Path) -> dict[str, int]:
     """Copy a download of the outputs repository into the folders the report commands read: each arm folder to
-    runs/eval/, truncation-regenerated/ to runs/trunc/, gpu/ to runs/gpu/ and the back-translations to runs/swcheck/.
-    Returns the number of files per folder."""
-    n = {"eval": 0, "trunc": 0, "gpu": 0, "swcheck": 0}
+    runs/eval/ and each folder of FOLDERS to its folder under runs/ (truncation-regenerated/ to runs/trunc/, gpu/ to
+    runs/gpu/, the back-translations to runs/swcheck/, the six further languages to runs/morelangs/, the unsafe
+    prompts of XSTest to runs/xsunsafe/, the answers of those two generated again to runs/morelangs-trunc/ and
+    runs/xsunsafe-trunc/, and the quantization arms to runs/quant/). Returns the number of files per folder."""
+    n = {"eval": 0, **{key: 0 for key in FOLDERS.values()}}
 
     def put(src: Path, dest: Path, key: str) -> None:
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(src, dest)
         n[key] += 1
 
-    for d in sorted(p for p in hub.iterdir() if p.is_dir() and not p.name.startswith(".")):
+    for d in sorted(p for p in hub.iterdir() if p.is_dir() and not p.name.startswith(".") and p.name not in FOLDERS):
         if any(d.glob("*.gen.jsonl")):   # an arm folder: answers and verdicts side by side
             for p in sorted(x for x in d.iterdir() if x.is_file()):
                 put(p, runs / "eval" / d.name / p.name, "eval")
-    for name, key in (("truncation-regenerated", "trunc"), ("gpu", "gpu"), ("judge-check-backtranslations", "swcheck")):
+    for name, key in FOLDERS.items():
         for p in sorted(x for x in (hub / name).rglob("*") if x.is_file()):
             rel = p.relative_to(hub / name)
             # the outputs repository names the staging revision file differently from `python -m lir.gpu fetch`

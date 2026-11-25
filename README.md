@@ -185,36 +185,56 @@ No GPU, no model and no login. In a fresh clone of this repository (one with no 
 
 ```sh
 python3.12 -m venv .venv && .venv/bin/pip install huggingface_hub matplotlib
-.venv/bin/python -m lir.rebuild fetch     # the public outputs at a pinned revision -> runs/ (about 220 MB)
+.venv/bin/python -m lir.rebuild fetch     # the public outputs at a pinned revision -> runs/ (about 455 MB)
 .venv/bin/python -m lir.rebuild tables    # runs each report and compares its tables with the committed files
 git status --short results                # prints nothing
 ```
 
 `tables` deletes each table before the command that writes it runs, and counts a table only if it comes back byte
-for byte the same as the committed file. What it covers depends on what is installed and readable:
+for byte the same as the committed file. The pinned revision is the upload of Nov 25, 2026 (`cf19782b`, 979 files).
+What it covers depends on what is installed and readable:
 
 | With | Tables rebuilt | Which |
 |---|---:|---|
-| The two packages above | 26, from 13 commands | H1 to H3 on three seeds, the numbers of both figures, Earth's checks, the truncation audit (counts, report, split), harm categories, task score by answer length, the Unsafe-only reading, the repair vector, the GPU runs, the circuit comparison |
-| AuditKIT as well (no dependencies; clone and `pip install -e vendor/AuditKIT` at the commit below) | 36, from 18 commands | The five per-arm tables written with AuditKIT's statistics (`results.md` in `stage2/`, `mixing/`, `earth/`, `aya/`, `vector/`) |
-| The training records as well (`python -m lir.rebuild records`; no weights) | 50, from 25 commands | K1 on three seeds, Aya and Earth on three seeds, K1 after re-generation, the single-language tables, training time |
+| The two packages above | 39, from 20 commands | H1 to H3 on three seeds, the numbers of three figures, Earth's checks, the truncation counts, harm categories, task score by answer length, the Unsafe-only reading, the repair vector, the circuit comparison. From the folders added on Nov 25: the six further languages and the second benchmark, each as first read and after re-generation; the quantization arms, their rank test and Global-MMLU-Lite; on Granite 4.1, the runs with no Korean row and the task score |
+| AuditKIT as well (no dependencies; clone and `pip install -e vendor/AuditKIT` at the commit below) | 49, from 25 commands | The five per-arm tables written with AuditKIT's statistics (`results.md` in `stage2/`, `mixing/`, `earth/`, `aya/`, `vector/`) |
+| The training records as well (`python -m lir.rebuild records`; no weights) | 63, from 32 commands | K1 on three seeds, Aya and Earth on three seeds, K1 after re-generation, the single-language tables, training time |
 
-The records of the stage 2 runs are in the adapter repository, so the last row works for readers once that
-repository is public. Until then `records` says so and `tables` skips and names those seven commands.
+The records of the stage 2 runs are in the adapter repository, which is public since Nov 25, 2026, so the last row
+needs no login either. That repository holds the runs made up to Nov 22. The records of the nine laptop runs made
+since are not in it yet: the mixing runs at seeds 1 and 2, the run through AlignTune, and the four runs with the
+learning rate or the number of epochs changed.
 
-Not rebuilt, and why: `vector_aya` (its command checks the hashes of adapter weights), `refusal_direction` (the
-activation files are not published), `aya/task` (the held-out Aya answers are not published), `aya/checks` (the
-public copy of one stage 1 training record still names a folder on the training machine, so its `.json` differs
-in that one field), `swahili_nllb*.json` (written by a step that runs the translation model and the guard),
-`ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a write-up), `mixing/seeds`, `mixing/seeds_regen`,
-`more_languages`, `more_languages_regen`, `ten_languages.json`, `aligntune`, `sensitivity`, `second_benchmark` and `second_benchmark_regen` (their answers and verdicts are not published yet), and the four images
-(the numbers beside three of them are compared).
+Not rebuilt, and why:
 
-Tested on Nov 23, 2026 on one machine (macOS, Python 3.12.13), in a clean copy of the repository and a new
-virtual environment with only the packages named above: all three rows came out as stated (the third with the
-team's access to the adapter repository), and changing one verdict in the downloaded files changed 34 of the 50
-tables. Other Python versions and operating systems were not
-tried.
+- An input is not published. `vector_aya` (its command checks the hashes of adapter weights), `refusal_direction`
+  (the activation files), `aya/task` (the held-out Aya answers), `third_judge_check.md` (the third judge's verdicts
+  are in the private staging dataset) and `granite41/person.md` (its command reads its key from a folder that is not
+  published; a copy of the key is in `results/lir/labels`). `mixing/seeds`, `mixing/seeds_regen`, `sensitivity`,
+  `aligntune` and `review_tables`: their answers and verdicts are published, but each command also reads the
+  training record of one of the nine runs above.
+- The command needs a model or another package. `swahili_nllb.json` and `swahili_nllb_seeds.json` (written by a step
+  that runs the translation model and the guard), `quantization_gate` (loads the model for every plan it measures)
+  and `quantization_plan.json` (needs CircuitKIT).
+- The command reads more runs today than when the table was written, and adds them. `gpu` is the reading of Nov 23;
+  the arms with the adapter left unmerged are published since, and its command reads NF4 against them.
+  `truncation/report` and `truncation/split` are the readings of Nov 21; the two mixing runs at seed 42 were
+  generated again since, and their commands add the rows of those two runs. Every line of the two committed
+  truncation tables comes out the same.
+- The `.md` comes out the same and the `.json` does not. `aya/checks`: the public copy of one stage 1 training
+  record still names a folder on the training machine, and the table copies that field. `nf4_seeds` and
+  `granite41/seeds`: each copies the revision of the private staging dataset its files were read from, and the
+  published files name another one. `granite41/seeds` and `granite41/seeds_regen`: a few counts by language are
+  written in an order that changes from one run of the command to the next; the numbers are the same.
+- No command here writes it. `ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a
+  write-up), `third_judge_inputs.json` (its command writes elsewhere; from the published answers it gives the same
+  hashes) and the four images (the numbers beside them are compared).
+
+Tested on Nov 25, 2026 on one machine (macOS, Python 3.12.13), in a clean clone of the repository and with no
+login: all three rows came out as stated, and changing one verdict in the downloaded files changed 32 of the 63
+tables. No new environment was made for this test: it ran in the project's environment, with Python set to find
+only the packages a row names and what they require. A new environment with only those packages was last tried on
+Nov 23, at the revision of that day. Other Python versions and operating systems were not tried.
 
 ### Stage 1 table and re-running
 

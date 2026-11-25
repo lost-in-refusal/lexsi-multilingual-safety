@@ -490,7 +490,14 @@ class Publish(unittest.TestCase):
             for src, rel in files:
                 (hub / rel).parent.mkdir(parents=True, exist_ok=True)
                 (hub / rel).write_text(src.read_text())
-            self.assertEqual(layout(hub, Path(tmp) / "runs2")["eval"], 0)
+            back = Path(tmp) / "runs2"
+            n = layout(hub, back)
+            self.assertEqual(n["eval"], 0)
+            # and the rebuild puts every file back under the folder it was staged from, where its report reads it
+            self.assertEqual(sorted(p.relative_to(back).as_posix() for p in back.rglob("*") if p.is_file()),
+                             sorted(src.relative_to(runs).as_posix() for src, _ in files))
+            self.assertEqual({k: v for k, v in n.items() if v},
+                             {"morelangs": 14, "morelangs-trunc": 14, "xsunsafe": 20, "xsunsafe-trunc": 20, "quant": 45})
 
             guard = runs / "xsunsafe" / "plain-mix5-s2" / "unsafe.guard.jsonl"   # one arm judged part-way
             guard.write_text(guard.read_text().splitlines()[0] + "\n")
@@ -1688,9 +1695,17 @@ class Rebuild(unittest.TestCase):
 
         files = ["README.md", "base/attack.gen.jsonl", "base/attack.guard.jsonl", "plain-s1/attack.gen.jsonl",
                  "plain+steer-en-L17-c1/steer.json", "plain+steer-en-L17-c1/attack.gen.jsonl",
+                 "plain-lr-half/task.gen.jsonl", "plain-lr-half/task.judge.jsonl",   # one of the nine arms added on Nov 25
                  "truncation-regenerated/base/attack.gen.jsonl", "truncation-regenerated/base/attack.guard.jsonl",
+                 "truncation-regenerated/plain-mix1-s1/xstest.guard.jsonl",
                  "gpu/control/20261122-205736-330ebba/job.json", "gpu/control/20261122-205736-330ebba/gpu-base/attack.gen.jsonl",
+                 "gpu/granite41-plain-s1/20261125-024606-01c70c1/granite41-plain-s1/run/run.json",
+                 "gpu/mmlu/20261125-041733-52a36d8/circuit.jsonl",
                  "gpu/staging_revision.txt", "judge-check-backtranslations/base.sw.nllb.bt.jsonl",
+                 # the five folders added on Nov 25: their arms share names with the arm folders and are one level down
+                 "more-languages/base/attack.gen.jsonl", "more-languages-regenerated/base/attack.guard.jsonl",
+                 "xstest-unsafe/plain-mix5/unsafe.gen.jsonl", "xstest-unsafe-regenerated/plain-mix5/unsafe.guard.jsonl",
+                 "quantization/bf16/attack.gen.jsonl", "quantization/bf16/quantization.json", "quantization/gate.json",
                  "stage2/seeds.md", "circuits/base_en.json", "steering/results.json"]
         with tempfile.TemporaryDirectory() as tmp:
             hub, runs = Path(tmp) / "hub", Path(tmp) / "runs"
@@ -1702,16 +1717,59 @@ class Rebuild(unittest.TestCase):
             self.assertEqual(got, sorted([
                 "eval/base/attack.gen.jsonl", "eval/base/attack.guard.jsonl", "eval/plain-s1/attack.gen.jsonl",
                 "eval/plain+steer-en-L17-c1/steer.json", "eval/plain+steer-en-L17-c1/attack.gen.jsonl",
-                "trunc/base/attack.gen.jsonl", "trunc/base/attack.guard.jsonl",
+                "eval/plain-lr-half/task.gen.jsonl", "eval/plain-lr-half/task.judge.jsonl",
+                "trunc/base/attack.gen.jsonl", "trunc/base/attack.guard.jsonl", "trunc/plain-mix1-s1/xstest.guard.jsonl",
                 "gpu/control/20261122-205736-330ebba/job.json", "gpu/control/20261122-205736-330ebba/gpu-base/attack.gen.jsonl",
+                "gpu/granite41-plain-s1/20261125-024606-01c70c1/granite41-plain-s1/run/run.json",
+                "gpu/mmlu/20261125-041733-52a36d8/circuit.jsonl",
                 "gpu/revision.txt",   # the name `python -m lir.gpu` reads
-                "swcheck/base.sw.nllb.bt.jsonl"]))   # tables, circuit files and write-ups are not laid out
-            self.assertEqual(n, {"eval": 5, "trunc": 2, "gpu": 3, "swcheck": 1})
+                "swcheck/base.sw.nllb.bt.jsonl",
+                "morelangs/base/attack.gen.jsonl", "morelangs-trunc/base/attack.guard.jsonl",
+                "xsunsafe/plain-mix5/unsafe.gen.jsonl", "xsunsafe-trunc/plain-mix5/unsafe.guard.jsonl",
+                "quant/bf16/attack.gen.jsonl", "quant/bf16/quantization.json", "quant/gate.json"]))   # tables, circuit files and write-ups are not laid out
+            self.assertEqual(n, {"eval": 7, "trunc": 3, "gpu": 5, "swcheck": 1, "morelangs": 1, "morelangs-trunc": 1,
+                                 "xsunsafe": 1, "xsunsafe-trunc": 1, "quant": 3})
             self.assertEqual((runs / "gpu" / "revision.txt").read_text(), "gpu/staging_revision.txt")
+            self.assertEqual((runs / "morelangs" / "base" / "attack.gen.jsonl").read_text(), "more-languages/base/attack.gen.jsonl")
+            self.assertEqual((runs / "eval" / "base" / "attack.gen.jsonl").read_text(), "base/attack.gen.jsonl")   # not the family's base arm
             bare = Path(tmp) / "bare"   # a download with arm folders only
             (bare / "base").mkdir(parents=True)
             (bare / "base" / "attack.gen.jsonl").write_text("x")
-            self.assertEqual(layout(bare, Path(tmp) / "runs2"), {"eval": 1, "trunc": 0, "gpu": 0, "swcheck": 0})
+            n = layout(bare, Path(tmp) / "runs2")
+            self.assertEqual({k: v for k, v in n.items() if v}, {"eval": 1})
+            self.assertEqual(sorted(n), sorted(["eval", "trunc", "gpu", "swcheck", "morelangs", "morelangs-trunc", "xsunsafe",
+                                                "xsunsafe-trunc", "quant"]))
+
+    def test_layout_reads_the_staging_backwards(self):
+        from lir import publish, rebuild
+
+        # each family of lir.publish comes back to the folder under runs/ it was staged from
+        fixed = {"truncation-regenerated": "trunc", "gpu": "gpu", "judge-check-backtranslations": "swcheck"}
+        self.assertEqual(rebuild.FOLDERS, {**fixed, **{hub: name for name, (hub, _, _) in publish.FAMILIES.items()}})
+        self.assertEqual(len(set(rebuild.FOLDERS.values())), len(rebuild.FOLDERS))
+        self.assertNotIn("eval", rebuild.FOLDERS.values())
+        self.assertFalse(set(rebuild.FOLDERS) & set(publish.STAGE1_ARMS + publish.STAGE2_ARMS + publish.STAGE2_LATER))
+        self.assertEqual(rebuild.OUTPUTS, publish.EVAL_REPO)
+        self.assertEqual(rebuild.ADAPTERS, publish.ADAPTER_REPO)
+        with tempfile.TemporaryDirectory() as tmp:   # the GPU job files, as `python -m lir.gpu fetch` leaves them
+            root, hub, back = Path(tmp) / "runs" / "gpu", Path(tmp) / "hub", Path(tmp) / "runs2"
+            job, task = "granite41-noko-s1/20261125-050211-7e1b9aa", "granite41-task/20261125-061540-7e1b9aa"
+            for rel in (f"{job}/job.json", f"{job}/granite41-noko-s1/attack.guard.jsonl", f"{job}/granite41-noko-s1/run/run.json",
+                        f"{job}/granite41-noko-s1/run/adapter/adapter_config.json", f"{job}/logs/granite41-noko-s1.train.log",
+                        f"{task}/job.json", f"{task}/granite41-base/task.judge.jsonl", "mmlu/20261125-041733-52a36d8/job.json",
+                        "mmlu/20261125-041733-52a36d8/circuit.jsonl", "judge3/20261125-123800-d0854a2/job.json", "revision.txt"):
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                (root / rel).write_text(rel)
+            staged = publish.gpu_files(root)
+            for src, rel in staged:
+                (hub / rel).parent.mkdir(parents=True, exist_ok=True)
+                (hub / rel).write_text(src.read_text())
+            self.assertEqual(rebuild.layout(hub, back)["gpu"], 9)
+            got = sorted(p.relative_to(back / "gpu").as_posix() for p in back.rglob("*") if p.is_file())
+            self.assertEqual(got, sorted(src.relative_to(root).as_posix() for src, _ in staged))
+            self.assertIn("revision.txt", got)   # under the name the reports read
+            self.assertFalse([p for p in got if "adapter" in p or "judge3" in p])
+            self.assertEqual((back / "gpu" / job / "granite41-noko-s1" / "run" / "run.json").read_text(), f"{job}/granite41-noko-s1/run/run.json")
 
     def test_every_table_is_classified(self):
         import subprocess
@@ -1730,10 +1788,48 @@ class Rebuild(unittest.TestCase):
         # the GPU table is the reading of Nov 23 and is not written again: with the unmerged arms beside it, its command reads 12.2 another way
         self.assertNotIn("lir.gpu", {c["args"][0] for c in COMMANDS})
         self.assertLessEqual({"gpu.json", "gpu.md"}, set(left))
+        # nor are the truncation report and split of Nov 21: with the two mixing runs generated again, their commands add two arms
+        args = [c["args"] for c in COMMANDS]
+        self.assertNotIn(["lir.trunc", "report"], args)
+        self.assertNotIn(["lir.truncsplit"], args)
+        self.assertLessEqual({"truncation/report.md", "truncation/split.md"}, set(left))
+        self.assertIn("truncation/counts.md", tables)
+        # a table that copies the staging revision or writes a set's order does not come back the same, so it is not listed as rebuilt
+        self.assertFalse({"lir.nf4seeds", "lir.granite_reading", "lir.judge3", "lir.sensitivity", "lir.train_aligntune", "lir.reviewtables"}
+                         & {a[0] for a in args})
+        self.assertEqual([a for a in args if a[0] == "lir.granite41"], [["lir.granite41", "noko"], ["lir.granite41", "task"]])
+        self.assertEqual([a for a in args if a[0] == "lir.repeat"], [["lir.repeat", "aya"], ["lir.repeat", "k1"], ["lir.repeat", "earth"]])
+        # the tables of the folders added on Nov 25 that come back the same, and `again` after the `report` whose table it reads
+        self.assertLessEqual({"more_languages.md", "ten_languages.json", "more_languages_regen.md", "second_benchmark.md",
+                              "second_benchmark_regen.md", "quantization.md", "quantization_ranks.md", "quantization_mmlu.md",
+                              "granite41/noko.md", "granite41/task.md"}, set(tables))
+        for module in ("lir.morelangs", "lir.xsunsafe"):
+            self.assertLess(args.index([module, "report"]), args.index([module, "again"]))
+        self.assertTrue(all(why and not why.endswith(".") for _, why in NOT_REBUILT))   # `tables` prints each reason with a full stop
         r = subprocess.run(["git", "ls-files", S2.as_posix()], cwd=ROOT, capture_output=True, text=True)
         if r.returncode == 0 and r.stdout.strip():   # in a checkout: every committed file is rebuilt or named with a reason
             tracked = {Path(l).relative_to(S2).as_posix() for l in r.stdout.splitlines()} - {"README.md"}
             self.assertEqual(tracked, set(tables) | set(left))
+
+    def test_the_readme_says_what_the_lists_say(self):
+        import re
+
+        from lir.common import ROOT
+        from lir.rebuild import COMMANDS, NOT_REBUILT, OUTPUTS_REV
+
+        text = (ROOT / "README.md").read_text()
+        part = text[text.index("### Rebuild the stage 2 tables"):text.index("### Stage 1 table")]
+        want, tables, commands = [], 0, 0
+        for need in (None, "auditkit", "records"):   # each row of the README's table adds one requirement
+            cmds = [c for c in COMMANDS if c.get("needs") == need]
+            tables, commands = tables + sum(len(c["tables"]) for c in cmds), commands + len(cmds)
+            want.append((tables, commands))
+        self.assertEqual([(int(t), int(c)) for t, c in re.findall(r"\| (\d+), from (\d+) commands \|", part)], want)
+        self.assertIn(f"`{OUTPUTS_REV[:8]}`", part)
+        for names, _ in NOT_REBUILT:   # every table that is not rebuilt is named there, by a file name or without its ending
+            if all(n.endswith(".png") for n in names):
+                continue
+            self.assertTrue(any(f"`{n}`" in part or f"`{n.rsplit('.', 1)[0]}`" in part for n in names), names)
 
     def test_a_command_that_writes_nothing_does_not_pass(self):
         import subprocess
