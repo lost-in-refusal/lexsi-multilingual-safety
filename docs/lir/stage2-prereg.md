@@ -2827,6 +2827,23 @@ The job, the reader and their tests are in a module of their own (`lir/xlsumrege
 - The bar of 30 answers still cut is applied to XSTest's 250 Korean answers too.
 - The job uploads once, at its end, with a limit of three hours; `mix` is read before `again`, so that M1's first reading exists.
 
+**Added Nov 25, 6:58 PM ET by Mingyu, when the uploads were pinned and before the job is launched.** M1 and M2 were read at 6:52 PM, so this second reading is no longer blind to M1's first; it was registered at 6:11 PM, before anything of the mixing runs had been read. The job reads the staging dataset at revision `6310c12bbc7161fb33f31283f00c2606c8bf3ed7` and these ten uploads, which are the ones X0 to X4 and M1 were read on, each trained run's adapter by its sha256 there (the first eight characters are given; the full hashes are in `lir/xlsumregen.py`):
+
+| Run | Upload | Adapter sha256 |
+| --- | --- | --- |
+| `xlsum-base` | `20261125-212812-2f69714` | none |
+| `xlsum-plain-s42` | `20261125-213133-2f69714` | `c00bb4ac` |
+| `xlsum-safegrad-s42` | `20261125-221150-1bce5c9` | `87234c61` |
+| `xlsum-plain-s1` | `20261125-221122-1bce5c9` | `d7b4aacc` |
+| `xlsum-safegrad-s1` | `20261125-221155-1bce5c9` | `68d6f1a4` |
+| `xlsum-plain-s2` | `20261125-221127-1bce5c9` | `74a4ab9c` |
+| `xlsum-safegrad-s2` | `20261125-221222-1bce5c9` | `6fe966ba` |
+| `xlsum-mix5-s42` | `20261125-231223-cc879e1` | `b9c715dd` |
+| `xlsum-mix5-s1` | `20261125-231225-cc879e1` | `4c42a9f5` |
+| `xlsum-mix5-s2` | `20261125-231225-cc879e1` | `103562fd` |
+
+By the cap tables of `xlsum.md` and `xlsum_mix.md` that is about 2,500 attack answers (1,889 of the seven runs of section 20 and about 600 of the mixing runs), with the capped Korean XSTest answers on top, whose number is not known. Nothing has been generated again.
+
 ## 21. A second reader, outside the team, on the stored Korean answers of both models
 
 **Added Nov 25, 4:28 PM ET by Mingyu, before either sheet is made and before the second reader has seen anything.**

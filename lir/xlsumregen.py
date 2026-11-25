@@ -40,8 +40,17 @@ ROUNDING = 1e-9               # an interval's end nearer zero than this is zero 
 # The pins, filled in by hand from `pin` with a dated note in section 20c before the job is launched. STAGING_REV: the
 # revision of the staging dataset the job reads. UPLOADS: run -> (its upload's folder name, the sha256 of its adapter
 # weights there; None for the base run, which has no adapter).
-STAGING_REV = ""
-UPLOADS: dict[str, tuple[str, str | None]] = {}
+STAGING_REV = "6310c12bbc7161fb33f31283f00c2606c8bf3ed7"
+UPLOADS: dict[str, tuple[str, str | None]] = {"xlsum-base": ("20261125-212812-2f69714", None),
+           "xlsum-plain-s42": ("20261125-213133-2f69714", "c00bb4ac634eb8bc25fcdfafc1c44ec08a72626cd6ea445fbe4c894db2909264"),
+           "xlsum-safegrad-s42": ("20261125-221150-1bce5c9", "87234c61a331e4377f41e0fe121c6f994d12de626346445c1e26d7973e52000b"),
+           "xlsum-plain-s1": ("20261125-221122-1bce5c9", "d7b4aacc6a1128d93176c32bad966d5c15d338f54fd4e118b36c010915586dd8"),
+           "xlsum-safegrad-s1": ("20261125-221155-1bce5c9", "68d6f1a4a22dfe3d5a6da4ee1d6a2313ba8dddf48847a464aa5bac83f42fe76e"),
+           "xlsum-plain-s2": ("20261125-221127-1bce5c9", "74a4ab9c035c5c822e3fc0ba02359b649c7e85eab7f86a2b720776cec66873d0"),
+           "xlsum-safegrad-s2": ("20261125-221222-1bce5c9", "6fe966ba1f40bb43deff14836b3f118c7ae1297449d9916bdd16868f90da38bb"),
+           "xlsum-mix5-s42": ("20261125-231223-cc879e1", "b9c715dd51e8f71c0ec4631245ad63e25c1effc334d17c8b9399e202c176d247"),
+           "xlsum-mix5-s1": ("20261125-231225-cc879e1", "4c42a9f5e13ca8783d658b87a8b282564e2706d4eb5c5a688e850623c12fb853"),
+           "xlsum-mix5-s2": ("20261125-231225-cc879e1", "103562fd356a882c89a6f0bd095415656782b97706cbe1c4f4d02d26cc683fc6")}
 
 AGAIN_ROWS = {True: "the same on the capped answers and after re-generation",
               False: "differs after re-generation: both readings are given wherever it is used, and the first reading stands"}
