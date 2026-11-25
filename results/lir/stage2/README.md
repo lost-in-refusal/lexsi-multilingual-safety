@@ -1,6 +1,6 @@
 # Stage 2 results so far
 
-Updated Nov 23, 1:58 PM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
+Updated Nov 25, 9:06 AM ET. Every number comes from our own runs, and the file named on each line has the detail. What each check means is fixed in `docs/lir/stage2-prereg.md`.
 
 **Section numbers.** Section 12 of the preregistration is Aish's: the Hugging Face GPU runs (registered Nov 21, 8:59 PM; parts 12.0 to 12.4). The laptop blocks added on Nov 22 are section 13 (parts 13a to 13h). They were first numbered 12 as well (12a to 12h), written a few hours after hers without her branch having been read, and three of their checks had names her section also uses (L1, L2 and T1). On Nov 22 at 8:20 PM they were renumbered at Mingyu's decision, and those three checks were renamed SL1, SL2 and V1 in the same change; no rule or number changed. L1, L2 and T1 now mean her checks only. The laptop single-language runs of 13a are the same three fine-tunes as her 12.1, on different hardware. Tables uploaded to Hugging Face before the change carry the old labels and keys until they are uploaded again.
 
@@ -219,6 +219,7 @@ Intervals are 95%. Results marked 1 seed are single runs.
 - Against the guard: on these prompts its strict count is 7 for base and 23 for plain. It agrees with the labels on 285 of 306 clear answers. Of its 21 Unsafe answers he marked 12 unsafe, 6 safe and 3 unsure; of its 9 Controversial, 2, 6 and 1. He marked 9 answers unsafe that the guard called Safe; in K2 he marked none.
 - How the sheet came back is on record under 14c in the preregistration. The file times allow at most 42 minutes for the 322 answers. The labeller says he read every answer himself and that those times are wrong. A check of the laptop's clock against GitHub and a network clock found no fault. He chose to have the sheet scored with that note on record. Whether the paper uses K3 is Aish's decision, and any use names the seed, the single labeller and that record.
 - One labeller, who knows the expected direction and can often guess the arm from the answer's length.
+- Which prompts the guard's counts are over (18a, Nov 25). The guard's 2 against 17 (K2) and 7 against 23 (K3) are over all 100 and 161 prompts of the sheets. On the prompts the person's test used, the 94 and 145 where both answers got a yes or a no, the guard counts 2 against 11 and 6 against 18. Quote those beside the person's 1 against 5 and 5 against 11, and never the first pair as "on the same prompts".
 - The first scoring matched both answers to a prompt to one guard verdict. That is fixed and did not touch the test. The joins for the 120-label set were checked for the same error: every id appears once there, so Check A stands.
 
 **16d.** The same reading on the model outside the Tiny Aya family, IBM Granite 4.1 3B, registered on Nov 25 before its sheet was made: 150 of the 291 Korean prompts drawn at random, 300 answers from base and plain at seed 42, arm hidden. Mingyu marked 167 unsafe and 133 safe, none unsure. Scored once, on Nov 25 at 5:05 AM.

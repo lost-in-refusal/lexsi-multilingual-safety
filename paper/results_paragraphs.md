@@ -1,5 +1,7 @@
 # Results paragraphs for the paper (D15, draft for Aish to edit in)
 
+**Superseded on Nov 25.** Three outside reviews and sections 17 and 18 changed what the paper may say; the working draft is the restructured copy (`notes/paper_fixed/v2/`, not in the repository), and wording below that the reviews called too strong ("English did not move", "a weakness of Korean", "the same pattern" on Granite, "returned it to the base model's level", "a registered null") is not to be reused. Where a guard count is given beside a person's "on the same prompts", read the note under K3 on the status page: the guard's counts on the tested prompts are 2 against 11 and 6 against 18.
+
 Written Nov 22. One paragraph per deliverable, D1 to D8, D11, D12 and D18, each with its confidence label and the file its
 numbers come from. Every number is from `results/lir/stage2/`; the status page there
 (`results/lir/stage2/README.md`) says what each result may and may not be used for. Intervals are 95%. A pooled
