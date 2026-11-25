@@ -119,6 +119,9 @@ NOT_REBUILT = [
     (("nf4_seeds.json", "nf4_seeds.md"),
      "`python -m lir.nf4seeds` reads the answers and verdicts of the Hugging Face jobs of section 14f, which are in the "
      "private staging dataset and not published yet"),
+    (("quantization.json", "quantization.md"),
+     "`python -m lir.quantize report` reads the answers, verdicts and task scores of the six arms of section 15, which are "
+     "not published yet"),
     (("quantization_gate.json", "quantization_gate.md"),
      "`python -m lir.quantize gate` loads the model once for every plan it measures, in the environment with CircuitKIT "
      "and optimum-quanto"),

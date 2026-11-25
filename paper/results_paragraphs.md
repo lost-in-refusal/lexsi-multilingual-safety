@@ -238,6 +238,22 @@ its card does not list Swahili (left out of the checks), and the runs were on a 
 reached the 256-token cap far more often than the fine-tuned models' (Korean 73% against 22 to 38%), and no reading
 after re-generation exists for this model, so the result is on capped answers. Guard verdicts only.
 
+## Circuit-guided mixed-precision quantization (section 15, D21). Confidence: a registered null (one run per arm, preregistered; no protection claimed)
+
+Keeping the layers the refusal circuit ranks highest at 8 bits and its lowest-ranked at 2 bits, at 4.0 bits on average,
+did not protect safety, and we claim no protection. Uniform 4-bit quantization of the base model did not raise attack
+success detectably (+0.2 points [-1.2, +1.5] over four languages), so there was no rise for a mixed plan to prevent and
+the registered comparisons of the circuit plan with uniform 4-bit and with random plans were not read. The circuit plan
+scored 1.31 points [1.10, 1.52] below uniform 4-bit on the task (4.78 against 6.09, on a 1 to 7 scale; the unquantized
+model 6.35), and every random plan of the same shape scored lower still (3.69 to 4.15) (`quantization.md`).
+
+What can be said beside it, with no rule: against random plans of the same shape the circuit plan had lower attack
+success (-5.8 [-7.6, -3.9]) and a higher task score, and it had the lowest perplexity of four plans at every tier size
+in the gate. The rank test of section 15a asks that question of perplexity on 43 random plans.
+
+Limits to state with it: the quantized weights were evaluated written out, so nothing about speed or memory; one
+quantizer (optimum-quanto, no calibration) and one tier size, chosen by a gate on perplexity; the base model only.
+
 ## D9. Costs: task score. Confidence: High that there is a cost; the cause is not established
 
 Both fine-tunes score below the base model on the 300 held-out task prompts in every seed: averaged over three seeds, English goes from 6.61 to 6.37 under plain and 6.31 under SafeGrad, Korean from 6.10 to 5.51 and 5.49, Chinese from 6.25 to 5.79 and 5.74 (1 to 7 scale, Qwen3-14B judge). SafeGrad adds little to the cost of fine-tuning itself. The drop is not explained by shorter answers. With length groups fixed in advance, answers about as long as the base model's still score lower (plain -0.39 points, -0.81 to -0.05; SafeGrad -0.67, -1.10 to -0.30), and the drop is the same size for answers under half the length. It sits in the judge's accuracy score (-0.6 in English, -1.2 in Korean, -1.1 in Chinese) and not in fluency. The fine-tuned models answer at the length of the references they were trained on, a third of the base model's length.
