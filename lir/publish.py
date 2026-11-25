@@ -100,6 +100,27 @@ def no_home_paths(folder: Path) -> None:
         raise SystemExit("these staged files name a home directory or hold a token, nothing uploaded: " + "; ".join(bad[:10]))
 
 
+# Section 20 trains on BBC articles (XL-Sum, CC BY-NC-SA 4.0). Its training file, its held-out file and every answer
+# file of its runs quote them, and none of that is published: it stays under runs/xlsum and in the private staging
+# dataset. Its tables in results/lir/stage2 (xlsum.json, xlsum.md, xlsum_premise.json) hold numbers only and go up.
+PRIVATE = "xlsum"
+
+
+def private(rel: Path) -> bool:
+    """Whether a path is one of section 20's row files: under a folder named xlsum or one whose name starts with
+    xlsum- (its runs), or a .jsonl file whose own name starts with xlsum."""
+    *folders, name = rel.parts
+    return any(f == PRIVATE or f.startswith(PRIVATE + "-") for f in folders) or (name.startswith(PRIVATE) and name.endswith(".jsonl"))
+
+
+def no_private(folder: Path) -> None:
+    """Stop an upload if a staged file is one of section 20's row files. See `private` for what counts."""
+    bad = [str(p.relative_to(folder)) for p in sorted(folder.rglob("*")) if p.is_file() and private(p.relative_to(folder))]
+    if bad:
+        raise SystemExit("these staged files quote the BBC articles of section 20, which are not published; nothing uploaded: "
+                         + "; ".join(bad[:10]))
+
+
 def blob_id(p: Path) -> str:
     """The id git gives the content of a file. The Hub lists it for every file that is not in LFS."""
     h = hashlib.sha1(f"blob {p.stat().st_size}\0".encode())
@@ -171,6 +192,7 @@ def push_data(api: HfApi, public: bool) -> None:
                 shutil.copy(p, t / p.name)
         shutil.copy(CARDS / "data.md", t / "README.md")
         no_home_paths(t)
+        no_private(t)
         api.upload_folder(folder_path=t, repo_id=DATA_REPO, repo_type="dataset",
                           commit_message="Frozen datasets")
     print("pushed", DATA_REPO)
@@ -199,6 +221,7 @@ def push_evals(api: HfApi, arms: list[str], public: bool, dry_run: bool = False)
         t = Path(tmp)
         stage_evals(t, arms)
         no_home_paths(t)
+        no_private(t)
         files = sorted(p for p in t.rglob("*") if p.is_file())
         print(f"{len(files)} files, {sum(p.stat().st_size for p in files) / 1e6:.1f} MB -> {EVAL_REPO}")
         if dry_run:
@@ -354,11 +377,13 @@ def gpu_files(root: Path) -> list[tuple[Path, Path]]:
     """The result files of the Hugging Face GPU jobs (answers, verdicts, records and logs), each with its path in the
     outputs repo. root is runs/gpu as `python -m lir.gpu fetch` leaves it. A job folder with no job record is left
     out, and so is a job that is not in GPU_JOBS. Nothing under a folder named `adapter` is taken, whatever its
-    suffix: the adapters trained in the jobs do not belong in the outputs repo, their configs included."""
+    suffix: the adapters trained in the jobs do not belong in the outputs repo, their configs included. Nothing of
+    section 20 is taken, wherever it lies (see `private`)."""
     out = []
     for job in sorted(p for p in root.glob("*/*") if (p / "job.json").exists() and p.parent.name in GPU_JOBS):
         out += [(p, Path("gpu") / p.relative_to(root)) for p in sorted(job.rglob("*"))
-                if p.is_file() and p.suffix in (".jsonl", ".json", ".log") and "adapter" not in p.relative_to(job).parts]
+                if p.is_file() and p.suffix in (".jsonl", ".json", ".log") and "adapter" not in p.relative_to(job).parts
+                and not private(p.relative_to(root))]
     if out and (root / "revision.txt").exists():   # the revision of the staging dataset the files were read from
         out.append((root / "revision.txt", Path("gpu") / "staging_revision.txt"))
     return out
@@ -502,6 +527,7 @@ def push_stage2(api: HfApi, arms: list[str] | None, dry_run: bool, aya_task: boo
         t = Path(tmp)
         staged = stage_stage2(t, arms, aya_task)
         no_home_paths(t)
+        no_private(t)
         files = sorted(p for p in t.rglob("*") if p.is_file())
         size = sum(p.stat().st_size for p in files)
         print(f"{len(files)} files, {size / 1e6:.1f} MB -> {EVAL_REPO}")

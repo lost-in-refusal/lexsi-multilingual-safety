@@ -50,6 +50,18 @@ def norm(text: str) -> str:
     return " ".join(text.casefold().split())
 
 
+def screened(v: dict) -> str | None:
+    """Why the guard's verdict on a row (its prompt with its reference answer) drops the row, or None if the row is
+    kept: no readable verdict, a verdict other than Safe, or an answer the guard calls a refusal."""
+    if v["safety"] is None:
+        return "guard_unreadable"
+    if v["safety"] != "Safe":
+        return "guard_not_safe"
+    if v["refusal"] == "Yes":
+        return "guard_refusal"
+    return None
+
+
 def split_sizes(passed: dict[str, int], n_eval: int = N_EVAL, cap: int = N_TRAIN_MAX) -> int:
     """Training rows per language: the same number in each, set by the scarcest training language after the hold-out."""
     return max(0, min(cap, *(passed[l] - n_eval for l in TRAIN_LANGS)))
@@ -127,13 +139,9 @@ def build_final() -> None:
         raise SystemExit(f"{len(missing)} candidates were not screened by the guard; nothing written")
     passed, flagged = {l: [] for l in NAMES}, {l: Counter() for l in NAMES}
     for r in cand:
-        v = screen[r["uid"]]
-        if v["safety"] is None:
-            flagged[r["lang"]]["guard_unreadable"] += 1
-        elif v["safety"] != "Safe":
-            flagged[r["lang"]]["guard_not_safe"] += 1
-        elif v["refusal"] == "Yes":
-            flagged[r["lang"]]["guard_refusal"] += 1
+        why = screened(screen[r["uid"]])
+        if why:
+            flagged[r["lang"]][why] += 1
         else:
             passed[r["lang"]].append(r)
     evals, pools = {}, {}

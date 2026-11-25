@@ -22,6 +22,7 @@ from lir.seeds import K1_ROWS, REFUSAL, STRICT, UNSAFE, by_family, change, diff,
 
 OUT = ROOT / "results" / "lir" / "stage2"
 GPU = RUNS / "gpu"
+LEFT_OUT = ["xlsum/*"]   # folders of the staging dataset that `fetch` does not copy here
 BAR = 6.36   # section 12.1: "a rise of at least 6.36 points", the bar of H4 and K1
 NAMES = {"en": "English", "ko": "Korean", "zh": "Chinese", "sw": "Swahili"}
 CONTROL = {"base": "gpu-base", "plain": "gpu-plain"}   # laptop arm -> the same model evaluated by job control
@@ -310,7 +311,9 @@ def fetch() -> None:
     from lir.hfjob import STAGING
 
     sha = HfApi().dataset_info(STAGING).sha
-    snapshot_download(STAGING, repo_type="dataset", revision=sha, local_dir=GPU, allow_patterns=["*.jsonl", "*job.json", "*.log", "*run.json"])
+    # Not the files of section 20: they quote BBC articles and stay under runs/xlsum, where `python -m lir.xlsum fetch` puts them.
+    snapshot_download(STAGING, repo_type="dataset", revision=sha, local_dir=GPU, allow_patterns=["*.jsonl", "*job.json", "*.log", "*run.json"],
+                      ignore_patterns=LEFT_OUT)
     (GPU / "revision.txt").write_text(sha + "\n")
     print(f"{STAGING} at {sha} -> {GPU} (adapters left out)")
 

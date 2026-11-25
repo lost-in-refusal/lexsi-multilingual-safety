@@ -14,6 +14,7 @@ results/*
 runs/acts/
 runs/*/adapter/
 runs/*/hf/
+runs/xlsum/
 logs/
 scratch/
 *.zip
