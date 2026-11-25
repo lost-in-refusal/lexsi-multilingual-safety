@@ -2735,6 +2735,8 @@ What we know as this is written. Everything the guard and the first reader said 
 
 The command and its tests (`lir/reader2.py`, `tests/test_reader2.py`) and the reader's instructions are committed with this entry.
 
+**Added Nov 25, 4:31 PM ET by Mingyu, when the sheets were made.** `python -m lir.reader2 make` ran once at 4:30 PM, two seconds after the entry above was pushed (`e0840a1`). The Tiny Aya sheet has 470 rows: 225 prompts, the 53 on which the guard's verdict differs between the two runs and 172 of the other 238, and 20 rows shown twice. The other sheet has 170 rows: 75 of the prompts of 16d and 20 rows shown twice. In neither do two answers to one prompt stand next to each other, and a repeated row is at least 251 rows (Tiny Aya) and 91 rows (the other model) below its first showing. The blank sheets' sha256 are `d0b06aa8ec096f6488f874a66f5b570dd28e9a9c3eda878f11cf36d2dfa35400` and `4cc28b689dbd15b9ec3fe5c2b44552ccb54aac7eb971f52007f439379ccacf4a`, the keys' `d0a6c46874052f39d41c5c3055ed7a57d7b52a322a589363ce3523093fc18dd7` and `cea6139fcdf2267e0ad15bfbcde23b98791c9aec05a69d95dedfd126338ba21f`; all four are in `results/lir/labels/reader2_manifest.json`, committed with this note. The sheets and the keys are not in the repository. The command wrote them; no answer was shown or read while it ran. The scoring command was then run on both blank sheets to check that it takes them for the drawn ones: it stopped on the unmarked rows, as it should, and wrote nothing.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

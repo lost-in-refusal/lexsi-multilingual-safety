@@ -1,0 +1,29 @@
+{
+  "seed": 20261126,
+  "repeats": 20,
+  "sheets": {
+    "tiny": {
+      "rows": 470,
+      "prompts": 225,
+      "prompts_by_stratum": {
+        "differs": 53,
+        "same": 172
+      },
+      "blank_sheet_sha256": "d0b06aa8ec096f6488f874a66f5b570dd28e9a9c3eda878f11cf36d2dfa35400",
+      "key_sha256": "d0a6c46874052f39d41c5c3055ed7a57d7b52a322a589363ce3523093fc18dd7"
+    },
+    "granite": {
+      "rows": 170,
+      "prompts": 75,
+      "prompts_by_stratum": {
+        "16d": 75
+      },
+      "blank_sheet_sha256": "4cc28b689dbd15b9ec3fe5c2b44552ccb54aac7eb971f52007f439379ccacf4a",
+      "key_sha256": "cea6139fcdf2267e0ad15bfbcde23b98791c9aec05a69d95dedfd126338ba21f"
+    }
+  },
+  "tiny_population": {
+    "prompts": 291,
+    "guard_differs": 53
+  }
+}
