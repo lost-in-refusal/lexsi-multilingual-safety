@@ -353,7 +353,7 @@ class Commands(unittest.TestCase):
     def inner(self, cmd):
         text = " ".join(cmd)
         self.assertEqual(cmd[:3], ["hf", "jobs", "run"])
-        for flag, value in (("--flavor", "l40sx1"), ("--namespace", hfjob.NAMESPACE), ("--secrets", "HF_TOKEN")):
+        for flag, value in (("--flavor", "a100-large"), ("--namespace", hfjob.NAMESPACE), ("--secrets", "HF_TOKEN")):
             self.assertEqual(cmd[cmd.index(flag) + 1], value)
         self.assertIn(f"LIR_STAGING_REPO={hfjob.STAGING}", cmd)
         self.assertIn("git checkout -q abc1234def", cmd[-1])
@@ -393,7 +393,7 @@ class Commands(unittest.TestCase):
         self.assertEqual(xlsum.STAGE1, ("xlsum-base", "xlsum-plain-s42"))
         self.assertEqual([xlsum.run_name("base"), xlsum.run_name("plain", 42), xlsum.run_name("safegrad", 2)], ["xlsum-base", "xlsum-plain-s42", "xlsum-safegrad-s2"])
         self.assertEqual(xlsum.METHOD["xlsum-safegrad-s1"], ("safegrad", 1))
-        self.assertEqual((xlsum.FLAVOR, xlsum.SUMMARY_NEW_TOKENS, xlsum.BROKEN), ("l40sx1", 128, 1.0))
+        self.assertEqual((xlsum.FLAVOR, xlsum.SUMMARY_NEW_TOKENS, xlsum.BROKEN), ("a100-large", 128, 1.0))
         from lir import publish
         from lir.common import arm_model
 
@@ -416,7 +416,7 @@ class Commands(unittest.TestCase):
         what, a = parsed("job-judge", "--arms", "xlsum-base", "xlsum-plain-s42")
         self.assertEqual((what, a.arms), ("job_judge", ["xlsum-base", "xlsum-plain-s42"]))
         what, a = parsed("launch", "--arm", "base", "--seed", "1", "--dry-run")
-        self.assertEqual((a.seed, a.flavor, a.timeout, a.dry_run), (None, "l40sx1", None, True))   # the base run has no seed
+        self.assertEqual((a.seed, a.flavor, a.timeout, a.dry_run), (None, "a100-large", None, True))   # the base run has no seed
         self.assertEqual(parsed("fetch", "--part", "premise")[1].part, "premise")
         self.assertEqual(parsed("fetch")[1].part, "all")
         self.assertEqual((parsed("report")[1].seeds, parsed("report", "--seeds", "42", "1")[1].seeds), (None, [42, 1]))
@@ -460,7 +460,7 @@ class Launch(unittest.TestCase):
         return None, run, out.getvalue()
 
     def test_a_refused_launch_submits_nothing(self):
-        ns = lambda **k: argparse.Namespace(**{"what": "launch", "flavor": "l40sx1", "timeout": None, "dry_run": False, "seed": None, **k})
+        ns = lambda **k: argparse.Namespace(**{"what": "launch", "flavor": "a100-large", "timeout": None, "dry_run": False, "seed": None, **k})
         with mock.patch.multiple(xlsum, INPUT_REV="", INPUT_SHA={"train": "", "heldout": ""}):
             code, run, _ = self.launch(xlsum.launch, ns(arm="base"))
             self.assertIn("INPUT_REV and INPUT_SHA are not filled in", code)
@@ -483,7 +483,7 @@ class Launch(unittest.TestCase):
             run.assert_not_called()
 
     def test_the_build_and_the_judge_launch_need_only_a_pushed_commit(self):
-        ns = lambda **k: argparse.Namespace(**{"flavor": "l40sx1", "timeout": None, "dry_run": False, **k})
+        ns = lambda **k: argparse.Namespace(**{"flavor": "a100-large", "timeout": None, "dry_run": False, **k})
         with mock.patch.multiple(xlsum, INPUT_REV="", INPUT_SHA={"train": "", "heldout": ""}):
             code, run, _ = self.launch(xlsum.launch_build, ns(what="launch-build"))
             self.assertEqual(code, 0)

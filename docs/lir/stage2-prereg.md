@@ -2671,6 +2671,8 @@ Where it goes in the paper. Section 3.4. The table of the learning rate and the 
 
 The jobs, the readers and their tests (`lir/xlsum.py`, `tests/test_xlsum.py`), the screening rule as a function (`lir/aya.py`), and the exclusions (`lir/publish.py`, `lir/gpu.py`, `.gitignore`) are committed before this entry or with it.
 
+**Added Nov 25, 4:17 PM ET by Mingyu, before any job of this block has run.** The build job was submitted at 12:49 PM on one L40S (job `6b071f8ad91f621b9308a094`) and waited for hardware until 4:16 PM, when it was cancelled: no L40S came free, the job never started, and nothing was downloaded, built or measured. Every job of this block now runs on one NVIDIA A100 with 80 GB (`a100-large`, $2.50 an hour) in place of the L40S, the build and the judge included, so that the base run and the fine-tuned runs are still on one kind of GPU. Nothing else of the entry changes. The cost at list price becomes $14 to $25 for the same GPU hours. The default GPU type in `lir/xlsum.py` is changed with this note.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

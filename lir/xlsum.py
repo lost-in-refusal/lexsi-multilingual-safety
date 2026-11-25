@@ -37,7 +37,7 @@ from lir.repeat import ci, pooled_scores, score_diff, side
 from lir.seeds import REFUSAL, STRICT, by_family, diff, pooled, rate
 
 JOB = "xlsum"
-FLAVOR = "l40sx1"
+FLAVOR = "a100-large"   # section 20's note of Nov 25: no L40S came free; every job of the block runs on an A100
 TIMEOUTS = {"launch-build": "1h", "launch": "2h", "launch-judge": "2h"}
 OUT = ROOT / "results" / "lir" / "stage2"
 GO_FILE = OUT / "xlsum_premise.json"     # written by `premise`; `launch` asks for it before any run of stage 2
