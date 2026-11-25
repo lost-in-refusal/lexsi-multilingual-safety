@@ -2383,6 +2383,8 @@ It is the last judge. If it fails Check A, no fourth is named.
 
 How it runs. Two jobs on a Hugging Face GPU with 80 GB (`a100-large`; the weights load in bfloat16 there, about 48 GB by the maker's guide): `python -m lir.judge3 launch --part labels` runs the set-up test and the 150 label rows; `--part arms` is refused by the code until Check A has been read and English and Korean have reached the bar. Then `fetch`, `check-a` and `report`. The command, its tests and the manifest of the inputs are committed with this entry.
 
+**Added Nov 25, 7:40 AM ET by Mingyu, when the first job was launched.** The entry above is headed 7:40 AM; it was pushed at 7:37 AM (`d0854a2`), and the heading was written a few minutes ahead of the clock. The label job (`--part labels`: the set-up test, then the 150 label rows) was submitted at 7:38 AM from that commit on one A100 with 80 GB, job `6b06d695b6a90bbe997d2f4e`. Nothing it wrote has been read.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
