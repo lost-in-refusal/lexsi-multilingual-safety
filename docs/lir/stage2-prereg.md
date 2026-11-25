@@ -2461,6 +2461,8 @@ How it runs. On the laptop, through the queue that section 15a left finished: fo
 
 The command and its tests (`lir/dose.py`, `tests/test_dose.py`) are committed with this entry.
 
+**Added Nov 25, 7:50 AM ET by Mingyu, when the arms were built and queued.** The entry above is headed 7:50 AM and was pushed at 7:47 AM (`92ca5c0`); the heading was written ahead of the clock. The five adapters were built at 7:48 AM from that commit (sha256 beginning `plain-x025` 0661e2cd9e64, `plain-x050` cb5b9d44292d, `plain-x075` f1a7abc48036, `random-r1` 49214483aef4, `random-r2` c6abd627f130; update norms 1.510, 3.020, 4.531, 6.041 and 6.041 against 6.041 for the plain adapter), and the laptop queue was started at 7:48 AM with lines 297 to 307, a stop line after them. No answer of any arm exists yet.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
