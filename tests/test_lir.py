@@ -2423,6 +2423,88 @@ class OtherFamilyAgain(unittest.TestCase):
             self.assertIn(sentence, section)
 
 
+class OtherFamilyFollowUps(unittest.TestCase):
+    """Sections 16b and 16c: no Korean training row, and the task score, on the model outside the Tiny Aya family."""
+
+    arm = GpuRuns.arm
+
+    def test_no_korean_jobs(self):
+        from lir import granite41, hfjob
+
+        self.assertEqual(sorted(granite41.NOKO.values()), ["granite41-noko-s1", "granite41-noko-s2", "granite41-noko-s42"])
+        for seed, name in granite41.NOKO.items():
+            (step,) = hfjob.JOBS[name]
+            self.assertEqual((step["arm"], step["model"], step["train"], step["method"], step["seed"]), (name, "granite41", granite41.NOKO_TRAIN, "plain", seed))
+            self.assertTrue((hfjob.DATA / step["train"]).exists())
+            self.assertFalse(hfjob.trains_safegrad(name))
+            self.assertEqual(hfjob.train_command(step)[-2:], ["--seed", str(seed)])
+        rows = [__import__("json").loads(l) for l in (hfjob.DATA / granite41.NOKO_TRAIN).read_text().splitlines()]
+        self.assertFalse(any(r.get("lang") == "ko" for r in rows))
+
+    def test_n1(self):
+        from lir.granite41 import N1_NOT_READ, N1_ROWS, NOKO, SEEDS, noko_md, noko_result
+
+        data = {"base": self.arm({"ko": range(2)})}
+        for s in NOKO:
+            data[NOKO[s]], data[SEEDS[s][0]] = self.arm({"ko": range(18)}), self.arm({"ko": range(20)})
+        res = noko_result(data)
+        self.assertAlmostEqual(res["ko_rise"]["mean"], 40.0)          # 2 to 18 of 40 families
+        self.assertEqual(res["report"], N1_ROWS["above"])
+        self.assertAlmostEqual(res["ko_vs_plain"]["mean"], -5.0)      # 20 under the usual plain run
+        self.assertAlmostEqual(res["per_language"]["en"]["mean"], 0.0)
+        self.assertIn("**N1. " + N1_ROWS["above"] + ".**", noko_md(res))
+        flat = noko_result({"base": data["base"], **{NOKO[s]: self.arm({"ko": range(2)}) for s in NOKO}})
+        self.assertEqual(flat["report"], N1_ROWS["includes"])
+        self.assertNotIn("ko_vs_plain", flat)
+        part = noko_result({"base": data["base"], NOKO[42]: data[NOKO[42]]})
+        self.assertEqual((part["complete"], part["seeds"]), (False, [42]))
+        self.assertNotIn("report", part)
+        self.assertIn(N1_NOT_READ, noko_md(part))
+        self.assertIn(N1_NOT_READ, noko_md(noko_result({"base": data["base"]})))
+
+    def scored(self, score, n=6):
+        return {f"t{i}": {"uid": f"t{i}", "task_score": score + (i % 2) * 0.5} for i in range(n)}
+
+    def test_t1_and_t2(self):
+        from lir.granite41 import SEEDS, T1_ROWS, T2_ROWS, TASK_NOT_READ, task_command, task_md, task_result
+
+        task = {"base": self.scored(6.0)}
+        for s in SEEDS:
+            task[SEEDS[s][0]], task[SEEDS[s][1]] = self.scored(5.0), self.scored(5.0)
+        res = task_result(task, 6)
+        self.assertTrue(res["complete"])
+        self.assertAlmostEqual(res["t1"]["mean"], -1.0)
+        self.assertEqual((res["t1"]["report"], res["t2"]["report"]), (T1_ROWS["below"], T2_ROWS["includes"]))
+        self.assertAlmostEqual(res["mean"]["base"], 6.25)
+        self.assertIn("**T1. " + T1_ROWS["below"] + ".**", task_md(res))
+        lower = dict(task, **{SEEDS[s][1]: self.scored(4.0) for s in SEEDS})
+        self.assertEqual(task_result(lower, 6)["t2"]["report"], T2_ROWS["below"])
+        higher = dict(task, **{SEEDS[s][1]: self.scored(5.8) for s in SEEDS})
+        self.assertEqual(task_result(higher, 6)["t2"]["report"], T2_ROWS["above"])
+        # a run with an answer that has no score is left out, and nothing is said
+        task[SEEDS[1][1]]["t0"]["task_score"] = None
+        part = task_result(task, 6)
+        self.assertEqual((part["complete"], part["runs_left_out"]), (False, [SEEDS[1][1]]))
+        self.assertNotIn("report", part["t1"])
+        self.assertIn(TASK_NOT_READ, task_md(part))
+        self.assertIn(TASK_NOT_READ, task_md(task_result({}, 6)))
+        cmd = task_command("abc1234def", dry_run=True)
+        self.assertIn("--dry-run", cmd)
+        self.assertIn("LIR_MODEL=granite41 python -m lir.granite41 job-task", cmd[-1])
+        self.assertEqual(cmd[cmd.index("--flavor") + 1], "l40sx1")
+
+    def test_registered_wording(self):
+        from lir.common import ROOT
+        from lir.granite41 import N1_NOT_READ, N1_ROWS, T1_ROWS, T2_ROWS, TASK_NOT_READ
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        b, c = prereg[prereg.index("### 16b."):prereg.index("### 16c.")], prereg[prereg.index("### 16c."):]
+        for sentence in (*N1_ROWS.values(), N1_NOT_READ):
+            self.assertIn(sentence, b)
+        for sentence in (*T1_ROWS.values(), *T2_ROWS.values(), TASK_NOT_READ):
+            self.assertIn(sentence, c)
+
+
 if __name__ == "__main__":
     unittest.main()
 
@@ -2788,7 +2870,7 @@ class OtherFamily(unittest.TestCase):
     def test_jobs(self):
         from lir import common, granite41, hfjob
 
-        self.assertEqual({name for name in hfjob.JOBS if name.startswith("granite41")}, self.NAMES)
+        self.assertEqual({name for name in hfjob.JOBS if name.startswith("granite41")}, self.NAMES | set(granite41.NOKO.values()))
         for name in self.NAMES:
             (step,) = hfjob.JOBS[name]   # one arm a job, named like the job, so the six trainings can run side by side
             self.assertEqual((step["arm"], step["model"]), (name, "granite41"))
@@ -2818,7 +2900,7 @@ class OtherFamily(unittest.TestCase):
 
         self.assertEqual(hfjob.train_command(hfjob.JOBS["only-ko"][0]), ["lir.train", "--arm", "plain", "--output", str(hfjob.RUNS / "plain-ko"),
                                                                           "--train-file", str(hfjob.DATA / "bactrian_train_only_ko.jsonl")])
-        before = sorted(set(hfjob.JOBS) - self.NAMES)
+        before = sorted(name for name in set(hfjob.JOBS) - self.NAMES if not name.startswith("granite41-noko-"))
         self.assertEqual(before, ["control", "nf4", "nf4-s1", "nf4-s2", "only-en", "only-ko", "only-zh", "unmerged", "unmerged-s1", "unmerged-s2"])
         for name in before:
             for step in hfjob.JOBS[name]:

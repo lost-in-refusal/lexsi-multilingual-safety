@@ -78,6 +78,9 @@ JOBS = {
     **{f"{OTHER}-{method}-s{seed}": [{"arm": f"{OTHER}-{method}-s{seed}", "model": OTHER, "train": "bactrian_train.jsonl", "method": method,
                                       "seed": seed, **({"align": f"{OTHER}-base"} if method == "safegrad" else {})}]
        for method in ("plain", "safegrad") for seed in OTHER_SEEDS},
+    # Section 16b. Plain LoRA on that model with no Korean training row, at the three seeds.
+    **{f"{OTHER}-noko-s{seed}": [{"arm": f"{OTHER}-noko-s{seed}", "model": OTHER, "train": "bactrian_train_noko.jsonl", "method": "plain",
+                                  "seed": seed}] for seed in OTHER_SEEDS},
 }
 
 

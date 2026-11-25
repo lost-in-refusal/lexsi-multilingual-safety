@@ -2125,6 +2125,8 @@ The jobs (`lir/hfjob.py`, `requirements-gpu-safegrad.txt`), the reader (`lir/gra
 - Recounted from the verdict files with separate code: +10.1 [+7.5, +12.6], +20.8 [+15.2, +26.6] and -13.7 [-16.1, -11.5], where the last digit of an interval end moves with the bootstrap draw.
 - Limits, as registered: one model of one other family; no test compares its figures with Tiny Aya's; the guard's verdicts on capped answers; no second judge, no task score, no person. The differences from the Tiny Aya runs listed above go with it: no system prompt, 1,795 rows, its own refusal set, a cloud GPU. The files as read: `granite41/seeds.md`, sha256 `901ef3d32afc940abe5358c95d65e66474035d38dc1e14e386e2a376af5541b3`, and `granite41/seeds.json`, sha256 `3f2c3e43a7348cb290f5451f5d6fa60bb9aa32807beb677d1bc2218071dcef0f`.
 
+**Added Nov 25, 12:02 AM ET by Mingyu, to the reading of section 16: a table of its report that the note above left out.** The report shows refusals on the safe prompts of XSTest for each run against the base model, with no rule. Under SafeGrad they rise in English, from 9.6% to 24.4%, 25.2% and 21.6% at the three seeds, and in Chinese at two seeds (10.8% to 16.8% and 18.4%; 12.4% at seed 2); in Korean they do not rise (13.6% to 10.8%, 10.0% and 9.2%). Under plain they rise less in English (15.2%, 11.2%, 16.8%) and fall in Korean (to 2.8%, 4.4%, 3.6%). In Swahili they rise under both (11.2% to between 24.9% and 29.3%). On the attack prompts SafeGrad refuses more than the base model in every language (English +10.4 points [+6.8, +14.2], Korean +5.7 [+1.5, +10.2], Chinese +8.7 [+5.3, +12.3]). So on this model SafeGrad's lower attack success comes with more refusals of safe prompts in English and Chinese, which it did not on Tiny Aya. This goes with G3 wherever G3 is used.
+
 ### 16a. The model outside the Tiny Aya family, read again after re-generation at 1,024 tokens
 
 **Added Nov 24, 11:05 PM ET by Mingyu, after section 16 was read and before any answer below was generated again.**
@@ -2155,6 +2157,68 @@ If it is not finished. The second reading is not made: it needs every capped ans
 Cost and reading. One job with a limit of two hours, about an hour expected, about $2. It uploads its answers, verdicts and record to the private staging dataset. `python -m lir.gpu fetch`, then `python -m lir.granite41 again`, which writes `results/lir/stage2/granite41/seeds_regen.md`.
 
 The job and its reader (in `lir/granite41.py`) and their tests are committed with this entry.
+
+### 16b. The model outside the Tiny Aya family, trained with no Korean row
+
+**Added Nov 25, 12:02 AM ET by Mingyu, after section 16 was read and before any run below was launched.**
+
+Question. G2 says that on this model Korean again rose more than English. K1 (section 6) asked of Tiny Aya whether the Korean rise needs Korean training rows, and found it does not. Does Korean attack success rise on this model when it is fine-tuned with no Korean row?
+
+The runs. Plain LoRA on `ibm-granite/granite-4.1-3b` at seeds 42, 1 and 2 on `bactrian_train_noko.jsonl`, the training file of K1: 874 English and 874 Chinese rows and no Korean row. Jobs `granite41-noko-s42`, `-s1` and `-s2` of `lir/hfjob.py`, with the settings, the GPU type (one NVIDIA L40S) and the evaluation of section 16: the attack set and XSTest, answers capped at 256 tokens. They are read against the base run of section 16.
+
+**N1.** Prediction: above zero. Korean strict attack success, the run with no Korean row minus base, each prompt family averaged over the three seeds, the 291 families bootstrapped, the 95% interval read.
+
+| The interval | What we write |
+| --- | --- |
+| Above zero | On the model outside the Tiny Aya family, Korean attack success rose without a Korean training row |
+| Includes zero | On the model outside the Tiny Aya family, no rise in Korean attack success was detected without a Korean training row |
+| Below zero | On the model outside the Tiny Aya family, Korean attack success fell without a Korean training row |
+
+Beside, with no rule: each language against base; Korean against the usual plain run of the same seed; the rows trained and the rows the trainer dropped as too long.
+
+What we will not write. That the rise is the same size with and without Korean rows: no test of equality is made. Anything about answers past the cap, unless a second reading is registered. A comparison with Tiny Aya's K1 as a test.
+
+What we know as this is written. All of section 16. Nothing of any run on this file with this model.
+
+If it is not finished. N1 is not read: it needs the base run and the run with no Korean training row at all three seeds. A job that fails before its training has started is launched again after the cause is fixed, each failure noted, with nothing measured changed; a job that fails later is launched again once. A job not finished by Wednesday Nov 25, 9 PM ET is listed as not run.
+
+Cost and reading. Three jobs of about 25 minutes on an L40S, about $2.50. `python -m lir.gpu fetch`, then `python -m lir.granite41 noko`, which writes `results/lir/stage2/granite41/noko.md`.
+
+### 16c. The task score on the model outside the Tiny Aya family
+
+**Added Nov 25, 12:02 AM ET by Mingyu, after section 16 was read and before any task prompt was answered by this model.**
+
+Question. Section 16 did not measure the task score, and its report shows SafeGrad refusing more safe prompts on this model. On Tiny Aya both fine-tunes score below the base model on the task. What does fine-tuning cost on this model, and is SafeGrad's lower attack success bought with a weaker model?
+
+What is run. One job on one NVIDIA L40S (`lir.granite41 job-task`): each of the seven runs of section 16, with the adapter it was evaluated with (from its upload at staging revision `9070ad38`, checked by sha256), answers the 300 held-out task prompts at up to 1,024 new tokens; then the task judge used everywhere, Qwen3-14B, scores every answer from 1 to 7.
+
+**T1, the cost of fine-tuning.** No prediction. The task score of plain minus base. Each prompt is averaged over the three seeds, the 300 prompts are bootstrapped, the 95% interval is read.
+
+| The interval | What we write |
+| --- | --- |
+| Below zero | Plain fine-tuning lowered the task score on the model outside the Tiny Aya family |
+| Includes zero | No change in task score under plain fine-tuning was detected on the model outside the Tiny Aya family |
+| Above zero | Plain fine-tuning raised the task score on the model outside the Tiny Aya family |
+
+**T2, SafeGrad against plain.** No prediction. The task score of SafeGrad minus plain, the same way.
+
+| The interval | What we write |
+| --- | --- |
+| Below zero | SafeGrad scored below plain fine-tuning on the task on the model outside the Tiny Aya family, so part of its lower attack success may be a weaker model |
+| Includes zero | No difference in task score between SafeGrad and plain fine-tuning was detected on the model outside the Tiny Aya family |
+| Above zero | SafeGrad scored above plain fine-tuning on the task on the model outside the Tiny Aya family |
+
+Beside, with no rule: SafeGrad minus base, and the mean score of each run.
+
+What we will not write. That a score is quality: one judge model gives it, no person has read the answers, and it can move with the length of an answer (section 13h). A comparison of the scores with Tiny Aya's.
+
+What we know as this is written. All of section 16, with the refusals on safe prompts stated above. Nothing of any answer of this model to a task prompt.
+
+If it is not finished. T1 and T2 are not read: they need every task answer of the base run and of both arms at all three seeds scored. A job that fails before the first answer is generated is launched again after the cause is fixed, each failure noted, with nothing measured changed. A job not finished by Wednesday Nov 25, 9 PM ET is listed as not run.
+
+Cost and reading. One job with a limit of two hours, about $2. `python -m lir.gpu fetch`, then `python -m lir.granite41 task`, which writes `results/lir/stage2/granite41/task.md`.
+
+The jobs and the readers of 16b and 16c (`lir/hfjob.py`, `lir/granite41.py`) and their tests are committed with these entries.
 
 ## Rules
 

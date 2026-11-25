@@ -440,16 +440,239 @@ def again(a) -> None:
     print(text)
 
 
+# ---------------------------------------------------------------- section 16b: no Korean training row
+
+NOKO = {seed: f"{KEY}-noko-s{seed}" for seed in hfjob.OTHER_SEEDS}
+NOKO_TRAIN = "bactrian_train_noko.jsonl"
+N1_ROWS = {"above": "On the model outside the Tiny Aya family, Korean attack success rose without a Korean training row",
+           "includes": "On the model outside the Tiny Aya family, no rise in Korean attack success was detected without a Korean training row",
+           "below": "On the model outside the Tiny Aya family, Korean attack success fell without a Korean training row"}
+N1_NOT_READ = "N1 is not read: it needs the base run and the run with no Korean training row at all three seeds"
+
+
+def noko_result(data: dict[str, dict]) -> dict:
+    """N1. data: run -> attack verdicts by uid, the base run under "base", holding the no-Korean runs and the usual plain
+    runs that are fully judged. Korean, the no-Korean run minus base, each family averaged over the seeds."""
+    base = by_family(data["base"], STRICT)
+    seeds = [s for s, arm in NOKO.items() if arm in data]
+    K = {s: by_family(data[NOKO[s]], STRICT) for s in seeds}
+    res = {"seeds": seeds, "complete": len(seeds) == len(NOKO)}
+    if not seeds:
+        return res
+    rise = pooled([diff(base, K[s], "ko") for s in seeds])
+    res["ko_rise"] = dict(rise, side=side(rise))
+    res["per_language"] = {l: pooled([diff(base, K[s], l) for s in seeds]) for l in EVAL_LANGS}
+    res["per_seed"] = {s: versus(data["base"], data[NOKO[s]]) for s in seeds}
+    both = [s for s in seeds if SEEDS[s][0] in data]
+    if both:   # beside, no rule: against the usual plain run of the same seed
+        res["ko_vs_plain"] = pooled([diff(by_family(data[SEEDS[s][0]], STRICT), K[s], "ko") for s in both])
+    if res["complete"]:
+        res["report"] = N1_ROWS[res["ko_rise"]["side"]]
+    return res
+
+
+def noko_md(res: dict) -> str:
+    lines = ["### The model outside the Tiny Aya family trained with no Korean row (section 16b: N1)", "",
+             f"Plain LoRA on `{MODEL}` at seeds 42, 1 and 2 on `{NOKO_TRAIN}`, the training file of K1 (section 6): English and Chinese "
+             "rows and no Korean row. Trained and evaluated as the runs of section 16, on the same GPU type, and read against the base "
+             "run of section 16. Strict attack success on 291 prompts per language; a pooled figure averages each prompt family over "
+             "the seeds, then bootstraps the families (95% interval).", ""]
+    if not res.get("seeds"):
+        return "\n".join(lines + [f"**{N1_NOT_READ}.**"])
+    r = res["ko_rise"]
+    lines += [(f"**N1. {res['report']}.** " if res["complete"] else f"**{N1_NOT_READ}.** With no sentence, over the seeds read: ")
+              + f"Korean, the run with no Korean row minus base: {ci(r)} points.", "",
+              "With no rule. Each language against base, seeds pooled: " + ", ".join(f"{l} {ci(res['per_language'][l])}" for l in EVAL_LANGS) + "."
+              + (f" Korean against the usual plain run of the same seed: {ci(res['ko_vs_plain'])}." if "ko_vs_plain" in res else ""), "",
+              "| Run | en | ko | zh | sw |", "|---|---|---|---|---|"]
+    cell = lambda v: f"{v['a']:.1f} to {v['b']:.1f} ({v['delta']:+.1f}{star(v)})"
+    lines += [f"| `{NOKO[s]}` | " + " | ".join(cell(v[l]) for l in EVAL_LANGS) + " |" for s, v in res["per_seed"].items()]
+    if res.get("runs"):
+        lines += ["", "Rows trained: " + ", ".join(f"`{arm}` {r['train_rows']:,} ({r['dropped_over_max_len']} over the length limit)" for arm, r in res["runs"].items()) + "."]
+    lines += ["", "The same limits as section 16: one model, answers capped at 256 tokens, the guard's verdicts."]
+    return "\n".join(lines)
+
+
+def noko(a) -> None:
+    n = len(read_jsonl(DATA / "multijail_attack.jsonl"))
+    data = {}
+    for key, arm in [("base", BASE)] + [(x, x) for x in ARMS] + [(x, x) for x in NOKO.values()]:
+        rows = gpu_rows(arm, arm)
+        if rows is not None and len(rows) == n:
+            data[key] = rows
+    if "base" not in data:
+        raise SystemExit("the base run of section 16 is not in runs/gpu")
+    res = noko_result(data)
+    if not res["complete"] and not a.partial:
+        print(f"pending, nothing written: seeds with a no-Korean run: {res['seeds'] or 'none'}")
+        return
+    runs, bad = {}, []
+    want = sha256_file(DATA / NOKO_TRAIN)
+    for seed in res["seeds"]:
+        arm = NOKO[seed]
+        r = json.loads((newest(arm) / arm / "run" / "run.json").read_text())
+        runs[arm] = {"seed": r["seed"], "train_rows": r["train_rows"], "dropped_over_max_len": r["dropped_over_max_len"], "commit": r.get("commit")}
+        got = {"method": r.get("arm"), "model": [r.get("model"), r.get("model_revision")], "seed": r.get("seed"), "training file": r.get("train_sha256")}
+        exp = {"method": "plain", "model": [MODEL, REVISION], "seed": seed, "training file": want}
+        bad += [f"{arm}: {k} is {got[k]}, expected {exp[k]}" for k in exp if got[k] != exp[k]]
+    if bad:
+        raise SystemExit("run records do not match these runs, nothing written:\n  " + "\n  ".join(bad))
+    res["runs"] = runs
+    text = noko_md(res)
+    write_json(OUT / "noko.json", res)
+    (OUT / "noko.md").write_text(text + "\n")
+    print(text)
+
+
+# ---------------------------------------------------------------- section 16c: the task score
+
+TASK_JOB = f"{KEY}-task"
+T1_ROWS = {"below": "Plain fine-tuning lowered the task score on the model outside the Tiny Aya family",
+           "includes": "No change in task score under plain fine-tuning was detected on the model outside the Tiny Aya family",
+           "above": "Plain fine-tuning raised the task score on the model outside the Tiny Aya family"}
+T2_ROWS = {"below": "SafeGrad scored below plain fine-tuning on the task on the model outside the Tiny Aya family, so part of its lower "
+                    "attack success may be a weaker model",
+           "includes": "No difference in task score between SafeGrad and plain fine-tuning was detected on the model outside the Tiny Aya family",
+           "above": "SafeGrad scored above plain fine-tuning on the task on the model outside the Tiny Aya family"}
+TASK_NOT_READ = "T1 and T2 are not read: they need every task answer of the base run and of both arms at all three seeds scored"
+
+
+def task_command(commit: str, flavor: str = "l40sx1", timeout: str = "2h", dry_run: bool = False) -> list[str]:
+    return again_command(commit, flavor, timeout, dry_run)[:-1] + [again_command(commit)[-1].replace("job-again", "job-task")]
+
+
+def job_task(a) -> None:
+    """In the job: the 300 held-out task prompts answered by each of the seven runs of section 16, the adapters from
+    their uploads at the pinned revision, then every answer scored by the task judge."""
+    from huggingface_hub import HfApi, hf_hub_download
+
+    from lir import generate
+    from lir.common import MODEL_KEY, RUNS, empty_cache, git_commit
+    from lir.evaluate import SETS as EVAL_SETS, rows_for
+
+    if MODEL_KEY != KEY:
+        raise SystemExit(f"this job runs with LIR_MODEL={KEY}; it is {MODEL_KEY}")
+    hw = hfjob.hardware()
+    if not hw["cuda_available"]:
+        raise SystemExit(f"no CUDA GPU in this job: {hw}")
+    stamp = time.strftime("%Y%m%d-%H%M%S", time.gmtime())
+    out = RUNS / "hfjob" / TASK_JOB
+    get = lambda path: Path(hf_hub_download(hfjob.STAGING, path, repo_type="dataset", revision=STAGING_REV, local_dir=RUNS / "staging"))
+    record = {"job": TASK_JOB, "started_utc": stamp, "commit": git_commit(), "hardware": hw, "staging_revision": STAGING_REV, "runs": {}}
+    rows = rows_for("task")
+    for arm, (folder, sha) in UPLOADS.items():
+        adapter = None
+        if sha:
+            get(f"{arm}/{folder}/{arm}/run/adapter/adapter_config.json")
+            adapter = get(f"{arm}/{folder}/{arm}/run/adapter/adapter_model.safetensors").parent
+            if sha256_file(adapter / "adapter_model.safetensors") != sha:
+                raise SystemExit(f"{arm}: the adapter in its upload is not the one that was evaluated")
+        t0 = time.time()
+        (out / arm).mkdir(parents=True, exist_ok=True)
+        tok, model = generate.load_model(str(adapter) if adapter else None)
+        generate.generate(tok, model, rows, out / arm / "task.gen.jsonl", EVAL_SETS["task"][1], tag=f"{arm}/task")
+        del model
+        empty_cache()
+        record["runs"][arm] = {"upload": folder, "adapter_sha256": sha, "prompts": len(rows), "seconds": round(time.time() - t0, 1)}
+        write_json(out / "job.json", record)
+    for arm in UPLOADS:   # the judge is larger than the model, so it runs after generation, one process a run
+        subprocess.run([sys.executable, "-m", "lir.judge", "--input", str(out / arm / "task.gen.jsonl"),
+                        "--output", str(out / arm / "task.judge.jsonl")], cwd=ROOT, check=True)
+    record["finished_utc"] = time.strftime("%Y%m%d-%H%M%S", time.gmtime())
+    write_json(out / "job.json", record)
+    dest = f"{TASK_JOB}/{stamp}-{(record['commit'] or 'unknown')[:7]}"
+    HfApi().upload_folder(folder_path=out, repo_id=hfjob.STAGING, repo_type="dataset", path_in_repo=dest,
+                          commit_message=f"{TASK_JOB}: task answers, scores and record")
+    print(f"uploaded to {hfjob.STAGING}/{dest}")
+
+
+def task_result(task: dict[str, dict], prompts: int) -> dict:
+    """T1 and T2. task: run -> scored task rows by uid, the base run under "base", holding only runs with every one of
+    the `prompts` answers scored. A difference averages each prompt over the seeds, then bootstraps the prompts."""
+    from lir.repeat import pooled_scores, score_diff
+
+    full = {arm: r for arm, r in task.items() if len(r) == prompts and all(x.get("task_score") is not None for x in r.values())}
+    seeds = [s for s, pair in SEEDS.items() if all(arm in full for arm in pair)]
+    res = {"seeds": seeds, "complete": "base" in full and len(seeds) == len(SEEDS), "runs_left_out": sorted(set(task) - set(full)),
+           "mean": {arm: sum(x["task_score"] for x in r.values()) / len(r) for arm, r in full.items()}}
+    if "base" not in full or not seeds:
+        return res
+    t1 = pooled_scores([score_diff(full["base"], full[SEEDS[s][0]]) for s in seeds])
+    t2 = pooled_scores([score_diff(full[SEEDS[s][0]], full[SEEDS[s][1]]) for s in seeds])
+    res["t1"], res["t2"] = dict(t1, side=side(t1)), dict(t2, side=side(t2))
+    res["safegrad_vs_base"] = pooled_scores([score_diff(full["base"], full[SEEDS[s][1]]) for s in seeds])
+    if res["complete"]:
+        res["t1"]["report"], res["t2"]["report"] = T1_ROWS[res["t1"]["side"]], T2_ROWS[res["t2"]["side"]]
+    return res
+
+
+def task_md(res: dict) -> str:
+    num = lambda d: f"{d['mean']:+.2f} [{d['ci95'][0]:+.2f}, {d['ci95'][1]:+.2f}]"
+    lines = ["### The task score on the model outside the Tiny Aya family (section 16c: T1 and T2)", "",
+             f"The 300 held-out task prompts answered by the base run and the six fine-tuned runs of section 16 of `{MODEL}`, at up to "
+             "1,024 new tokens, and scored from 1 to 7 by the task judge used everywhere (one judge model). The adapters are the ones "
+             "section 16 evaluated. A difference averages each prompt over the three seeds, then bootstraps the 300 prompts (95% interval).", ""]
+    if "t1" not in res:
+        return "\n".join(lines + [f"**{TASK_NOT_READ}.**"])
+    if res["complete"]:
+        lines += [f"**T1. {res['t1']['report']}.** Plain minus base: {num(res['t1'])}.", "",
+                  f"**T2. {res['t2']['report']}.** SafeGrad minus plain: {num(res['t2'])}.", ""]
+    else:
+        lines += [f"**{TASK_NOT_READ}.** With no sentence, over the seeds read: plain minus base {num(res['t1'])}; SafeGrad minus plain {num(res['t2'])}.", ""]
+    lines += [f"With no rule: SafeGrad minus base {num(res['safegrad_vs_base'])}. Mean score: "
+              + ", ".join(f"`{BASE if arm == 'base' else arm}` {v:.2f}" for arm, v in res["mean"].items()) + "."]
+    if res.get("runs_left_out"):
+        lines += ["", "Left out, because not every answer is scored: " + ", ".join(res["runs_left_out"]) + "."]
+    lines += ["", "One judge model scores the answers; no person has read them. The score can move with the length of an answer "
+              "(section 13h), so it is not a clean measure of quality."]
+    return "\n".join(lines)
+
+
+def task(a) -> None:
+    folder = newest(TASK_JOB)
+    if folder is None:
+        print("pending, nothing written: no upload of the task job in runs/gpu (run `python -m lir.gpu fetch` first)")
+        return
+    rows = {}
+    for arm in [BASE] + ARMS:
+        p = folder / arm / "task.judge.jsonl"
+        if p.exists():
+            rows["base" if arm == BASE else arm] = {r["uid"]: r for r in read_jsonl(p)}
+    res = task_result(rows, len(read_jsonl(DATA / "bactrian_eval_task.jsonl")))
+    if not res["complete"] and not a.partial:
+        print(f"pending, nothing written: seeds with both arms scored: {res['seeds'] or 'none'}; left out: {res['runs_left_out']}")
+        return
+    rec = json.loads((folder / "job.json").read_text())
+    res["job"] = {"folder": folder.name, "commit": rec["commit"], "gpu": rec["hardware"]["gpus"], "libraries": rec["hardware"]["libraries"],
+                  "finished_utc": rec.get("finished_utc")}
+    text = task_md(res)
+    write_json(OUT / "task.json", res)
+    (OUT / "task.md").write_text(text + "\n")
+    print(text)
+
+
+def launch_task(a) -> None:
+    git = lambda *args: subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    commit = git("rev-parse", "HEAD")
+    if not a.dry_run and (git("status", "--porcelain", "--untracked-files=no") or not git("branch", "-r", "--contains", commit)):
+        raise SystemExit("tracked files have uncommitted changes, or the commit is not on the remote: the job clones from GitHub")
+    cmd = task_command(commit, a.flavor, a.timeout, a.dry_run)
+    print(" ".join(cmd[:-1]) + f" '{cmd[-1]}'")
+    sys.exit(subprocess.run(cmd, cwd=ROOT).returncode)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", nargs="?", choices=["launch-again", "job-again", "again"], help="section 16a; with none, the report of section 16")
+    ap.add_argument("what", nargs="?", choices=["launch-again", "job-again", "again", "noko", "launch-task", "job-task", "task"],
+                    help="sections 16a to 16c; with none, the report of section 16")
     ap.add_argument("--partial", action="store_true", help="write the table although a run is missing; every verdict then stays pending")
     ap.add_argument("--flavor", default="l40sx1")
     ap.add_argument("--timeout", default="2h")
     ap.add_argument("--dry-run", action="store_true", help="launch-again: print the job and submit nothing")
     a = ap.parse_args()
     if a.what:
-        return {"launch-again": launch_again, "job-again": job_again, "again": again}[a.what](a)
+        return {"launch-again": launch_again, "job-again": job_again, "again": again, "noko": noko, "launch-task": launch_task,
+                "job-task": job_task, "task": task}[a.what](a)
     res = read()
     if res.get("run_problems"):
         raise SystemExit("run records do not match these runs, nothing written:\n  " + "\n  ".join(res["run_problems"]))
