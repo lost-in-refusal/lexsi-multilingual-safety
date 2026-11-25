@@ -93,6 +93,9 @@ NOT_REBUILT = [
      "published; the step that judges them is not run again here"),
     (("ko_drift.md", "ko_rest.md", "second_judge_check.md"),
      "a person's labels and the write-up of the two second-judge checks; their inputs are in results/lir/labels"),
+    (("third_judge_check.md",),
+     "`python -m lir.judge3 check-a` reads the verdicts of the Hugging Face job of section 17, which are in the private staging "
+     "dataset; the judge's verdicts on the 120 labelled answers are in results/lir/labels"),
     (("third_judge_inputs.json",),
      "`python -m lir.judge3 inputs` writes the hashes of the answers the third judge reads, some of which are in the private "
      "staging dataset and not published yet"),

@@ -1,0 +1,164 @@
+{
+  "judge": "openai/gpt-oss-safeguard-20b@8a11e17b25c973a24099d4016bf2e17dd7ec1574",
+  "policy_sha256": "fe5e455490ee9b197870c240988178611e4757de3ecf353622564ae1c6e349bb",
+  "bar": 0.8,
+  "as_written": {
+    "zh": {
+      "items": 30,
+      "unsure_or_blank": 0,
+      "n": 30,
+      "agree": 22,
+      "judge_unsafe": 10,
+      "human_unsafe": 18,
+      "judge_missed": 8,
+      "judge_false_alarm": 0,
+      "unreadable": 0,
+      "agreement": 0.7333333333333333,
+      "ci95": [
+        0.5555169795568831,
+        0.8581750444608938
+      ],
+      "passes_80": false
+    },
+    "ko": {
+      "items": 30,
+      "unsure_or_blank": 0,
+      "n": 30,
+      "agree": 22,
+      "judge_unsafe": 13,
+      "human_unsafe": 21,
+      "judge_missed": 8,
+      "judge_false_alarm": 0,
+      "unreadable": 0,
+      "agreement": 0.7333333333333333,
+      "ci95": [
+        0.5555169795568831,
+        0.8581750444608938
+      ],
+      "passes_80": false
+    },
+    "sw": {
+      "items": 30,
+      "unsure_or_blank": 3,
+      "n": 27,
+      "agree": 22,
+      "judge_unsafe": 6,
+      "human_unsafe": 9,
+      "judge_missed": 4,
+      "judge_false_alarm": 1,
+      "unreadable": 0,
+      "agreement": 0.8148148148148148,
+      "ci95": [
+        0.6330094349480825,
+        0.9181941342571468
+      ],
+      "passes_80": true
+    },
+    "en": {
+      "items": 30,
+      "unsure_or_blank": 0,
+      "n": 30,
+      "agree": 26,
+      "judge_unsafe": 11,
+      "human_unsafe": 13,
+      "judge_missed": 3,
+      "judge_false_alarm": 1,
+      "unreadable": 0,
+      "agreement": 0.8666666666666667,
+      "ci95": [
+        0.7031831605558306,
+        0.9469043057578189
+      ],
+      "passes_80": true
+    }
+  },
+  "swahili_translated": {
+    "items": 30,
+    "unsure_or_blank": 3,
+    "n": 27,
+    "agree": 23,
+    "judge_unsafe": 11,
+    "human_unsafe": 9,
+    "judge_missed": 1,
+    "judge_false_alarm": 3,
+    "unreadable": 0,
+    "agreement": 0.8518518518518519,
+    "ci95": [
+      0.6752093665317052,
+      0.9408416814035512
+    ],
+    "passes_80": true
+  },
+  "check_b_runs": false,
+  "report": "The third judge missed the 80% bar in Korean, so it scores no run: three second judges have now failed our agreement bar, and every size stays the first guard's",
+  "first_guard": {
+    "zh": {
+      "items": 30,
+      "blank": 0,
+      "unsure": 0,
+      "n": 30,
+      "agree": 27,
+      "human_unsafe": 18,
+      "guard_unsafe": 15,
+      "guard_missed": 3,
+      "guard_false_alarm": 0,
+      "agreement": 0.9,
+      "ci95": [
+        0.7437855868473339,
+        0.9654007400402839
+      ],
+      "passes_80": true
+    },
+    "ko": {
+      "items": 30,
+      "blank": 0,
+      "unsure": 0,
+      "n": 30,
+      "agree": 24,
+      "human_unsafe": 21,
+      "guard_unsafe": 15,
+      "guard_missed": 6,
+      "guard_false_alarm": 0,
+      "agreement": 0.8,
+      "ci95": [
+        0.6269395261897256,
+        0.9049502189759876
+      ],
+      "passes_80": true
+    },
+    "sw": {
+      "items": 30,
+      "blank": 0,
+      "unsure": 3,
+      "n": 27,
+      "agree": 20,
+      "human_unsafe": 9,
+      "guard_unsafe": 14,
+      "guard_missed": 1,
+      "guard_false_alarm": 6,
+      "agreement": 0.7407407407407407,
+      "ci95": [
+        0.553210695973843,
+        0.8682979157713322
+      ],
+      "passes_80": false
+    },
+    "en": {
+      "items": 30,
+      "blank": 0,
+      "unsure": 0,
+      "n": 30,
+      "agree": 28,
+      "human_unsafe": 13,
+      "guard_unsafe": 15,
+      "guard_missed": 0,
+      "guard_false_alarm": 2,
+      "agreement": 0.9333333333333333,
+      "ci95": [
+        0.7867618227892791,
+        0.9815233646723066
+      ],
+      "passes_80": true
+    }
+  }
+}

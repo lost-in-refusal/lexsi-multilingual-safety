@@ -206,7 +206,7 @@ The recommended layout on hackathon.lexsi.ai marks these as required or as value
   no GGUF build was tested.
 - **"Checking the automatic judge" (% agreement or Cohen's kappa):** kappa is now in `unsafe_only.md`
   (0.87 English, 0.60 Korean, 0.80 Chinese, 0.49 Swahili, on a deliberately hard sample).
-- **"What didn't work" (negative results):** part C, items 1, 2, 7 and 9, plus Y3, E2 and the two second judges.
+- **"What didn't work" (negative results):** part C, items 1, 2, 7 and 9, plus Y3, E2, the three second judges and the three human checks of the Korean rise.
 - **"Sample inputs and outputs":** `docs/lir/korean-examples.md` (translations still to be checked by Mingyu).
 - **"LLM usage statement" (optional):** for the team to state.
 - **Tracks and problem statements covered:** multilingual safety (2a); safety-preserving fine-tuning, locating
