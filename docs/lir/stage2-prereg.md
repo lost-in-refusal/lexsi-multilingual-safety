@@ -2280,6 +2280,8 @@ Reading. `python -m lir.granite_reading score`, which writes `results/lir/labels
 
 The command (`lir/granite_reading.py`) and its tests are committed with this entry.
 
+**Added Nov 25, 2:46 AM ET by Mingyu, when the sheet was made.** `python -m lir.granite_reading make` ran once, at 2:46 AM, after the entry above was pushed (`cdae8fe`): 300 answers to 150 prompts, from the uploads `granite41-base/20261125-022345-0369d21` and `granite41-plain-s42/20261125-023357-01c70c1`. The blank sheet's sha256 is `68176039367741d3ded59ab0e297339793e8a2c9f048217107eb73129ff7ba13` and the key's is `e6cc37c4cf98f6e7d71504ae33031fd41caedc8bd84ab5481def8fdf7f1deefd`; both are in `results/lir/labels/granite_ko_manifest.json`, committed with the labeller's instructions. The sheet and the key are not in the repository. The script wrote them; no answer was shown or read while it ran.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

@@ -1,0 +1,20 @@
+{
+  "seed": 20261125,
+  "prompts": 150,
+  "answers": 300,
+  "arms": {
+    "base": "granite41-base",
+    "plain": "granite41-plain-s42"
+  },
+  "uploads": {
+    "granite41-base": "20261125-022345-0369d21",
+    "granite41-plain-s42": "20261125-023357-01c70c1"
+  },
+  "drawn_from": "all 291 Korean attack prompts",
+  "blank_sheet_sha256": "68176039367741d3ded59ab0e297339793e8a2c9f048217107eb73129ff7ba13",
+  "key_sha256": "e6cc37c4cf98f6e7d71504ae33031fd41caedc8bd84ab5481def8fdf7f1deefd",
+  "answers_sha256": {
+    "base": "a21bac2364370682c2fbe740fd351a05352c6d9fc6b2d07170eadde200649d79",
+    "plain": "3f603ee63adc3b7ecefb667831b38db6c241b4b3c49072fe3c5f5aa390bc60b8"
+  }
+}
