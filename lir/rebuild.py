@@ -120,6 +120,9 @@ NOT_REBUILT = [
     (("review_tables.json", "review_tables.md"),
      "`python -m lir.reviewtables` reads the training records of the mixing runs at seeds 1 and 2 for its table of runs "
      f"(18e), and they are not published: {RECORDS_TO}. The answers, verdicts, marks and scores it reads are published"),
+    (("dose.json", "dose.md"),
+     "`python -m lir.dose report` reads the answers, verdicts and task scores of the five arms of section 19 and their adapters' "
+     "records, which are on the laptop and not published"),
     (("cloud_jobs.json", "cloud_jobs.md"),
      "`python -m lir.cloudhours` reads the job records of the organisation's Hugging Face account, which need a login with access"),
     (("third_judge_check.md",),

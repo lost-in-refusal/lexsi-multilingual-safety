@@ -210,7 +210,7 @@ learning rate or the number of epochs changed.
 Not rebuilt, and why:
 
 - An input is not published. `vector_aya` (its command checks the hashes of adapter weights), `refusal_direction`
-  (the activation files), `aya/task` (the held-out Aya answers), `cloud_jobs` (the account's job records need a login), `third_judge_check.md` (the third judge's verdicts
+  (the activation files), `aya/task` (the held-out Aya answers), `dose` (the five arms of section 19 are not uploaded), `cloud_jobs` (the account's job records need a login), `third_judge_check.md` (the third judge's verdicts
   are in the private staging dataset) and `granite41/person.md` (its command reads its key from a folder that is not
   published; a copy of the key is in `results/lir/labels`). `mixing/seeds`, `mixing/seeds_regen`, `sensitivity`,
   `aligntune` and `review_tables`: their answers and verdicts are published, but each command also reads the
