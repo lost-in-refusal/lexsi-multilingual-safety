@@ -13,6 +13,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
+import sys
+import time
+from collections import Counter
+from pathlib import Path
 
 from lir import gpu, hfjob
 from lir.common import DATA, EVAL_LANGS, MODELS, ROOT, read_jsonl, sha256_file, write_json
@@ -238,10 +243,213 @@ def read() -> dict:
     return res
 
 
+# ---------------------------------------------------------------- section 16a: the capped answers generated again
+
+REGEN_JOB = f"{KEY}-regen"
+STAGING_REV = "9070ad38cec7af008911ae840bf1c58beaa0389f"   # the staging dataset as section 16 was read
+# run -> its upload in the staging dataset and, for a trained run, the sha256 of its adapter weights there
+UPLOADS = {BASE: ("20261125-022345-0369d21", None),
+           f"{KEY}-plain-s42": ("20261125-023357-01c70c1", "06708d556baef6d0457b7209edd12bbe8d7c4e465dec5d48053f821aa6954dc0"),
+           f"{KEY}-safegrad-s42": ("20261125-024917-dd1b1ee", "bfcd6ba0da44822d3f944ab0a14ad7b34d5fcbad6352bbec8e27c2d776c4cead"),
+           f"{KEY}-plain-s1": ("20261125-024606-01c70c1", "3006646f5112dc6d67708dee74f800fd50a0ba921f97be240cf0be4aaaa9eb34"),
+           f"{KEY}-safegrad-s1": ("20261125-031448-c4fde0c", "12e70834e39c5dfeee1134fdf75740302dff2d01caecf806d04903e2e3477982"),
+           f"{KEY}-plain-s2": ("20261125-023443-01c70c1", "455de651e82608545ba4b7d11d3445890aef362c5896cafd8b7e9a8e4a62362c"),
+           f"{KEY}-safegrad-s2": ("20261125-031944-c4fde0c", "cc49a24fdc75781975d6de222b73cd2c754ca646fb71f2d3be14965f435cc776")}
+ANSWER_FIELDS = ("response", "n_tokens", "truncated", "safety", "categories", "refusal", "guard_raw")
+STILL_CUT = 30   # answers of one run in one language (of 291) still cut at 1,024 tokens: from here on a caveat is printed
+AGAIN_ROWS = {True: "the same on the capped answers and after re-generation",
+              False: "differs after re-generation: both readings are given wherever it is used, and the reading of section 16 stands"}
+G1_GONE = ("After re-generation plain fine-tuning is not detected to raise attack success on this model: G1 is given with both "
+           "readings wherever it is used, and G3 is given with the note that on completed answers the rise it takes back was not detected")
+AGAIN_NOT_READ = "The second reading is not made: it needs every capped answer of all seven runs generated again and judged"
+G_NAMES = {"g1": "G1, plain minus base", "g2": "G2, the Korean rise minus the English rise", "g3": "G3, SafeGrad minus plain"}
+
+
+def again_command(commit: str, flavor: str = "l40sx1", timeout: str = "2h", dry_run: bool = False) -> list[str]:
+    inner = (f"set -euo pipefail; git clone -q {hfjob.REPO_URL} repo; cd repo; git checkout -q {commit}; "
+             f"pip install -q -r requirements-gpu.txt; LIR_MODEL={KEY} python -m lir.granite41 job-again")
+    return (["hf", "jobs", "run", "--flavor", flavor, "--namespace", hfjob.NAMESPACE, "--timeout", timeout, "--secrets", "HF_TOKEN",
+             "--env", f"LIR_FLAVOR={flavor}", "--env", f"LIR_STAGING_REPO={hfjob.STAGING}", "--name", f"lir-{REGEN_JOB}", "--detach"]
+            + (["--dry-run"] if dry_run else []) + [hfjob.IMAGE, "bash", "-c", inner])
+
+
+def launch_again(a) -> None:
+    git = lambda *args: subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    commit = git("rev-parse", "HEAD")
+    stops = []
+    if git("status", "--porcelain", "--untracked-files=no"):
+        stops.append("tracked files have uncommitted changes: the job would not run the code you see")
+    if not git("branch", "-r", "--contains", commit):
+        stops.append(f"commit {commit[:7]} is not on the remote yet: push it first, the job clones from GitHub")
+    if stops and not a.dry_run:
+        raise SystemExit(stops[0])
+    cmd = again_command(commit, a.flavor, a.timeout, a.dry_run)
+    print(" ".join(cmd[:-1]) + f" '{cmd[-1]}'")
+    for why in stops:
+        print(f"a launch would stop here: {why}")
+    sys.exit(subprocess.run(cmd, cwd=ROOT).returncode)
+
+
+def capped(rows: list[dict]) -> list[dict]:
+    """The answers that reached the 256-token cap, as prompts to generate again: no answer or verdict fields."""
+    return [{k: v for k, v in r.items() if k not in ANSWER_FIELDS} for r in rows if r["truncated"]]
+
+
+def job_again(a) -> None:
+    """In the job: every capped attack answer of the seven runs, generated again at 1,024 tokens by the model that wrote
+    it and judged by the same guard. Each run's verdicts and adapter come from its upload at the pinned revision."""
+    from huggingface_hub import HfApi, hf_hub_download
+
+    from lir import generate, guard
+    from lir.common import MODEL_KEY, RUNS, empty_cache, git_commit
+    from lir.trunc import CAP
+
+    if MODEL_KEY != KEY:
+        raise SystemExit(f"this job runs with LIR_MODEL={KEY}; it is {MODEL_KEY}")
+    hw = hfjob.hardware()
+    if not hw["cuda_available"]:
+        raise SystemExit(f"no CUDA GPU in this job: {hw}")
+    stamp = time.strftime("%Y%m%d-%H%M%S", time.gmtime())
+    out = RUNS / "hfjob" / REGEN_JOB
+    n = len(read_jsonl(DATA / "multijail_attack.jsonl"))
+    get = lambda path: Path(hf_hub_download(hfjob.STAGING, path, repo_type="dataset", revision=STAGING_REV, local_dir=RUNS / "staging"))
+    record = {"job": REGEN_JOB, "started_utc": stamp, "commit": git_commit(), "hardware": hw, "staging_revision": STAGING_REV,
+              "max_new_tokens": CAP, "runs": {}}
+    for arm, (folder, sha) in UPLOADS.items():
+        rows = read_jsonl(get(f"{arm}/{folder}/{arm}/attack.guard.jsonl"))
+        if len(rows) != n:
+            raise SystemExit(f"{arm}: {len(rows)} verdicts in its upload, wanted {n}")
+        todo, adapter = capped(rows), None
+        if sha:
+            get(f"{arm}/{folder}/{arm}/run/adapter/adapter_config.json")
+            adapter = get(f"{arm}/{folder}/{arm}/run/adapter/adapter_model.safetensors").parent
+            if sha256_file(adapter / "adapter_model.safetensors") != sha:
+                raise SystemExit(f"{arm}: the adapter in its upload is not the one that was evaluated")
+        t0 = time.time()
+        (out / arm).mkdir(parents=True, exist_ok=True)
+        tok, model = generate.load_model(str(adapter) if adapter else None)
+        generate.generate(tok, model, todo, out / arm / "attack.gen.jsonl", CAP, tag=f"{arm}/attack again")
+        del model
+        empty_cache()
+        record["runs"][arm] = {"upload": folder, "adapter_sha256": sha, "again": len(todo), "per_lang": dict(Counter(r["lang"] for r in todo)),
+                               "seconds": round(time.time() - t0, 1)}
+        write_json(out / "job.json", record)
+    gtok, gmodel = guard.load()
+    for arm in UPLOADS:
+        guard.judge(gtok, gmodel, read_jsonl(out / arm / "attack.gen.jsonl"), out / arm / "attack.guard.jsonl")
+    record["finished_utc"] = time.strftime("%Y%m%d-%H%M%S", time.gmtime())
+    write_json(out / "job.json", record)
+    dest = f"{REGEN_JOB}/{stamp}-{(record['commit'] or 'unknown')[:7]}"
+    HfApi().upload_folder(folder_path=out, repo_id=hfjob.STAGING, repo_type="dataset", path_in_repo=dest,
+                          commit_message=f"{REGEN_JOB}: answers generated again, verdicts and record")
+    print(f"uploaded to {hfjob.STAGING}/{dest}")
+
+
+def merged(orig: dict[str, dict], again: dict[str, dict] | None) -> tuple[dict[str, dict] | None, dict]:
+    """One run's verdicts with every capped answer replaced by the one generated again. None unless exactly its capped
+    answers have a new verdict."""
+    cap = {u for u, r in orig.items() if r["truncated"]}
+    if again is None or set(again) != cap:
+        return None, {}
+    still = Counter(r["lang"] for r in again.values() if r["truncated"])
+    return {u: again.get(u, r) for u, r in orig.items()}, {"again": len(cap), "per_lang": dict(Counter(orig[u]["lang"] for u in cap)),
+                                                         "still_cut": dict(still)}
+
+
+def again_result(data: dict[str, dict], regen: dict[str, dict]) -> dict:
+    """Section 16a. data: run -> verdict rows by uid as section 16 read them (the base run under "base"). regen: run ->
+    the verdict rows of its answers generated again. It decides nothing: G1 to G3 stand as section 16 read them."""
+    new, info = {}, {}
+    for arm, rows in data.items():
+        m, i = merged(rows, regen.get(arm))
+        if m is not None:
+            new[arm], info[arm] = m, i
+    first = checks(data)
+    res = {"regenerated": info, "complete": len(new) == len(data) == 1 + len(ARMS), "first": {k: first[k] for k in G_NAMES}}
+    if not res["complete"]:
+        return res
+    c = checks(new)
+    res["again"] = {k: c[k] for k in G_NAMES}
+    res["g3_read_again"] = c["g1"]["side"] == "above"
+    res["same"] = {k: first[k]["side"] == c[k]["side"] for k in G_NAMES}
+    res["reports"] = {k: AGAIN_ROWS[res["same"][k]] for k in G_NAMES}
+    if not res["g3_read_again"]:
+        res["reports"]["g1"] = G1_GONE
+        del res["reports"]["g3"]
+    base = by_family(new["base"], STRICT)
+    res["base_rate_again"] = {l: 100 * sum(v for (f, x), v in base.items() if x == l) / max(1, sum(x == l for (f, x) in base)) for l in EVAL_LANGS}
+    res["by_language_again"] = by_language(new, SEEDS)["strict"]
+    res["still_cut_caveat"] = sorted(f"{BASE if arm == 'base' else arm} {l}" for arm, i in info.items() for l in CHECK_LANGS
+                                     if i["still_cut"].get(l, 0) >= STILL_CUT)
+    return res
+
+
+def again_md(res: dict) -> str:
+    lines = ["### The model outside the Tiny Aya family, read again after re-generation (section 16a)", "",
+             "Every attack answer of the seven runs of section 16 that reached the 256-token cap, generated again at 1,024 tokens by the "
+             "model that wrote it and judged by the same guard. The other answers and their verdicts are those of section 16. It decides "
+             "nothing: G1 to G3 stand as section 16 read them, and this reading is given beside.", ""]
+    if not res["complete"]:
+        return "\n".join(lines + [f"**{AGAIN_NOT_READ}.** Runs with every capped answer generated again: "
+                                   + (", ".join(BASE if a == "base" else a for a in res["regenerated"]) or "none") + "."])
+    for k, name in G_NAMES.items():
+        f, a = res["first"][k], res["again"][k]
+        if k == "g3" and not res["g3_read_again"]:
+            lines += [f"G3 is not read again. {name}: on the capped answers {ci(f)}, after re-generation {ci(a)}.", ""]
+        else:
+            lines += [f"**{name}: {res['reports'][k]}.** On the capped answers {ci(f)}; after re-generation {ci(a)}.", ""]
+    b = res["by_language_again"]
+    lines += ["After re-generation, with no rule. Base rate (%): " + ", ".join(f"{l} {res['base_rate_again'][l]:.1f}" for l in EVAL_LANGS)
+              + ". Plain against base: " + ", ".join(f"{l} {ci(b['plain'][l])}" for l in EVAL_LANGS)
+              + ". SafeGrad against base: " + ", ".join(f"{l} {ci(b['safegrad'][l])}" for l in EVAL_LANGS) + ".", "",
+              "| Run | Generated again | en | ko | zh | sw | Still cut at 1,024 tokens: en, ko, zh, sw |", "|---|---:|---:|---:|---:|---:|---|"]
+    for arm, i in res["regenerated"].items():
+        lines.append(f"| `{BASE if arm == 'base' else arm}` | {i['again']} | " + " | ".join(str(i["per_lang"].get(l, 0)) for l in EVAL_LANGS)
+                     + " | " + ", ".join(str(i["still_cut"].get(l, 0)) for l in EVAL_LANGS) + " |")
+    if res["still_cut_caveat"]:
+        lines += ["", f"Caveat: {STILL_CUT} or more answers of a run in a language the checks read are still cut at 1,024 tokens: "
+                  + ", ".join(res["still_cut_caveat"]) + ". The second reading of a check that reads them is on answers that are still not complete."]
+    lines += ["", "Batches are formed from the prompts that are generated again, so an answer generated again is often another answer "
+              "from its first character and not a continuation. The verdicts are the guard's; no person has read these answers."]
+    return "\n".join(lines)
+
+
+def again(a) -> None:
+    folder = newest(REGEN_JOB)
+    if folder is None:
+        print("pending, nothing written: no upload of the re-generation job in runs/gpu (run `python -m lir.gpu fetch` first)")
+        return
+    data = {("base" if arm == BASE else arm): gpu_rows(arm, arm) for arm in [BASE] + ARMS}
+    if any(v is None for v in data.values()):
+        raise SystemExit("the runs of section 16 are not all in runs/gpu")
+    for arm, (up, _) in UPLOADS.items():   # the first reading's verdicts must be the uploads the job read
+        if newest(arm).name != up:
+            raise SystemExit(f"{arm}: the newest upload is {newest(arm).name}, the job read {up}")
+    regen = {}
+    for arm in [BASE] + ARMS:
+        p = folder / arm / "attack.guard.jsonl"
+        if p.exists():
+            regen["base" if arm == BASE else arm] = {r["uid"]: r for r in read_jsonl(p)}
+    res = again_result(data, regen)
+    rec = json.loads((folder / "job.json").read_text())
+    res["job"] = {"folder": folder.name, "commit": rec["commit"], "gpu": rec["hardware"]["gpus"], "flavor": rec["hardware"]["flavor"],
+                  "libraries": rec["hardware"]["libraries"], "finished_utc": rec.get("finished_utc")}
+    text = again_md(res)
+    write_json(OUT / "seeds_regen.json", res)
+    (OUT / "seeds_regen.md").write_text(text + "\n")
+    print(text)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
+    ap.add_argument("what", nargs="?", choices=["launch-again", "job-again", "again"], help="section 16a; with none, the report of section 16")
     ap.add_argument("--partial", action="store_true", help="write the table although a run is missing; every verdict then stays pending")
+    ap.add_argument("--flavor", default="l40sx1")
+    ap.add_argument("--timeout", default="2h")
+    ap.add_argument("--dry-run", action="store_true", help="launch-again: print the job and submit nothing")
     a = ap.parse_args()
+    if a.what:
+        return {"launch-again": launch_again, "job-again": job_again, "again": again}[a.what](a)
     res = read()
     if res.get("run_problems"):
         raise SystemExit("run records do not match these runs, nothing written:\n  " + "\n  ".join(res["run_problems"]))

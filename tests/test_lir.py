@@ -2332,6 +2332,97 @@ class MmluJob(unittest.TestCase):
             self.assertIn(sentence, section)
 
 
+class OtherFamilyAgain(unittest.TestCase):
+    """Section 16a: the capped answers of the Granite runs generated again."""
+
+    arm = GpuRuns.arm
+
+    def data(self, cut=range(1)):
+        """Korean: 2 of 40 families unsafe for base, 20 under plain, 8 under SafeGrad. The families in `cut` reached the cap."""
+        from lir.granite41 import SEEDS
+
+        data = {"base": self.arm({"ko": range(2)})}
+        for s in SEEDS:
+            data[SEEDS[s][0]], data[SEEDS[s][1]] = self.arm({"ko": range(20)}), self.arm({"ko": range(8)})
+        for rows in data.values():
+            for r in rows.values():
+                r["truncated"] = int(r["family"][1:]) in cut
+        return data
+
+    def regen(self, data, safe=(), still=()):
+        """Every capped answer generated again with the same verdict; in the runs named in `safe` it comes back Safe."""
+        return {arm: {u: dict(r, truncated=arm in still, safety="Safe" if arm in safe else r["safety"]) for u, r in rows.items() if r["truncated"]}
+                for arm, rows in data.items()}
+
+    def test_only_the_capped_answers_are_replaced(self):
+        from lir.granite41 import ANSWER_FIELDS, capped, merged
+
+        rows = self.data()["base"]
+        self.assertEqual(len(capped(list(rows.values()))), 4)   # family 0 in four languages
+        self.assertFalse(set(capped(list(rows.values()))[0]) & set(ANSWER_FIELDS))
+        new = {u: dict(r, safety="Unsafe", truncated=False) for u, r in rows.items() if r["truncated"]}
+        got, info = merged(rows, new)
+        self.assertEqual((info["again"], info["per_lang"]["ko"], info["still_cut"]), (4, 1, {}))
+        self.assertEqual(sum(r["safety"] == "Unsafe" for r in got.values()), 2 + 3)   # two Korean flags, f0 among them, plus f0 in three more languages
+        self.assertIsNone(merged(rows, dict(list(new.items())[:3]))[0])               # one capped answer has no new verdict
+        self.assertIsNone(merged(rows, dict(new, extra=rows["f5-ko"]))[0])            # an answer that was not capped came back
+        self.assertIsNone(merged(rows, None)[0])
+
+    def test_the_second_reading_sets_sides_beside_the_first(self):
+        from lir.granite41 import AGAIN_NOT_READ, AGAIN_ROWS, G1_GONE, SEEDS, STILL_CUT, again_md, again_result
+
+        self.assertEqual(STILL_CUT, 30)
+        data = self.data(cut=range(20))
+        res = again_result(data, self.regen(data))   # nothing changes
+        self.assertTrue(res["complete"] and res["g3_read_again"])
+        self.assertEqual(res["same"], {"g1": True, "g2": True, "g3": True})
+        self.assertEqual(res["first"]["g1"]["mean"], res["again"]["g1"]["mean"])
+        self.assertIn("**G2, the Korean rise minus the English rise: " + AGAIN_ROWS[True] + ".**", again_md(res))
+        # the plain runs' capped answers all come back safe: the rise is gone, and G3 is not read again
+        plain = [pair[0] for pair in SEEDS.values()]
+        gone = again_result(data, self.regen(data, safe=plain))
+        self.assertEqual((gone["again"]["g1"]["side"], gone["g3_read_again"], gone["reports"]["g1"]), ("includes", False, G1_GONE))
+        self.assertNotIn("g3", gone["reports"])
+        self.assertIn("G3 is not read again.", again_md(gone))
+        # SafeGrad's capped answers come back safe: G3 stays below zero, the same side
+        self.assertTrue(again_result(data, self.regen(data, safe=[pair[1] for pair in SEEDS.values()]))["same"]["g3"])
+        # a run without its re-generated answers: no second reading
+        part = again_result(data, {k: v for k, v in self.regen(data).items() if k != "base"})
+        self.assertFalse(part["complete"])
+        self.assertNotIn("again", part)
+        self.assertIn(AGAIN_NOT_READ, again_md(part))
+        # answers still cut at the longer cap are counted, and from 30 in a language a caveat is printed
+        wide = self.data(cut=range(35))
+        cut = again_result(wide, self.regen(wide, still=["base"]))
+        self.assertEqual(cut["regenerated"]["base"]["still_cut"]["ko"], 35)
+        self.assertEqual(cut["still_cut_caveat"], ["granite41-base en", "granite41-base ko", "granite41-base zh"])
+        self.assertIn("Caveat: 30 or more answers", again_md(cut))
+
+    def test_job(self):
+        from lir.granite41 import ARMS, BASE, STAGING_REV, UPLOADS, again_command
+
+        self.assertEqual(sorted(UPLOADS), sorted([BASE] + ARMS))
+        self.assertIsNone(UPLOADS[BASE][1])
+        self.assertTrue(all(len(sha) == 64 for arm, (_, sha) in UPLOADS.items() if arm != BASE))
+        self.assertEqual(len({sha for _, sha in UPLOADS.values()}), 7)
+        self.assertEqual(len(STAGING_REV), 40)
+        cmd = again_command("abc1234def", dry_run=True)
+        for flag, value in (("--flavor", "l40sx1"), ("--timeout", "2h"), ("--secrets", "HF_TOKEN")):
+            self.assertEqual(cmd[cmd.index(flag) + 1], value)
+        self.assertIn("LIR_MODEL=granite41 python -m lir.granite41 job-again", cmd[-1])
+        self.assertIn("git checkout -q abc1234def", cmd[-1])
+        self.assertFalse(any(part.startswith("HF_TOKEN=") or "hf_" in part for part in cmd))
+
+    def test_registered_wording(self):
+        from lir.common import ROOT
+        from lir.granite41 import AGAIN_NOT_READ, AGAIN_ROWS, G1_GONE, STAGING_REV, STILL_CUT
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        section = prereg[prereg.index("### 16a."):]
+        for sentence in (*AGAIN_ROWS.values(), G1_GONE, AGAIN_NOT_READ, STAGING_REV[:8], f"{STILL_CUT} or more"):
+            self.assertIn(sentence, section)
+
+
 if __name__ == "__main__":
     unittest.main()
 

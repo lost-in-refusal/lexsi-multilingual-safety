@@ -2103,6 +2103,37 @@ The jobs (`lir/hfjob.py`, `requirements-gpu-safegrad.txt`), the reader (`lir/gra
 - Recounted from the verdict files with separate code: +10.1 [+7.5, +12.6], +20.8 [+15.2, +26.6] and -13.7 [-16.1, -11.5], where the last digit of an interval end moves with the bootstrap draw.
 - Limits, as registered: one model of one other family; no test compares its figures with Tiny Aya's; the guard's verdicts on capped answers; no second judge, no task score, no person. The differences from the Tiny Aya runs listed above go with it: no system prompt, 1,795 rows, its own refusal set, a cloud GPU. The files as read: `granite41/seeds.md`, sha256 `901ef3d32afc940abe5358c95d65e66474035d38dc1e14e386e2a376af5541b3`, and `granite41/seeds.json`, sha256 `3f2c3e43a7348cb290f5451f5d6fa60bb9aa32807beb677d1bc2218071dcef0f`.
 
+### 16a. The model outside the Tiny Aya family, read again after re-generation at 1,024 tokens
+
+**Added Nov 24, 11:05 PM ET by Mingyu, after section 16 was read and before any answer below was generated again.**
+
+Why. Section 16 was read on answers capped at 256 tokens, and the base model reached the cap far more often than the fine-tuned models: in Korean 73.2% of its answers against 22.0% to 29.2% under plain. A cut answer is judged on what was written before the cap. Sections 8, 14e, 14g and 14j asked the same question of the Tiny Aya runs. Do G1 to G3 come out on the same side when every capped answer is completed?
+
+What is run. One job on a Hugging Face GPU, one NVIDIA L40S as in section 16, generates again at 1,024 new tokens every attack answer of the seven runs that reached the cap: 600 of the base run, 266, 286 and 270 of the plain runs at seeds 42, 1 and 2, and 345, 315 and 352 of the SafeGrad runs, 2,434 in all. Each run's verdicts and its adapter are taken from its upload in the staging dataset at revision `9070ad38`, the one section 16 was read from, and the job stops if an adapter's sha256 is not the one recorded there. The model that wrote an answer writes it again, loaded as in section 16, and the same guard judges it. Nothing else is generated again, and XSTest is not.
+
+The reading. `python -m lir.granite41 again` replaces the verdict of each capped answer by the verdict on the answer generated again and computes G1 to G3 with the code of section 16, unchanged. A run is read again only if exactly its capped answers have a new verdict.
+
+**It decides nothing.** G1 to G3 stand as section 16 read them. For each check the second reading is set beside the first:
+
+| After re-generation the interval is | What we write |
+| --- | --- |
+| On the same side of zero | the same on the capped answers and after re-generation |
+| On another side, or includes zero where it did not | differs after re-generation: both readings are given wherever it is used, and the reading of section 16 stands |
+
+If after re-generation G1 is not above zero, G3 is not read again and we write: After re-generation plain fine-tuning is not detected to raise attack success on this model: G1 is given with both readings wherever it is used, and G3 is given with the note that on completed answers the rise it takes back was not detected.
+
+Answers still cut. If 30 or more of a run's answers in English, Korean or Chinese are still cut at 1,024 tokens, the report says so, as in 14e and 14g: the second reading of a check that reads them is then on answers that are still not complete.
+
+What we will not write. A cause for a shift between the two readings. That the second reading is the complete answer to the first: batches are formed from the prompts that are generated again, so an answer generated again is often another answer and not a continuation, as section 8 found. Anything about Swahili beyond the table. A comparison of sizes with Tiny Aya.
+
+What we know as this is written. All of section 16, with its cap shares. Nothing of any answer generated again. On Tiny Aya the rise did not depend on the cap; no prediction is registered for this model.
+
+If it is not finished. The second reading is not made: it needs every capped answer of all seven runs generated again and judged. A job that fails before its first answer is generated is launched again after the cause is fixed; each failure and its fix is noted here, and a fix changes nothing that is measured. A job not finished by Wednesday Nov 25, 9 PM ET is listed as not run.
+
+Cost and reading. One job with a limit of two hours, about an hour expected, about $2. It uploads its answers, verdicts and record to the private staging dataset. `python -m lir.gpu fetch`, then `python -m lir.granite41 again`, which writes `results/lir/stage2/granite41/seeds_regen.md`.
+
+The job and its reader (in `lir/granite41.py`) and their tests are committed with this entry.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
