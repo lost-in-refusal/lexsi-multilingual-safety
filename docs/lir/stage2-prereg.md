@@ -2006,6 +2006,8 @@ Cost and reading. One job, about an hour on an L4, about $1. It uploads its answ
 
 The job and its reader (`lir/mmlu.py`), the pins and their tests are committed with this entry.
 
+**Added Nov 24, 9:31 PM ET by Mingyu, when the job was launched.** The job was submitted on Nov 24 at 9:22 PM ET from commit `01c70c1` on one NVIDIA L4 (`l4x1`) with a limit of two hours: `6b06465ad0582cfbbefd7402`. At that moment the report of section 15 did not exist and the laptop was evaluating `random-2`. No output of the job has been read.
+
 ## 16. The main experiment on a model outside the Tiny Aya family
 
 **Added Nov 24, 8:48 PM ET by Mingyu, before any job of this section was launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.** Aish can amend this section before the runs are read.
@@ -2075,6 +2077,8 @@ Order and cost. The base job first, alone. The three plain jobs once its log sho
 Reading. `python -m lir.gpu fetch`, then `python -m lir.granite41`, which writes `results/lir/stage2/granite41/seeds.md`.
 
 The jobs (`lir/hfjob.py`, `requirements-gpu-safegrad.txt`), the reader (`lir/granite41.py`), the model key (`lir/common.py`, `lir/evaluate.py`) and their tests are committed before this entry or with it.
+
+**Added Nov 24, 9:31 PM ET by Mingyu, when the base job and the plain jobs were launched.** The GPU type is one NVIDIA L40S (`l40sx1`): the base job, submitted at 8:50 PM ET from commit `0369d21` (`6b063eeed0582cfbbefd6899`), started on it at 9:23 PM, before the hour of the fallback. Its log showed the attack set and XSTest answered (1,164 and 999 answers) at 9:29 PM, and the three plain jobs were submitted at 9:30 PM from commit `01c70c1`, each with a limit of two hours: `granite41-plain-s42` (`6b06483c1460ffe1d5e994fc`), `granite41-plain-s1` (`6b06483cd0582cfbbefd77a4`) and `granite41-plain-s2` (`6b06483c1460ffe1d5e99500`). Between the two commits nothing a job of this section runs has changed (`git diff 0369d21 01c70c1` is empty over the trainer, the generation and guard code, the job runner, the pins and the data files); the later commit adds section 15b. Of the base job's log only the progress lines of generation were read: no answer, no verdict and no count of refusals. The SafeGrad jobs are not launched.
 
 ## Rules
 
