@@ -10,7 +10,7 @@ Writes runs/eval/<arm>/<set>.gen.jsonl and <set>.guard.jsonl. The task judge
 from __future__ import annotations
 
 import argparse
-from lir.common import DATA, EVAL_LANGS, MODEL, MODEL_KEY, RUNS, empty_cache, read_jsonl
+from lir.common import DATA, EVAL_LANGS, MODEL, MODEL_KEY, RUNS, arm_model, empty_cache, read_jsonl
 
 SETS = {
     # name: (files, max_new_tokens)
@@ -41,7 +41,7 @@ def main() -> None:
     ap.add_argument("--skip-guard", action="store_true")
     a = ap.parse_args()
     # outputs carry no model name and a rerun resumes from them, so the arm name has to say which model it is
-    if a.arm.startswith("earth-") != (MODEL_KEY == "earth"):
+    if arm_model(a.arm) != MODEL_KEY:
         raise SystemExit(f"arm {a.arm} does not match the loaded model {MODEL} (set LIR_MODEL)")
     out = RUNS / "eval" / a.arm
     out.mkdir(parents=True, exist_ok=True)

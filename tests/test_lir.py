@@ -1077,7 +1077,7 @@ class GpuJobs(unittest.TestCase):
         self.assertEqual(set(arms) & laptop, set())
         for steps in hfjob.JOBS.values():
             for step in steps:
-                self.assertLessEqual(set(step), {"arm", "hub", "stage2", "train", "env"})
+                self.assertLessEqual(set(step), {"arm", "hub", "stage2", "train", "env", "model", "sets", "method", "seed", "refusals", "align"})
                 if "train" in step:
                     self.assertTrue((hfjob.DATA / step["train"]).exists())
 
@@ -2527,3 +2527,310 @@ class SecondBenchmark(unittest.TestCase):
         prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
         for sentence in [*AGAIN_ROWS.values(), X1_MOVED]:
             self.assertIn(sentence, prereg)   # the second reading can only say what section 14j registered
+
+
+class OtherFamily(unittest.TestCase):
+    """The main experiment on a model outside the Tiny Aya family: the granite41 jobs of lir.hfjob and their reader."""
+
+    arm = GpuRuns.arm
+    NAMES = {"granite41-base"} | {f"granite41-{method}-s{seed}" for method in ("plain", "safegrad") for seed in (42, 1, 2)}
+
+    def data(self, plain_ko=range(20), safe_ko=range(8), plain_en=range(1), seeds=(42, 1, 2)):
+        """Korean: 2 of 40 families unsafe for base, 20 under plain, 8 under SafeGrad. Swahili refusals: 30, 20 and 30."""
+        from lir.granite41 import SEEDS
+
+        pick = lambda v, s: v[s] if isinstance(v, dict) else v
+        data = {"base": self.arm({"ko": range(2)}, {"sw": range(30)})}
+        for s in seeds:
+            data[SEEDS[s][0]] = self.arm({"ko": pick(plain_ko, s), "en": plain_en}, {"sw": range(20)})
+            data[SEEDS[s][1]] = self.arm({"ko": pick(safe_ko, s)}, {"sw": range(30)})
+        return data
+
+    def test_model_key(self):
+        from lir import common
+
+        repo, revision = common.MODELS["granite41"]
+        self.assertEqual((repo, len(revision)), ("ibm-granite/granite-4.1-3b", 40))
+        self.assertNotIn("granite", common.MODELS)   # lir.granite and attack.granite.jsonl are the second judge
+        arms = ("base", "plain-s1", "gpu-base", "earth-base", "earth-plain-s2", "granite41-base", "granite41-safegrad-s42", "granite-base")
+        self.assertEqual([common.arm_model(a) for a in arms], ["global", "global", "global", "earth", "earth", "granite41", "granite41", "global"])
+        self.assertEqual(common.MODELS["global"][0], "CohereLabs/tiny-aya-global")
+        self.assertEqual(common.MODELS["earth"][0], "CohereLabs/tiny-aya-earth")
+
+    def test_an_arm_runs_only_on_the_model_its_name_says(self):
+        from unittest import mock
+
+        from lir import evaluate
+
+        wrong = (("global", "granite41-base"), ("granite41", "base"), ("granite41", "earth-base"), ("earth", "granite41-plain-s1"),
+                 ("global", "earth-base"), ("earth", "plain"))
+        for key, arm in wrong:   # stops before a model is loaded or a folder is made
+            with mock.patch.object(evaluate, "MODEL_KEY", key), mock.patch("sys.argv", ["evaluate", "--arm", arm]), \
+                    mock.patch.object(evaluate, "RUNS", Path("/nonexistent")), self.assertRaises(SystemExit):
+                evaluate.main()
+
+    def test_jobs(self):
+        from lir import common, granite41, hfjob
+
+        self.assertEqual({name for name in hfjob.JOBS if name.startswith("granite41")}, self.NAMES)
+        for name in self.NAMES:
+            (step,) = hfjob.JOBS[name]   # one arm a job, named like the job, so the six trainings can run side by side
+            self.assertEqual((step["arm"], step["model"]), (name, "granite41"))
+            self.assertEqual(hfjob.model_env(step), {"LIR_MODEL": "granite41"})
+            self.assertEqual(common.arm_model(step["arm"]), "granite41")
+        base = hfjob.JOBS["granite41-base"][0]
+        self.assertEqual(hfjob.step_sets(base), ["alignment", "attack", "xstest"])   # the held-out prompts as well
+        self.assertEqual(base["refusals"], "alignment_sft_granite41.jsonl")
+        self.assertNotIn("train", base)
+        plain, safegrad = hfjob.JOBS["granite41-plain-s1"][0], hfjob.JOBS["granite41-safegrad-s42"][0]
+        self.assertEqual(hfjob.train_command(plain), ["lir.train", "--arm", "plain", "--output", str(hfjob.RUNS / "granite41-plain-s1"),
+                                                      "--train-file", str(hfjob.DATA / "bactrian_train.jsonl"), "--seed", "1"])
+        self.assertEqual(hfjob.train_command(safegrad, Path("/job/refusals.jsonl")),
+                         ["lir.train", "--arm", "safegrad", "--output", str(hfjob.RUNS / "granite41-safegrad-s42"), "--train-file",
+                          str(hfjob.DATA / "bactrian_train.jsonl"), "--seed", "42", "--align-file", "/job/refusals.jsonl"])
+        self.assertEqual((hfjob.step_sets(plain), safegrad["align"]), (["attack", "xstest"], "granite41-base"))
+        self.assertNotIn("align", plain)
+        # the reader looks for the arms these jobs write, on the model they load
+        self.assertEqual(set([granite41.BASE] + granite41.ARMS), self.NAMES)
+        self.assertEqual(granite41.SEEDS[42], ("granite41-plain-s42", "granite41-safegrad-s42"))
+        self.assertEqual(list(granite41.SEEDS), [42, 1, 2])
+        self.assertEqual((granite41.REFUSALS, (granite41.MODEL, granite41.REVISION)), (base["refusals"], common.MODELS["granite41"]))
+        self.assertEqual(granite41.TRAIN, plain["train"])
+
+    def test_the_jobs_of_sections_12_and_14f_are_as_before(self):
+        from lir import hfjob
+
+        self.assertEqual(hfjob.train_command(hfjob.JOBS["only-ko"][0]), ["lir.train", "--arm", "plain", "--output", str(hfjob.RUNS / "plain-ko"),
+                                                                          "--train-file", str(hfjob.DATA / "bactrian_train_only_ko.jsonl")])
+        before = sorted(set(hfjob.JOBS) - self.NAMES)
+        self.assertEqual(before, ["control", "nf4", "nf4-s1", "nf4-s2", "only-en", "only-ko", "only-zh", "unmerged", "unmerged-s1", "unmerged-s2"])
+        for name in before:
+            for step in hfjob.JOBS[name]:
+                self.assertLessEqual(set(step), {"arm", "hub", "stage2", "train", "env"})
+                self.assertEqual((hfjob.model_env(step), hfjob.step_sets(step)), ({}, ["attack", "xstest"]))
+            self.assertFalse(hfjob.trains_safegrad(name))
+            self.assertEqual(hfjob.job_command(name, "abc1234def")[-1],
+                             f"set -euo pipefail; git clone -q {hfjob.REPO_URL} repo; cd repo; git checkout -q abc1234def; "
+                             f"pip install -q -r requirements-gpu.txt; python -m lir.hfjob run --job {name}")
+
+    def test_only_a_safegrad_job_installs_safetune(self):
+        from lir import hfjob
+
+        root = Path(hfjob.ROOT)
+        url, commit = hfjob.SAFETUNE
+        self.assertEqual(len(commit), 40)
+        self.assertIn(f"git clone {url} vendor/SafeTune && git -C vendor/SafeTune checkout {commit[:7]}", (root / "README.md").read_text())
+        for name in self.NAMES:
+            inner = hfjob.job_command(name, "abc1234def")[-1]
+            self.assertEqual(hfjob.trains_safegrad(name), "safegrad" in name)
+            if "safegrad" in name:
+                self.assertTrue(inner.endswith("pip install -q -r requirements-gpu.txt; pip install -q -r requirements-gpu-safegrad.txt; "
+                                               f"pip install -q --no-deps git+{url}@{commit}; python -m lir.hfjob run --job {name}"))
+            else:
+                self.assertTrue(inner.endswith(f"pip install -q -r requirements-gpu.txt; python -m lir.hfjob run --job {name}"))
+        pins = lambda name: dict(line.split("==") for line in (root / name).read_text().splitlines()
+                                 if line and not line.startswith(("#", "-e")))
+        extra, gpu, laptop = pins("requirements-gpu-safegrad.txt"), pins("requirements-gpu.txt"), pins("requirements.txt")
+        self.assertEqual(set(extra) & set(gpu), set())
+        self.assertIn("datasets", extra)
+        self.assertEqual({k: v for k, v in extra.items() if k in laptop}, {k: laptop[k] for k in extra if k in laptop})   # the laptop's versions
+
+    def test_safegrad_trains_against_the_refusals_of_the_base_job(self):
+        import json
+        import tempfile
+
+        from lir import hfjob
+
+        step, name = hfjob.JOBS["granite41-safegrad-s1"][0], "alignment_sft_granite41.jsonl"
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+
+            def download(path):
+                p = tmp / "staging" / path
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text("" if "empty" in path else json.dumps({"uid": path, "lang": "ko"}) + "\n")
+                return str(p)
+
+            files = [f"granite41-base/20261125-010000-aaaaaaa/{name}", f"granite41-base/20261125-020000-bbbbbbb/{name}",
+                     "granite41-base/20261125-020000-bbbbbbb/job.json", "granite41-base/20261125-020000-bbbbbbb/granite41-base/alignment.guard.jsonl",
+                     f"control/20261126-000000-ccccccc/{name}", f"granite41-base/20261127-000000-ddddddd/granite41-base/{name}"]
+            path, info = hfjob.refusal_set(step, tmp / "job", files, download)
+            self.assertEqual(path, tmp / "job" / name)   # in the job's folder, so it is uploaded with the record
+            self.assertEqual(info["from"], f"{hfjob.STAGING}/granite41-base/20261125-020000-bbbbbbb/{name}")   # the newest upload of the base job
+            self.assertEqual((info["file"], info["rows"], info["sha256"]), (name, 1, hfjob.sha256_file(path)))
+            self.assertEqual(hfjob.train_command(step, path)[-2:], ["--align-file", str(path)])
+            with self.assertRaises(SystemExit):   # the base job has not written one
+                hfjob.refusal_set(step, tmp / "job", ["granite41-base/20261125-020000-bbbbbbb/job.json"], download)
+            with self.assertRaises(SystemExit):   # the base model refused nothing safely: nothing to train against
+                hfjob.refusal_set(step, tmp / "job", [f"granite41-base/empty/{name}"], download)
+
+    def test_a_dry_run_prints_a_job_that_is_not_pushed(self):
+        import argparse
+        import contextlib
+        import io
+        from unittest import mock
+
+        from lir import hfjob
+
+        def launch(dirty, pushed, dry_run):
+            calls = []
+
+            def run(cmd, **kw):
+                if cmd[0] == "git":
+                    out = {"rev-parse": "abc1234def", "status": " M lir/train.py" if dirty else "", "branch": "  origin/x" if pushed else ""}[cmd[1]]
+                    return mock.Mock(stdout=out + "\n", returncode=0)
+                calls.append(cmd)
+                return mock.Mock(returncode=0)
+
+            a = argparse.Namespace(job="granite41-plain-s1", flavor=hfjob.FLAVOR, timeout=hfjob.TIMEOUT, namespace=hfjob.NAMESPACE, dry_run=dry_run)
+            with mock.patch.object(hfjob.subprocess, "run", run), contextlib.redirect_stdout(io.StringIO()) as out, self.assertRaises(SystemExit) as stop:
+                hfjob.launch(a)
+            return calls, out.getvalue(), stop.exception.code
+
+        calls, text, code = launch(dirty=False, pushed=False, dry_run=True)
+        self.assertEqual((len(calls), code), (1, 0))
+        self.assertIn("--dry-run", calls[0])   # hf prints the job and submits nothing
+        self.assertIn("python -m lir.hfjob run --job granite41-plain-s1", text)
+        self.assertIn("a launch would stop here: commit abc1234 is not on the remote yet", text)
+        calls, text, code = launch(dirty=True, pushed=False, dry_run=True)
+        self.assertEqual(text.count("a launch would stop here"), 2)
+        for dirty, pushed in ((False, False), (True, True), (True, False)):   # without --dry-run nothing is printed or submitted
+            calls, text, code = launch(dirty, pushed, dry_run=False)
+            self.assertEqual((calls, text), ([], ""))
+            self.assertIn("uncommitted changes" if dirty else "not on the remote yet", code)
+        calls, text, code = launch(dirty=False, pushed=True, dry_run=False)
+        self.assertEqual((len(calls), code, "--dry-run" in calls[0], "would stop" in text), (1, 0, False, False))
+
+    def test_three_seed_checks(self):
+        from lir.granite41 import NAMES, SEEDS, report_md, result
+        from lir.seeds import analyse
+
+        res = result(self.data(), {"base": self.arm(refuse={"sw": range(10)}), SEEDS[1][0]: self.arm(refuse={"sw": range(2)})})
+        self.assertEqual((res["complete"], list(res["seeds"])), (True, [42, 1, 2]))
+        self.assertEqual([res[h]["verdict"] for h in ("h1", "h2", "h3")], ["pass", "pass", "pass"])
+        row = res["seeds"][1]
+        self.assertAlmostEqual(row["plain_vs_base"]["ko"]["delta"], 45.0)       # 2 to 20 of 40
+        self.assertAlmostEqual(row["plain_vs_base"]["en"]["delta"], 2.5)
+        self.assertAlmostEqual(row["safegrad_vs_plain"]["ko"]["delta"], -30.0)   # 20 to 8
+        self.assertAlmostEqual(row["sw_refusal_plain_vs_base"]["delta"], -25.0)  # 30 to 20 refusals
+        self.assertAlmostEqual(row["safegrad_vs_base_ko"]["delta"], 15.0)        # beside, no rule
+        self.assertAlmostEqual(res["h1"]["pooled_ko_minus_en_rise"]["mean"], 42.5)
+        self.assertAlmostEqual(res["h2"]["pooled_ko_safegrad_minus_plain"]["mean"], -30.0)
+        self.assertAlmostEqual(res["h3"]["pooled_sw_refusal_change"]["mean"], -25.0)
+        self.assertAlmostEqual(res["by_language"]["strict"]["plain"]["ko"]["mean"], 45.0)
+        self.assertAlmostEqual(res["over_refusal"][SEEDS[1][0]]["sw"]["delta"], -20.0)
+        same = analyse(self.data(), SEEDS)   # the rules are those of lir.seeds, on this model's own base run
+        self.assertEqual([same[h] for h in ("h1", "h2", "h3")], [res[h] for h in ("h1", "h2", "h3")])
+        # SafeGrad above plain on Korean in one seed fails the second check and no other
+        one = result(self.data(safe_ko={42: range(8), 1: range(22), 2: range(8)}))
+        self.assertEqual([one[h]["verdict"] for h in ("h1", "h2", "h3")], ["pass", "fail", "pass"])
+        self.assertEqual([r["h2"] for r in one["seeds"].values()], [True, False, True])
+        # English rising more than Korean fails the first
+        flat = result(self.data(plain_en=range(25)))
+        self.assertEqual([flat[h]["verdict"] for h in ("h1", "h2", "h3")], ["fail", "pass", "pass"])
+        # a seed that is not there leaves every verdict pending
+        part = result(self.data(seeds=(42, 1)))
+        self.assertEqual((part["complete"], list(part["seeds"])), (False, [42, 1]))
+        self.assertEqual([part[h]["verdict"] for h in ("h1", "h2", "h3")], ["pending"] * 3)
+        self.assertEqual(result({"base": self.data()["base"]}), {"seeds": {}, "complete": False})
+        text = report_md(res)
+        self.assertIn("ibm-granite/granite-4.1-3b", text)
+        self.assertIn(f"| {NAMES[0]} Korean rises more than English | 42: yes, 1: yes, 2: yes |", text)
+        self.assertIn(f"| {NAMES[1]} SafeGrad below plain (Korean, macro) |", text)
+        self.assertIn("| pass |", text)
+        self.assertNotIn("The checks are not read", text)
+        self.assertIn("SafeGrad against the base model on Korean: seed 42 +15.0", text)
+        self.assertIn("**The checks are not read", report_md(part))
+        self.assertIn("| pending |", report_md(part))
+
+    def test_run_records(self):
+        from lir.granite41 import ARMS, MODEL, REVISION, SEEDS, run_problems
+
+        def record(method, seed):
+            return {"arm": method, "model": MODEL, "model_revision": REVISION, "seed": seed, "train_sha256": "train", "epochs": 3, "lr": 2e-4,
+                    "effective_batch": 32, "micro_batch": 4, "commit": "abc1234", "alignment": {"sha256": "refusals"} if method == "safegrad" else None}
+
+        runs = {arm: record(method, seed) for seed, pair in SEEDS.items() for method, arm in zip(("plain", "safegrad"), pair)}
+        self.assertEqual(sorted(runs), sorted(ARMS))
+        self.assertEqual(run_problems(runs, "refusals", "train"), [])
+        other = run_problems(runs, "the file of another upload", "train")   # every SafeGrad run must have trained on the base job's file
+        self.assertEqual((len(other), all("refusal examples" in line for line in other)), (3, True))
+        plain, safegrad = SEEDS[1]
+        for change, word in (({"seed": 2}, "seed"), ({"model": "CohereLabs/tiny-aya-global"}, "model"), ({"model_revision": "0" * 40}, "model"),
+                             ({"train_sha256": "another"}, "training file"), ({"epochs": 1.5}, "epochs"), ({"lr": 1e-4}, "lr"),
+                             ({"arm": "safegrad"}, "method"), ({"alignment": {"sha256": "refusals"}}, "refusal examples"),
+                             ({"commit": "abc1234-dirty"}, "uncommitted")):
+            bad = run_problems(dict(runs, **{plain: dict(record("plain", 1), **change)}), "refusals", "train")
+            self.assertEqual((len(bad), bad[0].startswith(plain + ":"), word in bad[0]), (1, True, True), change)
+        self.assertEqual(run_problems(dict(runs, **{safegrad: None}), "refusals", "train"), [f"{safegrad}: no run record"])
+
+    def test_read_from_the_job_uploads(self):
+        import contextlib
+        import io
+        import json
+        import tempfile
+        from unittest import mock
+
+        from lir import gpu, granite41
+        from lir.common import DATA, read_jsonl, sha256_file, write_json, write_jsonl
+
+        attack = read_jsonl(DATA / "multijail_attack.jsonl")
+        families = sorted({r["family"] for r in attack})
+        first = lambda k: set(families[:k])
+
+        def rows(unsafe=None, refuse=None):
+            unsafe, refuse = unsafe or {}, refuse or {}
+            return [{"uid": r["uid"], "family": r["family"], "lang": r["lang"], "safety": "Unsafe" if r["family"] in unsafe.get(r["lang"], ()) else "Safe",
+                     "refusal": "Yes" if r["family"] in refuse.get(r["lang"], ()) else "No"} for r in attack]
+
+        def upload(root, job, guard, run=None, stamp="20261126-010000-abc1234", n=None):
+            folder = root / job / stamp
+            write_jsonl(folder / job / "attack.guard.jsonl", guard[:n])
+            write_jsonl(folder / job / "xstest.guard.jsonl", guard[::7])   # some rows of every language stand in for XSTest
+            steps = [{"arm": job, "what": "train", "peak_gpu_mib": 15000}] if run else []
+            write_json(folder / "job.json", {"commit": "abc1234", "finished_utc": "20261126-020000", "steps": steps,
+                                             "hardware": {"gpus": ["NVIDIA L4"], "flavor": "l4x1", "libraries": {"torch": "2.15.0"}}})
+            if run:
+                write_json(folder / job / "run" / "run.json", run)
+            return folder
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            base = upload(tmp, granite41.BASE, rows({"ko": first(20)}, {"sw": first(200)}))
+            write_jsonl(base / granite41.REFUSALS, [{"uid": f"r{i}", "lang": "ko" if i % 2 else "en"} for i in range(30)])
+            sha = sha256_file(base / granite41.REFUSALS)
+            for seed, (plain, safegrad) in granite41.SEEDS.items():
+                for method, arm in (("plain", plain), ("safegrad", safegrad)):
+                    run = {"arm": method, "model": granite41.MODEL, "model_revision": granite41.REVISION, "seed": seed, "epochs": 3, "lr": 2e-4,
+                           "effective_batch": 32, "micro_batch": 4, "commit": "abc1234", "train_sha256": sha256_file(DATA / granite41.TRAIN),
+                           "train_rows": 1795, "dropped_over_max_len": 5, "optimizer_steps": 171, "train_runtime_s": 1800.0,
+                           "alignment": {"sha256": sha, "rows": 30} if method == "safegrad" else None}
+                    guard = rows({"ko": first(120 if method == "plain" else 60)}, {"sw": first(150 if method == "plain" else 200)})
+                    upload(tmp, arm, guard, run, n=100 if arm == "granite41-safegrad-s2" else None)   # one run still being judged
+            with mock.patch.object(gpu, "GPU", tmp), mock.patch.object(granite41, "OUT", tmp / "out"), mock.patch("sys.argv", ["granite41"]), \
+                    contextlib.redirect_stdout(io.StringIO()) as said:
+                res = granite41.read()
+                self.assertEqual((res["complete"], list(res["seeds"]), res["unjudged"]), (False, [42, 1], ["granite41-safegrad-s2 (100 of 1164)"]))
+                self.assertEqual(res["run_problems"], [])
+                self.assertEqual((res["refusals"]["rows"], res["refusals"]["per_lang"]), (30, {"en": 15, "ko": 15}))
+                self.assertEqual(res["runs"]["granite41-plain-s1"]["peak_gpu_mib"], 15000)
+                self.assertEqual(len(res["jobs"]), 7)
+                granite41.main()
+                self.assertIn("pending, nothing written", said.getvalue())
+                self.assertFalse((tmp / "out").exists())
+                # the last run is judged: all three checks are read and the table is written
+                upload(tmp, "granite41-safegrad-s2", rows({"ko": first(60)}, {"sw": first(200)}), json.loads(
+                    (tmp / "granite41-safegrad-s1" / "20261126-010000-abc1234" / "granite41-safegrad-s1" / "run" / "run.json").read_text()) | {"seed": 2},
+                    stamp="20261126-030000-abc1234")
+                done = granite41.read()
+                self.assertEqual((done["complete"], [done[h]["verdict"] for h in ("h1", "h2", "h3")]), (True, ["pass", "pass", "pass"]))
+                self.assertEqual(done["jobs"]["granite41-safegrad-s2"]["folder"], "20261126-030000-abc1234")   # the newest upload of a job
+                granite41.main()
+                text = (tmp / "out" / "seeds.md").read_text()
+                self.assertIn("| `granite41-plain-s42` | 42 | 1,795 | 5 | 171 | 30.0 | 15000 |  |", text)
+                self.assertIn("SafeGrad's refusal set is this model's own: 30 safe refusals", text)
+                self.assertEqual(json.loads((tmp / "out" / "seeds.json").read_text())["h2"]["verdict"], "pass")
+                # a SafeGrad run that trained against another file than the base job's stops the reader
+                write_jsonl(base / granite41.REFUSALS, [{"uid": "r0", "lang": "ko"}])
+                with self.assertRaises(SystemExit):
+                    granite41.main()

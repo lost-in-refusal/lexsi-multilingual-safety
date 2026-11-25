@@ -1,0 +1,8 @@
+# For the Hugging Face GPU jobs that train SafeGrad (python -m lir.hfjob), installed after requirements-gpu.txt.
+# SafeTune itself is installed without its dependencies from the commit pinned in lir/hfjob.py. These are the packages
+# its SafeGrad trainer imports that requirements-gpu.txt does not pin, at the versions of the laptop that trained
+# every SafeGrad run so far. The rest of SafeTune's dependency list (evaluation suites, loggers) is not needed to train.
+datasets==5.1.0
+psutil==7.2.2
+PyYAML==6.0.3
+tqdm==4.70.1
