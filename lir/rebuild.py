@@ -69,6 +69,8 @@ COMMANDS = [
     {"args": ["lir.harm"], "tables": ["harm_categories.json", "harm_categories.md"]},
     {"args": ["lir.harm", "--regenerated"], "tables": ["harm_categories_regenerated.json", "harm_categories_regenerated.md"]},
     {"args": ["lir.trunc", "count"], "tables": ["truncation/counts.json", "truncation/counts.md"]},
+    {"args": ["lir.trunc", "report"], "tables": ["truncation/report.json", "truncation/report.md"]},
+    {"args": ["lir.truncsplit"], "tables": ["truncation/split.json", "truncation/split.md"]},
     {"args": ["lir.tasklen"], "tables": ["task_length.json", "task_length.md"]},
     {"args": ["lir.loose"], "tables": ["unsafe_only.json", "unsafe_only.md"]},
     {"args": ["lir.circuits", "nodes"], "tables": ["circuit_nodes.json", "circuit_nodes.md"]},
@@ -105,14 +107,6 @@ NOT_REBUILT = [
      "of job `unmerged` are in runs/gpu, which they are since the upload of Nov 25, and names the staging revision it finds "
      "there. The committed table is the reading of Nov 23, made before that job ran, so the command now writes another "
      "table; the unmerged arms are read in nf4_seeds.md (section 14f)"),
-    (("truncation/report.json", "truncation/report.md"),
-     "`python -m lir.trunc report` reads every arm of its list whose capped answers were generated again. Since the upload "
-     "of Nov 25 that includes `plain-mix1` and `plain-mix5` (section 14g), so the command now adds the rows of those two "
-     "arms. The committed table is the reading of Nov 21, made before they were generated again; every line of it comes "
-     "out the same"),
-    (("truncation/split.json", "truncation/split.md"),
-     "`python -m lir.truncsplit` reads the same arms as `python -m lir.trunc report`, so it too now adds the rows of "
-     "`plain-mix1` and `plain-mix5` to a table of Nov 21; every line of the committed table comes out the same"),
     (("aya/task.json", "aya/task.md"),
      "`python -m lir.aya taskreport` reads the answers to the held-out Aya prompts, which are not published because they quote Aya rows"),
     (("aya/checks.json", "aya/checks.md"),

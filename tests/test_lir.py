@@ -1788,12 +1788,12 @@ class Rebuild(unittest.TestCase):
         # the GPU table is the reading of Nov 23 and is not written again: with the unmerged arms beside it, its command reads 12.2 another way
         self.assertNotIn("lir.gpu", {c["args"][0] for c in COMMANDS})
         self.assertLessEqual({"gpu.json", "gpu.md"}, set(left))
-        # nor are the truncation report and split of Nov 21: with the two mixing runs generated again, their commands add two arms
+        # the truncation report and split were written again on Nov 25 with the two mixing runs generated again, and are rebuilt
         args = [c["args"] for c in COMMANDS]
-        self.assertNotIn(["lir.trunc", "report"], args)
-        self.assertNotIn(["lir.truncsplit"], args)
-        self.assertLessEqual({"truncation/report.md", "truncation/split.md"}, set(left))
-        self.assertIn("truncation/counts.md", tables)
+        self.assertIn(["lir.trunc", "report"], args)
+        self.assertIn(["lir.truncsplit"], args)
+        self.assertLessEqual({"truncation/counts.md", "truncation/report.md", "truncation/report.json", "truncation/split.md",
+                              "truncation/split.json"}, set(tables))
         # a table that copies the staging revision or writes a set's order does not come back the same, so it is not listed as rebuilt
         self.assertFalse({"lir.nf4seeds", "lir.granite_reading", "lir.judge3", "lir.sensitivity", "lir.train_aligntune", "lir.reviewtables"}
                          & {a[0] for a in args})
