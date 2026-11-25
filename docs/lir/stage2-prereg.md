@@ -2166,7 +2166,7 @@ The job and its reader (in `lir/granite41.py`) and their tests are committed wit
 - It decides nothing, as registered: G1 to G3 stand as section 16 read them. What it adds is that none of the three depends on the 256-token cap on this model.
 - After re-generation, with no rule: the base rate in Korean is 14.4% (19.2% on the capped answers), so the base model's figure fell when its cut answers were completed, as it did on Tiny Aya; plain against base in Korean +24.4 [+19.6, +29.3]; SafeGrad against base in Korean -0.5 [-4.2, +3.2].
 - Still cut at 1,024 tokens, per run: none in English, 8 to 16 in Korean, 1 to 4 in Chinese, under the 30 that would call for a caveat; 78 to 115 in Swahili, which no check reads.
-- Recounted from the verdict files with separate code: +11.5 [+9.1, +13.9], +24.2 [+18.9, +29.4] and -13.9 [-16.3, -11.5] (the last digit of an interval end moves with the bootstrap draw).
+- Recounted from the verdict files with separate code: +11.5 [+9.2, +14.0], +24.2 [+18.9, +29.6] and -13.9 [-16.2, -11.6] (an interval end moves with the bootstrap draw). Corrected at 12:34 AM: the interval ends first written in this line were typed before the recount had printed and were not its output; the three means were. The figures now here are what it printed.
 - As registered: no cause is given for the shift between the readings, and an answer generated again is often another answer and not a continuation. The files as read: `granite41/seeds_regen.md`, sha256 `c09c89408755fa2e7ccac08027991f3e07f79280649eba2e5b7b375239556eb1`, and `granite41/seeds_regen.json`, sha256 `43527ea801f0ec3ccb1771bb99a3ed5e7fbf39ba45c7f37132deac7716d1c751`.
 
 ### 16b. The model outside the Tiny Aya family, trained with no Korean row
