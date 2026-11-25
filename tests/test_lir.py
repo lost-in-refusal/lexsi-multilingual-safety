@@ -2829,6 +2829,53 @@ class OtherFamily(unittest.TestCase):
         self.assertIn("**The checks are not read", report_md(part))
         self.assertIn("| pending |", report_md(part))
 
+    def test_checks_of_section_16(self):
+        from lir.granite41 import CHECK_LANGS, G1_ROWS, G2_ROWS, G3_NOT_READ, G3_ROWS, report_md, result
+
+        self.assertEqual(CHECK_LANGS, ("en", "ko", "zh"))   # Swahili is not on the model's card
+        res = result(self.data())   # Korean 2, 20 and 8 of 40 families; English 0, 1 and 0
+        c = res["checks"]
+        self.assertAlmostEqual(c["g1"]["mean"], (45.0 + 2.5 + 0.0) / 3)
+        self.assertAlmostEqual(c["g2"]["mean"], 42.5)
+        self.assertAlmostEqual(c["g3"]["mean"], (-30.0 - 2.5 + 0.0) / 3)
+        self.assertEqual((c["g1"]["report"], c["g2"]["report"], c["g3"]["report"]), (G1_ROWS["above"], G2_ROWS["above"], G3_ROWS["below"]))
+        self.assertTrue(c["g3_read"])
+        self.assertEqual(c["g2"]["mean"], res["h1"]["pooled_ko_minus_en_rise"]["mean"])   # G2 is the pooled gap of H1
+        self.assertAlmostEqual(c["safegrad_vs_plain_per_language"]["ko"]["mean"], -30.0)
+        text = report_md(res)
+        self.assertIn("**G1. " + G1_ROWS["above"] + ".**", text)
+        self.assertIn("**G2. " + G2_ROWS["above"] + ".**", text)
+        self.assertIn("**G3. " + G3_ROWS["below"] + ".**", text)
+        self.assertIn("shown beside with no sentence", text)
+        # no rise under plain: G1 includes zero, and G3 is then not read whatever SafeGrad does
+        flat = result(self.data(plain_ko=range(2), plain_en=range(0), safe_ko=range(0)))
+        self.assertEqual((flat["checks"]["g1"]["report"], flat["checks"]["g3_read"], flat["checks"]["g3"]["report"]),
+                         (G1_ROWS["includes"], False, G3_NOT_READ))
+        self.assertIn("**" + G3_NOT_READ + ".**", report_md(flat))
+        self.assertNotIn("**G3.", report_md(flat))
+        # English rising as much as Korean: Korean is not detected to rise more
+        even = result(self.data(plain_en=range(19)))
+        self.assertEqual((even["checks"]["g1"]["side"], even["checks"]["g2"]["report"]), ("above", G2_ROWS["includes"]))
+        # SafeGrad level with plain
+        self.assertEqual(result(self.data(safe_ko=range(20), plain_en=range(0)))["checks"]["g3"]["report"], G3_ROWS["includes"])
+        # two seeds: figures and no sentence
+        part = result(self.data(seeds=(42, 1)))
+        self.assertNotIn("report", part["checks"]["g1"])
+        self.assertNotIn("g3_read", part["checks"])
+        self.assertIn("With no sentence, over the seeds read.", report_md(part))
+        for sentence in (*G1_ROWS.values(), *G2_ROWS.values(), *G3_ROWS.values(), G3_NOT_READ):
+            self.assertNotIn(sentence, report_md(part))
+
+    def test_registered_wording_of_section_16(self):
+        from lir.common import ROOT
+        from lir.granite41 import G1_ROWS, G2_ROWS, G3_NOT_READ, G3_ROWS, MIN_REFUSALS
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        section = prereg[prereg.index("## 16."):]
+        for sentence in (*G1_ROWS.values(), *G2_ROWS.values(), *G3_ROWS.values(), G3_NOT_READ):
+            self.assertIn(sentence, section)
+        self.assertIn(f"at least {MIN_REFUSALS} rows", section)
+
     def test_run_records(self):
         from lir.granite41 import ARMS, MODEL, REVISION, SEEDS, run_problems
 

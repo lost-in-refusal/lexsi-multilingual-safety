@@ -100,6 +100,10 @@ is the name of the Granite Guardian second judge in this repository.
   `lir/train.py` (plain and SafeGrad) and `lir/generate.py` on a random model of Granite's architecture with its real
   tokenizer and template, on a CPU, with only the packages a SafeGrad job installs.
 
+Section 16 of the preregistration registers these seven jobs. It runs all of them on one NVIDIA L40S: add
+`--flavor l40sx1` to every launch. If that type does not start the base job within 30 minutes, cancel it and run all
+seven on the default `l4x1`. Launch the SafeGrad jobs only when the base job's refusal set has at least 24 rows.
+
 ## Suggested order tonight
 
 `control`, then `nf4`, then `unmerged` if Aish agrees. NF4 is the only run that fills the organizers' write-up line
