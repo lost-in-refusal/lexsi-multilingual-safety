@@ -2195,6 +2195,13 @@ If it is not finished. N1 is not read: it needs the base run and the run with no
 
 Cost and reading. Three jobs of about 25 minutes on an L40S, about $2.50. `python -m lir.gpu fetch`, then `python -m lir.granite41 noko`, which writes `results/lir/stage2/granite41/noko.md`.
 
+**Added Nov 25, 1:57 AM ET by Mingyu, after the three jobs of 16b had finished.** All three completed on one NVIDIA L40S at commit `541e5bf`, each launched once. Every run has 1,164 attack answers and 999 XSTest answers with verdicts, and trained on all 1,748 rows of the file, none over the length limit. `python -m lir.granite41 noko` ran once, at 1:56 AM.
+
+- **N1: above zero.** On the model outside the Tiny Aya family, Korean attack success rose without a Korean training row: +19.5 points [+14.3, +24.7] against base over the three seeds (+19.2, +18.9 and +20.3, each significant).
+- Beside, with no rule. Each language against base: English +3.2 [+0.3, +6.3], Korean +19.5 [+14.3, +24.7], Chinese +8.9 [+5.0, +13.1], Swahili -0.0 [-4.0, +4.2]. Korean against the usual plain run of the same seed: -1.6 [-5.0, +1.8]; as registered, that is not a test of equality.
+- Recounted from the verdict files with separate code: +19.5 [+14.3, +24.5].
+- Limits: one model, answers capped at 256 tokens with no second reading of these three runs, the guard's verdicts. The files as read: `granite41/noko.md`, sha256 `488e693d0021f618225bf9778e25663c028f8738436a61a44c875579f1604532`, and `granite41/noko.json`, sha256 `6a02055d46c9519b4c295dffb0e1d6a7d89626f3c43ec58cab7cf400bbcf6ac0`.
+
 ### 16c. The task score on the model outside the Tiny Aya family
 
 **Added Nov 25, 12:02 AM ET by Mingyu, after section 16 was read and before any task prompt was answered by this model.**
@@ -2234,6 +2241,14 @@ The jobs and the readers of 16b and 16c (`lir/hfjob.py`, `lir/granite41.py`) and
 **Added Nov 25, 12:05 AM ET by Mingyu, when the jobs of 16b and 16c were launched.** All four were submitted on Nov 25 at 12:04 AM ET from commit `541e5bf` on one NVIDIA L40S each, with a limit of two hours: `granite41-noko-s42` (`6b066c691460ffe1d5e9cc17`), `granite41-noko-s1` (`6b066c691460ffe1d5e9cc1c`), `granite41-noko-s2` (`6b066c691460ffe1d5e9cc1e`), and the task job of 16c (`6b066c6a1460ffe1d5e9cc20`). The task job carries the display name of the re-generation job of 16a, a mistake in the launch command; its command is `lir.granite41 job-task`, and it uploads under `granite41-task/`. The mistake is corrected for later launches and changes nothing that is measured. The re-generation job of 16a was still running. No output of any of them has been read.
 
 **Added Nov 25, 12:30 AM ET by Mingyu: the task job of 16c failed before any model was loaded, and was launched again.** Job `6b066c6a1460ffe1d5e9cc20` ended with an error after 22 minutes, inside `pip install -r requirements-gpu.txt`: the connection to the package index broke (`ProtocolError: Connection broken: BrokenPipeError`). No task prompt had been answered and nothing was uploaded. Nothing was changed: the same command was submitted again at 12:30 AM ET from commit `1bd4939`, which differs from `541e5bf` only in the job's display name and in notes (`6b0672611460ffe1d5e9da62`). The three jobs of 16b had not started; they were waiting for a GPU.
+
+**Added Nov 25, 1:57 AM ET by Mingyu, after the task job of 16c had finished.** The second launch completed on one NVIDIA L40S at commit `1bd4939` (upload `granite41-task/20261125-055858-1bd4939`). Each of the seven runs has 300 task answers, all scored. `python -m lir.granite41 task` ran once, at 1:56 AM.
+
+- **T1: below zero.** Plain fine-tuning lowered the task score on the model outside the Tiny Aya family: plain minus base -0.47 [-0.61, -0.35] on the judge's scale of 1 to 7.
+- **T2: includes zero.** No difference in task score between SafeGrad and plain fine-tuning was detected on the model outside the Tiny Aya family: SafeGrad minus plain -0.07 [-0.15, +0.00]. With more digits the interval is [-0.149, +0.002]: it reaches zero by two thousandths, so the registered row is this one, and the figure is close to the row below it. Both facts are stated wherever T2 is used.
+- Beside, with no rule: SafeGrad minus base -0.55 [-0.68, -0.42]. Mean scores: base 6.34; plain 5.82, 5.88 and 5.89; SafeGrad 5.77, 5.78 and 5.82.
+- Recounted from the score files with separate code: T1 -0.47 [-0.61, -0.34]; T2 -0.074 [-0.147, +0.001].
+- Limits, as registered: one judge model, no person, and a score that can move with the length of an answer. The files as read: `granite41/task.md`, sha256 `5aeadd9cfac976d34f12fdd85af9295defbc0eede7f6a6298481b213192ae3f5`, and `granite41/task.json`, sha256 `6b737094cdae2bd0aed09245c63410092950d683f1f8dd09950b77b8882f4df6`.
 
 ## Rules
 

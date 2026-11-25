@@ -113,6 +113,12 @@ NOT_REBUILT = [
     (("second_benchmark_regen.json", "second_benchmark_regen.md"),
      "`python -m lir.xsunsafe again` reads the answers of the ten arms to the unsafe prompts of XSTest that were generated "
      "again, and their verdicts, which are not published yet"),
+    (("granite41/noko.json", "granite41/noko.md"),
+     "`python -m lir.granite41 noko` reads the answers, verdicts and run records of the Hugging Face jobs of section 16b, which "
+     "are in the private staging dataset and not published yet"),
+    (("granite41/task.json", "granite41/task.md"),
+     "`python -m lir.granite41 task` reads the task answers and scores of the Hugging Face job of section 16c, which are in the "
+     "private staging dataset and not published yet"),
     (("granite41/seeds_regen.json", "granite41/seeds_regen.md"),
      "`python -m lir.granite41 again` reads the answers of section 16 that were generated again by the job of section 16a, and "
      "their verdicts, which are in the private staging dataset and not published yet"),

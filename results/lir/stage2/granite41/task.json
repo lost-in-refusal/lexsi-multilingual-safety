@@ -1,0 +1,65 @@
+{
+  "seeds": [
+    42,
+    1,
+    2
+  ],
+  "complete": true,
+  "runs_left_out": [],
+  "mean": {
+    "base": 6.3375,
+    "granite41-plain-s42": 5.8225,
+    "granite41-safegrad-s42": 5.7725,
+    "granite41-plain-s1": 5.876666666666667,
+    "granite41-safegrad-s1": 5.7775,
+    "granite41-plain-s2": 5.888333333333334,
+    "granite41-safegrad-s2": 5.815
+  },
+  "t1": {
+    "mean": -0.475,
+    "ci95": [
+      -0.6069444444444445,
+      -0.34805555555555556
+    ],
+    "prompts": 300,
+    "side": "below",
+    "report": "Plain fine-tuning lowered the task score on the model outside the Tiny Aya family"
+  },
+  "t2": {
+    "mean": -0.07416666666666667,
+    "ci95": [
+      -0.1486111111111111,
+      0.0016666666666666663
+    ],
+    "prompts": 300,
+    "side": "includes",
+    "report": "No difference in task score between SafeGrad and plain fine-tuning was detected on the model outside the Tiny Aya family"
+  },
+  "safegrad_vs_base": {
+    "mean": -0.5491666666666667,
+    "ci95": [
+      -0.6825,
+      -0.4236111111111111
+    ],
+    "prompts": 300
+  },
+  "job": {
+    "folder": "20261125-055858-1bd4939",
+    "commit": "1bd4939a9087541740f37636801055e7f0b15b2e",
+    "gpu": [
+      "NVIDIA L40S, 620.70.06, 46068 MiB"
+    ],
+    "libraries": {
+      "torch": "2.15.0",
+      "transformers": "5.22.1",
+      "peft": "0.21.2",
+      "accelerate": "1.15.0",
+      "bitsandbytes": "0.50.2",
+      "safetensors": "0.8.0",
+      "tokenizers": "0.23.3",
+      "huggingface_hub": "2.4.0",
+      "numpy": "2.5.4"
+    },
+    "finished_utc": "20261125-065618"
+  }
+}

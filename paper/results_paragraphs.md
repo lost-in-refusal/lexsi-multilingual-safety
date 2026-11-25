@@ -241,6 +241,13 @@ answer was generated again at 1,024 tokens (section 16a): the three checks come 
 [-4.2, +3.2]). A cost to state with the repair: on this model SafeGrad refuses more safe English prompts (9.6% to
 between 21.6% and 25.2%; it did not on Tiny Aya). Guard verdicts only.
 
+Two follow-ups on the same model. Trained with no Korean row at all (section 16b), Korean attack success still rose,
+by +19.5 points [+14.3, +24.7] against base over three seeds, as K1 found for Tiny Aya: the Korean rise does not need
+Korean training data on either model (`granite41/noko.md`). On the task score (section 16c), plain fine-tuning cost
+0.47 points [0.35, 0.61] on the 1 to 7 scale, and no difference between SafeGrad and plain was detected (-0.07
+[-0.15, +0.00], an interval that reaches zero by two thousandths), so the repair is not shown to be bought with a
+weaker model (`granite41/task.md`).
+
 ## Circuit-guided mixed-precision quantization (section 15, D21). Confidence: a registered null (one run per arm, preregistered; no protection claimed)
 
 Keeping the layers the refusal circuit ranks highest at 8 bits and its lowest-ranked at 2 bits, at 4.0 bits on average,
