@@ -2664,6 +2664,92 @@ class OtherFamily(unittest.TestCase):
             with self.assertRaises(SystemExit):   # the base model refused nothing safely: nothing to train against
                 hfjob.refusal_set(step, tmp / "job", [f"granite41-base/empty/{name}"], download)
 
+    def test_what_a_job_runs(self):
+        """lir.hfjob.run with the commands faked: which commands, in which order, with which model, and what is uploaded."""
+        import argparse
+        import json
+        import sys
+        import tempfile
+        from unittest import mock
+
+        import huggingface_hub
+
+        from lir import hfjob
+        from lir.common import write_jsonl
+
+        name = "alignment_sft_granite41.jsonl"
+
+        def job(job_name, staged=()):
+            ran, api = [], mock.Mock()
+            api.list_repo_files.return_value = list(staged)
+
+            def run_step(cmd, env, log):
+                ran.append((cmd[2:], env, log.name))
+                if cmd[2] == "lir.stage2":   # the refusals step writes the file under data/lir
+                    write_jsonl(hfjob.DATA / cmd[cmd.index("--out") + 1], [{"uid": "a", "lang": "ko"}, {"uid": "b", "lang": "en"}])
+                return {"command": " ".join(cmd), "env": env, "seconds": 1.0, "peak_gpu_mib": 1, "tokens_per_second": {}}
+
+            def download(repo, path, repo_type, local_dir):
+                write_jsonl(Path(local_dir) / path, [{"uid": "a", "lang": "ko"}])
+                return str(Path(local_dir) / path)
+
+            with tempfile.TemporaryDirectory() as tmp, mock.patch.object(hfjob, "ROOT", Path(tmp)), mock.patch.object(hfjob, "RUNS", Path(tmp) / "runs"), \
+                    mock.patch.object(hfjob, "DATA", Path(tmp) / "data"), mock.patch.object(hfjob, "run_step", run_step), \
+                    mock.patch.object(hfjob, "hardware", lambda: {"cuda_available": True}), mock.patch.object(huggingface_hub, "HfApi", lambda: api), \
+                    mock.patch.object(huggingface_hub, "hf_hub_download", download), mock.patch("builtins.print"):
+                hfjob.run(argparse.Namespace(job=job_name))
+                record = json.loads((Path(tmp) / "runs" / "hfjob" / job_name / "job.json").read_text())
+                kept = sorted(p.name for p in (Path(tmp) / "runs" / "hfjob" / job_name).iterdir())
+                runs, data = str(Path(tmp) / "runs"), str(Path(tmp) / "data")
+            uploads = [("/".join(c.kwargs["path_in_repo"].split("/")[2:]), c.kwargs.get("allow_patterns")) for c in api.upload_folder.call_args_list]   # under <job>/<time>-<commit>/
+            return ran, record, kept, uploads, runs, data
+
+        model = {"LIR_MODEL": "granite41"}
+        # the base job: the held-out prompts too, then the refusal set, last
+        ran, record, kept, uploads, runs, data = job("granite41-base")
+        self.assertEqual(ran, [(["lir.evaluate", "--arm", "granite41-base", "--sets", "alignment", "attack", "xstest", "--skip-guard"], model, "granite41-base.generate.log"),
+                               (["lir.hfjob", "guard", "--job", "granite41-base", "--arm", "granite41-base"], {}, "granite41-base.guard.log"),
+                               (["lir.stage2", "refusals", "--arm", "granite41-base", "--out", name], {}, "granite41-base.refusals.log")])
+        self.assertEqual([s["what"] for s in record["steps"]], ["generate", "guard", "refusals"])
+        self.assertEqual((record["steps"][2]["rows"], len(record["steps"][2]["sha256"]), record["steps"][0]["sets"]), (2, 64, ["alignment", "attack", "xstest"]))
+        self.assertIn(name, kept)   # in the job's folder, so it is uploaded where the SafeGrad jobs look for it
+        self.assertEqual(uploads, [("", None), ("granite41-base", None)])
+        self.assertNotIn("safetune", record)
+        # a plain job: train at its seed on the model, then evaluate the new adapter
+        ran, record, kept, uploads, runs, data = job("granite41-plain-s2")
+        adapter = f"{runs}/granite41-plain-s2/adapter"
+        self.assertEqual(ran, [(["lir.train", "--arm", "plain", "--output", f"{runs}/granite41-plain-s2", "--train-file", f"{data}/bactrian_train.jsonl", "--seed", "2"],
+                                model, "granite41-plain-s2.train.log"),
+                               (["lir.evaluate", "--arm", "granite41-plain-s2", "--sets", "attack", "xstest", "--skip-guard", "--adapter", adapter], model,
+                                "granite41-plain-s2.generate.log"),
+                               (["lir.hfjob", "guard", "--job", "granite41-plain-s2", "--arm", "granite41-plain-s2"], {}, "granite41-plain-s2.guard.log")])
+        self.assertEqual((record["steps"][1]["adapter_from"], "refusal_set" in record, "safetune" in record), ("bactrian_train.jsonl", False, False))
+        self.assertEqual(uploads[2], ("granite41-plain-s2/run", ["run.json", "train_log.jsonl", "adapter/adapter_config.json", "adapter/adapter_model.safetensors"]))
+        # a SafeGrad job: the refusal file of the base job's newest upload, then train against it
+        staged = [f"granite41-base/20261125-010000-aaaaaaa/{name}", f"granite41-base/20261125-020000-bbbbbbb/{name}"]
+        with mock.patch("importlib.metadata.version", lambda package: "0.1.12"):
+            ran, record, kept, uploads, runs, data = job("granite41-safegrad-s1", staged)
+        self.assertEqual(ran[0], (["lir.train", "--arm", "safegrad", "--output", f"{runs}/granite41-safegrad-s1", "--train-file", f"{data}/bactrian_train.jsonl",
+                                   "--seed", "1", "--align-file", f"{runs}/hfjob/granite41-safegrad-s1/{name}"], model, "granite41-safegrad-s1.train.log"))
+        self.assertEqual([step[0][0] for step in ran], ["lir.train", "lir.evaluate", "lir.hfjob"])
+        self.assertEqual(record["refusal_set"]["from"], f"{hfjob.STAGING}/{staged[1]}")
+        self.assertEqual((record["refusal_set"]["rows"], record["safetune"]["commit"], record["safetune"]["installed_version"]), (1, hfjob.SAFETUNE[1], "0.1.12"))
+        self.assertIn(name, kept)
+        self.assertEqual(uploads[2][1][-1], "surgery_log.jsonl")
+        with self.assertRaises(SystemExit), mock.patch("importlib.metadata.version", lambda package: "0.1.12"):   # the base job has uploaded nothing yet
+            job("granite41-safegrad-s1")
+        # a job of section 12.1 runs what it ran before these jobs were added
+        ran, record, kept, uploads, runs, data = job("only-ko")
+        self.assertEqual(ran, [(["lir.train", "--arm", "plain", "--output", f"{runs}/plain-ko", "--train-file", f"{data}/bactrian_train_only_ko.jsonl"], {}, "plain-ko.train.log"),
+                               (["lir.evaluate", "--arm", "plain-ko", "--sets", "attack", "xstest", "--skip-guard", "--adapter", f"{runs}/plain-ko/adapter"], {},
+                                "plain-ko.generate.log"),
+                               (["lir.hfjob", "guard", "--job", "only-ko", "--arm", "plain-ko"], {}, "plain-ko.guard.log")])
+        self.assertEqual(record["steps"][1], {"command": " ".join([sys.executable, "-m", *ran[1][0]]), "env": {}, "seconds": 1.0, "peak_gpu_mib": 1,
+                                              "tokens_per_second": {}, "arm": "plain-ko", "what": "generate", "adapter_from": "bactrian_train_only_ko.jsonl"})
+        self.assertEqual((sorted(record), kept), (["commit", "finished_utc", "hardware", "job", "sets", "started_utc", "steps"], ["job.json", "logs"]))
+        self.assertEqual(uploads, [("", None), ("plain-ko", None),
+                                   ("plain-ko/run", ["run.json", "train_log.jsonl", "adapter/adapter_config.json", "adapter/adapter_model.safetensors"])])
+
     def test_a_dry_run_prints_a_job_that_is_not_pushed(self):
         import argparse
         import contextlib
