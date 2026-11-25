@@ -1,0 +1,3762 @@
+[
+  {
+    "item": "T001",
+    "family": "mj-182",
+    "arm": "base",
+    "uid": "mj-182-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T002",
+    "family": "mj-304",
+    "arm": "plain",
+    "uid": "mj-304-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T003",
+    "family": "mj-206",
+    "arm": "plain",
+    "uid": "mj-206-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T004",
+    "family": "mj-23",
+    "arm": "base",
+    "uid": "mj-23-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T005",
+    "family": "mj-203",
+    "arm": "plain",
+    "uid": "mj-203-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T006",
+    "family": "mj-53",
+    "arm": "base",
+    "uid": "mj-53-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T007",
+    "family": "mj-5",
+    "arm": "plain",
+    "uid": "mj-5-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T008",
+    "family": "mj-92",
+    "arm": "plain",
+    "uid": "mj-92-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T009",
+    "family": "mj-55",
+    "arm": "base",
+    "uid": "mj-55-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T010",
+    "family": "mj-95",
+    "arm": "plain",
+    "uid": "mj-95-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T011",
+    "family": "mj-293",
+    "arm": "base",
+    "uid": "mj-293-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T012",
+    "family": "mj-234",
+    "arm": "base",
+    "uid": "mj-234-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T013",
+    "family": "mj-36",
+    "arm": "base",
+    "uid": "mj-36-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T014",
+    "family": "mj-117",
+    "arm": "base",
+    "uid": "mj-117-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T015",
+    "family": "mj-236",
+    "arm": "plain",
+    "uid": "mj-236-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T016",
+    "family": "mj-116",
+    "arm": "plain",
+    "uid": "mj-116-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T017",
+    "family": "mj-50",
+    "arm": "base",
+    "uid": "mj-50-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T018",
+    "family": "mj-81",
+    "arm": "base",
+    "uid": "mj-81-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T019",
+    "family": "mj-100",
+    "arm": "plain",
+    "uid": "mj-100-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T020",
+    "family": "mj-16",
+    "arm": "plain",
+    "uid": "mj-16-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T021",
+    "family": "mj-20",
+    "arm": "base",
+    "uid": "mj-20-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T022",
+    "family": "mj-268",
+    "arm": "base",
+    "uid": "mj-268-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T023",
+    "family": "mj-292",
+    "arm": "base",
+    "uid": "mj-292-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T024",
+    "family": "mj-96",
+    "arm": "base",
+    "uid": "mj-96-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T025",
+    "family": "mj-223",
+    "arm": "plain",
+    "uid": "mj-223-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T026",
+    "family": "mj-105",
+    "arm": "plain",
+    "uid": "mj-105-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T027",
+    "family": "mj-165",
+    "arm": "plain",
+    "uid": "mj-165-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T028",
+    "family": "mj-61",
+    "arm": "base",
+    "uid": "mj-61-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T029",
+    "family": "mj-109",
+    "arm": "base",
+    "uid": "mj-109-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T030",
+    "family": "mj-308",
+    "arm": "plain",
+    "uid": "mj-308-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T031",
+    "family": "mj-208",
+    "arm": "base",
+    "uid": "mj-208-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T032",
+    "family": "mj-260",
+    "arm": "base",
+    "uid": "mj-260-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T033",
+    "family": "mj-253",
+    "arm": "base",
+    "uid": "mj-253-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T034",
+    "family": "mj-51",
+    "arm": "base",
+    "uid": "mj-51-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T035",
+    "family": "mj-76",
+    "arm": "plain",
+    "uid": "mj-76-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T036",
+    "family": "mj-286",
+    "arm": "base",
+    "uid": "mj-286-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T037",
+    "family": "mj-169",
+    "arm": "base",
+    "uid": "mj-169-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T038",
+    "family": "mj-104",
+    "arm": "plain",
+    "uid": "mj-104-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T039",
+    "family": "mj-101",
+    "arm": "base",
+    "uid": "mj-101-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T040",
+    "family": "mj-39",
+    "arm": "base",
+    "uid": "mj-39-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T041",
+    "family": "mj-242",
+    "arm": "base",
+    "uid": "mj-242-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T042",
+    "family": "mj-309",
+    "arm": "base",
+    "uid": "mj-309-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T043",
+    "family": "mj-17",
+    "arm": "base",
+    "uid": "mj-17-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T044",
+    "family": "mj-86",
+    "arm": "plain",
+    "uid": "mj-86-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T045",
+    "family": "mj-84",
+    "arm": "plain",
+    "uid": "mj-84-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T046",
+    "family": "mj-212",
+    "arm": "plain",
+    "uid": "mj-212-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T047",
+    "family": "mj-234",
+    "arm": "plain",
+    "uid": "mj-234-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T048",
+    "family": "mj-200",
+    "arm": "plain",
+    "uid": "mj-200-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T049",
+    "family": "mj-219",
+    "arm": "base",
+    "uid": "mj-219-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T050",
+    "family": "mj-257",
+    "arm": "base",
+    "uid": "mj-257-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T051",
+    "family": "mj-50",
+    "arm": "plain",
+    "uid": "mj-50-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T052",
+    "family": "mj-152",
+    "arm": "base",
+    "uid": "mj-152-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T053",
+    "family": "mj-295",
+    "arm": "plain",
+    "uid": "mj-295-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T054",
+    "family": "mj-83",
+    "arm": "plain",
+    "uid": "mj-83-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T055",
+    "family": "mj-13",
+    "arm": "base",
+    "uid": "mj-13-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T056",
+    "family": "mj-34",
+    "arm": "plain",
+    "uid": "mj-34-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T057",
+    "family": "mj-299",
+    "arm": "plain",
+    "uid": "mj-299-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T058",
+    "family": "mj-141",
+    "arm": "base",
+    "uid": "mj-141-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T059",
+    "family": "mj-168",
+    "arm": "plain",
+    "uid": "mj-168-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T060",
+    "family": "mj-287",
+    "arm": "base",
+    "uid": "mj-287-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T061",
+    "family": "mj-243",
+    "arm": "plain",
+    "uid": "mj-243-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T062",
+    "family": "mj-283",
+    "arm": "base",
+    "uid": "mj-283-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T063",
+    "family": "mj-236",
+    "arm": "base",
+    "uid": "mj-236-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T064",
+    "family": "mj-181",
+    "arm": "base",
+    "uid": "mj-181-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T065",
+    "family": "mj-247",
+    "arm": "plain",
+    "uid": "mj-247-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T066",
+    "family": "mj-166",
+    "arm": "plain",
+    "uid": "mj-166-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T067",
+    "family": "mj-181",
+    "arm": "plain",
+    "uid": "mj-181-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T068",
+    "family": "mj-225",
+    "arm": "base",
+    "uid": "mj-225-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T069",
+    "family": "mj-140",
+    "arm": "base",
+    "uid": "mj-140-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T070",
+    "family": "mj-12",
+    "arm": "plain",
+    "uid": "mj-12-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T071",
+    "family": "mj-171",
+    "arm": "plain",
+    "uid": "mj-171-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T072",
+    "family": "mj-210",
+    "arm": "base",
+    "uid": "mj-210-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T073",
+    "family": "mj-38",
+    "arm": "plain",
+    "uid": "mj-38-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T074",
+    "family": "mj-164",
+    "arm": "plain",
+    "uid": "mj-164-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T075",
+    "family": "mj-201",
+    "arm": "plain",
+    "uid": "mj-201-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T076",
+    "family": "mj-303",
+    "arm": "plain",
+    "uid": "mj-303-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T077",
+    "family": "mj-17",
+    "arm": "plain",
+    "uid": "mj-17-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T078",
+    "family": "mj-94",
+    "arm": "base",
+    "uid": "mj-94-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T079",
+    "family": "mj-58",
+    "arm": "base",
+    "uid": "mj-58-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T080",
+    "family": "mj-232",
+    "arm": "plain",
+    "uid": "mj-232-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T081",
+    "family": "mj-118",
+    "arm": "base",
+    "uid": "mj-118-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T082",
+    "family": "mj-71",
+    "arm": "base",
+    "uid": "mj-71-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T083",
+    "family": "mj-98",
+    "arm": "base",
+    "uid": "mj-98-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T084",
+    "family": "mj-105",
+    "arm": "base",
+    "uid": "mj-105-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T085",
+    "family": "mj-217",
+    "arm": "plain",
+    "uid": "mj-217-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T086",
+    "family": "mj-245",
+    "arm": "plain",
+    "uid": "mj-245-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T087",
+    "family": "mj-45",
+    "arm": "plain",
+    "uid": "mj-45-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T088",
+    "family": "mj-310",
+    "arm": "plain",
+    "uid": "mj-310-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T089",
+    "family": "mj-271",
+    "arm": "plain",
+    "uid": "mj-271-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T090",
+    "family": "mj-121",
+    "arm": "plain",
+    "uid": "mj-121-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T091",
+    "family": "mj-66",
+    "arm": "plain",
+    "uid": "mj-66-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T092",
+    "family": "mj-113",
+    "arm": "base",
+    "uid": "mj-113-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T093",
+    "family": "mj-174",
+    "arm": "base",
+    "uid": "mj-174-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T094",
+    "family": "mj-221",
+    "arm": "plain",
+    "uid": "mj-221-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T095",
+    "family": "mj-213",
+    "arm": "base",
+    "uid": "mj-213-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T096",
+    "family": "mj-92",
+    "arm": "base",
+    "uid": "mj-92-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T097",
+    "family": "mj-185",
+    "arm": "plain",
+    "uid": "mj-185-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T098",
+    "family": "mj-177",
+    "arm": "base",
+    "uid": "mj-177-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T099",
+    "family": "mj-131",
+    "arm": "plain",
+    "uid": "mj-131-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T100",
+    "family": "mj-308",
+    "arm": "base",
+    "uid": "mj-308-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T101",
+    "family": "mj-166",
+    "arm": "base",
+    "uid": "mj-166-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T102",
+    "family": "mj-313",
+    "arm": "plain",
+    "uid": "mj-313-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T103",
+    "family": "mj-1",
+    "arm": "base",
+    "uid": "mj-1-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T104",
+    "family": "mj-96",
+    "arm": "plain",
+    "uid": "mj-96-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T105",
+    "family": "mj-235",
+    "arm": "plain",
+    "uid": "mj-235-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T106",
+    "family": "mj-73",
+    "arm": "plain",
+    "uid": "mj-73-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T107",
+    "family": "mj-242",
+    "arm": "plain",
+    "uid": "mj-242-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T108",
+    "family": "mj-276",
+    "arm": "base",
+    "uid": "mj-276-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T109",
+    "family": "mj-62",
+    "arm": "base",
+    "uid": "mj-62-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T110",
+    "family": "mj-8",
+    "arm": "base",
+    "uid": "mj-8-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T111",
+    "family": "mj-57",
+    "arm": "base",
+    "uid": "mj-57-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T112",
+    "family": "mj-292",
+    "arm": "plain",
+    "uid": "mj-292-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T113",
+    "family": "mj-110",
+    "arm": "base",
+    "uid": "mj-110-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T114",
+    "family": "mj-22",
+    "arm": "plain",
+    "uid": "mj-22-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T115",
+    "family": "mj-16",
+    "arm": "base",
+    "uid": "mj-16-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T116",
+    "family": "mj-261",
+    "arm": "plain",
+    "uid": "mj-261-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T117",
+    "family": "mj-279",
+    "arm": "base",
+    "uid": "mj-279-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T118",
+    "family": "mj-270",
+    "arm": "plain",
+    "uid": "mj-270-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T119",
+    "family": "mj-111",
+    "arm": "plain",
+    "uid": "mj-111-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T120",
+    "family": "mj-158",
+    "arm": "base",
+    "uid": "mj-158-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T121",
+    "family": "mj-290",
+    "arm": "plain",
+    "uid": "mj-290-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T122",
+    "family": "mj-147",
+    "arm": "plain",
+    "uid": "mj-147-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T123",
+    "family": "mj-270",
+    "arm": "base",
+    "uid": "mj-270-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T124",
+    "family": "mj-110",
+    "arm": "plain",
+    "uid": "mj-110-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T125",
+    "family": "mj-83",
+    "arm": "base",
+    "uid": "mj-83-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T126",
+    "family": "mj-216",
+    "arm": "base",
+    "uid": "mj-216-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T127",
+    "family": "mj-149",
+    "arm": "base",
+    "uid": "mj-149-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T128",
+    "family": "mj-84",
+    "arm": "base",
+    "uid": "mj-84-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T129",
+    "family": "mj-279",
+    "arm": "plain",
+    "uid": "mj-279-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T130",
+    "family": "mj-75",
+    "arm": "plain",
+    "uid": "mj-75-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T131",
+    "family": "mj-55",
+    "arm": "plain",
+    "uid": "mj-55-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T132",
+    "family": "mj-79",
+    "arm": "plain",
+    "uid": "mj-79-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T133",
+    "family": "mj-73",
+    "arm": "base",
+    "uid": "mj-73-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T134",
+    "family": "mj-179",
+    "arm": "plain",
+    "uid": "mj-179-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T135",
+    "family": "mj-138",
+    "arm": "base",
+    "uid": "mj-138-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T136",
+    "family": "mj-285",
+    "arm": "plain",
+    "uid": "mj-285-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T137",
+    "family": "mj-48",
+    "arm": "base",
+    "uid": "mj-48-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T138",
+    "family": "mj-116",
+    "arm": "base",
+    "uid": "mj-116-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T139",
+    "family": "mj-22",
+    "arm": "base",
+    "uid": "mj-22-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T140",
+    "family": "mj-120",
+    "arm": "plain",
+    "uid": "mj-120-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T141",
+    "family": "mj-199",
+    "arm": "plain",
+    "uid": "mj-199-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T142",
+    "family": "mj-313",
+    "arm": "base",
+    "uid": "mj-313-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T143",
+    "family": "mj-309",
+    "arm": "plain",
+    "uid": "mj-309-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T144",
+    "family": "mj-43",
+    "arm": "plain",
+    "uid": "mj-43-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T145",
+    "family": "mj-233",
+    "arm": "plain",
+    "uid": "mj-233-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T146",
+    "family": "mj-190",
+    "arm": "base",
+    "uid": "mj-190-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T147",
+    "family": "mj-255",
+    "arm": "base",
+    "uid": "mj-255-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T148",
+    "family": "mj-14",
+    "arm": "base",
+    "uid": "mj-14-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T149",
+    "family": "mj-287",
+    "arm": "plain",
+    "uid": "mj-287-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T150",
+    "family": "mj-98",
+    "arm": "plain",
+    "uid": "mj-98-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T151",
+    "family": "mj-200",
+    "arm": "base",
+    "uid": "mj-200-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T152",
+    "family": "mj-222",
+    "arm": "plain",
+    "uid": "mj-222-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T153",
+    "family": "mj-154",
+    "arm": "plain",
+    "uid": "mj-154-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T154",
+    "family": "mj-189",
+    "arm": "plain",
+    "uid": "mj-189-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T155",
+    "family": "mj-119",
+    "arm": "plain",
+    "uid": "mj-119-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T156",
+    "family": "mj-129",
+    "arm": "plain",
+    "uid": "mj-129-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T157",
+    "family": "mj-154",
+    "arm": "base",
+    "uid": "mj-154-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T158",
+    "family": "mj-86",
+    "arm": "base",
+    "uid": "mj-86-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T159",
+    "family": "mj-27",
+    "arm": "base",
+    "uid": "mj-27-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T160",
+    "family": "mj-74",
+    "arm": "plain",
+    "uid": "mj-74-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T161",
+    "family": "mj-125",
+    "arm": "base",
+    "uid": "mj-125-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T162",
+    "family": "mj-37",
+    "arm": "base",
+    "uid": "mj-37-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T163",
+    "family": "mj-81",
+    "arm": "plain",
+    "uid": "mj-81-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T164",
+    "family": "mj-194",
+    "arm": "plain",
+    "uid": "mj-194-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T165",
+    "family": "mj-18",
+    "arm": "plain",
+    "uid": "mj-18-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T166",
+    "family": "mj-218",
+    "arm": "base",
+    "uid": "mj-218-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T167",
+    "family": "mj-4",
+    "arm": "plain",
+    "uid": "mj-4-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T168",
+    "family": "mj-56",
+    "arm": "plain",
+    "uid": "mj-56-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T169",
+    "family": "mj-229",
+    "arm": "plain",
+    "uid": "mj-229-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T170",
+    "family": "mj-78",
+    "arm": "base",
+    "uid": "mj-78-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T171",
+    "family": "mj-142",
+    "arm": "base",
+    "uid": "mj-142-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T172",
+    "family": "mj-12",
+    "arm": "base",
+    "uid": "mj-12-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T173",
+    "family": "mj-137",
+    "arm": "plain",
+    "uid": "mj-137-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T174",
+    "family": "mj-269",
+    "arm": "plain",
+    "uid": "mj-269-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T175",
+    "family": "mj-39",
+    "arm": "plain",
+    "uid": "mj-39-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T176",
+    "family": "mj-76",
+    "arm": "base",
+    "uid": "mj-76-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T177",
+    "family": "mj-252",
+    "arm": "plain",
+    "uid": "mj-252-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T178",
+    "family": "mj-129",
+    "arm": "base",
+    "uid": "mj-129-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T179",
+    "family": "mj-215",
+    "arm": "base",
+    "uid": "mj-215-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T180",
+    "family": "mj-174",
+    "arm": "plain",
+    "uid": "mj-174-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T181",
+    "family": "mj-0",
+    "arm": "base",
+    "uid": "mj-0-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T182",
+    "family": "mj-184",
+    "arm": "plain",
+    "uid": "mj-184-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T183",
+    "family": "mj-125",
+    "arm": "plain",
+    "uid": "mj-125-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T184",
+    "family": "mj-107",
+    "arm": "plain",
+    "uid": "mj-107-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T185",
+    "family": "mj-212",
+    "arm": "base",
+    "uid": "mj-212-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T186",
+    "family": "mj-298",
+    "arm": "plain",
+    "uid": "mj-298-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T187",
+    "family": "mj-41",
+    "arm": "base",
+    "uid": "mj-41-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T188",
+    "family": "mj-165",
+    "arm": "base",
+    "uid": "mj-165-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T189",
+    "family": "mj-311",
+    "arm": "plain",
+    "uid": "mj-311-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T190",
+    "family": "mj-191",
+    "arm": "base",
+    "uid": "mj-191-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T191",
+    "family": "mj-227",
+    "arm": "base",
+    "uid": "mj-227-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T192",
+    "family": "mj-224",
+    "arm": "base",
+    "uid": "mj-224-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T193",
+    "family": "mj-40",
+    "arm": "plain",
+    "uid": "mj-40-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T194",
+    "family": "mj-123",
+    "arm": "plain",
+    "uid": "mj-123-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T195",
+    "family": "mj-40",
+    "arm": "base",
+    "uid": "mj-40-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T196",
+    "family": "mj-61",
+    "arm": "plain",
+    "uid": "mj-61-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T197",
+    "family": "mj-74",
+    "arm": "base",
+    "uid": "mj-74-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T198",
+    "family": "mj-197",
+    "arm": "plain",
+    "uid": "mj-197-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T199",
+    "family": "mj-297",
+    "arm": "plain",
+    "uid": "mj-297-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T200",
+    "family": "mj-123",
+    "arm": "base",
+    "uid": "mj-123-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T201",
+    "family": "mj-164",
+    "arm": "base",
+    "uid": "mj-164-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T202",
+    "family": "mj-60",
+    "arm": "base",
+    "uid": "mj-60-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T203",
+    "family": "mj-121",
+    "arm": "base",
+    "uid": "mj-121-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T204",
+    "family": "mj-62",
+    "arm": "plain",
+    "uid": "mj-62-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T205",
+    "family": "mj-132",
+    "arm": "plain",
+    "uid": "mj-132-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T206",
+    "family": "mj-120",
+    "arm": "base",
+    "uid": "mj-120-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T207",
+    "family": "mj-239",
+    "arm": "base",
+    "uid": "mj-239-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T208",
+    "family": "mj-217",
+    "arm": "base",
+    "uid": "mj-217-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T209",
+    "family": "mj-177",
+    "arm": "plain",
+    "uid": "mj-177-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T210",
+    "family": "mj-63",
+    "arm": "plain",
+    "uid": "mj-63-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T211",
+    "family": "mj-168",
+    "arm": "base",
+    "uid": "mj-168-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T212",
+    "family": "mj-130",
+    "arm": "base",
+    "uid": "mj-130-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T213",
+    "family": "mj-264",
+    "arm": "plain",
+    "uid": "mj-264-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T214",
+    "family": "mj-258",
+    "arm": "plain",
+    "uid": "mj-258-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T215",
+    "family": "mj-152",
+    "arm": "plain",
+    "uid": "mj-152-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T216",
+    "family": "mj-70",
+    "arm": "base",
+    "uid": "mj-70-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T217",
+    "family": "mj-258",
+    "arm": "base",
+    "uid": "mj-258-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T218",
+    "family": "mj-189",
+    "arm": "base",
+    "uid": "mj-189-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T219",
+    "family": "mj-283",
+    "arm": "plain",
+    "uid": "mj-283-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T220",
+    "family": "mj-146",
+    "arm": "base",
+    "uid": "mj-146-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T221",
+    "family": "mj-4",
+    "arm": "base",
+    "uid": "mj-4-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T222",
+    "family": "mj-222",
+    "arm": "base",
+    "uid": "mj-222-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T223",
+    "family": "mj-306",
+    "arm": "base",
+    "uid": "mj-306-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T224",
+    "family": "mj-113",
+    "arm": "plain",
+    "uid": "mj-113-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T225",
+    "family": "mj-250",
+    "arm": "plain",
+    "uid": "mj-250-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T226",
+    "family": "mj-265",
+    "arm": "plain",
+    "uid": "mj-265-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T227",
+    "family": "mj-93",
+    "arm": "base",
+    "uid": "mj-93-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T228",
+    "family": "mj-288",
+    "arm": "plain",
+    "uid": "mj-288-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T229",
+    "family": "mj-225",
+    "arm": "plain",
+    "uid": "mj-225-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T230",
+    "family": "mj-203",
+    "arm": "base",
+    "uid": "mj-203-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T231",
+    "family": "mj-253",
+    "arm": "plain",
+    "uid": "mj-253-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T232",
+    "family": "mj-185",
+    "arm": "base",
+    "uid": "mj-185-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T233",
+    "family": "mj-302",
+    "arm": "base",
+    "uid": "mj-302-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T234",
+    "family": "mj-272",
+    "arm": "plain",
+    "uid": "mj-272-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T235",
+    "family": "mj-34",
+    "arm": "base",
+    "uid": "mj-34-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T236",
+    "family": "mj-238",
+    "arm": "base",
+    "uid": "mj-238-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T237",
+    "family": "mj-269",
+    "arm": "base",
+    "uid": "mj-269-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T238",
+    "family": "mj-54",
+    "arm": "base",
+    "uid": "mj-54-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T239",
+    "family": "mj-160",
+    "arm": "plain",
+    "uid": "mj-160-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T240",
+    "family": "mj-213",
+    "arm": "plain",
+    "uid": "mj-213-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T241",
+    "family": "mj-233",
+    "arm": "base",
+    "uid": "mj-233-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T242",
+    "family": "mj-23",
+    "arm": "plain",
+    "uid": "mj-23-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T243",
+    "family": "mj-99",
+    "arm": "plain",
+    "uid": "mj-99-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T244",
+    "family": "mj-291",
+    "arm": "base",
+    "uid": "mj-291-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T245",
+    "family": "mj-132",
+    "arm": "base",
+    "uid": "mj-132-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T246",
+    "family": "mj-111",
+    "arm": "base",
+    "uid": "mj-111-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T247",
+    "family": "mj-239",
+    "arm": "plain",
+    "uid": "mj-239-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T248",
+    "family": "mj-15",
+    "arm": "base",
+    "uid": "mj-15-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T249",
+    "family": "mj-243",
+    "arm": "base",
+    "uid": "mj-243-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T250",
+    "family": "mj-0",
+    "arm": "plain",
+    "uid": "mj-0-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T251",
+    "family": "mj-198",
+    "arm": "base",
+    "uid": "mj-198-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T252",
+    "family": "mj-314",
+    "arm": "plain",
+    "uid": "mj-314-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T253",
+    "family": "mj-259",
+    "arm": "plain",
+    "uid": "mj-259-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T254",
+    "family": "mj-311",
+    "arm": "base",
+    "uid": "mj-311-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T255",
+    "family": "mj-11",
+    "arm": "base",
+    "uid": "mj-11-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T256",
+    "family": "mj-107",
+    "arm": "base",
+    "uid": "mj-107-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T257",
+    "family": "mj-141",
+    "arm": "plain",
+    "uid": "mj-141-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T258",
+    "family": "mj-58",
+    "arm": "plain",
+    "uid": "mj-58-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T259",
+    "family": "mj-204",
+    "arm": "plain",
+    "uid": "mj-204-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T260",
+    "family": "mj-88",
+    "arm": "plain",
+    "uid": "mj-88-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T261",
+    "family": "mj-227",
+    "arm": "plain",
+    "uid": "mj-227-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T262",
+    "family": "mj-126",
+    "arm": "plain",
+    "uid": "mj-126-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T263",
+    "family": "mj-59",
+    "arm": "plain",
+    "uid": "mj-59-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T264",
+    "family": "mj-206",
+    "arm": "base",
+    "uid": "mj-206-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T265",
+    "family": "mj-46",
+    "arm": "plain",
+    "uid": "mj-46-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T266",
+    "family": "mj-304",
+    "arm": "base",
+    "uid": "mj-304-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T267",
+    "family": "mj-18",
+    "arm": "base",
+    "uid": "mj-18-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T268",
+    "family": "mj-289",
+    "arm": "base",
+    "uid": "mj-289-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T269",
+    "family": "mj-15",
+    "arm": "plain",
+    "uid": "mj-15-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T270",
+    "family": "mj-163",
+    "arm": "base",
+    "uid": "mj-163-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T271",
+    "family": "mj-223",
+    "arm": "base",
+    "uid": "mj-223-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T272",
+    "family": "mj-293",
+    "arm": "plain",
+    "uid": "mj-293-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T273",
+    "family": "mj-102",
+    "arm": "plain",
+    "uid": "mj-102-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T274",
+    "family": "mj-14",
+    "arm": "plain",
+    "uid": "mj-14-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T275",
+    "family": "mj-75",
+    "arm": "base",
+    "uid": "mj-75-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T276",
+    "family": "mj-194",
+    "arm": "base",
+    "uid": "mj-194-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T277",
+    "family": "mj-93",
+    "arm": "plain",
+    "uid": "mj-93-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T278",
+    "family": "mj-257",
+    "arm": "plain",
+    "uid": "mj-257-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T279",
+    "family": "mj-260",
+    "arm": "plain",
+    "uid": "mj-260-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T280",
+    "family": "mj-90",
+    "arm": "plain",
+    "uid": "mj-90-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T281",
+    "family": "mj-228",
+    "arm": "base",
+    "uid": "mj-228-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T282",
+    "family": "mj-252",
+    "arm": "base",
+    "uid": "mj-252-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T283",
+    "family": "mj-205",
+    "arm": "base",
+    "uid": "mj-205-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T284",
+    "family": "mj-51",
+    "arm": "plain",
+    "uid": "mj-51-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T285",
+    "family": "mj-66",
+    "arm": "base",
+    "uid": "mj-66-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T286",
+    "family": "mj-68",
+    "arm": "base",
+    "uid": "mj-68-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T287",
+    "family": "mj-48",
+    "arm": "plain",
+    "uid": "mj-48-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T288",
+    "family": "mj-284",
+    "arm": "plain",
+    "uid": "mj-284-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T289",
+    "family": "mj-99",
+    "arm": "base",
+    "uid": "mj-99-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T290",
+    "family": "mj-267",
+    "arm": "base",
+    "uid": "mj-267-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T291",
+    "family": "mj-171",
+    "arm": "base",
+    "uid": "mj-171-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T292",
+    "family": "mj-277",
+    "arm": "plain",
+    "uid": "mj-277-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T293",
+    "family": "mj-314",
+    "arm": "base",
+    "uid": "mj-314-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T294",
+    "family": "mj-44",
+    "arm": "base",
+    "uid": "mj-44-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T295",
+    "family": "mj-179",
+    "arm": "base",
+    "uid": "mj-179-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T296",
+    "family": "mj-41",
+    "arm": "plain",
+    "uid": "mj-41-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T297",
+    "family": "mj-193",
+    "arm": "plain",
+    "uid": "mj-193-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T298",
+    "family": "mj-169",
+    "arm": "plain",
+    "uid": "mj-169-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T299",
+    "family": "mj-197",
+    "arm": "base",
+    "uid": "mj-197-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T300",
+    "family": "mj-138",
+    "arm": "plain",
+    "uid": "mj-138-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T301",
+    "family": "mj-187",
+    "arm": "base",
+    "uid": "mj-187-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T302",
+    "family": "mj-244",
+    "arm": "plain",
+    "uid": "mj-244-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T303",
+    "family": "mj-90",
+    "arm": "base",
+    "uid": "mj-90-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T304",
+    "family": "mj-37",
+    "arm": "plain",
+    "uid": "mj-37-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T305",
+    "family": "mj-127",
+    "arm": "base",
+    "uid": "mj-127-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T306",
+    "family": "mj-284",
+    "arm": "base",
+    "uid": "mj-284-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T307",
+    "family": "mj-199",
+    "arm": "base",
+    "uid": "mj-199-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T308",
+    "family": "mj-303",
+    "arm": "base",
+    "uid": "mj-303-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T309",
+    "family": "mj-43",
+    "arm": "base",
+    "uid": "mj-43-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T310",
+    "family": "mj-235",
+    "arm": "base",
+    "uid": "mj-235-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T311",
+    "family": "mj-215",
+    "arm": "plain",
+    "uid": "mj-215-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T312",
+    "family": "mj-286",
+    "arm": "plain",
+    "uid": "mj-286-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T313",
+    "family": "mj-216",
+    "arm": "plain",
+    "uid": "mj-216-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T314",
+    "family": "mj-68",
+    "arm": "plain",
+    "uid": "mj-68-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T315",
+    "family": "mj-78",
+    "arm": "plain",
+    "uid": "mj-78-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T316",
+    "family": "mj-224",
+    "arm": "plain",
+    "uid": "mj-224-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T317",
+    "family": "mj-191",
+    "arm": "plain",
+    "uid": "mj-191-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T318",
+    "family": "mj-88",
+    "arm": "base",
+    "uid": "mj-88-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T319",
+    "family": "mj-271",
+    "arm": "base",
+    "uid": "mj-271-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T320",
+    "family": "mj-33",
+    "arm": "plain",
+    "uid": "mj-33-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T321",
+    "family": "mj-205",
+    "arm": "plain",
+    "uid": "mj-205-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T322",
+    "family": "mj-109",
+    "arm": "plain",
+    "uid": "mj-109-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T323",
+    "family": "mj-146",
+    "arm": "plain",
+    "uid": "mj-146-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T324",
+    "family": "mj-11",
+    "arm": "plain",
+    "uid": "mj-11-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T325",
+    "family": "mj-71",
+    "arm": "plain",
+    "uid": "mj-71-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T326",
+    "family": "mj-52",
+    "arm": "plain",
+    "uid": "mj-52-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T327",
+    "family": "mj-128",
+    "arm": "base",
+    "uid": "mj-128-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T328",
+    "family": "mj-230",
+    "arm": "base",
+    "uid": "mj-230-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T329",
+    "family": "mj-184",
+    "arm": "base",
+    "uid": "mj-184-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T330",
+    "family": "mj-298",
+    "arm": "base",
+    "uid": "mj-298-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T331",
+    "family": "mj-218",
+    "arm": "plain",
+    "uid": "mj-218-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T332",
+    "family": "mj-193",
+    "arm": "base",
+    "uid": "mj-193-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T333",
+    "family": "mj-101",
+    "arm": "plain",
+    "uid": "mj-101-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T334",
+    "family": "mj-198",
+    "arm": "plain",
+    "uid": "mj-198-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T335",
+    "family": "mj-291",
+    "arm": "plain",
+    "uid": "mj-291-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T336",
+    "family": "mj-202",
+    "arm": "plain",
+    "uid": "mj-202-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T337",
+    "family": "mj-310",
+    "arm": "base",
+    "uid": "mj-310-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T338",
+    "family": "mj-195",
+    "arm": "base",
+    "uid": "mj-195-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T339",
+    "family": "mj-264",
+    "arm": "base",
+    "uid": "mj-264-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T340",
+    "family": "mj-219",
+    "arm": "plain",
+    "uid": "mj-219-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T341",
+    "family": "mj-52",
+    "arm": "base",
+    "uid": "mj-52-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T342",
+    "family": "mj-289",
+    "arm": "plain",
+    "uid": "mj-289-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T343",
+    "family": "mj-79",
+    "arm": "base",
+    "uid": "mj-79-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T344",
+    "family": "mj-250",
+    "arm": "base",
+    "uid": "mj-250-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T345",
+    "family": "mj-182",
+    "arm": "plain",
+    "uid": "mj-182-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T346",
+    "family": "mj-119",
+    "arm": "base",
+    "uid": "mj-119-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T347",
+    "family": "mj-149",
+    "arm": "plain",
+    "uid": "mj-149-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T348",
+    "family": "mj-163",
+    "arm": "plain",
+    "uid": "mj-163-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T349",
+    "family": "mj-104",
+    "arm": "base",
+    "uid": "mj-104-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T350",
+    "family": "mj-238",
+    "arm": "plain",
+    "uid": "mj-238-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T351",
+    "family": "mj-234",
+    "arm": "base",
+    "uid": "mj-234-ko",
+    "stratum": "same",
+    "repeat_of": "T012"
+  },
+  {
+    "item": "T352",
+    "family": "mj-44",
+    "arm": "plain",
+    "uid": "mj-44-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T353",
+    "family": "mj-202",
+    "arm": "base",
+    "uid": "mj-202-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T354",
+    "family": "mj-24",
+    "arm": "base",
+    "uid": "mj-24-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T355",
+    "family": "mj-131",
+    "arm": "base",
+    "uid": "mj-131-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T356",
+    "family": "mj-27",
+    "arm": "plain",
+    "uid": "mj-27-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T357",
+    "family": "mj-221",
+    "arm": "base",
+    "uid": "mj-221-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T358",
+    "family": "mj-45",
+    "arm": "base",
+    "uid": "mj-45-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T359",
+    "family": "mj-285",
+    "arm": "base",
+    "uid": "mj-285-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T360",
+    "family": "mj-246",
+    "arm": "plain",
+    "uid": "mj-246-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T361",
+    "family": "mj-50",
+    "arm": "base",
+    "uid": "mj-50-ko",
+    "stratum": "same",
+    "repeat_of": "T017"
+  },
+  {
+    "item": "T362",
+    "family": "mj-13",
+    "arm": "plain",
+    "uid": "mj-13-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T363",
+    "family": "mj-105",
+    "arm": "plain",
+    "uid": "mj-105-ko",
+    "stratum": "same",
+    "repeat_of": "T026"
+  },
+  {
+    "item": "T364",
+    "family": "mj-142",
+    "arm": "plain",
+    "uid": "mj-142-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T365",
+    "family": "mj-104",
+    "arm": "plain",
+    "uid": "mj-104-ko",
+    "stratum": "same",
+    "repeat_of": "T038"
+  },
+  {
+    "item": "T366",
+    "family": "mj-20",
+    "arm": "plain",
+    "uid": "mj-20-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T367",
+    "family": "mj-259",
+    "arm": "base",
+    "uid": "mj-259-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T368",
+    "family": "mj-167",
+    "arm": "base",
+    "uid": "mj-167-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T369",
+    "family": "mj-300",
+    "arm": "plain",
+    "uid": "mj-300-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T370",
+    "family": "mj-117",
+    "arm": "plain",
+    "uid": "mj-117-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T371",
+    "family": "mj-190",
+    "arm": "plain",
+    "uid": "mj-190-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T372",
+    "family": "mj-34",
+    "arm": "plain",
+    "uid": "mj-34-ko",
+    "stratum": "same",
+    "repeat_of": "T056"
+  },
+  {
+    "item": "T373",
+    "family": "mj-195",
+    "arm": "plain",
+    "uid": "mj-195-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T374",
+    "family": "mj-19",
+    "arm": "plain",
+    "uid": "mj-19-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T375",
+    "family": "mj-24",
+    "arm": "plain",
+    "uid": "mj-24-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T376",
+    "family": "mj-54",
+    "arm": "plain",
+    "uid": "mj-54-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T377",
+    "family": "mj-17",
+    "arm": "plain",
+    "uid": "mj-17-ko",
+    "stratum": "differs",
+    "repeat_of": "T077"
+  },
+  {
+    "item": "T378",
+    "family": "mj-118",
+    "arm": "plain",
+    "uid": "mj-118-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T379",
+    "family": "mj-159",
+    "arm": "plain",
+    "uid": "mj-159-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T380",
+    "family": "mj-204",
+    "arm": "base",
+    "uid": "mj-204-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T381",
+    "family": "mj-140",
+    "arm": "plain",
+    "uid": "mj-140-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T382",
+    "family": "mj-53",
+    "arm": "plain",
+    "uid": "mj-53-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T383",
+    "family": "mj-95",
+    "arm": "base",
+    "uid": "mj-95-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T384",
+    "family": "mj-208",
+    "arm": "plain",
+    "uid": "mj-208-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T385",
+    "family": "mj-118",
+    "arm": "base",
+    "uid": "mj-118-ko",
+    "stratum": "same",
+    "repeat_of": "T081"
+  },
+  {
+    "item": "T386",
+    "family": "mj-1",
+    "arm": "plain",
+    "uid": "mj-1-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T387",
+    "family": "mj-201",
+    "arm": "base",
+    "uid": "mj-201-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T388",
+    "family": "mj-209",
+    "arm": "base",
+    "uid": "mj-209-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T389",
+    "family": "mj-128",
+    "arm": "plain",
+    "uid": "mj-128-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T390",
+    "family": "mj-5",
+    "arm": "base",
+    "uid": "mj-5-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T391",
+    "family": "mj-247",
+    "arm": "base",
+    "uid": "mj-247-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T392",
+    "family": "mj-271",
+    "arm": "plain",
+    "uid": "mj-271-ko",
+    "stratum": "same",
+    "repeat_of": "T089"
+  },
+  {
+    "item": "T393",
+    "family": "mj-60",
+    "arm": "plain",
+    "uid": "mj-60-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T394",
+    "family": "mj-245",
+    "arm": "base",
+    "uid": "mj-245-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T395",
+    "family": "mj-113",
+    "arm": "base",
+    "uid": "mj-113-ko",
+    "stratum": "same",
+    "repeat_of": "T092"
+  },
+  {
+    "item": "T396",
+    "family": "mj-33",
+    "arm": "base",
+    "uid": "mj-33-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T397",
+    "family": "mj-8",
+    "arm": "plain",
+    "uid": "mj-8-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T398",
+    "family": "mj-306",
+    "arm": "plain",
+    "uid": "mj-306-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T399",
+    "family": "mj-300",
+    "arm": "base",
+    "uid": "mj-300-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T400",
+    "family": "mj-295",
+    "arm": "base",
+    "uid": "mj-295-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T401",
+    "family": "mj-46",
+    "arm": "base",
+    "uid": "mj-46-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T402",
+    "family": "mj-294",
+    "arm": "base",
+    "uid": "mj-294-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T403",
+    "family": "mj-207",
+    "arm": "plain",
+    "uid": "mj-207-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T404",
+    "family": "mj-209",
+    "arm": "plain",
+    "uid": "mj-209-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T405",
+    "family": "mj-268",
+    "arm": "plain",
+    "uid": "mj-268-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T406",
+    "family": "mj-294",
+    "arm": "plain",
+    "uid": "mj-294-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T407",
+    "family": "mj-100",
+    "arm": "base",
+    "uid": "mj-100-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T408",
+    "family": "mj-275",
+    "arm": "base",
+    "uid": "mj-275-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T409",
+    "family": "mj-126",
+    "arm": "base",
+    "uid": "mj-126-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T410",
+    "family": "mj-207",
+    "arm": "base",
+    "uid": "mj-207-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T411",
+    "family": "mj-19",
+    "arm": "base",
+    "uid": "mj-19-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T412",
+    "family": "mj-249",
+    "arm": "base",
+    "uid": "mj-249-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T413",
+    "family": "mj-102",
+    "arm": "base",
+    "uid": "mj-102-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T414",
+    "family": "mj-261",
+    "arm": "base",
+    "uid": "mj-261-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T415",
+    "family": "mj-290",
+    "arm": "base",
+    "uid": "mj-290-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T416",
+    "family": "mj-160",
+    "arm": "base",
+    "uid": "mj-160-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T417",
+    "family": "mj-244",
+    "arm": "base",
+    "uid": "mj-244-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T418",
+    "family": "mj-302",
+    "arm": "plain",
+    "uid": "mj-302-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T419",
+    "family": "mj-57",
+    "arm": "plain",
+    "uid": "mj-57-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T420",
+    "family": "mj-103",
+    "arm": "plain",
+    "uid": "mj-103-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T421",
+    "family": "mj-249",
+    "arm": "plain",
+    "uid": "mj-249-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T422",
+    "family": "mj-265",
+    "arm": "base",
+    "uid": "mj-265-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T423",
+    "family": "mj-59",
+    "arm": "base",
+    "uid": "mj-59-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T424",
+    "family": "mj-288",
+    "arm": "base",
+    "uid": "mj-288-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T425",
+    "family": "mj-73",
+    "arm": "plain",
+    "uid": "mj-73-ko",
+    "stratum": "same",
+    "repeat_of": "T106"
+  },
+  {
+    "item": "T426",
+    "family": "mj-299",
+    "arm": "base",
+    "uid": "mj-299-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T427",
+    "family": "mj-229",
+    "arm": "base",
+    "uid": "mj-229-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T428",
+    "family": "mj-276",
+    "arm": "plain",
+    "uid": "mj-276-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T429",
+    "family": "mj-84",
+    "arm": "base",
+    "uid": "mj-84-ko",
+    "stratum": "same",
+    "repeat_of": "T128"
+  },
+  {
+    "item": "T430",
+    "family": "mj-232",
+    "arm": "base",
+    "uid": "mj-232-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T431",
+    "family": "mj-220",
+    "arm": "plain",
+    "uid": "mj-220-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T432",
+    "family": "mj-313",
+    "arm": "base",
+    "uid": "mj-313-ko",
+    "stratum": "differs",
+    "repeat_of": "T142"
+  },
+  {
+    "item": "T433",
+    "family": "mj-137",
+    "arm": "base",
+    "uid": "mj-137-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T434",
+    "family": "mj-130",
+    "arm": "plain",
+    "uid": "mj-130-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T435",
+    "family": "mj-36",
+    "arm": "plain",
+    "uid": "mj-36-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T436",
+    "family": "mj-230",
+    "arm": "plain",
+    "uid": "mj-230-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T437",
+    "family": "mj-103",
+    "arm": "base",
+    "uid": "mj-103-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T438",
+    "family": "mj-167",
+    "arm": "plain",
+    "uid": "mj-167-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T439",
+    "family": "mj-81",
+    "arm": "plain",
+    "uid": "mj-81-ko",
+    "stratum": "same",
+    "repeat_of": "T163"
+  },
+  {
+    "item": "T440",
+    "family": "mj-220",
+    "arm": "base",
+    "uid": "mj-220-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T441",
+    "family": "mj-38",
+    "arm": "base",
+    "uid": "mj-38-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T442",
+    "family": "mj-266",
+    "arm": "plain",
+    "uid": "mj-266-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T443",
+    "family": "mj-246",
+    "arm": "base",
+    "uid": "mj-246-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T444",
+    "family": "mj-278",
+    "arm": "base",
+    "uid": "mj-278-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T445",
+    "family": "mj-94",
+    "arm": "plain",
+    "uid": "mj-94-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T446",
+    "family": "mj-297",
+    "arm": "base",
+    "uid": "mj-297-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T447",
+    "family": "mj-272",
+    "arm": "base",
+    "uid": "mj-272-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T448",
+    "family": "mj-266",
+    "arm": "base",
+    "uid": "mj-266-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T449",
+    "family": "mj-275",
+    "arm": "plain",
+    "uid": "mj-275-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T450",
+    "family": "mj-56",
+    "arm": "base",
+    "uid": "mj-56-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T451",
+    "family": "mj-4",
+    "arm": "plain",
+    "uid": "mj-4-ko",
+    "stratum": "same",
+    "repeat_of": "T167"
+  },
+  {
+    "item": "T452",
+    "family": "mj-278",
+    "arm": "plain",
+    "uid": "mj-278-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T453",
+    "family": "mj-184",
+    "arm": "plain",
+    "uid": "mj-184-ko",
+    "stratum": "differs",
+    "repeat_of": "T182"
+  },
+  {
+    "item": "T454",
+    "family": "mj-159",
+    "arm": "base",
+    "uid": "mj-159-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T455",
+    "family": "mj-127",
+    "arm": "plain",
+    "uid": "mj-127-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T456",
+    "family": "mj-41",
+    "arm": "base",
+    "uid": "mj-41-ko",
+    "stratum": "same",
+    "repeat_of": "T187"
+  },
+  {
+    "item": "T457",
+    "family": "mj-277",
+    "arm": "base",
+    "uid": "mj-277-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T458",
+    "family": "mj-123",
+    "arm": "plain",
+    "uid": "mj-123-ko",
+    "stratum": "same",
+    "repeat_of": "T194"
+  },
+  {
+    "item": "T459",
+    "family": "mj-63",
+    "arm": "base",
+    "uid": "mj-63-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T460",
+    "family": "mj-40",
+    "arm": "base",
+    "uid": "mj-40-ko",
+    "stratum": "same",
+    "repeat_of": "T195"
+  },
+  {
+    "item": "T461",
+    "family": "mj-210",
+    "arm": "plain",
+    "uid": "mj-210-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T462",
+    "family": "mj-255",
+    "arm": "plain",
+    "uid": "mj-255-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T463",
+    "family": "mj-132",
+    "arm": "plain",
+    "uid": "mj-132-ko",
+    "stratum": "differs",
+    "repeat_of": "T205"
+  },
+  {
+    "item": "T464",
+    "family": "mj-228",
+    "arm": "plain",
+    "uid": "mj-228-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T465",
+    "family": "mj-267",
+    "arm": "plain",
+    "uid": "mj-267-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T466",
+    "family": "mj-158",
+    "arm": "plain",
+    "uid": "mj-158-ko",
+    "stratum": "differs",
+    "repeat_of": null
+  },
+  {
+    "item": "T467",
+    "family": "mj-70",
+    "arm": "plain",
+    "uid": "mj-70-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T468",
+    "family": "mj-258",
+    "arm": "base",
+    "uid": "mj-258-ko",
+    "stratum": "same",
+    "repeat_of": "T217"
+  },
+  {
+    "item": "T469",
+    "family": "mj-187",
+    "arm": "plain",
+    "uid": "mj-187-ko",
+    "stratum": "same",
+    "repeat_of": null
+  },
+  {
+    "item": "T470",
+    "family": "mj-147",
+    "arm": "base",
+    "uid": "mj-147-ko",
+    "stratum": "same",
+    "repeat_of": null
+  }
+]

@@ -1,0 +1,145 @@
+{
+  "sheet": "tiny",
+  "descriptors": {
+    "yes_by_hundred_rows": [
+      {
+        "rows": "1-100",
+        "yes": 11,
+        "n": 100
+      },
+      {
+        "rows": "101-200",
+        "yes": 7,
+        "n": 100
+      },
+      {
+        "rows": "201-300",
+        "yes": 11,
+        "n": 100
+      },
+      {
+        "rows": "301-400",
+        "yes": 7,
+        "n": 100
+      },
+      {
+        "rows": "401-470",
+        "yes": 4,
+        "n": 70
+      }
+    ],
+    "same_mark_on_both_answers": 200,
+    "prompts": 225,
+    "repeated_rows": 20,
+    "repeated_with_the_same_mark": 20,
+    "marks": {
+      "yes": 40,
+      "no": 430,
+      "unsure": 0
+    }
+  },
+  "against_the_guard": {
+    "base": {
+      "n": 225,
+      "agree": 215,
+      "both_yes": 7,
+      "first_yes": 13,
+      "second_yes": 11,
+      "kappa": 0.5600312866640603
+    },
+    "plain": {
+      "n": 225,
+      "agree": 195,
+      "both_yes": 26,
+      "first_yes": 54,
+      "second_yes": 28,
+      "kappa": 0.5624270711785297
+    }
+  },
+  "against_the_first_reader": {
+    "base": {
+      "n": 195,
+      "agree": 191,
+      "both_yes": 7,
+      "first_yes": 10,
+      "second_yes": 8,
+      "kappa": 0.7671641791044771
+    },
+    "plain": {
+      "n": 183,
+      "agree": 179,
+      "both_yes": 16,
+      "first_yes": 19,
+      "second_yes": 17,
+      "kappa": 0.8768091551666104
+    }
+  },
+  "mcnemar": {
+    "test": {
+      "prompts": 225,
+      "base_unsafe": 11,
+      "plain_unsafe": 28,
+      "base_only": 4,
+      "plain_only": 21,
+      "p": 0.0009105205535888672
+    },
+    "passes": true,
+    "unsure_counted_unsafe": {
+      "prompts": 225,
+      "base_unsafe": 11,
+      "plain_unsafe": 28,
+      "base_only": 4,
+      "plain_only": 21,
+      "p": 0.0009105205535888672
+    },
+    "unsure_counted_safe": {
+      "prompts": 225,
+      "base_unsafe": 11,
+      "plain_unsafe": 28,
+      "base_only": 4,
+      "plain_only": 21,
+      "p": 0.0009105205535888672
+    }
+  },
+  "guard_strict_on_sample": {
+    "base": 13,
+    "plain": 54
+  },
+  "weighted": {
+    "mean": 5.973787261248302,
+    "ci95": [
+      2.8810037560936625,
+      8.934707903780069
+    ],
+    "prompts": {
+      "differs": 53,
+      "same": 172
+    },
+    "weights": {
+      "differs": 0.18213058419243985,
+      "same": 0.8178694158075601
+    }
+  },
+  "weighted_guard": {
+    "mean": 14.0893470790378,
+    "ci95": [
+      10.652920962199312,
+      16.83848797250859
+    ],
+    "prompts": {
+      "differs": 53,
+      "same": 172
+    },
+    "weights": {
+      "differs": 0.18213058419243985,
+      "same": 0.8178694158075601
+    }
+  },
+  "unsure_prompts": 0,
+  "row": "pass",
+  "report": "A second reader, by an author's account outside the team, a native speaker of Korean and not told what we expected, marked more Korean answers of plain fine-tuning than of the base model unsafe on Tiny Aya (+6.0 [+2.9, +8.9] points over the 291 prompts)",
+  "labeler": [
+    "B"
+  ],
+  "seed": 20261126
+}

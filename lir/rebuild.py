@@ -147,6 +147,9 @@ NOT_REBUILT = [
      "`python -m lir.judge3 inputs` writes its hashes under runs/judge3 and not into this folder, and the committed copy "
      "also names the revision of the private staging dataset that the upload of the two input files returned. From the "
      "published answers the command gives the same hashes"),
+    (("second_reader_tiny.md", "second_reader_granite.md"),
+     "`python -m lir.reader2 score` reads its keys from runs/humancheck, a folder that is not published, and writes two files "
+     "in results/lir/labels. The marks, a copy of each key and the results are in results/lir/labels"),
     (("granite41/person.md",),
      "`python -m lir.granite_reading score` reads its key from runs/humancheck, a folder that is not published, and also "
      "writes two files in results/lir/labels. The answers and verdicts it reads are published, and the marks and a copy "

@@ -1,0 +1,99 @@
+{
+  "sheet": "granite",
+  "descriptors": {
+    "yes_by_hundred_rows": [
+      {
+        "rows": "1-100",
+        "yes": 16,
+        "n": 100
+      },
+      {
+        "rows": "101-170",
+        "yes": 8,
+        "n": 70
+      }
+    ],
+    "same_mark_on_both_answers": 64,
+    "prompts": 75,
+    "repeated_rows": 20,
+    "repeated_with_the_same_mark": 20,
+    "marks": {
+      "yes": 24,
+      "no": 146,
+      "unsure": 0
+    }
+  },
+  "against_the_guard": {
+    "base": {
+      "n": 75,
+      "agree": 70,
+      "both_yes": 8,
+      "first_yes": 12,
+      "second_yes": 9,
+      "kappa": 0.7240618101545255
+    },
+    "plain": {
+      "n": 75,
+      "agree": 57,
+      "both_yes": 13,
+      "first_yes": 30,
+      "second_yes": 14,
+      "kappa": 0.451219512195122
+    }
+  },
+  "against_the_first_reader": {
+    "base": {
+      "n": 75,
+      "agree": 35,
+      "both_yes": 7,
+      "first_yes": 45,
+      "second_yes": 9,
+      "kappa": 0.07407407407407401
+    },
+    "plain": {
+      "n": 75,
+      "agree": 36,
+      "both_yes": 11,
+      "first_yes": 47,
+      "second_yes": 14,
+      "kappa": 0.10248542497698676
+    }
+  },
+  "mcnemar": {
+    "test": {
+      "prompts": 75,
+      "base_unsafe": 9,
+      "plain_unsafe": 14,
+      "base_only": 3,
+      "plain_only": 8,
+      "p": 0.2265625
+    },
+    "passes": false,
+    "unsure_counted_unsafe": {
+      "prompts": 75,
+      "base_unsafe": 9,
+      "plain_unsafe": 14,
+      "base_only": 3,
+      "plain_only": 8,
+      "p": 0.2265625
+    },
+    "unsure_counted_safe": {
+      "prompts": 75,
+      "base_unsafe": 9,
+      "plain_unsafe": 14,
+      "base_only": 3,
+      "plain_only": 8,
+      "p": 0.2265625
+    }
+  },
+  "guard_strict_on_sample": {
+    "base": 12,
+    "plain": 30
+  },
+  "row": "fail",
+  "report": "On the model outside the Tiny Aya family, the second reader did not confirm the Korean rise either: the difference did not reach significance (9 against 14 on 75 prompts)",
+  "labeler": [
+    "B"
+  ],
+  "seed": 20261126
+}
