@@ -2811,6 +2811,13 @@ Where it goes in the paper. One clause beside X1 in section 3.4 and a column in 
 
 The job, the reader and their tests are in a module of their own (`lir/xlsumregen.py`, `tests/test_xlsumregen.py`), so that `lir/xlsum.py` is not changed for it; they are committed before the job is launched, with a dated note here.
 
+**Added Nov 25, 6:41 PM ET by Mingyu, when the job and the reader of 20c were committed and before any answer is generated again.** They are in `lir/xlsumregen.py` with their tests (commit `0fa6046` and the one that carries this note); `lir/xlsum.py` is not changed. Fixed now, where the entry is silent or its words meet the arithmetic:
+
+- An interval's end nearer to zero than 1e-9 is read as zero. The entry says an interval that ends at zero includes it; X4's stored upper end is 3.8e-17, a rounding of zero, and a second interval could as well end at minus that. The sign of such a residue does not choose the row. No first reading changes by this.
+- X3 is read again once the Korean XSTest answers of the base run and the plain runs are generated again; it reads no other run. M1 needs its plain runs generated again as well as the mixing runs.
+- The bar of 30 answers still cut is applied to XSTest's 250 Korean answers too.
+- The job uploads once, at its end, with a limit of three hours; `mix` is read before `again`, so that M1's first reading exists.
+
 ## 21. A second reader, outside the team, on the stored Korean answers of both models
 
 **Added Nov 25, 4:28 PM ET by Mingyu, before either sheet is made and before the second reader has seen anything.**
@@ -2900,6 +2907,17 @@ The command and its tests (`lir/reader2.py`, `tests/test_reader2.py`) and the re
 - The recount, with code that shares nothing with `lir/reader2.py`: 11 and 28, 21 and 4, p = 0.0009, the two groups' sums and the weighted difference of +5.97; 9 and 14, 8 and 3, p = 0.2266; 20 of 20 repeated rows in each sheet; the yes and no totals. All as reported. The intervals were not computed again.
 - What the reading says, and what it does not. By one more reader's marks, taken against the entry's own rule on how they come back, more of the fine-tuned model's Korean answers than of the base model's are unsafe on Tiny Aya, by about 6 points where the guard counts about 14 on the same sum, and almost all of that difference lies on the prompts the guard already reads differently. On the other model it is not found, a second time. It does not make the marks ground truth: it is one person, whose standing, tool and time rest on the account of an author who is the first reader, and whose marks on Tiny Aya are nearly the first reader's. Not "independent", "blind" or "confirmed" without these words. R1's figure is a weighted mean, not a count. K2, K3 and 16d stand as failed.
 - The tool is asked for once more. If it is ever seen to have shown the reader more than the request and the answer, R1 and R2 are withdrawn.
+
+**Added Nov 25, 6:41 PM ET by Mingyu, after the tool was given and read.** At about 6:39 PM Mingyu gave the file of the labelling tool, one HTML page of 83,726 bytes (sha256 beginning `b974ee38`). It is not copied into the repository: its built-in sample row carries a labeller's name. It was read in full by its code, not run.
+
+- What it is. A page that runs in the browser of whoever opens it. It holds no row of either sheet, no key, no guard verdict and no mark of an earlier reading: the person at the computer loads a CSV file into it, and it knows only that file's columns. With a registered sheet loaded it can therefore show nothing of the runs, the guard or the first reader. So the condition of the 6:26 PM note for withdrawing R1 and R2 is not met.
+- What it shows of a row: the row's name, its place in the file ("k / N"), the request, the answer, the answer's length in characters, the mark the row has so far, and a box for notes. Rows come in the file's order; nothing is shuffled or sorted.
+- The marks it offers: Unsafe (yes), Safe (no) and Unsure, by button or key, moving to the next row after a mark. So "unsure" was offered and was not used on any of 640 rows.
+- What it does not show: the rule and the content warning. Those were in the README alone.
+- What it adds that the entry did not provide for: a side list of every row with the mark it has so far, a filter by one's own mark, and a search of the text. The README asks the reader not to look up what they wrote before; the tool makes that possible. So "20 of 20 rows shown twice got the same mark" in each sheet does not show that the two showings were judged apart, and it is given with this sentence.
+- How marks leave it: a three-column list (item, human_unsafe, labeler), by download or by copying it, which is the form that was pasted; it can also write the whole sheet with its marks. No export carries a time. The labeller's name is a field the user types; the sample row built into the tool carries the same name as the pasted list.
+- What the file cannot tell us. Its copy was created and last changed at 6:38 PM, after the list was pasted (6:12 PM) and after the tool was asked for, so it is a copy saved after the reading. That this is the tool the reader used, that the two registered sheets are what was loaded into it, and on whose computer, rest on Mingyu's account; the list's row names are the sheets' item names in their order.
+- The words that go with R1 and R2 from now on. In place of "a tool set up by an author, which nobody else has seen": "a labelling page set up by an author, which shows only what is in the sheet loaded into it and whose copy we were given after the reading". The other words stand: a pasted list, which the registration said would not be taken; 640 rows in at most 72 to 101 minutes by that author's account; who the reader is rests on an author's account.
 
 ## Rules
 

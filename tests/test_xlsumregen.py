@@ -752,5 +752,16 @@ class NothingIsPublished(unittest.TestCase):
         self.assertFalse((DATA / "xlsum_regen.jsonl").exists())
 
 
+class EndsAtZero(unittest.TestCase):
+    def test_a_rounding_residue_does_not_choose_the_side(self):
+        from lir import xlsumregen as g
+        for end in (3.8e-17, -3.8e-17, 0.0):
+            self.assertEqual(g.side_at({"mean": -2.3, "ci95": [-4.6, end]}), "includes")
+            self.assertEqual(g.side_at({"mean": 2.3, "ci95": [end, 4.6]}), "includes")
+        self.assertEqual(g.side_at({"mean": -2.3, "ci95": [-4.6, -0.3]}), "below")
+        self.assertEqual(g.side_at({"mean": 2.3, "ci95": [0.3, 4.6]}), "above")
+        self.assertEqual(g.side_at({"mean": -2.3, "ci95": [-4.6, -1e-6]}), "below")   # a small interval end that is not rounding
+
+
 if __name__ == "__main__":
     unittest.main()

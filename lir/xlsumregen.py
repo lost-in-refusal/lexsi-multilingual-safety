@@ -229,6 +229,13 @@ def reads(seeds: tuple[int, ...], mix_seeds: tuple[int, ...]) -> dict[str, list[
             "m1": each([xlsum.PAIRS[seed][0] for seed in mix_seeds] + [xlsum.MIX[seed] for seed in mix_seeds], "attack", ["ko"])}
 
 
+def side_at(d: dict) -> str:
+    """Where an interval lies, by the project's `side`, with an end nearer zero than ROUNDING read as zero. Section 20c
+    says an interval that ends at zero includes it; a bootstrap mean that is zero can be stored as 3.8e-17 or as
+    -3.8e-17, and the sign of that residue must not choose the row (note of Nov 25 under 20c, before the job ran)."""
+    return side(dict(d, ci95=[0.0 if abs(v) < ROUNDING else v for v in d["ci95"]]))
+
+
 def again_result(x: dict, mixj: dict | None, att: dict[str, dict], xs: dict[str, dict], rouge: dict[str, dict], task: dict[str, dict],
                  regen: dict[str, dict]) -> dict:
     """Section 20c. x: section 20's table (xlsum.json). mixj: section 20b's table when M1 was read, None otherwise. att,
@@ -280,7 +287,7 @@ def again_result(x: dict, mixj: dict | None, att: dict[str, dict], xs: dict[str,
         second.update({k: r[k] for k in ("x1", "x2", "x3", "x4") if k not in not_read})
     if "m1" not in not_read:
         second["m1"] = xlsum.mix_result({**att, **new_att}, {**xs, **new_xs}, rouge, task, mix_seeds)["m1"]
-    figure = lambda d: {"mean": d["mean"], "ci95": list(d["ci95"]), "side": side(d)}   # the interval and where it lies; no sentence of the first reading
+    figure = lambda d: {"mean": d["mean"], "ci95": list(d["ci95"]), "side": side_at(d)}   # the interval and where it lies; no sentence of the first reading
     checks = {k: {"name": CHECKS[k], "first": figure(first[k]), "again": figure(second[k])} for k in CHECKS if k in second}
     for c in checks.values():
         c["same"] = c["first"]["side"] == c["again"]["side"]
