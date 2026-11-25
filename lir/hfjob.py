@@ -1,4 +1,4 @@
-"""Runs on a Hugging Face GPU for preregistration sections 12.0 to 12.2 on Aish's branch (deliverable D20).
+"""Runs on a Hugging Face GPU for preregistration sections 12.0 to 12.2 and 14f (deliverable D20).
 
   python -m lir.hfjob launch --job control --dry-run    # print the job, submit nothing
   python -m lir.hfjob launch --job control              # submit it; needs a login with Jobs rights on the namespace
@@ -32,11 +32,20 @@ LAPTOP = {"plain": (f"{HF_ORG}/tiny-aya-global-bactrian-lora-plain", "0e57114e18
                     "f244c893ba78532f94e68658b86a290abd90ef319536854908ac867b5b5b3f83"),
           "safegrad": (f"{HF_ORG}/tiny-aya-global-bactrian-lora-safegrad", "8b2687f885d388e4a3a370fb04252a21c3f13e99",
                        "dca9b81486c46d1ba683fbafaa0ca933058467ade7a7baa09eedab36e10fac16")}
+# The seed 1 and 2 adapters trained on the laptop are folders of the stage 2 adapter repository, pinned the same way:
+# one revision of the repository, and for each folder the hash of the weights the laptop evaluated.
+STAGE2_REPO, STAGE2_REV = f"{HF_ORG}/tiny-aya-lora-stage2", "292f8ba92163b3a2ac58ce625046f16516d0c70b"
+STAGE2 = {"plain-s1": "02374672ba14d67abb79f5fab8a46a0abfe41f35a3301d428554cbcb3a8b2a17",
+          "safegrad-s1": "7c8b94797bd44e8000be4e272e9330d2b4bdca71d414a8d8ac2b676e195d0e04",
+          "plain-s2": "d71a63e21def479901fd7adee5f840960bdb22a1c69f51eededb90bea6e5e10f",
+          "safegrad-s2": "ccc2d4868b5d2479fb83545981057c75ebba1547c63678a4804aafd428a36848"}
 SETS = ["attack", "xstest"]
 NF4 = {"LIR_QUANT": "nf4"}
+UNMERGED = {"LIR_MERGE": "0"}
 
-# job -> steps. A step has an arm name, where its adapter comes from (no key: the base model; "hub": a laptop adapter;
-# "train": a training file under data/lir) and the environment that changes how the model is loaded.
+# job -> steps. A step has an arm name, where its adapter comes from (no key: the base model; "hub": a laptop adapter
+# of seed 42; "stage2": a laptop adapter of seed 1 or 2; "train": a training file under data/lir) and the environment
+# that changes how the model is loaded.
 # Arm names differ from every laptop arm, so a GPU result can never be read as a laptop one.
 JOBS = {
     "control": [{"arm": "gpu-base"}, {"arm": "gpu-plain", "hub": "plain"}],                                   # 12.0
@@ -45,9 +54,12 @@ JOBS = {
     "only-zh": [{"arm": "plain-zh", "train": "bactrian_train_only_zh.jsonl"}],
     "nf4": [{"arm": "gpu-safegrad", "hub": "safegrad"}, {"arm": "gpu-base-nf4", "env": NF4},                    # 12.2
             {"arm": "gpu-plain-nf4", "hub": "plain", "env": NF4}, {"arm": "gpu-safegrad-nf4", "hub": "safegrad", "env": NF4}],
-    # Not registered. bfloat16 with the adapter left unmerged, as under NF4; run only if it is added to 12.2 first.
-    "unmerged": [{"arm": "gpu-plain-unmerged", "hub": "plain", "env": {"LIR_MERGE": "0"}},
-                 {"arm": "gpu-safegrad-unmerged", "hub": "safegrad", "env": {"LIR_MERGE": "0"}}],
+    # Section 14f. bfloat16 with the adapter left unmerged, as under NF4: the review note under 12.2 names these arms.
+    "unmerged": [{"arm": "gpu-plain-unmerged", "hub": "plain", "env": UNMERGED},
+                 {"arm": "gpu-safegrad-unmerged", "hub": "safegrad", "env": UNMERGED}],
+    # Section 14f. Seeds 1 and 2, plain and SafeGrad: bfloat16 with the adapter unmerged, and NF4. Two arms a job.
+    **{f"{how}-s{seed}": [{"arm": f"gpu-{arm}-s{seed}-{how}", "stage2": f"{arm}-s{seed}", "env": env} for arm in ("plain", "safegrad")]
+       for seed in (1, 2) for how, env in (("unmerged", UNMERGED), ("nf4", NF4))},
 }
 
 
@@ -141,8 +153,28 @@ def run_step(cmd: list[str], env: dict, log: Path) -> dict:
             "tokens_per_second": speeds(text)}
 
 
+def laptop_adapter(step: dict, arm: str, download=None) -> str | None:
+    """The folder of the adapter a step evaluates when it was trained on the laptop, downloaded at its pinned revision;
+    None for the base model and for a step that trains. Stops if the weights are not the file the laptop evaluated."""
+    if "hub" in step:
+        repo, revision, sha = LAPTOP[step["hub"]]
+        folder, sub = RUNS / arm / "adapter", ""
+    elif "stage2" in step:
+        repo, revision, sha = STAGE2_REPO, STAGE2_REV, STAGE2[step["stage2"]]
+        folder, sub = RUNS / arm / "hub", step["stage2"] + "/"
+    else:
+        return None
+    if download is None:
+        from huggingface_hub import snapshot_download as download
+    got = Path(download(repo, revision=revision, local_dir=folder,
+                        allow_patterns=[sub + "adapter_config.json", sub + "adapter_model.safetensors"])) / sub
+    if sha256_file(got / "adapter_model.safetensors") != sha:
+        raise SystemExit(f"{repo}@{revision[:8]} {sub}: the adapter weights are not the file the laptop evaluated")
+    return str(got)
+
+
 def run(a) -> None:
-    from huggingface_hub import HfApi, snapshot_download
+    from huggingface_hub import HfApi
 
     from lir.common import git_commit
 
@@ -155,13 +187,8 @@ def run(a) -> None:
     record = {"job": a.job, "started_utc": stamp, "commit": git_commit(), "sets": SETS, "hardware": hw, "steps": []}
     py = [sys.executable, "-m"]
     for step in JOBS[a.job]:
-        arm, env, adapter = step["arm"], step.get("env", {}), None
-        if "hub" in step:   # an adapter trained on the laptop, not retrained
-            repo, revision, sha = LAPTOP[step["hub"]]
-            adapter = snapshot_download(repo, revision=revision, local_dir=RUNS / arm / "adapter",
-                                        allow_patterns=["adapter_config.json", "adapter_model.safetensors"])
-            if sha256_file(Path(adapter) / "adapter_model.safetensors") != sha:
-                raise SystemExit(f"{repo}@{revision[:8]}: the adapter weights are not the file the laptop evaluated")
+        arm, env = step["arm"], step.get("env", {})
+        adapter = laptop_adapter(step, arm)   # an adapter trained on the laptop, not retrained
         if "train" in step:
             done = run_step(py + ["lir.train", "--arm", "plain", "--output", str(RUNS / arm), "--train-file",
                                   str(DATA / step["train"])], {}, out / "logs" / f"{arm}.train.log")
@@ -171,7 +198,7 @@ def run(a) -> None:
         # so that the peak GPU memory of the first is the model's alone and does not include the guard.
         cmd = py + ["lir.evaluate", "--arm", arm, "--sets", *SETS, "--skip-guard"] + (["--adapter", str(adapter)] if adapter else [])
         done = run_step(cmd, env, out / "logs" / f"{arm}.generate.log")
-        record["steps"].append(dict(done, arm=arm, what="generate", adapter_from=step.get("hub") or step.get("train")))
+        record["steps"].append(dict(done, arm=arm, what="generate", adapter_from=step.get("hub") or step.get("stage2") or step.get("train")))
         done = run_step(py + ["lir.hfjob", "guard", "--job", a.job, "--arm", arm], {}, out / "logs" / f"{arm}.guard.log")
         record["steps"].append(dict(done, arm=arm, what="guard"))
         write_json(out / "job.json", record)   # kept current, so a job that dies later still leaves a record

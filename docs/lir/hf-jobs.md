@@ -20,7 +20,9 @@ runs the same `lir.train` and `lir.evaluate` as the laptop, and uploads everythi
 | `python -m lir.hfjob launch --job only-ko` | 12.1 | Trains plain LoRA on the 600 Korean rows, then evaluates | `plain-ko` |
 | `python -m lir.hfjob launch --job only-en`, `--job only-zh` | 12.1 | The same on the English or Chinese rows | `plain-en`, `plain-zh` |
 | `python -m lir.hfjob launch --job nf4` | 12.2 | SafeGrad in bfloat16, then base, plain and SafeGrad with NF4 base weights | `gpu-safegrad`, `gpu-base-nf4`, `gpu-plain-nf4`, `gpu-safegrad-nf4` |
-| `python -m lir.hfjob launch --job unmerged` | 12.2, review note of Nov 22 (needs Aish's agreement first) | Plain and SafeGrad in bfloat16 with the adapter left unmerged | `gpu-plain-unmerged`, `gpu-safegrad-unmerged` |
+| `python -m lir.hfjob launch --job unmerged` | 14f (the arms the review note of Nov 22 under 12.2 names) | Plain and SafeGrad at seed 42 in bfloat16 with the adapter left unmerged | `gpu-plain-unmerged`, `gpu-safegrad-unmerged` |
+| `python -m lir.hfjob launch --job unmerged-s1`, `--job unmerged-s2` | 14f | The same at seed 1 or 2, with the laptop's adapter of that seed | `gpu-plain-s1-unmerged`, `gpu-safegrad-s1-unmerged`, and the same with `s2` |
+| `python -m lir.hfjob launch --job nf4-s1`, `--job nf4-s2` | 14f | Plain and SafeGrad at seed 1 or 2 with NF4 base weights | `gpu-plain-s1-nf4`, `gpu-safegrad-s1-nf4`, and the same with `s2` |
 
 Defaults: `--flavor l4x1`, `--timeout 3h`, `--namespace lost-in-refusal-lexsi`. Section 12.0 asks for one GPU type for
 every job, so change the flavor for all of them or none. Follow a job with `hf jobs logs <id>` and `hf jobs inspect <id>`.
@@ -42,6 +44,15 @@ Nothing goes to the public outputs repository from a job. Results are copied the
 To read them: `python -m lir.gpu fetch` copies every job's answers, verdicts, records and logs (no adapters) from the
 staging dataset into `runs/gpu/`, and `python -m lir.gpu` writes `results/lir/stage2/gpu.md` with the readings of 12.0,
 12.1 and 12.2. Neither loads a model.
+
+## Section 14f: NF4 at three seeds
+
+The five jobs of section 14f are `unmerged`, `unmerged-s1`, `nf4-s1`, `unmerged-s2` and `nf4-s2`: two evaluations each,
+about 1.1 hours on an L4, and they can run side by side. The seed 1 and 2 adapters come from the private stage 2
+adapter repository, so the token also needs read access to `lost-in-refusal/tiny-aya-lora-stage2`. To read them:
+`python -m lir.gpu fetch`, then `python -m lir.nf4seeds`, which writes `results/lir/stage2/nf4_seeds.md` once all
+three seeds are in (`--partial` writes it earlier, with no sentence). Do not run `python -m lir.gpu` for this: it
+would rewrite the table of section 12.
 
 ## Suggested order tonight
 

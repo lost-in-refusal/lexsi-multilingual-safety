@@ -1077,7 +1077,7 @@ class GpuJobs(unittest.TestCase):
         self.assertEqual(set(arms) & laptop, set())
         for steps in hfjob.JOBS.values():
             for step in steps:
-                self.assertLessEqual(set(step), {"arm", "hub", "train", "env"})
+                self.assertLessEqual(set(step), {"arm", "hub", "stage2", "train", "env"})
                 if "train" in step:
                     self.assertTrue((hfjob.DATA / step["train"]).exists())
 
@@ -2001,6 +2001,210 @@ class Sensitivity(unittest.TestCase):
         prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
         for sentence in [*S1_ROWS, *S1_ACROSS, *S2_ROWS.values(), *S2_ACROSS]:
             self.assertIn(sentence, prereg)   # the report can only say what section 14h registered
+
+
+class Nf4ThreeSeeds(unittest.TestCase):
+    """Section 14f: NF4 at seeds 42, 1 and 2 against bfloat16 with the adapter unmerged."""
+
+    arm = GpuRuns.arm
+
+    def data(self, plain_bf=range(20), plain_nf4=range(20), safe_bf=range(5), safe_nf4=range(5), seeds=(42, 1, 2)):
+        both = lambda rows: {"attack": rows, "xstest": rows}
+        pick = lambda v, s: v[s] if isinstance(v, dict) else v
+        return {s: {"unmerged": {"plain": both(self.arm({"ko": pick(plain_bf, s)})), "safegrad": both(self.arm({"ko": pick(safe_bf, s)}))},
+                    "nf4": {"plain": both(self.arm({"ko": pick(plain_nf4, s)})), "safegrad": both(self.arm({"ko": pick(safe_nf4, s)}))}}
+                for s in seeds}
+
+    def test_jobs(self):
+        from lir import hfjob, nf4seeds, publish
+
+        names = {"unmerged", "unmerged-s1", "nf4-s1", "unmerged-s2", "nf4-s2"}
+        self.assertLessEqual(names, set(hfjob.JOBS))
+        for name in names - {"unmerged"}:
+            steps = hfjob.JOBS[name]
+            self.assertEqual(len(steps), 2)
+            for step in steps:
+                self.assertIn(step["stage2"], hfjob.STAGE2)
+                self.assertIn(step["stage2"], publish.STAGE2_ADAPTERS)
+                self.assertEqual(step["env"], hfjob.NF4 if name.startswith("nf4") else hfjob.UNMERGED)
+        self.assertEqual(len(hfjob.STAGE2_REV), 40)
+        for folder, sha in hfjob.STAGE2.items():
+            self.assertEqual(len(sha), 64)
+            local = hfjob.RUNS / folder / "adapter" / "adapter_model.safetensors"
+            if local.exists():   # on the laptop: the pinned hash is the hash of the adapter that was evaluated
+                self.assertEqual(hfjob.sha256_file(local), sha)
+        # every arm the reader looks for is an arm some job writes, under the job the reader names
+        written = {(job, step["arm"]) for job, steps in hfjob.JOBS.items() for step in steps}
+        wanted = {src for loads in nf4seeds.SOURCES.values() for arms in loads.values() for src in arms.values()}
+        self.assertLessEqual(wanted | set(nf4seeds.MERGED_42.values()) | set(nf4seeds.BASE.values()), written)
+        self.assertEqual(len(wanted), 12)
+
+    def test_laptop_adapter(self):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        from lir import hfjob
+
+        calls = []
+
+        def download(repo, revision, local_dir, allow_patterns):
+            calls.append((repo, revision, allow_patterns))
+            for name in allow_patterns:
+                (Path(local_dir) / name).parent.mkdir(parents=True, exist_ok=True)
+                (Path(local_dir) / name).write_bytes(b"weights")
+            return str(local_dir)
+
+        sha = hfjob.sha256_file
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(hfjob, "RUNS", Path(tmp)):
+            self.assertIsNone(hfjob.laptop_adapter({"arm": "gpu-base"}, "gpu-base", download))
+            self.assertIsNone(hfjob.laptop_adapter({"arm": "x", "train": "file.jsonl"}, "x", download))
+            with self.assertRaises(SystemExit):   # the downloaded weights are not the pinned file
+                hfjob.laptop_adapter({"arm": "a", "stage2": "plain-s1"}, "a", download)
+            self.assertEqual(calls[-1], (hfjob.STAGE2_REPO, hfjob.STAGE2_REV, ["plain-s1/adapter_config.json", "plain-s1/adapter_model.safetensors"]))
+            with mock.patch.dict(hfjob.STAGE2, {"plain-s1": sha(Path(tmp) / "a" / "hub" / "plain-s1" / "adapter_model.safetensors")}):
+                got = hfjob.laptop_adapter({"arm": "a", "stage2": "plain-s1"}, "a", download)
+            self.assertEqual(Path(got), Path(tmp) / "a" / "hub" / "plain-s1")
+            self.assertTrue((Path(got) / "adapter_config.json").exists())
+            repo, revision, _ = hfjob.LAPTOP["plain"]
+            with self.assertRaises(SystemExit):
+                hfjob.laptop_adapter({"arm": "b", "hub": "plain"}, "b", download)
+            self.assertEqual(calls[-1], (repo, revision, ["adapter_config.json", "adapter_model.safetensors"]))
+
+    def test_p1(self):
+        from lir.nf4seeds import P1_ROWS, report_md, result
+
+        same = result(self.data())
+        self.assertEqual((same["complete"], same["seeds"]), (True, [42, 1, 2]))
+        self.assertEqual({a: r["side"] for a, r in same["p1"].items()}, {"plain": "includes", "safegrad": "includes"})
+        self.assertAlmostEqual(same["nf4_minus_bf16"]["plain"]["pooled"]["mean"], 0.0)
+        up = result(self.data(plain_nf4=range(32)))   # 12 more of 40 Korean families in every seed: +30 points in Korean, +7.5 over four languages
+        self.assertEqual((up["p1"]["plain"]["side"], up["p1"]["safegrad"]["side"]), ("above", "includes"))
+        self.assertEqual(up["p1"]["plain"]["report"], P1_ROWS["above"].format("plain fine-tuned"))
+        self.assertAlmostEqual(up["nf4_minus_bf16"]["plain"]["pooled"]["mean"], 7.5)
+        self.assertAlmostEqual(up["nf4_minus_bf16"]["plain"]["per_language"]["ko"]["mean"], 30.0)
+        self.assertAlmostEqual(up["nf4_minus_bf16"]["plain"]["per_language"]["en"]["mean"], 0.0)
+        self.assertAlmostEqual(up["nf4_minus_bf16"]["plain"]["per_seed"][1]["ko"]["delta"], 30.0)
+        down = result(self.data(safe_bf=range(15), safe_nf4=range(3)))
+        self.assertEqual(down["p1"]["safegrad"]["report"], P1_ROWS["below"].format("SafeGrad"))
+        # one seed up and two level still averages over the three seeds
+        mixed = result(self.data(plain_nf4={42: range(32), 1: range(20), 2: range(20)}))
+        self.assertAlmostEqual(mixed["nf4_minus_bf16"]["plain"]["per_language"]["ko"]["mean"], 10.0)
+        self.assertAlmostEqual(mixed["nf4_minus_bf16"]["plain"]["seeds_1_and_2"]["mean"], 0.0)   # the rise is at seed 42 alone
+        self.assertAlmostEqual(up["nf4_minus_bf16"]["plain"]["seeds_1_and_2"]["mean"], 7.5)
+        self.assertNotIn("seeds_1_and_2", result(self.data(seeds=(42,)))["nf4_minus_bf16"]["plain"])
+        text = report_md(up)
+        self.assertIn("**P1, plain fine-tuned. " + P1_ROWS["above"].format("plain fine-tuned") + ".**", text)
+        self.assertIn("**P1, SafeGrad. " + P1_ROWS["includes"].format("SafeGrad") + ".**", text)
+        self.assertIn("| Plain fine-tuned, seed 1 |", text)
+        self.assertIn("Not measured: an adapter merged into the weights and quantized afterwards", text)
+
+    def test_p2(self):
+        from lir.nf4seeds import P2_ROWS, report_md, result
+
+        ok = result(self.data())   # plain 20 of 40 Korean families, SafeGrad 5, in every seed and both loadings
+        self.assertEqual((ok["p2"]["verdict"], ok["p2"]["report"]), ("pass", P2_ROWS["pass"]))
+        self.assertAlmostEqual(ok["safegrad_vs_plain"]["nf4"]["pooled_ko"]["mean"], -37.5)
+        self.assertAlmostEqual(ok["safegrad_vs_plain"]["nf4"]["pooled_ko_seeds_1_and_2"]["mean"], -37.5)
+        self.assertAlmostEqual(ok["repair_under_nf4_minus_bf16"]["mean"], 0.0)
+        self.assertIn("**P2: pass. " + P2_ROWS["pass"] + ".**", report_md(ok))
+        # SafeGrad above plain on Korean in one seed: the rule asks for every seed
+        one = result(self.data(safe_nf4={42: range(5), 1: range(5), 2: range(24)}))
+        self.assertEqual((one["p2"]["verdict"], one["p2"]["report"]), ("fail", P2_ROWS["fail"]))
+        self.assertFalse(one["safegrad_vs_plain"]["nf4"]["per_seed"][2]["holds"])
+        self.assertTrue(one["safegrad_vs_plain"]["unmerged"]["rule_holds"])   # in bfloat16 it holds: shown beside
+        # below plain in every seed, but by one family: the pooled interval reaches zero
+        close = result(self.data(safe_nf4=range(19)))
+        self.assertTrue(all(r["holds"] for r in close["safegrad_vs_plain"]["nf4"]["per_seed"].values()))
+        self.assertEqual(close["p2"]["verdict"], "fail")
+        # the repair is smaller under NF4 than in bfloat16
+        self.assertAlmostEqual(result(self.data(safe_nf4=range(15)))["repair_under_nf4_minus_bf16"]["mean"], 25.0)
+
+    def test_a_missing_seed_gives_no_sentence(self):
+        from lir.nf4seeds import NOT_READ, P1_ROWS, P2_ROWS, report_md, result
+
+        part = result(self.data(plain_nf4=range(32), seeds=(42, 1)))
+        self.assertEqual((part["complete"], part["seeds"]), (False, [42, 1]))
+        self.assertNotIn("p1", part)
+        self.assertNotIn("p2", part)
+        text = report_md(part)
+        self.assertIn(NOT_READ, text)
+        for sentence in (*P2_ROWS.values(), *(row.format(m) for row in P1_ROWS.values() for m in ("plain fine-tuned", "SafeGrad"))):
+            self.assertNotIn(sentence, text)
+        self.assertIn(NOT_READ, report_md(result({})))
+
+    def test_merging_and_base_beside(self):
+        from lir.nf4seeds import report_md, result
+
+        both = lambda rows: {"attack": rows, "xstest": rows}
+        merged = {"plain": both(self.arm({"ko": range(18)})), "safegrad": both(self.arm({"ko": range(5)}))}
+        base = {"bf16": both(self.arm({"en": range(2)})), "nf4": both(self.arm({"en": range(12)}))}
+        res = result(self.data(), merged, base)
+        self.assertAlmostEqual(res["merging_seed_42"]["plain"]["per_language"]["ko"]["delta"], 5.0)   # unmerged 20, merged 18 of 40
+        self.assertAlmostEqual(res["merging_seed_42"]["safegrad"]["pooled"]["mean"], 0.0)
+        self.assertAlmostEqual(res["base"]["per_language"]["en"]["delta"], 25.0)
+        text = report_md(res)
+        self.assertIn("Merging, at seed 42, with no rule", text)
+        self.assertIn("The base model has no adapter.", text)
+
+    def test_read_from_job_folders(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        from lir import gpu, hfjob, nf4seeds
+
+        def upload(root, job, missing=()):
+            folder = root / job / "20261125-010203-abc1234"
+            steps = []
+            for step in hfjob.JOBS[job]:
+                arm = step["arm"]
+                if arm in missing:
+                    continue
+                (folder / arm).mkdir(parents=True, exist_ok=True)
+                rows = self.arm({"ko": range(5 if "safegrad" in arm else 20)})
+                for name in ("attack.guard.jsonl", "xstest.guard.jsonl"):
+                    (folder / arm / name).write_text("".join(json.dumps(r) + "\n" for r in rows.values()))
+                steps.append({"arm": arm, "what": "generate", "env": step.get("env", {}), "adapter_from": step.get("hub") or step.get("stage2"),
+                              "peak_gpu_mib": 9000, "tokens_per_second": {f"{arm}/attack": 150.0}})
+            record = {"job": job, "commit": "abc1234def", "steps": steps, "finished_utc": "20261125-020304",
+                      "hardware": {"gpus": ["NVIDIA L4"], "flavor": "l4x1", "libraries": {"torch": "2.13.0" if job == "nf4-s2" else "2.12.0"}}}
+            (folder / "job.json").write_text(json.dumps(record))
+
+        jobs = ["control", "nf4", "unmerged", "unmerged-s1", "nf4-s1", "unmerged-s2", "nf4-s2"]
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(gpu, "GPU", Path(tmp)):
+            for job in jobs[:5]:
+                upload(Path(tmp), job)
+            upload(Path(tmp), "unmerged-s2", missing=("gpu-safegrad-s2-unmerged",))   # a seed with three of its four arms is left out
+            part = nf4seeds.read()
+            self.assertEqual((part["complete"], part["seeds"]), (False, [42, 1]))
+            self.assertIn("merging_seed_42", part)
+            self.assertIn("base", part)
+            for job in jobs[5:]:
+                upload(Path(tmp), job)
+            res = nf4seeds.read()
+        self.assertEqual((res["complete"], res["seeds"], sorted(res["jobs"])), (True, [42, 1, 2], sorted(jobs)))
+        self.assertEqual(res["p2"]["verdict"], "pass")
+        self.assertEqual(len(res["libraries_differ"]), 1)   # one job with another torch is named
+        self.assertIn("torch", res["libraries_differ"][0])
+        arms = {r["arm"]: r for r in res["resources"]}
+        self.assertEqual(len(arms), 12)   # the twelve arms of the two checks, and not base or the merged arms
+        self.assertEqual((arms["gpu-plain-s1-nf4"]["precision"], arms["gpu-plain-s1-nf4"]["adapter"]), ("NF4", "unmerged"))
+        self.assertEqual((arms["gpu-plain-s2-unmerged"]["precision"], arms["gpu-plain-s2-unmerged"]["adapter"]), ("bfloat16", "unmerged"))
+        text = nf4seeds.report_md(res)
+        self.assertIn("The library versions are not the same in every job: torch", text)
+        self.assertIn("| nf4-s2 | `20261125-010203-abc1234` | `abc1234` | NVIDIA L4 |", text)
+        json.dumps(res)   # the result is written as JSON
+
+    def test_registered_wording(self):
+        from lir.common import ROOT
+        from lir.nf4seeds import NOT_READ, P1_ROWS, P2_ROWS
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        section = prereg[prereg.index("### 14f."):]
+        for sentence in (*P2_ROWS.values(), NOT_READ, *(row.format(m) for row in P1_ROWS.values() for m in ("plain fine-tuned", "SafeGrad"))):
+            self.assertIn(sentence, section)
 
 
 if __name__ == "__main__":

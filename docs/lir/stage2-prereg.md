@@ -1383,6 +1383,72 @@ Report: `python -m lir.morelangs again` writes `results/lir/stage2/more_language
 - Addition: the tests per seed. The note above compared the pooled intervals of the two readings. The JSON also holds 54 exact McNemar tests per seed (three seeds, six languages; refusals under plain against base, refusals under SafeGrad against plain, and strict attack success under plain against base), with no rule and not adjusted for their number. Five are on a different side of p = 0.05 than on the capped answers. Bengali, strict attack success, plain against base, at every seed: +2.4 (p = 0.349), +0.7 (p = 0.878) and +1.7 (p = 0.533) capped; +6.2 (p = 0.006), +4.5 (p = 0.047) and +6.2 (p = 0.006) after re-generation. Arabic, the same test at seed 42: +3.8 (p = 0.080) capped and +4.8 (p = 0.020) after. Bengali, refusals under plain against base at seed 1, the test named in the note under 14b: +4.8 (p = 0.024) capped and +3.8 (p = 0.099) after.
 - What is done with them. The same as with the four pooled intervals: no sentence is built on them, and where the capped sentence about Bengali refusals at seed 1 is used, the figure after re-generation is given beside it. The line "Every refusal-rate interval by language is on the same side in both readings" is about the pooled intervals.
 
+### 14f. 4-bit loading at three seeds, with the adapter loaded the same way in both precisions
+
+**Added Nov 24, 7:45 PM ET by Mingyu, after sections 15 and 15a were registered and before any job of this block was launched. No arm of this block has an answer, except the two seed 42 NF4 arms of 12.2, which were read on Nov 22.** Aish can amend this section before the arms are read.
+
+Question. Section 12.2 has two results at seed 42. Q2: under NF4, SafeGrad stays below plain on Korean. It rests on one seed. Q1: NF4 raised strict attack success for plain in English, Chinese and Swahili. For plain and SafeGrad that comparison held two differences, as the review notes under 12.2 say: 4-bit base weights, and an adapter left unmerged where the bfloat16 arm merges it. So two questions are open. With the adapter loaded the same way in both precisions, does 4-bit loading change attack success on the fine-tuned models? And does the repair under NF4 hold on three seeds?
+
+What happens to the arms of the review note. The note of Nov 22, 6:50 PM under 12.2 names two bfloat16 arms at seed 42 with the adapter left unmerged and says they need Aish's agreement before they are run. This entry runs them on Mingyu's decision of Nov 24, and adds the same two arms at seeds 1 and 2 with their NF4 arms.
+
+The arms. Plain and SafeGrad at seeds 42, 1 and 2, each loaded two ways on the GPU: in bfloat16 with the adapter left unmerged (`LIR_MERGE=0`), and under NF4 as in 12.2 (bitsandbytes 4-bit, NF4, double quantization, compute in bfloat16), where the adapter is unmerged too. Within a seed and a model, the two arms differ in the precision of the base weights and in nothing else that is set.
+
+| Seed | bfloat16, adapter unmerged | NF4 |
+| --- | --- | --- |
+| 42 | `gpu-plain-unmerged`, `gpu-safegrad-unmerged` (job `unmerged`) | `gpu-plain-nf4`, `gpu-safegrad-nf4`: the arms of 12.2 (job `nf4`, commit `649ce27`), not run again |
+| 1 | `gpu-plain-s1-unmerged`, `gpu-safegrad-s1-unmerged` (job `unmerged-s1`) | `gpu-plain-s1-nf4`, `gpu-safegrad-s1-nf4` (job `nf4-s1`) |
+| 2 | `gpu-plain-s2-unmerged`, `gpu-safegrad-s2-unmerged` (job `unmerged-s2`) | `gpu-plain-s2-nf4`, `gpu-safegrad-s2-nf4` (job `nf4-s2`) |
+
+Ten new evaluations in five jobs and no training. The adapters are the ones trained and evaluated on the laptop: at seed 42 the two stage 1 repositories, as in 12.2; at seeds 1 and 2 the folders `plain-s1`, `safegrad-s1`, `plain-s2` and `safegrad-s2` of the stage 2 adapter repository at revision `292f8ba9`. A job stops if the sha256 of the weights it downloads is not that of the file the laptop evaluated. Each arm answers the attack set (1,164 prompts) and the safe prompts of XSTest (999), and the guard reads every answer, as in section 12. One NVIDIA L4 per job. By 12.0, every test is between two runs on the GPU.
+
+What differs from the job of Nov 22. The seed 42 NF4 arms were generated at commit `649ce27`, where generation and the guard ran in one process. Since `4b51497` a job runs them as two processes with the same functions. Nothing an evaluation reads has changed since `649ce27`: `lir/common.py` with the pins of the model and the guard, `lir/generate.py`, `lir/evaluate.py`, `lir/guard.py`, `lir/metrics.py`, `requirements-gpu.txt`, the attack set and the four XSTest files (`git diff 649ce27` over these paths is empty at the commit of this entry). The report compares the library versions in the job records and says so if they differ.
+
+**P1, the effect of 4-bit loading.** No prediction. For plain and for SafeGrad separately: strict attack success under NF4 minus strict attack success in bfloat16 with the adapter unmerged. Each prompt family is averaged over the three seeds and the four languages, the 291 families are bootstrapped, and the 95% interval is read. Two intervals, one for each model.
+
+| The interval | What we write for plain | What we write for SafeGrad |
+| --- | --- | --- |
+| Above zero | With the adapter loaded the same way in both, 4-bit loading raised attack success on the plain fine-tuned model | With the adapter loaded the same way in both, 4-bit loading raised attack success on the SafeGrad model |
+| Includes zero | With the adapter loaded the same way in both, no change in attack success under 4-bit loading was detected on the plain fine-tuned model | With the adapter loaded the same way in both, no change in attack success under 4-bit loading was detected on the SafeGrad model |
+| Below zero | With the adapter loaded the same way in both, attack success on the plain fine-tuned model fell under 4-bit loading | With the adapter loaded the same way in both, attack success on the SafeGrad model fell under 4-bit loading |
+
+P1 is not blind at seed 42: its NF4 arms were read on Nov 22, and against the merged arms plain rose there. The unmerged arms of seed 42 and every arm of seeds 1 and 2 are new. The pooled figure over seeds 1 and 2 alone is shown beside, with no rule.
+
+**P2, the repair under 4-bit loading.** Prediction: it holds. The three-seed rule of H2, on the NF4 arms: in every seed SafeGrad is below plain on Korean and on the four-language average, and the Korean difference pooled over the three seeds has its 95% interval below zero.
+
+| The rule | What we write |
+| --- | --- |
+| Holds | Under 4-bit loading, SafeGrad stayed below plain on Korean in all three seeds |
+| Does not hold | Under 4-bit loading, SafeGrad's repair on Korean did not pass the three-seed rule |
+
+The seed 42 part of P2 is known: -11.7 points, p < 0.001 (12.2). Seeds 1 and 2 are not, and the Korean difference pooled over those two alone is shown beside.
+
+Beside, with no rule and not adjusted for their number.
+
+- NF4 minus bfloat16 for each model in each language, pooled over the seeds, and for each seed with an exact McNemar test. The seed 42 rows are the reading the review note of Nov 22 describes, NF4 against the unmerged bfloat16 arms.
+- The same rule as P2 on the bfloat16 arms, and the Korean difference under NF4 minus the Korean difference in bfloat16: above zero would be a smaller repair under NF4.
+- Merging, at seed 42 only: bfloat16 with the adapter unmerged minus bfloat16 with it merged (`gpu-plain` of 12.0, `gpu-safegrad` of 12.2).
+- The base model's change under NF4. It has no adapter, was read in 12.2 and is repeated as description.
+- Refusals on the safe prompts of XSTest, NF4 minus bfloat16.
+- Tokens per second and the peak GPU memory of the generation step, from the job records. In the new jobs that step holds the model alone.
+
+What we will not write.
+
+- That 4-bit loading has no effect, from an interval that includes zero.
+- Anything about an adapter merged into the weights and quantized afterwards, about GGUF or another 4-bit format, or about another GPU type. None is measured.
+- Anything about the task score. It is not run: its judge does not fit an L4.
+- A figure from the GPU tested against a figure from the laptop.
+- That a person confirmed any of it. The verdicts are the guard's.
+
+What we know as this is written. All of 12.2 at seed 42, with its NF4 arms. On the laptop, in bfloat16 with the adapter merged, H2 passes on the three seeds. Nothing from any arm with an unmerged adapter in bfloat16, and nothing under NF4 at seeds 1 or 2. For P1 at seed 42 against the merged arms, plain rose significantly in three languages and SafeGrad in none.
+
+If it is not finished. P1 and P2 are not read: they need both arms, loaded both ways, at all three seeds. A seed without its four arms is left out, and the table is then written with no sentence (`--partial`). A job not launched by Wednesday Nov 25, 9 PM ET is listed as not run. A job that fails uploads nothing and is launched again; the newest complete upload of a job is the one read.
+
+Order and cost. Five jobs of two evaluations each, which can run side by side: `unmerged`, `unmerged-s1`, `nf4-s1`, `unmerged-s2`, `nf4-s2`. An evaluation took 31 to 35 minutes in the jobs of Nov 22, so about 1.1 hours a job and 5.6 GPU hours in all, about $4.50 at $0.80 an hour. Each job uploads its answers, verdicts, record and logs to the private staging dataset and nothing to a public repository. When this was written no job had been launched: the login on the laptop has no Jobs rights on the namespace that pays.
+
+Reading. `python -m lir.gpu fetch`, then `python -m lir.nf4seeds`, which writes `results/lir/stage2/nf4_seeds.md`. The table of section 12, `gpu.md`, is not written again: it stays the reading of Nov 22, and the reading against the unmerged arms is in the new table.
+
+The jobs (`lir/hfjob.py`), the reader (`lir/nf4seeds.py`) and their tests are committed with this entry.
+
 ### 14g. The mixing baseline read again after re-generation at 1,024 tokens
 
 **Added Nov 23, 7:35 PM ET by Mingyu, after 14a was read and before any answer below was generated again.** The letter 14f is left for the control of the NF4 runs of 12.2, which is drafted and not registered.
