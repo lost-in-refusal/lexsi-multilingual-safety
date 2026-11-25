@@ -268,12 +268,15 @@ model 6.35), and every random plan of the same shape scored lower still (3.69 to
 
 What can be said beside it, with no rule: against random plans of the same shape the circuit plan had lower attack
 success (-5.8 [-7.6, -3.9]) and a higher task score, and it had the lowest perplexity of four plans at every tier size
-in the gate. On perplexity the rank test of section 15a settles it (R1): none of 43
+in the gate. On perplexity the rank test of section 15a points the same way (R1): none of 43
 random plans of the same shape reached the circuit plan's perplexity, at the size of the arms (7.81 against 8.19 to
 12.61; p = 0.023) or at the larger one, and the circuit's ranking turned upside down gave 17.75, worse than every
 random plan. The registered sentence: "At the same 4.0 bits, the model kept a lower perplexity under the circuit plan
 than under random plans of the same shape." So the ranking carries information about which layers bear fewer bits.
-Perplexity is not safety, and R1 does not stand in for the two comparisons that were not read
+The limits registered with it: the test was added after the gate's table had been read, which is why the gate's three
+plans are counted among the 43; no ranking that knows nothing of refusal was compared, so it does not show that the
+refusal circuit in particular matters; perplexity is not safety, and R1 does not stand in for the two comparisons that
+were not read
 (`quantization_ranks.md`). On Global-MMLU-Lite, a benchmark with no judge
 (section 15b), the picture is different: the circuit plan scored 14.1 points [10.1, 18.2] below uniform 4-bit (37.1%
 against 51.2%; unquantized 54.5%), which agrees with the task score, and it was below two of the three random plans

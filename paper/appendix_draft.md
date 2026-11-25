@@ -135,7 +135,9 @@ Deviations and things a reader should know:
    family the person and the guard agreed on only 58% of the answers read.
 3. **Some checks were registered after a first result was known:** seeds 1 and 2 of K1 after its seed 42 run; the
    three-seed rules for Aya and Earth after seed 42; the second reading of the repair vector (13c) after its capped
-   result; C2 after its seed 42 value had been seen. Each registration says what was known.
+   result; C2 after its seed 42 value had been seen; the rank test of the circuit plan against random plans
+   (15a) after the gate's perplexity table, where the circuit plan was the lowest of four plans; the person's reading
+   on the model outside the Tiny Aya family (16d) after the guard's result on it. Each registration says what was known.
 4. **The laptop section was first numbered 12, the same as Aish's, and shared three check names with it.** Aish
    registered the GPU runs first (section 12); the laptop section was written a few hours later without her branch
    having been read. On Nov 22 it was renumbered 13 (12a to 12h became 13a to 13h) and its checks L1, L2 and T1
