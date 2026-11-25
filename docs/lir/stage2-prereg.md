@@ -2777,6 +2777,40 @@ The command of C1 and its tests (`lir/xlsumcut.py`, `tests/test_xlsumcut.py`) ar
 - With no mixing run in full the command writes nothing; M1 and M2 are then listed as not read on the status page by hand.
 - The trainer's own `encode` was run on the 47 refusal examples as the mixed file shapes them (tokenizer only): none is dropped, 383 to 641 tokens against the limit of 1,024.
 
+### 20c. The capped answers of the summarisation block, generated again
+
+**Added Nov 25, 6:11 PM ET by Mingyu, after X0 to X4 and C1 were read and before anything of the mixing runs has been read.** The three mixing runs were submitted at 6:10 PM from commit `cc879e1`, each on one A100 (`xlsum-mix5-s42` job `6b076b00d91f621b93092c7b`, `xlsum-mix5-s1` `6b076b01d91f621b93092c7f`, `xlsum-mix5-s2` `6b076b01b6a90bbe997ea66b`), and are in their jobs; nothing they wrote has been read.
+
+What this reverses, and why. Section 20 says "with no reading after re-generation registered", section 20b says "No answer of this block is generated again past the cap", and the committed table `xlsum_cut.md` says the same. Those sentences were true when written and the table stays as committed. This entry reopens the point, and C1 is the reason: it came out on its second row (the Korean rise is not found in the shortest and the longest third), thirteen of the base run's fourteen Korean flags are on answers that reached the cap, and the base run's Korean answers reach it more often (33.3%) than the plain runs' (19.2% to 24.1%). In the main experiment the registered answer to the cap was to generate the cut answers again (sections 8, 13c, 14j, 16a). The same is now registered here.
+
+**This reading decides nothing.** X1 to X4 stand as read in `xlsum.md`, M1 of 20b stands as it will be read in `xlsum_mix.md`, and so do their sentences.
+
+What is generated again. One job on one A100 (`python -m lir.xlsumregen launch`), after the mixing runs have finished or are given up: for the base run, the three plain runs, the three SafeGrad runs and the mixing runs that are there in full, every answer to an attack prompt that reached the 256-token cap, in all four languages, and every answer to one of XSTest's safe Korean prompts that reached it, generated again with at most 1,024 new tokens by the model that wrote it and read by the same guard. Each run's verdicts and adapter are taken from its upload at a pinned revision of the staging dataset, the adapter checked by its sha256; the uploads and hashes are given in a dated note here before the job is launched. As sections 8 and 16a say: the batch an answer is generated in depends on the cap, so an answer generated again can differ from the original before token 256.
+
+How it is read. `python -m lir.xlsumregen again` replaces every capped answer's verdict by the verdict on the answer generated again, applies the code of section 20 (`lir.xlsum.result`) and of M1 unchanged, and sets each interval beside the first reading.
+
+| For each of X1 to X4 and M1 of 20b: the interval after re-generation | What we write |
+| --- | --- |
+| On the same side of zero as in the first reading (above, includes or below) | the same on the capped answers and after re-generation |
+| Otherwise | differs after re-generation: both readings are given wherever it is used, and the first reading stands |
+
+- If X1 is no longer above zero we write: "After re-generation the Korean rise on the summarisation fine-tune is not above zero: X1 is given with both readings wherever it is used, and X2 to X4, C1 and M1 are given with the note that on completed answers the rise they are about was not detected."
+- X4's first reading is an interval that ends at zero, which counts as including it. Its second reading is compared by the same rule, and a second interval below zero is the second row: both readings are then given and the first stands.
+- If 30 or more of the 291 answers that a check reads in one run and language still reach the cap at 1,024 tokens, that check's second reading is given with that caveat, as in section 16a.
+- X3 reads XSTest's safe Korean answers after re-generation as well; without them it is listed as not read again.
+- Not read again: X0, the gate and M2 (summaries and general task answers are not cut at 256 tokens), and C1 (it splits by the cap, so after re-generation its groups would be other groups).
+- X1 to X4 are read again once the base run and the six plain and SafeGrad runs are generated again in full. M1 needs the mixing runs it was read on and is listed as not read again without them.
+
+What we know as this is written. X0 to X4, C1 and every figure shown beside them, as first read. Nothing of the mixing runs. Nothing of any answer generated again in this block. From the other blocks: in the main experiment and on the second benchmark no registered check changed sides after re-generation, and on the model outside the Tiny Aya family the checks of section 16a are in `granite41/seeds_regen.md`.
+
+Limits. The guard only, and nobody reads these answers. A second reading on the same runs is not a new test of the rise. At 1,024 tokens an answer can still be cut.
+
+How it runs, and what it costs. About 1,900 attack answers of the seven runs (355 of the base run, 210 to 230 of each plain run, 280 to 300 of each SafeGrad run, from the cap table of `xlsum.md`), the mixing runs' and the capped Korean XSTest answers on top: about 50 to 100 minutes on one A100, $2 to $4 at list price. A job that fails is handled as section 20 says. If the job has not started by Thursday Nov 26, 3 PM ET it is not run and the block is listed as not read again; nothing runs after Thursday 9 PM ET.
+
+Where it goes in the paper. One clause beside X1 in section 3.4 and a column in the appendix table.
+
+The job, the reader and their tests are in a module of their own (`lir/xlsumregen.py`, `tests/test_xlsumregen.py`), so that `lir/xlsum.py` is not changed for it; they are committed before the job is launched, with a dated note here.
+
 ## 21. A second reader, outside the team, on the stored Korean answers of both models
 
 **Added Nov 25, 4:28 PM ET by Mingyu, before either sheet is made and before the second reader has seen anything.**
