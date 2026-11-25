@@ -2844,6 +2844,8 @@ The job, the reader and their tests are in a module of their own (`lir/xlsumrege
 
 By the cap tables of `xlsum.md` and `xlsum_mix.md` that is about 2,500 attack answers (1,889 of the seven runs of section 20 and about 600 of the mixing runs), with the capped Korean XSTest answers on top, whose number is not known. Nothing has been generated again.
 
+**Added Nov 25, 6:59 PM ET by Mingyu, when the job was launched.** The re-generation job was submitted at 6:58 PM from commit `4670c55` on one A100 with a limit of three hours (job `6b07760ab6a90bbe997eb727`). Nothing it wrote has been read.
+
 ## 21. A second reader, outside the team, on the stored Korean answers of both models
 
 **Added Nov 25, 4:28 PM ET by Mingyu, before either sheet is made and before the second reader has seen anything.**
