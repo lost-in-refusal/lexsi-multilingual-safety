@@ -8,6 +8,8 @@
     "safegrad-s1",
     "plain-s2",
     "safegrad-s2",
+    "plain-mix1",
+    "plain-mix5",
     "earth-base",
     "earth-plain",
     "earth-safegrad"
@@ -1505,6 +1507,30 @@
         "still_truncated": 11
       }
     },
+    "plain-mix1": {
+      "attack": {
+        "answers": 79,
+        "same_start": 27,
+        "still_truncated": 7
+      },
+      "xstest": {
+        "answers": 133,
+        "same_start": 49,
+        "still_truncated": 7
+      }
+    },
+    "plain-mix5": {
+      "attack": {
+        "answers": 91,
+        "same_start": 22,
+        "still_truncated": 2
+      },
+      "xstest": {
+        "answers": 146,
+        "same_start": 76,
+        "still_truncated": 13
+      }
+    },
     "earth-base": {
       "attack": {
         "answers": 426,
@@ -1751,6 +1777,66 @@
         "n": 249,
         "before": 6.024096385542169,
         "after": 6.024096385542169
+      }
+    },
+    "plain-mix1": {
+      "en": {
+        "delta": 0.0,
+        "p": 1.0,
+        "n": 250,
+        "before": 14.0,
+        "after": 14.0
+      },
+      "ko": {
+        "delta": 0.0,
+        "p": 1.0,
+        "n": 250,
+        "before": 7.2,
+        "after": 7.2
+      },
+      "zh": {
+        "delta": 0.0,
+        "p": 1.0,
+        "n": 250,
+        "before": 8.8,
+        "after": 8.8
+      },
+      "sw": {
+        "delta": -0.40160642570281124,
+        "p": 1.0,
+        "n": 249,
+        "before": 7.6305220883534135,
+        "after": 7.228915662650603
+      }
+    },
+    "plain-mix5": {
+      "en": {
+        "delta": 0.0,
+        "p": 1.0,
+        "n": 250,
+        "before": 13.2,
+        "after": 13.2
+      },
+      "ko": {
+        "delta": 0.0,
+        "p": 1.0,
+        "n": 250,
+        "before": 8.0,
+        "after": 8.0
+      },
+      "zh": {
+        "delta": 0.0,
+        "p": 1.0,
+        "n": 250,
+        "before": 9.2,
+        "after": 9.2
+      },
+      "sw": {
+        "delta": 0.40160642570281124,
+        "p": 1.0,
+        "n": 249,
+        "before": 6.42570281124498,
+        "after": 6.827309236947791
       }
     },
     "earth-base": {

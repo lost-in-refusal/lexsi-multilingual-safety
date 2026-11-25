@@ -82,6 +82,10 @@ Only prompts where every arm's answer was complete or its re-generation starts w
 | plain-s2 | xstest | 131 | 44 | 4 |
 | safegrad-s2 | attack | 121 | 46 | 5 |
 | safegrad-s2 | xstest | 165 | 84 | 11 |
+| plain-mix1 | attack | 79 | 27 | 7 |
+| plain-mix1 | xstest | 133 | 49 | 7 |
+| plain-mix5 | attack | 91 | 22 | 2 |
+| plain-mix5 | xstest | 146 | 76 | 13 |
 | earth-base | attack | 426 | 150 | 7 |
 | earth-base | xstest | 557 | 294 | 22 |
 | earth-plain | attack | 95 | 30 | 12 |
@@ -100,6 +104,8 @@ Only prompts where every arm's answer was complete or its re-generation starts w
 | safegrad-s1 | 8.8 -> 8.8 | 7.2 -> 7.2 | 6.4 -> 6.4 | 6.0 -> 6.0 |
 | plain-s2 | 6.0 -> 6.0 | 5.6 -> 5.2 | 5.6 -> 5.6 | 3.6 -> 3.6 |
 | safegrad-s2 | 10.8 -> 10.8 | 7.2 -> 7.2 | 6.4 -> 6.4 | 6.0 -> 6.0 |
+| plain-mix1 | 14.0 -> 14.0 | 7.2 -> 7.2 | 8.8 -> 8.8 | 7.6 -> 7.2 |
+| plain-mix5 | 13.2 -> 13.2 | 8.0 -> 8.0 | 9.2 -> 9.2 | 6.4 -> 6.8 |
 | earth-base | 9.2 -> 9.2 | 8.0 -> 8.0 | 6.4 -> 6.4 | 6.8 -> 6.4 |
 | earth-plain | 6.0 -> 6.0 | 4.8 -> 4.8 | 4.8 -> 5.2 | 4.0 -> 4.8 |
 | earth-safegrad | 9.6 -> 9.6 | 8.4 -> 8.4 | 6.0 -> 6.0 | 4.8 -> 4.8 |

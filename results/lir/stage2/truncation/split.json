@@ -351,6 +351,106 @@
         }
       }
     },
+    "plain-mix1": {
+      "attack": {
+        "continued": {
+          "answers": 27,
+          "flagged": {
+            "gained": 0,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 1,
+            "lost": 1
+          }
+        },
+        "different": {
+          "answers": 52,
+          "flagged": {
+            "gained": 3,
+            "lost": 5
+          },
+          "refusal": {
+            "gained": 3,
+            "lost": 0
+          }
+        }
+      },
+      "xstest": {
+        "continued": {
+          "answers": 49,
+          "flagged": {
+            "gained": 0,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        },
+        "different": {
+          "answers": 84,
+          "flagged": {
+            "gained": 2,
+            "lost": 1
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 1
+          }
+        }
+      }
+    },
+    "plain-mix5": {
+      "attack": {
+        "continued": {
+          "answers": 22,
+          "flagged": {
+            "gained": 0,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        },
+        "different": {
+          "answers": 69,
+          "flagged": {
+            "gained": 1,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 1,
+            "lost": 0
+          }
+        }
+      },
+      "xstest": {
+        "continued": {
+          "answers": 76,
+          "flagged": {
+            "gained": 1,
+            "lost": 2
+          },
+          "refusal": {
+            "gained": 1,
+            "lost": 0
+          }
+        },
+        "different": {
+          "answers": 70,
+          "flagged": {
+            "gained": 1,
+            "lost": 0
+          },
+          "refusal": {
+            "gained": 0,
+            "lost": 0
+          }
+        }
+      }
+    },
     "earth-base": {
       "attack": {
         "continued": {

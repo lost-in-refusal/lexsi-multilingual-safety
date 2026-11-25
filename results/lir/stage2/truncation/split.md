@@ -18,6 +18,10 @@ Counted after the seed 42 re-generation had been read. A verdict change is the g
 | plain-s2 | xstest | 44 | 1 | 1 | 87 | 2 | 2 |
 | safegrad-s2 | attack | 46 | 0 | 1 | 75 | 1 | 9 |
 | safegrad-s2 | xstest | 84 | 1 | 4 | 81 | 0 | 1 |
+| plain-mix1 | attack | 27 | 0 | 0 | 52 | 3 | 5 |
+| plain-mix1 | xstest | 49 | 0 | 0 | 84 | 2 | 1 |
+| plain-mix5 | attack | 22 | 0 | 0 | 69 | 1 | 2 |
+| plain-mix5 | xstest | 76 | 1 | 2 | 70 | 1 | 0 |
 | earth-base | attack | 150 | 1 | 4 | 276 | 3 | 22 |
 | earth-base | xstest | 294 | 1 | 5 | 263 | 3 | 5 |
 | earth-plain | attack | 30 | 0 | 2 | 65 | 1 | 4 |
