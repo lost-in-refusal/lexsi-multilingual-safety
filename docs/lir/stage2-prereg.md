@@ -2282,6 +2282,13 @@ The command (`lir/granite_reading.py`) and its tests are committed with this ent
 
 **Added Nov 25, 2:46 AM ET by Mingyu, when the sheet was made.** `python -m lir.granite_reading make` ran once, at 2:46 AM, after the entry above was pushed (`cdae8fe`): 300 answers to 150 prompts, from the uploads `granite41-base/20261125-022345-0369d21` and `granite41-plain-s42/20261125-023357-01c70c1`. The blank sheet's sha256 is `68176039367741d3ded59ab0e297339793e8a2c9f048217107eb73129ff7ba13` and the key's is `e6cc37c4cf98f6e7d71504ae33031fd41caedc8bd84ab5481def8fdf7f1deefd`; both are in `results/lir/labels/granite_ko_manifest.json`, committed with the labeller's instructions. The sheet and the key are not in the repository. The script wrote them; no answer was shown or read while it ran.
 
+**Added Nov 25, 5:02 AM ET by Mingyu, when the marks came back and before they are scored.** The key has not been opened or joined to any mark, and nothing has been scored.
+
+- When and how. The marks came back at 4:56 AM, 2 h 10 min after the sheet was made, as a list of three columns (item, mark, labeller) pasted into the working session. That is not the form the entry names: the sheet's file was not saved with marks, and its copy on disk still has the blank sheet's hash.
+- What the list holds. 300 rows, the sheet's 300 items in the sheet's order, 167 yes, 133 no, no unsure, the labeller's name on every row. Its sha256 is `b1a100c05ae1fad66e5a07debec5e3b74ce6b66c798930c3c189a37848e123e9`. The list is committed as it came with the result, and the sheet that is scored is the blank sheet with these marks written in by script, the prompt and answer columns untouched.
+- Not registered, and countable from the list alone: the share of yes falls along the sheet, 68 of the first hundred rows, 55 of the second and 44 of the third. The sheet's order is shuffled, so the order itself gives no reason for a fall. How the two runs' answers fall across the hundreds has not been looked at, because the key is closed. This changes neither the test nor which sentence is written, and it is reported with the result.
+- The question of the entry (whether he read every answer himself, with no model's verdict or draft and no assistant asked about a row) is put now. The answer is added here, in his words, before the sheet is scored. Labels made with a model's help would not be scored as this check.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
