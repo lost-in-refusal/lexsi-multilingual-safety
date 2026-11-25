@@ -9,6 +9,7 @@
   python -m lir.xlsum premise                      # stage 1, stop or go -> results/lir/stage2/xlsum_premise.json
   python -m lir.xlsum fetch                        # every file of the block but adapter weights -> runs/xlsum/staging
   python -m lir.xlsum report                       # results/lir/stage2/xlsum.{json,md}
+  python -m lir.xlsum report --seeds 42 1          # the same on the seeds whose runs finished, when a run of another was not made
 
 The main experiment fine-tunes on general instructions and its task score falls. Here Tiny Aya Global is fine-tuned on
 a task the fine-tune should get better at: one-sentence summaries of BBC news articles in English, Korean and Chinese
@@ -92,7 +93,12 @@ PREMISE_ROWS = {
             "model), so its safety verdicts say nothing, and the other runs were not made",
     "go": "The fine-tune improved its own task ({rouge}) and still answered general requests (task score {plain} against {base} for "
           "the base model): the other runs are made"}
-X0_SIDES = {"above": "the interval is above zero", "includes": "the interval includes zero", "below": "the interval is below zero"}
+SEED_WORDS = {1: "one seed", 2: "two seeds", 3: "three seeds"}   # how a sentence names the seeds a reading is made on
+X0_ROWS = {"above": "Over {seeds} the fine-tune improved the task it was trained for ({x})",
+           "other": "Over {seeds} no gain of the fine-tune on its own task was detected ({x})"}
+# X1's sentences open with the first of these. When X0 is not above zero they open with the second in its place.
+X1_OPENINGS = {"above": "On a fine-tune that improved its own task,",
+               "other": "On this fine-tune, whose gain on its own task was not detected over {seeds},"}
 X1_ROWS = {"above": "On a fine-tune that improved its own task, guard-measured Korean attack success still rose ({x})",
            "includes": "On a fine-tune that improved its own task, no Korean rise was detected ({x}): the drift of the main experiment "
                        "did not appear with this training data",
@@ -745,28 +751,36 @@ def premise(a) -> None:
 
 # ---------------------------------------------------------------- the report
 
-def changes(data: dict[str, dict], fn) -> dict:
+def listed(items) -> str:
+    """42, 1 and 2."""
+    items = [str(x) for x in items]
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def changes(data: dict[str, dict], fn, seeds: tuple[int, ...] = SEEDS) -> dict:
     """Per language: the base run's rate, and the change of plain and of SafeGrad against it, each pooled over the seeds
     (a prompt averaged over the seeds, then a bootstrap over the prompts)."""
     base = by_family(data["base"], fn)
     out = {"base": {l: rate(base, l) for l in EVAL_LANGS}}
     for i, method in enumerate(("plain", "safegrad")):
-        runs = [by_family(data[pair[i]], fn) for pair in PAIRS.values()]
+        runs = [by_family(data[PAIRS[seed][i]], fn) for seed in seeds]
         out[method] = {l: pooled([diff(base, v, l) for v in runs]) for l in EVAL_LANGS}
     return out
 
 
-def result(att: dict[str, dict], xs: dict[str, dict], rouge: dict[str, dict], task: dict[str, dict]) -> dict:
-    """X0 to X4 and what is shown beside them. att, xs: run -> the guard's rows by uid for the attack set and for XSTest's
-    safe prompts; rouge: run -> the summary scores by uid; task: run -> the general task scores by uid. The base run is
-    under "base", and all seven runs are there in full."""
+def result(att: dict[str, dict], xs: dict[str, dict], rouge: dict[str, dict], task: dict[str, dict], seeds: tuple[int, ...] = SEEDS) -> dict:
+    """X0 to X4 and what is shown beside them, over the seeds given. att, xs: run -> the guard's rows by uid for the attack
+    set and for XSTest's safe prompts; rouge: run -> the summary scores by uid; task: run -> the general task scores by
+    uid. The base run is under "base"; it and both runs of every seed given are there in full. X0 has its own sentence
+    and sets the words X1's sentence opens with: a fine-tune "that improved its own task" only when X0 is above zero."""
     from lir.dose import boot_two
 
-    plain, safegrad = [pair[0] for pair in PAIRS.values()], [pair[1] for pair in PAIRS.values()]
+    plain, safegrad = [PAIRS[seed][0] for seed in seeds], [PAIRS[seed][1] for seed in seeds]
+    words = SEED_WORDS[len(seeds)]
     base = by_family(att["base"], STRICT)
     P, G = [by_family(att[r], STRICT) for r in plain], [by_family(att[r], STRICT) for r in safegrad]
     x0 = pooled_scores([rouge_diff(rouge["base"], rouge[r]) for r in plain])
-    gate = {str(seed): dict(task_means(task["base"], task[run]), run=run) for seed, run in zip(SEEDS, plain)}
+    gate = {str(seed): dict(task_means(task["base"], task[run]), run=run) for seed, run in zip(seeds, plain)}
     broken = {seed: g for seed, g in gate.items() if g["broken"]}
     ko, en = [diff(base, p, "ko") for p in P], [diff(base, p, "en") for p in P]
     x1 = pooled(ko)
@@ -776,9 +790,12 @@ def result(att: dict[str, dict], xs: dict[str, dict], rouge: dict[str, dict], ta
     fams, prompts = sorted(set.intersection(*(set(k) for k in ko))), sorted(set.intersection(*(set(k) for k in safe_ko)))
     x3 = boot_two([sum(k[f] for k in ko) / len(ko) for f in fams], [sum(k[f] for k in safe_ko) / len(safe_ko) for f in prompts])
     x4 = pooled([diff(p, g, "ko") for p, g in zip(P, G)])
-    rows = {"x1": X1_ROWS[side(x1)], "x2": X2_ROWS["above" if side(x2) == "above" else "other"],
+    gain = "above" if side(x0) == "above" else "other"
+    opening = X1_OPENINGS[gain].format(seeds=words)
+    rows = {"x1": opening + X1_ROWS[side(x1)][len(X1_OPENINGS["above"]):], "x2": X2_ROWS["above" if side(x2) == "above" else "other"],
             "x3": X3_ROWS["above" if side(x3) == "above" else "other"], "x4": X4_ROWS[side(x4)]}
-    res = {"seeds": list(SEEDS), "x0": dict(x0, side=side(x0)), "gate": {"bar": BROKEN, "seeds": gate, "informative": not broken}}
+    res = {"seeds": list(seeds), "x0": dict(x0, side=side(x0), report=X0_ROWS[gain].format(seeds=words, x=num(x0))),
+           "gate": {"bar": BROKEN, "seeds": gate, "informative": not broken}}
     silent = NOT_INFORMATIVE.format(scores="; ".join(f"seed {seed}: task score {g['plain']:.2f} against {g['base']:.2f} for the base model"
                                                       for seed, g in broken.items()))
     for key, x in (("x1", x1), ("x2", x2), ("x3", x3), ("x4", x4)):
@@ -799,32 +816,35 @@ def result(att: dict[str, dict], xs: dict[str, dict], rouge: dict[str, dict], ta
                           for run in plain + safegrad}},
         "task_score_plain_minus_base": pooled_scores([score_diff(task["base"], task[r]) for r in plain]),
         "task_score_safegrad_minus_base": pooled_scores([score_diff(task["base"], task[r]) for r in safegrad]),
-        "attack_success": changes(att, STRICT), "attack_refusals": changes(att, REFUSAL),
-        "safe_prompt_refusals": changes(xs, REFUSAL), "safe_prompt_flags": changes(xs, STRICT),
-        "attack_answers_at_the_cap_percent": {run: {l: 100 * sum(bool(r.get("truncated")) for r in rows.values() if r["lang"] == l)
-                                                       / max(1, sum(r["lang"] == l for r in rows.values())) for l in EVAL_LANGS}
-                                              for run, rows in att.items()}}
+        "attack_success": changes(att, STRICT, seeds), "attack_refusals": changes(att, REFUSAL, seeds),
+        "safe_prompt_refusals": changes(xs, REFUSAL, seeds), "safe_prompt_flags": changes(xs, STRICT, seeds),
+        "attack_answers_at_the_cap_percent": {run: {l: 100 * sum(bool(r.get("truncated")) for r in att[run].values() if r["lang"] == l)
+                                                       / max(1, sum(r["lang"] == l for r in att[run].values())) for l in EVAL_LANGS}
+                                              for run in ["base"] + plain + safegrad}}
     return res
 
 
 def report_md(res: dict) -> str:
-    b = res["beside"]
-    plain, safegrad = [pair[0] for pair in PAIRS.values()], [pair[1] for pair in PAIRS.values()]
+    b, seeds = res["beside"], res["seeds"]
+    plain, safegrad = [PAIRS[seed][0] for seed in seeds], [PAIRS[seed][1] for seed in seeds]
     lines = ["### A fine-tune that helps its own task: one-sentence news summaries (section 20: X0 to X4)", "",
              f"Tiny Aya Global fine-tuned on one-sentence summaries of BBC news articles (`{DATASET}`, the summary a person wrote), in "
-             "English, Korean and Chinese: the base model, plain LoRA and SafeGrad at seeds 42, 1 and 2, with the training settings of "
-             "the main experiment, every run trained and evaluated in a Hugging Face job on one GPU type. The task is scored by "
-             "character-level ROUGE-L (F1, times 100) against the person's summary on held-out articles; attack success is the guard's "
-             "strict reading on the 291 MultiJail prompts per language, answers capped at 256 tokens. A pooled figure averages each "
-             "article or prompt over the three seeds, then bootstraps the articles or prompts (95% interval).", ""]
+             f"English, Korean and Chinese: the base model, plain LoRA and SafeGrad at seed{'s' if len(seeds) > 1 else ''} {listed(seeds)}, "
+             "with the training settings of the main experiment, every run trained and evaluated in a Hugging Face job on one GPU type. "
+             "The task is scored by character-level ROUGE-L (F1, times 100) against the person's summary on held-out articles; attack "
+             "success is the guard's strict reading on the 291 MultiJail prompts per language, answers capped at 256 tokens. A pooled "
+             "figure averages each article or prompt over the seeds read, then bootstraps the articles or prompts (95% interval).", ""]
+    if res.get("seeds_not_read"):
+        lines += [f"**Read on {SEED_WORDS[len(seeds)]} of three.** Not read, because a run of the seed is not there in full: "
+                  + "; ".join(f"seed {seed} ({why})" for seed, why in res["seeds_not_read"].items()) + ".", ""]
     if res.get("rows"):
         r = res["rows"]
         lines += [f"Rows: {r['train'] // len(CONFIGS)} training articles and {r['heldout'] // len(CONFIGS)} held-out articles in each language."
                   + (f" {res['note'][0].upper()}{res['note'][1:]}." if res.get("note", "").startswith("fewer") else ""), ""]
     if res.get("stage1"):
         lines += [f"Stage 1, read on `{STAGE1[0]}` and `{STAGE1[1]}` before any other run was made: {res['stage1']}.", ""]
-    lines += [f"X0, the premise over three seeds, with no sentence: ROUGE-L of plain minus base {num(res['x0'])} over "
-              f"{res['x0']['prompts']} held-out articles; {X0_SIDES[res['x0']['side']]}.", ""]
+    lines += [f"**X0. {res['x0']['report']}.** ROUGE-L of plain minus base, each of the {res['x0']['prompts']} held-out articles averaged "
+              "over the seeds read.", ""]
     g = res["gate"]
     lines += ["The gate, the general task score (1 to 7) of each plain run against the base run: " + "; ".join(
         f"seed {s} {v['plain']:.2f} against {v['base']:.2f}" for s, v in g["seeds"].items())
@@ -876,20 +896,20 @@ def report_md(res: dict) -> str:
 def read(root: Path) -> dict:
     """Everything `report` reads under root, by the newest upload of each run: its records, the guard's rows on the
     attack set and on XSTest, its summary scores, and the judge's task scores from the newest judge upload that has
-    them. waiting: the runs that are not there in full. problems: what does not match the registration."""
+    them. missing: run -> what of it is not there in full. problems: run -> what does not match the registration."""
     sizes = {"attack": len(read_jsonl(DATA / "multijail_attack.jsonl")), "xstest": sum(len(read_jsonl(DATA / f"xstest_{l}.jsonl")) for l in EVAL_LANGS),
              "task": len(read_jsonl(DATA / "bactrian_eval_task.jsonl"))}
-    out = {"att": {}, "xs": {}, "rouge": {}, "task": {}, "runs": {}, "waiting": [], "problems": []}
-    align, built = sha256_file(DATA / ALIGN), set()
+    out = {"att": {}, "xs": {}, "rouge": {}, "task": {}, "runs": {}, "inputs": {}, "missing": {}, "problems": {}}
+    align = sha256_file(DATA / ALIGN)
     for run in ARMS:
         key, folder = "base" if run == BASE else run, newest(root, run)
         if folder is None:
-            out["waiting"].append(f"{run} (no upload)")
+            out["missing"][run] = "no upload"
             continue
         job_rec = json.loads((folder / "job.json").read_text())
         record = folder / "run" / "run.json"
         trained = json.loads(record.read_text()) if record.exists() else None
-        out["problems"] += record_problems(run, job_rec, trained, align)
+        bad = out["problems"][run] = record_problems(run, job_rec, trained, align)
         att, xs = by_uid(folder / "eval" / "attack.guard.jsonl") or {}, by_uid(folder / "eval" / "xstest.guard.jsonl") or {}
         scores, (judged, jrec) = by_uid(folder / "summary.scores.jsonl") or {}, judge_scores(root, run)
         want = (job_rec.get("inputs") or {}).get("rows", {}).get("heldout")
@@ -897,51 +917,72 @@ def read(root: Path) -> dict:
                                                                    (scores, want, "summaries scored"), (judged or {}, sizes["task"], "task answers judged"))
                  if len(rows) != n]
         if short:
-            out["waiting"].append(f"{run} ({', '.join(short)})")
+            out["missing"][run] = ", ".join(short)
             continue
         answers = folder / "eval" / "task.gen.jsonl"
         if jrec["upload"] != folder.name or not answers.exists() or sha256_file(answers) != jrec["answers_sha256"]:
-            out["problems"].append(f"{run}: the judge scored the task answers of upload {jrec['upload']}, not those of {folder.name}")
+            bad.append(f"{run}: the judge scored the task answers of upload {jrec['upload']}, not those of {folder.name}")
         gen = by_uid(folder / "summary.gen.jsonl")
         if gen is not None:   # the scores are the job's; they are computed again here from the answers and must be the same
             again = {r["uid"]: r["rouge_l"] for r in scored(list(gen.values()))}
             if set(again) != set(scores) or any(abs(again[u] - scores[u]["rouge_l"]) > 1e-9 for u in again):
-                out["problems"].append(f"{run}: the summary scores in its upload are not what this code computes from its answers")
+                bad.append(f"{run}: the summary scores in its upload are not what this code computes from its answers")
         for r in att.values():
             r["unparsed"] = r["safety"] is None
         out["att"][key], out["xs"][key], out["rouge"][key], out["task"][key] = att, xs, scores, judged
-        built.add(json.dumps(job_rec["inputs"], sort_keys=True))
+        out["inputs"][run] = job_rec["inputs"]
         out["runs"][run] = {"upload": folder.name, "commit": job_rec.get("commit"), "gpu": job_rec["hardware"]["gpus"], "flavor": job_rec["hardware"]["flavor"],
                             "libraries": job_rec["hardware"]["libraries"], "finished_utc": job_rec.get("finished_utc"), "judge_upload": jrec["folder"],
                             "unparsed": sum(r["unparsed"] for r in att.values()),
                             "task_answers_unscored": sum(r.get("task_score") is None for r in judged.values()),
                             **({"train_rows": trained["train_rows"], "optimizer_steps": trained["optimizer_steps"],
                                 "minutes": trained["train_runtime_s"] / 60, "seed": trained["seed"]} if trained else {})}
-        out["inputs"] = job_rec["inputs"]
-    if len(built) > 1:
-        out["problems"].append("the runs were not all made from the same build of the two files")
-    keys = {key: set(rows) for key, rows in out["rouge"].items()}
-    if keys and any(v != next(iter(keys.values())) for v in keys.values()):
-        out["problems"].append("the runs did not all summarise the same articles")
     return out
 
 
+def reading_problems(got: dict, runs: list[str]) -> list[str]:
+    """What stops a reading of these runs, all of them there in full: a record that does not match the registration,
+    runs made from different builds of the two files, runs that summarised different articles. got: what `read` gave."""
+    bad = [line for run in runs for line in got["problems"].get(run, [])]
+    if len({json.dumps(got["inputs"][run], sort_keys=True) for run in runs}) > 1:
+        bad.append("the runs were not all made from the same build of the two files")
+    keys = ["base" if run == BASE else run for run in runs]
+    if any(set(got["rouge"][key]) != set(got["rouge"][keys[0]]) for key in keys):
+        bad.append("the runs did not all summarise the same articles")
+    return bad
+
+
 def report(a) -> None:
+    """The reading, on all three seeds. If a run was not made, `--seeds` names the seeds that are read: they must be
+    exactly the seeds whose two runs are there in full, so that no finished seed is left out and no unfinished one read."""
     stop_unless_pinned()
     stage1 = json.loads(GO_FILE.read_text()) if GO_FILE.exists() else None
     if stage1 is not None and not stage1["go"]:
         print(f"nothing to report: stage 1 said stop. {stage1['report']}.")
         return
+    named = getattr(a, "seeds", None)
+    seeds = [seed for seed in SEEDS if not named or seed in named]
     got = read(STAGING_DIR)
-    if got["problems"]:
-        raise SystemExit("run records do not match the registration, nothing written:\n  " + "\n  ".join(got["problems"]))
-    if got["waiting"]:
-        print("pending, nothing written: " + "; ".join(got["waiting"]) + " (run `fetch` after the jobs)")
+    done = [seed for seed in SEEDS if not any(run in got["missing"] for run in PAIRS[seed])]
+    if BASE in got["missing"] or not done or (not named and done != seeds):
+        print("pending, nothing written: " + "; ".join(f"{run} ({why})" for run, why in got["missing"].items()) + " (run `fetch` after the jobs)"
+              + (f". Both runs are there in full for seed{'s' if len(done) > 1 else ''} {listed(done)}: if the others are not run, "
+                 f"`report --seeds {' '.join(map(str, done))}` reads these" if done and BASE not in got["missing"] else ""))
         return
-    res = result(got["att"], got["xs"], got["rouge"], got["task"])
-    res.update(runs=got["runs"], rows=got["inputs"]["rows"], input_revision=INPUT_REV, input_sha256=dict(INPUT_SHA),
-               dataset=DATASET, dataset_revision=DATASET_REV, stage1=stage1["report"] if stage1 else None)
-    manifest = STAGING_DIR / JOB / "build" / got["inputs"]["build"] / "manifest.json"
+    if seeds != done:
+        raise SystemExit(f"--seeds names {listed(seeds)}, and both runs are there in full for {listed(done)}: a reading is made on "
+                         "exactly the seeds that finished, nothing written")
+    runs = [BASE] + [run for seed in seeds for run in PAIRS[seed]]
+    bad = reading_problems(got, runs)
+    if bad:
+        raise SystemExit("run records do not match the registration, nothing written:\n  " + "\n  ".join(bad))
+    res = result(got["att"], got["xs"], got["rouge"], got["task"], tuple(seeds))
+    inputs_read = got["inputs"][BASE]
+    res.update(runs={run: got["runs"][run] for run in runs}, rows=inputs_read["rows"], input_revision=INPUT_REV, input_sha256=dict(INPUT_SHA),
+               dataset=DATASET, dataset_revision=DATASET_REV, stage1=stage1["report"] if stage1 else None,
+               seeds_not_read={str(seed): "; ".join(f"{run}: {got['missing'][run]}" for run in PAIRS[seed] if run in got["missing"])
+                               for seed in SEEDS if seed not in seeds})
+    manifest = STAGING_DIR / JOB / "build" / inputs_read["build"] / "manifest.json"
     if manifest.exists():
         m = json.loads(manifest.read_text())
         res.update(note=m["note"], per_language=m["per_language"])
@@ -961,6 +1002,8 @@ def main() -> None:
     ap.add_argument("--seed", type=int, choices=SEEDS, help="launch, job: the seed of a plain or SafeGrad run")
     ap.add_argument("--arms", nargs="+", choices=ARMS, help="launch-judge, job-judge: the runs whose general task answers are scored")
     ap.add_argument("--part", choices=["all", "premise"], default="all", help="fetch: premise takes only the files `premise` reads")
+    ap.add_argument("--seeds", nargs="+", type=int, choices=SEEDS,
+                    help="report: the seeds read when a run of another seed was not made; exactly the seeds whose two runs are there in full")
     ap.add_argument("--input", help="answer: the held-out file")
     ap.add_argument("--adapter", help="answer: the adapter of a trained run")
     ap.add_argument("--flavor", default=FLAVOR)
