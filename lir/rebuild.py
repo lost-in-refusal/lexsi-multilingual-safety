@@ -66,7 +66,6 @@ COMMANDS = [
     {"args": ["lir.truncsplit"], "tables": ["truncation/split.json", "truncation/split.md"]},
     {"args": ["lir.tasklen"], "tables": ["task_length.json", "task_length.md"]},
     {"args": ["lir.loose"], "tables": ["unsafe_only.json", "unsafe_only.md"]},
-    {"args": ["lir.gpu"], "tables": ["gpu.json", "gpu.md"]},
     {"args": ["lir.circuits", "nodes"], "tables": ["circuit_nodes.json", "circuit_nodes.md"]},
     {"args": ["lir.seeds", "--control", "plain-noko", "plain-noko-s1", "plain-noko-s2"], "tables": ["noko.json", "noko.md"], "needs": "records"},
     {"args": ["lir.seeds", "--times"], "tables": ["train_time.json", "train_time.md"], "needs": "records"},
@@ -83,6 +82,10 @@ NOT_REBUILT = [
      "`python -m lir.section13 vector` checks the hashes of the adapters the edit was built from, so it needs the adapter weights"),
     (("refusal_direction.json", "refusal_direction.md"),
      "`python -m lir.direction` reads the activation files, which are not published"),
+    (("gpu.json", "gpu.md"),
+     "`python -m lir.gpu` reads Q1 of section 12.2 against the bfloat16 arms with the adapter left unmerged as soon as the "
+     "files of job `unmerged` are in runs/gpu, and names the staging revision it finds there; the committed table is the "
+     "reading of Nov 23, made before that job ran, and the unmerged arms are read in nf4_seeds.md (section 14f)"),
     (("aya/task.json", "aya/task.md"),
      "`python -m lir.aya taskreport` reads the answers to the held-out Aya prompts, which are not published because they quote Aya rows"),
     (("aya/checks.json", "aya/checks.md"),

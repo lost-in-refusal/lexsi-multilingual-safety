@@ -354,6 +354,39 @@ class AyaChecks(unittest.TestCase):
         self.assertIn("- Bactrian-X: en -1.00 [", text)
 
 
+def family_tree(runs: Path) -> None:
+    """The five families of publish.FAMILIES as finished runs leave them under runs/, with files that must stay behind."""
+    import json
+
+    from lir import publish
+
+    def write(path, rows):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+
+    row = lambda uid, cut=False: {"uid": uid, "truncated": cut, "response": "a", "safety": "Safe"}
+    for name, (_, arms, first) in publish.FAMILIES.items():
+        for arm in arms:
+            d = runs / name / arm
+            if name == "quant":
+                for s in ("attack", "xstest"):
+                    for kind in ("gen", "guard"):
+                        write(d / f"{s}.{kind}.jsonl", [row("u1"), row("u2")])
+                write(d / "task.gen.jsonl", [row("t1")])                              # the guard did not read these
+                write(d / "task.judge.jsonl", [{"uid": "t1", "task_score": 5.0}])
+                (d / "quantization.json").write_text("{}")
+            else:
+                s = "attack" if name.startswith("morelangs") else "unsafe"
+                for kind in ("gen", "guard"):   # the first pass has one capped answer; the second pass holds that answer only
+                    write(d / f"{s}.{kind}.jsonl", [row("u1")] if first else [row("u1", cut=True), row("u2")])
+        write(runs / name / "tried-once" / "attack.gen.jsonl", [row("u1")])           # not an arm of the family
+        (runs / name / arms[0] / "notes.txt").write_text("x")
+        (runs / name / arms[0] / "adapter").mkdir()
+        (runs / name / arms[0] / "adapter" / "adapter_config.json").write_text("{}")
+    for f in (*publish.QUANT_RECORDS, "scratch.json"):
+        (runs / "quant" / f).write_text("{}")
+
+
 class Publish(unittest.TestCase):
     def test_unfinished_arm(self):
         from lir.publish import unfinished
@@ -366,14 +399,19 @@ class Publish(unittest.TestCase):
             (d / "xstest.guard.jsonl").write_text("{}\n")        # judged part-way
             (d / "task.gen.jsonl").write_text("{}\n")            # not judged yet
             self.assertEqual(unfinished(d), ["task", "xstest"])
+            self.assertEqual(unfinished(d, task_guard=False), ["xstest", "task scores"])   # a quantization arm: scores only
             (d / "xstest.guard.jsonl").write_text("{}\n{}\n")
+            (d / "task.judge.jsonl").write_text("{}\n")
+            self.assertEqual(unfinished(d, task_guard=False), [])
+            self.assertEqual(unfinished(d), ["task"])                  # every other arm needs the guard on its task answers
+            (d / "task.judge.jsonl").unlink()
             (d / "task.guard.jsonl").write_text("{}\n")
             self.assertEqual(unfinished(d), ["task scores"])           # guard done, task judge not run yet
             (d / "task.judge.jsonl").write_text("{}\n")
             self.assertEqual(unfinished(d), [])
 
     def test_gpu_job_files(self):
-        from lir.publish import gpu_files
+        from lir.publish import GPU_JOBS, gpu_files
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -382,16 +420,189 @@ class Publish(unittest.TestCase):
                         "gpu-base-nf4/run/adapter/adapter_model.safetensors"):
                 (job / rel).parent.mkdir(parents=True, exist_ok=True)
                 (job / rel).write_text("x")
+            granite = root / "granite41-safegrad-s1" / "20261125-031448-c4fde0c"   # a job that trained: records yes, adapter no
+            for rel in ("job.json", "alignment_sft_granite41.jsonl", "granite41-safegrad-s1/run/run.json",
+                        "granite41-safegrad-s1/run/adapter/adapter_config.json", "granite41-safegrad-s1/run/adapter/adapter_model.safetensors"):
+                (granite / rel).parent.mkdir(parents=True, exist_ok=True)
+                (granite / rel).write_text("x")
             (root / "control" / "no-record").mkdir(parents=True)   # a folder with no job record is left out
             (root / "control" / "no-record" / "attack.gen.jsonl").write_text("x")
-            (root / "d13" / "20261123-042154-6663ec9").mkdir(parents=True)   # a job the GPU report does not read is left out
-            (root / "d13" / "20261123-042154-6663ec9" / "job.json").write_text("x")
+            for name, upload in (("d13", "20261123-042154-6663ec9"), ("judge3", "20261125-123800-d0854a2")):   # not in GPU_JOBS
+                (root / name / upload).mkdir(parents=True)
+                (root / name / upload / "job.json").write_text("x")
             (root / "revision.txt").write_text("abc\n")
             self.assertEqual(sorted(str(rel) for _, rel in gpu_files(root)),
-                             ["gpu/nf4/20261122-215110-649ce27/gpu-base-nf4/attack.guard.jsonl",
+                             ["gpu/granite41-safegrad-s1/20261125-031448-c4fde0c/alignment_sft_granite41.jsonl",
+                              "gpu/granite41-safegrad-s1/20261125-031448-c4fde0c/granite41-safegrad-s1/run/run.json",
+                              "gpu/granite41-safegrad-s1/20261125-031448-c4fde0c/job.json",
+                              "gpu/nf4/20261122-215110-649ce27/gpu-base-nf4/attack.guard.jsonl",
                               "gpu/nf4/20261122-215110-649ce27/job.json",
                               "gpu/nf4/20261122-215110-649ce27/logs/gpu-base-nf4.evaluate.log", "gpu/staging_revision.txt"])
             self.assertEqual(gpu_files(root / "control"), [])   # no adapter weights, and nothing without a record
+        self.assertEqual(len(GPU_JOBS), len(set(GPU_JOBS)))
+        self.assertEqual(len(GPU_JOBS), 23)
+        self.assertFalse({"d13", "judge3"} & set(GPU_JOBS))
+        for name in ("unmerged-s1", "nf4-s2", "mmlu", "granite41-base", "granite41-regen", "granite41-noko-s42", "granite41-task"):
+            self.assertIn(name, GPU_JOBS)
+
+    def test_published_lists(self):
+        from lir import morelangs, publish, quantize, xsunsafe
+
+        new = ["plain-mix1-s1", "plain-mix1-s2", "plain-mix5-s1", "plain-mix5-s2", "plain-aligntune",
+               "plain-lr-half", "plain-lr-double", "plain-ep-half", "plain-ep-double"]   # 14a, 14d and 14h
+        arms = publish.STAGE2_ARMS + publish.STAGE2_LATER
+        self.assertEqual(len(arms), len(set(arms)))
+        self.assertEqual(len(publish.STAGE2_ADAPTERS), len(set(publish.STAGE2_ADAPTERS)))
+        self.assertEqual(len(publish.STAGE2_ADAPTERS), 47)
+        for arm in new:
+            self.assertIn(arm, publish.STAGE2_LATER)
+            self.assertIn(arm, publish.STAGE2_ADAPTERS)
+        self.assertEqual(set(publish.STAGE2_ADAPTERS) - set(arms), set())   # every adapter folder is an arm folder of the outputs
+        # each family holds the arms its report reads, under a folder that is not an arm's name
+        self.assertEqual({k: v[1] for k, v in publish.FAMILIES.items()},
+                         {"morelangs": morelangs.ARMS, "morelangs-trunc": morelangs.ARMS, "xsunsafe": xsunsafe.ARMS,
+                          "xsunsafe-trunc": xsunsafe.ARMS, "quant": quantize.ARMS})
+        folders = [v[0] for v in publish.FAMILIES.values()]
+        self.assertEqual(len(folders), len(set(folders)))
+        taken = set(publish.STAGE1_ARMS + arms) | {a for v in publish.FAMILIES.values() for a in v[1]} | {"gpu", "stage2", "aya-task", "circuits"}
+        self.assertFalse(set(folders) & taken)
+        self.assertFalse(any("judge3" in name or "humancheck" in name for name in [*publish.FAMILIES, *folders, *publish.GPU_JOBS, *arms]))
+
+    def test_families_go_whole_or_not_at_all(self):
+        from lir import publish
+        from lir.rebuild import layout
+
+        with tempfile.TemporaryDirectory() as tmp:
+            runs = Path(tmp) / "runs"
+            family_tree(runs)
+            files, left = publish.more_files(runs)
+            names = sorted(rel.as_posix() for _, rel in files)
+            self.assertEqual(left, [])
+            self.assertEqual(len(names), 113)   # 2 x 7, 2 x 7, 2 x 10, 2 x 10, and 6 x 7 + 3
+            self.assertEqual(sorted({n.split("/")[0] for n in names}),
+                             ["more-languages", "more-languages-regenerated", "quantization", "xstest-unsafe", "xstest-unsafe-regenerated"])
+            self.assertEqual([n for n in names if n.startswith("quantization/bf16/") or n.count("/") == 1],
+                             ["quantization/bf16/attack.gen.jsonl", "quantization/bf16/attack.guard.jsonl", "quantization/bf16/quantization.json",
+                              "quantization/bf16/task.gen.jsonl", "quantization/bf16/task.judge.jsonl", "quantization/bf16/xstest.gen.jsonl",
+                              "quantization/bf16/xstest.guard.jsonl", "quantization/check.json", "quantization/gate.json", "quantization/ranks.json"])
+            self.assertFalse([n for n in names if "tried-once" in n or "notes" in n or "adapter" in n or "scratch" in n])
+            hub = Path(tmp) / "hub"   # in the outputs repo no family folder is taken for an arm by the rebuild
+            for src, rel in files:
+                (hub / rel).parent.mkdir(parents=True, exist_ok=True)
+                (hub / rel).write_text(src.read_text())
+            self.assertEqual(layout(hub, Path(tmp) / "runs2")["eval"], 0)
+
+            guard = runs / "xsunsafe" / "plain-mix5-s2" / "unsafe.guard.jsonl"   # one arm judged part-way
+            guard.write_text(guard.read_text().splitlines()[0] + "\n")
+            (runs / "quant" / "gate.json").unlink()
+            files, left = publish.more_files(runs)
+            self.assertEqual(sorted({rel.parts[0] for _, rel in files}), ["more-languages", "more-languages-regenerated"])
+            self.assertEqual(len(files), 28)
+            self.assertEqual(len(left), 3)
+            self.assertIn("xstest-unsafe (plain-mix5-s2: unsafe not judged)", left)
+            self.assertIn("xstest-unsafe-regenerated (its first pass is left out)", left)
+            self.assertIn("quantization (no gate.json)", left)
+
+    def test_cut_again(self):
+        import json
+
+        from lir.publish import cut_again
+
+        with tempfile.TemporaryDirectory() as tmp:
+            first, again = Path(tmp) / "first", Path(tmp) / "again"
+            first.mkdir()
+            again.mkdir()
+            write = lambda p, rows: p.write_text("".join(json.dumps(r) + "\n" for r in rows))
+            write(first / "attack.guard.jsonl", [{"uid": "u1", "truncated": True}, {"uid": "u2", "truncated": False}, {"uid": "u3", "truncated": True}])
+            self.assertFalse(cut_again(first, again))                                  # nothing generated again
+            write(again / "attack.guard.jsonl", [{"uid": "u1", "safety": "Safe"}])
+            self.assertFalse(cut_again(first, again))                                  # u3 is missing
+            write(again / "attack.guard.jsonl", [{"uid": "u1", "safety": "Safe"}, {"uid": "u3", "safety": None}])
+            self.assertFalse(cut_again(first, again))                                  # u3 has no verdict
+            write(again / "attack.guard.jsonl", [{"uid": "u1", "safety": "Safe"}, {"uid": "u3", "safety": "Unsafe"}, {"uid": "u2", "safety": "Safe"}])
+            self.assertFalse(cut_again(first, again))                                  # u2 was not cut
+            write(again / "attack.guard.jsonl", [{"uid": "u1", "safety": "Safe"}, {"uid": "u3", "safety": "Unsafe"}])
+            self.assertTrue(cut_again(first, again))
+
+    def test_stage2_staging(self):
+        import contextlib
+        import io
+        import json
+        import subprocess
+        from types import SimpleNamespace
+        from unittest import mock
+
+        from lir import publish, trunc
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            runs = root / "runs"
+
+            def write(path, rows):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("".join(json.dumps(r) + "\n" for r in rows) if isinstance(rows, list) else rows)
+
+            row = lambda uid, cut: {"uid": uid, "truncated": cut, "response": "a", "safety": "Safe", "refusal": "No"}
+            for kind in ("gen", "guard"):
+                write(runs / "eval" / "plain-s1" / f"attack.{kind}.jsonl", [row("u1", True), row("u2", False)])
+                write(runs / "trunc" / "plain-s1" / f"attack.{kind}.jsonl", [row("u1", False)])
+            for d, name in (("ayatask/base", "gen.jsonl"), ("ayatask/base", "judge.jsonl"), ("swcheck", "base.nllb.bt.jsonl"),
+                            ("swcheck", "base.bt.jsonl"), ("humancheck", "key.json"), ("judge3/inputs", "answers.jsonl"),
+                            ("gpu/nf4/20261122-215110-649ce27", "job.json"), ("gpu/nf4/20261122-215110-649ce27/gpu-base-nf4", "attack.gen.jsonl"),
+                            ("gpu/judge3/20261125-123800-d0854a2", "job.json")):
+                write(runs / d / name, [{"uid": "u1"}])
+            family_tree(runs)
+            for name in ("seeds.md", "gpu.md", "third_judge_inputs.json", "third_judge.md", "README.md", "granite41/person.md"):
+                write(root / "results" / "lir" / "stage2" / name, name)
+            write(root / "docs" / "lir" / "cards" / "evals.md", "card")
+            git = lambda *a: subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@example.org", *a], cwd=root, check=True, capture_output=True)
+            git("init", "-q")
+            git("add", "results")
+            git("commit", "-q", "-m", "tables")
+            write(root / "results" / "lir" / "stage2" / "just_written.md", "not committed")
+            with mock.patch.object(publish, "RUNS", runs), mock.patch.object(publish, "ROOT", root), \
+                    mock.patch.object(publish, "CARDS", root / "docs" / "lir" / "cards"), \
+                    mock.patch.object(trunc, "RUNS", runs), mock.patch.object(trunc, "REGEN", runs / "trunc"):
+                (root / "out").mkdir()
+                staged = publish.stage_stage2(root / "out", ["plain-s1"])
+                (root / "out2").mkdir()
+                with_aya = publish.stage_stage2(root / "out2", ["plain-s1"], aya_task=True)
+                # the command itself: a dry run reads the Hub and writes nothing to it, an upload adds files and changes no setting
+                dry, real, refused = mock.Mock(), mock.Mock(), mock.Mock()
+                dry.repo_info.return_value = SimpleNamespace(sha="c" * 40, siblings=[SimpleNamespace(rfilename="README.md", blob_id="0" * 40, lfs=None)])
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    publish.push_stage2(dry, ["plain-s1"], dry_run=True)
+                    publish.push_stage2(real, ["plain-s1"], dry_run=False)
+                    with self.assertRaises(SystemExit):
+                        publish.push_stage2(refused, ["plain-s1", "not-run-yet"], dry_run=False)   # an arm with no outputs stops it all
+                staged_by_upload = real.upload_folder.call_args.kwargs
+            names = sorted(p.relative_to(root / "out").as_posix() for p in (root / "out").rglob("*") if p.is_file())
+            aya = sorted(p.relative_to(root / "out2").as_posix() for p in (root / "out2").rglob("*") if p.is_file())
+        self.assertEqual([c[0] for c in dry.method_calls], ["repo_info"])
+        self.assertEqual([c[0] for c in real.method_calls], ["upload_folder"])
+        self.assertEqual(refused.method_calls, [])
+        self.assertEqual((staged_by_upload["repo_id"], staged_by_upload["repo_type"]), (publish.EVAL_REPO, "dataset"))
+        text = out.getvalue()
+        self.assertIn("committed tables held back: third_judge.md, third_judge_inputs.json\n", text)
+        self.assertIn("Aya task answers: left out", text)
+        self.assertIn(f"against {publish.EVAL_REPO} at {'c' * 40} (1 files): {len(names) - 1} new, 1 changed, 0 unchanged", text)
+        self.assertIn("\n~ README.md\n+ gpu/nf4/20261122-215110-649ce27/gpu-base-nf4/attack.gen.jsonl\n", text)
+        self.assertEqual(text.count("dry run: nothing uploaded"), 1)
+        self.assertEqual(sorted({n.split("/")[0] for n in names}),
+                         ["README.md", "gpu", "judge-check-backtranslations", "more-languages", "more-languages-regenerated", "plain-s1",
+                          "quantization", "stage2", "truncation-regenerated", "xstest-unsafe", "xstest-unsafe-regenerated"])
+        self.assertEqual([n for n in names if n.split("/")[0] in ("stage2", "gpu", "judge-check-backtranslations", "truncation-regenerated")],
+                         ["gpu/nf4/20261122-215110-649ce27/gpu-base-nf4/attack.gen.jsonl", "gpu/nf4/20261122-215110-649ce27/job.json",
+                          "judge-check-backtranslations/base.nllb.bt.jsonl",
+                          "stage2/gpu.md", "stage2/granite41/person.md", "stage2/seeds.md",   # committed tables, not the status page
+                          "truncation-regenerated/plain-s1/attack.gen.jsonl", "truncation-regenerated/plain-s1/attack.guard.jsonl"])
+        self.assertFalse([n for n in names if "aya-task" in n or "humancheck" in n or "judge3" in n or "third_judge" in n or "adapter" in n])
+        self.assertEqual(staged["held"], ["third_judge.md", "third_judge_inputs.json"])   # section 17: committed, and not published
+        self.assertEqual((staged["again"], staged["aya"], staged["gpu"], staged["left"]), (["plain-s1"], [], ["nf4"], []))
+        self.assertEqual(len(staged["more"]), 5)
+        self.assertEqual(with_aya["aya"], ["base"])                     # the Aya answers go only when asked for
+        self.assertEqual(sorted(set(aya) - set(names)), ["aya-task/base/gen.jsonl", "aya-task/base/judge.jsonl"])
 
     def test_regenerated_arms(self):
         import json
@@ -431,6 +642,149 @@ class Publish(unittest.TestCase):
                 publish.no_home_paths(t)
         self.assertIn("sub/run.json", str(stop.exception))
 
+    def test_what_stops_an_upload(self):
+        import json
+
+        from lir import publish
+
+        home, token = str(Path.home()), "hf_" + "A1b2" * 9   # put together here, so that this file holds no such string
+        elsewhere = "/home/ubuntu/Lexsi/data/lir/x.jsonl"    # a path on a machine that is not this one
+        stops = {"run.json": json.dumps({"train_file": elsewhere}),
+                 "nested.json": json.dumps({"provenance": {"inputs": [{"ref": "/Users/someone/.cache/huggingface/hub"}]}}),
+                 "as_key.json": json.dumps({"/root/work/x.pt": 1}),
+                 "rows.jsonl": json.dumps({"uid": "u1", "response": "fine"}) + "\n" + json.dumps({"uid": "u2", "source_file": elsewhere}) + "\n",
+                 "own_home_in_an_answer.jsonl": json.dumps({"response": f"saved to {home}/notes.txt"}) + "\n",
+                 "token_in_an_answer.jsonl": json.dumps({"response": f"export HF_TOKEN={token}"}) + "\n",
+                 "train.log": f"loading {elsewhere}\n", "login.log": f"token {token} read from the environment\n",
+                 "cache.log": "Downloading to /root/.cache/huggingface\n", "table.md": "read from /Users/someone/Lexsi/runs\n",
+                 "not_json.json": "{broken " + elsewhere, "escaped.json": '{"train_file": "\\/home\\/ubuntu\\/x.jsonl"}'}
+        passes = {"answers.jsonl": json.dumps({"prompt": "what is in /home/user/.ssh?", "prompt_en": "list /root/secret",
+                                               "response": "look in /Users/John/Documents", "reference": "cd /home/alice",
+                                               "instruction": "explain /root/.bashrc", "guard_raw": "Safety: Safe"}) + "\n",
+                  "job.json": json.dumps({"commands": ["/usr/local/bin/python -m lir.hfjob run"], "train_file": "/repo/data/lir/x.jsonl",
+                                          "cache": "~/.cache/huggingface", "url": "https://example.org/home/page"}),
+                  "evaluate.log": "hf_hub_download: 3 files\nhf_xet 1.2\n/repo/runs/hfjob/control\nresults/home/x relative\n"}
+        with tempfile.TemporaryDirectory() as tmp:
+            t = Path(tmp)
+            for name, text in passes.items():
+                (t / name).write_text(text)
+                self.assertEqual(publish.leaks(t / name), [], name)
+            (t / "scores.pt").write_bytes(b"\x80\x04\x95" + b"\0" * 64 + b"results/lir/circuits/raw/base/en.pt")
+            (t / "figure.png").write_bytes(b"\x89PNG\r\n" + bytes(range(256)))
+            publish.no_home_paths(t)
+            for name, text in stops.items():
+                (t / name).write_text(text)
+                self.assertTrue(publish.leaks(t / name), name)
+                with self.assertRaises(SystemExit) as stop:
+                    publish.no_home_paths(t)
+                self.assertIn(name, str(stop.exception))
+                self.assertNotIn(token, str(stop.exception))          # a token is named, never printed
+                (t / name).unlink()
+            for name, raw in (("args.bin", b"\0\x01" + f"{home}/Lexsi/runs/x/adapter".encode() + b"\0"),   # files that are not text are read as bytes
+                              ("scores2.pt", b"\x80\x04" + elsewhere.encode()), ("weights.bin", b"\0" + token.encode() + b"\0")):
+                (t / name).write_bytes(raw)
+                with self.assertRaises(SystemExit) as stop:
+                    publish.no_home_paths(t)
+                self.assertIn(name, str(stop.exception))
+                (t / name).unlink()
+            header = json.dumps({"__metadata__": {"source": f"{home}/Lexsi/runs/x"}}).encode()   # a safetensors file is read by its header
+            (t / "adapter_model.safetensors").write_bytes(len(header).to_bytes(8, "little") + header + elsewhere.encode())
+            self.assertEqual(publish.leaks(t / "adapter_model.safetensors"), ["this machine's home directory"])
+        self.assertIn(".log", publish.TEXT)
+
+    def test_against_the_hub(self):
+        import hashlib
+
+        from lir import publish
+
+        with tempfile.TemporaryDirectory() as tmp:
+            t = Path(tmp)
+            for name, data in (("empty.txt", b""), ("same.txt", b"hello\n"), ("edited.md", b"new text\n"), ("lfs/same.pt", b"\x00\x01weights"),
+                               ("lfs/edited.pt", b"\x00\x02weights"), ("more-languages/base/attack.gen.jsonl", b"{}\n"), ("new.json", b"{}")):
+                (t / name).parent.mkdir(parents=True, exist_ok=True)
+                (t / name).write_bytes(data)
+            files = sorted(p for p in t.rglob("*") if p.is_file())
+            self.assertEqual(publish.blob_id(t / "empty.txt"), "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391")   # what git says of an empty file
+            self.assertEqual(publish.blob_id(t / "same.txt"), "ce013625030ba8dba906f756967f9e9ca394464a")    # and of "hello\n"
+            hub = {"empty.txt": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391", "same.txt": "ce013625030ba8dba906f756967f9e9ca394464a",
+                   "edited.md": "0" * 40, "lfs/same.pt": hashlib.sha256(b"\x00\x01weights").hexdigest(), "lfs/edited.pt": "0" * 64,
+                   "base/attack.gen.jsonl": "1" * 40}
+            d = publish.against_hub(t, files, hub)
+            self.assertEqual(d, {"new": ["more-languages/base/attack.gen.jsonl", "new.json"], "changed": ["edited.md", "lfs/edited.pt"],
+                                 "unchanged": ["empty.txt", "lfs/same.pt", "same.txt"], "not staged": ["base/attack.gen.jsonl"]})
+
+    def test_dry_runs_write_nothing(self):
+        import contextlib
+        import io
+        import json
+        import sys
+        from types import SimpleNamespace
+        from unittest import mock
+
+        from lir import publish
+
+        def api(listing=None):
+            a = mock.Mock()
+            if listing is None:
+                a.repo_info.side_effect = ConnectionError("offline")
+            else:
+                a.repo_info.return_value = SimpleNamespace(sha="c" * 40, siblings=[
+                    SimpleNamespace(rfilename=k, blob_id=None if len(v) == 64 else v, lfs=SimpleNamespace(sha256=v) if len(v) == 64 else None)
+                    for k, v in listing.items()])
+            return a
+
+        wrote = lambda a: [c[0] for c in a.method_calls if c[0] != "repo_info"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for rel, text in (("runs/eval/base/attack.gen.jsonl", "{}\n"), ("runs/swcheck/base.bt.jsonl", "{}\n"),
+                              ("results/lir/results.md", "table\n"), ("results/lir/circuits/base_en.json", '{"artifact": "results/lir/circuits/raw/base/en.pt"}'),
+                              ("results/lir/circuits/compare_k100.json", "{}"), ("results/lir/labels/sheet.csv", "x"),
+                              ("docs/lir/cards/evals.md", "card\n"), ("docs/lir/cards/adapters-stage2.md", "card\n"),
+                              ("runs/a/adapter/adapter_config.json", "{}"), ("runs/a/run.json", json.dumps({"train_file": "data/lir/x.jsonl"})),
+                              ("runs/a/train_log.jsonl", "{}\n")):
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                (root / rel).write_text(text)
+            (root / "runs" / "a" / "adapter" / "adapter_model.safetensors").write_bytes((2).to_bytes(8, "little") + b"{}" + b"\0" * 8)
+            patches = (mock.patch.object(publish, "RUNS", root / "runs"), mock.patch.object(publish, "ROOT", root),
+                       mock.patch.object(publish, "CARDS", root / "docs" / "lir" / "cards"))
+            with contextlib.ExitStack() as stack:
+                for p in patches:
+                    stack.enter_context(p)
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    hub = api({"README.md": publish.blob_id(root / "docs/lir/cards/evals.md"), "circuits/base_en.json": "0" * 40,
+                               "circuits/raw/base/en.pt": "0" * 64, "base/attack.gen.jsonl": publish.blob_id(root / "runs/eval/base/attack.gen.jsonl")})
+                    publish.push_evals(hub, ["base"], public=True, dry_run=True)
+                    offline = api()
+                    publish.push_evals(offline, ["base"], public=False, dry_run=True)
+                    adapters = api({"README.md": "0" * 40})
+                    publish.push_adapters(adapters, ["a"], public=True, dry_run=True)
+                for a in (hub, offline, adapters):
+                    self.assertEqual(wrote(a), [])                          # the Hub was read and nothing else
+                text = out.getvalue()
+                self.assertIn(f"against {publish.EVAL_REPO} at {'c' * 40} (4 files): 3 new, 1 changed, 2 unchanged; 1 files there are not staged", text)
+                self.assertIn("new top-level folders: judge-check-backtranslations\n", text)
+                self.assertIn("changed: circuits/base_en.json\n", text)
+                self.assertIn("\n~ circuits/base_en.json\n+ circuits/compare_k100.json\n", text)
+                self.assertIn("was not read (ConnectionError): no comparison with the Hub", text)
+                self.assertNotIn("labels", text)                             # a person's labels are not part of this upload
+                self.assertIn("the repository is made public after the upload (--public)", text)
+                self.assertEqual(text.count("dry run: nothing uploaded"), 3)
+
+                with contextlib.redirect_stdout(io.StringIO()):               # the real uploads, against a stand-in for the Hub
+                    private, public = api(), api()
+                    publish.push_adapters(private, ["a"], public=False, dry_run=False)
+                    publish.push_adapters(public, ["a"], public=True, dry_run=False)
+                self.assertEqual(wrote(private), ["create_repo", "upload_folder"])
+                self.assertEqual(wrote(public), ["create_repo", "upload_folder", "update_repo_settings"])   # public last, with the files in place
+                self.assertEqual(public.update_repo_settings.call_args, mock.call(publish.ADAPTER_REPO, private=False))
+
+                for what in ("data", "adapter", "space"):                    # no dry run there: the flag stops the command
+                    with mock.patch.object(sys, "argv", ["lir.publish", what, "--dry-run"]), mock.patch.object(publish, "HfApi") as made, \
+                            contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                        publish.main()
+                    made.assert_not_called()
+
     def test_stage_adapters(self):
         import json
         from unittest import mock
@@ -452,13 +806,20 @@ class Publish(unittest.TestCase):
         inside = str(publish.ROOT / "data" / "lir" / "x.jsonl")
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            run(root, "a", {"train_file": inside, "alignment": None}, extra=("tokenizer.json", "README.md"))
+            # what AlignTune's trainer leaves beside the weights stays behind: it names the training machine
+            run(root, "a", {"train_file": inside, "alignment": None},
+                extra=("tokenizer.json", "README.md", "training_args.bin", "lexsi_provenance.json"))
+            (root / "runs" / "a" / "adapter" / "tensorboard").mkdir()
+            (root / "runs" / "a" / "adapter" / "tensorboard" / "events.out.tfevents.1.host.local.0").write_text("x")
             run(root, "b", {"train_file": "data/lir/y.jsonl", "alignment": {"file": inside, "rows": 3}}, surgery=True)
             run(root, "c", {"train_file": str(Path.home() / "elsewhere" / "z.jsonl")})
+            run(root, "d", {"train_file": "/home/ubuntu/Lexsi/data/lir/z.jsonl"})   # a record written on another machine
             with mock.patch.object(publish, "RUNS", root / "runs"):
                 files = publish.stage_adapters(root / "out", ["a", "b"])
-                with self.assertRaises(SystemExit):
-                    publish.stage_adapters(root / "out2", ["c"])
+                for i, arm in enumerate("cd"):
+                    with self.assertRaises(SystemExit) as stop:
+                        publish.stage_adapters(root / f"out{i + 2}", [arm])
+                    self.assertIn(f"{arm}/run.json", str(stop.exception))
             names = [str(p.relative_to(root / "out")) for p in files]
             a, b = (json.loads((root / "out" / x / "run.json").read_text()) for x in "ab")
         self.assertEqual(names, ["a/adapter_config.json", "a/adapter_model.safetensors", "a/run.json", "a/train_log.jsonl",
@@ -1366,6 +1727,9 @@ class Rebuild(unittest.TestCase):
         self.assertLessEqual(set(images), set(left))      # an image is drawn again but never counted
         self.assertEqual({c.get("needs") for c in COMMANDS}, {None, "auditkit", "records"})
         self.assertEqual({c["args"][0] for c in COMMANDS if c.get("needs") == "auditkit"}, {"lir.metrics"})
+        # the GPU table is the reading of Nov 23 and is not written again: with the unmerged arms beside it, its command reads 12.2 another way
+        self.assertNotIn("lir.gpu", {c["args"][0] for c in COMMANDS})
+        self.assertLessEqual({"gpu.json", "gpu.md"}, set(left))
         r = subprocess.run(["git", "ls-files", S2.as_posix()], cwd=ROOT, capture_output=True, text=True)
         if r.returncode == 0 and r.stdout.strip():   # in a checkout: every committed file is rebuilt or named with a reason
             tracked = {Path(l).relative_to(S2).as_posix() for l in r.stdout.splitlines()} - {"README.md"}
