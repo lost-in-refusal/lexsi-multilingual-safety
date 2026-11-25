@@ -14,7 +14,7 @@ figures need matplotlib, and the five tables written by `lir.metrics` need Audit
 its own (the README gives the commit). A command whose package or input is missing is skipped and named.
 
 `records` reads the seed 42 records from the two public stage 1 adapter repositories and the others from the stage 2
-adapter repository, which is private until the paper is submitted. Without access to it, the reports that check a
+adapter repository, which has been public since Nov 25, 2026. If it cannot be read, the reports that check a
 training record are skipped and named.
 """
 from __future__ import annotations
@@ -237,9 +237,9 @@ def records() -> None:
             d = snapshot_download(ADAPTERS, revision=ADAPTERS_REV, allow_patterns=[f"*/{k}" for k in RECORD_FILES],
                                   local_dir=Path(tmp) / "stage2")
             got["stage2"] = copy_records(Path(d), RUNS)
-        except HfHubHTTPError as e:   # a private repository answers "not found" to anyone without access
+        except HfHubHTTPError as e:
             got["stage2"] = 0
-            print(f"{ADAPTERS} did not open ({type(e).__name__}). It is private until the paper is submitted; "
+            print(f"{ADAPTERS} did not open ({type(e).__name__}); "
                   "the reports that check a training record will be skipped.")
     m["records"] = {"stage1": got["plain"] + got["safegrad"], "stage2": got["stage2"],
                     "stage2_revision": ADAPTERS_REV if got["stage2"] else None}

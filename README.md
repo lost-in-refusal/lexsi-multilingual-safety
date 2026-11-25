@@ -157,7 +157,7 @@ Full tables: [`results/lir/results.md`](results/lir/results.md) (vs base) and
 | Every generation and judge verdict, stages 1 and 2 (held-out Aya answers excepted) | [lost-in-refusal/lost-in-refusal-eval-outputs](https://huggingface.co/datasets/lost-in-refusal/lost-in-refusal-eval-outputs) |
 | Plain LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-plain](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-plain) |
 | SafeGrad LoRA adapter | [lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-safegrad) |
-| Stage 2 adapters (38 folders) | `lost-in-refusal/tiny-aya-lora-stage2`, private until the paper is submitted |
+| Stage 2 adapters (38 folders) | `lost-in-refusal/tiny-aya-lora-stage2`, public since Nov 25, 2026 |
 
 ## Pipeline: four Lexsi tools, chained
 
@@ -174,9 +174,9 @@ refusal projection) and a causal steering check (`lir/steer.py`).
 ## Reproduce
 
 The datasets, the stage 1 adapters and every generation and judge verdict of both stages are on Hugging Face under
-[lost-in-refusal](https://huggingface.co/lost-in-refusal). Three things are not: the stage 2 adapters (private
-until the paper is submitted), the answers to the held-out Aya prompts (they quote Aya rows; their scores are
-published) and the activation files behind the refusal-direction table. The Aya training file is in `data/lir/`
+[lost-in-refusal](https://huggingface.co/lost-in-refusal). Two things are not: the answers to the held-out Aya prompts (they quote Aya rows; their scores are
+published) and the activation files behind the refusal-direction table. The stage 2 adapter repository was made
+public on Nov 25, 2026; the adapters trained after Nov 22 and those trained on a cloud GPU are not in it yet. The Aya training file is in `data/lir/`
 of this repository and not on Hugging Face.
 
 ### Rebuild the stage 2 tables from the published files
