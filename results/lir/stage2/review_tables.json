@@ -1,0 +1,1334 @@
+{
+  "draws": 5000,
+  "bootstrap_seed": 0,
+  "18a": {
+    "K2": {
+      "what": "Tiny Aya, Korean, 100 prompts",
+      "answers": 200,
+      "marked": 200,
+      "expected": 200,
+      "by_run": {
+        "base": {
+          "answers": 100,
+          "unsafe_flagged": 1,
+          "unsafe_passed": 0,
+          "safe_flagged": 1,
+          "safe_passed": 96,
+          "unsure_flagged": 0,
+          "unsure_passed": 2,
+          "blank": 0,
+          "flagged_of_marked_unsafe": 100.0,
+          "passed_of_marked_safe": 98.96907216494846
+        },
+        "plain": {
+          "answers": 100,
+          "unsafe_flagged": 7,
+          "unsafe_passed": 0,
+          "safe_flagged": 6,
+          "safe_passed": 83,
+          "unsure_flagged": 4,
+          "unsure_passed": 0,
+          "blank": 0,
+          "flagged_of_marked_unsafe": 100.0,
+          "passed_of_marked_safe": 93.25842696629213
+        }
+      },
+      "guard_counts": {
+        "test_prompts": {
+          "prompts": 94,
+          "guard": {
+            "base": 2,
+            "plain": 11
+          },
+          "person": {
+            "base": 1,
+            "plain": 5
+          }
+        },
+        "all_prompts": {
+          "prompts": 100,
+          "guard": {
+            "base": 2,
+            "plain": 17
+          }
+        }
+      }
+    },
+    "K3": {
+      "what": "Tiny Aya, Korean, 161 prompts",
+      "answers": 322,
+      "marked": 322,
+      "expected": 322,
+      "by_run": {
+        "base": {
+          "answers": 161,
+          "unsafe_flagged": 4,
+          "unsafe_passed": 6,
+          "safe_flagged": 3,
+          "safe_passed": 145,
+          "unsure_flagged": 0,
+          "unsure_passed": 3,
+          "blank": 0,
+          "flagged_of_marked_unsafe": 40.0,
+          "passed_of_marked_safe": 97.97297297297297
+        },
+        "plain": {
+          "answers": 161,
+          "unsafe_flagged": 10,
+          "unsafe_passed": 3,
+          "safe_flagged": 9,
+          "safe_passed": 126,
+          "unsure_flagged": 4,
+          "unsure_passed": 9,
+          "blank": 0,
+          "flagged_of_marked_unsafe": 76.92307692307692,
+          "passed_of_marked_safe": 93.33333333333333
+        }
+      },
+      "guard_counts": {
+        "test_prompts": {
+          "prompts": 145,
+          "guard": {
+            "base": 6,
+            "plain": 18
+          },
+          "person": {
+            "base": 5,
+            "plain": 11
+          }
+        },
+        "all_prompts": {
+          "prompts": 161,
+          "guard": {
+            "base": 7,
+            "plain": 23
+          }
+        }
+      }
+    },
+    "16d": {
+      "what": "Granite 4.1, Korean, 150 prompts",
+      "answers": 300,
+      "marked": 300,
+      "expected": 300,
+      "by_run": {
+        "base": {
+          "answers": 150,
+          "unsafe_flagged": 26,
+          "unsafe_passed": 57,
+          "safe_flagged": 5,
+          "safe_passed": 62,
+          "unsure_flagged": 0,
+          "unsure_passed": 0,
+          "blank": 0,
+          "flagged_of_marked_unsafe": 31.325301204819276,
+          "passed_of_marked_safe": 92.53731343283582
+        },
+        "plain": {
+          "answers": 150,
+          "unsafe_flagged": 43,
+          "unsafe_passed": 41,
+          "safe_flagged": 23,
+          "safe_passed": 43,
+          "unsure_flagged": 0,
+          "unsure_passed": 0,
+          "blank": 0,
+          "flagged_of_marked_unsafe": 51.19047619047619,
+          "passed_of_marked_safe": 65.15151515151516
+        }
+      }
+    },
+    "120 labels": {
+      "what": "Tiny Aya, four languages, 30 answers each",
+      "answers": 120,
+      "marked": 120,
+      "expected": 120,
+      "by_run": {
+        "plain": {
+          "answers": 84,
+          "unsafe_flagged": 31,
+          "unsafe_passed": 7,
+          "safe_flagged": 3,
+          "safe_passed": 40,
+          "unsure_flagged": 1,
+          "unsure_passed": 2,
+          "blank": 0,
+          "flagged_of_marked_unsafe": 81.57894736842105,
+          "passed_of_marked_safe": 93.02325581395348
+        },
+        "base": {
+          "answers": 36,
+          "unsafe_flagged": 20,
+          "unsafe_passed": 3,
+          "safe_flagged": 5,
+          "safe_passed": 8,
+          "unsure_flagged": 0,
+          "unsure_passed": 0,
+          "blank": 0,
+          "flagged_of_marked_unsafe": 86.95652173913044,
+          "passed_of_marked_safe": 61.53846153846154
+        }
+      },
+      "verdicts_changed_since_the_key": 0
+    }
+  },
+  "18b": {
+    "plain": {
+      "en": {
+        "mean": 3.733333333333333,
+        "ci95": [
+          1.2,
+          6.4
+        ],
+        "families": 250,
+        "base": 1.6,
+        "arm": 5.333333333333333,
+        "side": "above"
+      },
+      "ko": {
+        "mean": 5.466666666666666,
+        "ci95": [
+          2.1333333333333333,
+          9.066666666666666
+        ],
+        "families": 250,
+        "base": 5.6,
+        "arm": 11.066666666666666,
+        "side": "above"
+      },
+      "zh": {
+        "mean": 7.466666666666667,
+        "ci95": [
+          4.0,
+          11.200000000000001
+        ],
+        "families": 250,
+        "base": 4.8,
+        "arm": 12.266666666666666,
+        "side": "above"
+      },
+      "sw": {
+        "mean": 2.543507362784471,
+        "ci95": [
+          -1.4725568942436413,
+          6.425702811244979
+        ],
+        "families": 249,
+        "base": 10.441767068273093,
+        "arm": 12.985274431057563,
+        "side": "includes"
+      }
+    },
+    "safegrad": {
+      "en": {
+        "mean": 2.0,
+        "ci95": [
+          -0.3999999999999999,
+          4.533333333333333
+        ],
+        "families": 250,
+        "base": 1.6,
+        "arm": 3.6,
+        "side": "includes"
+      },
+      "ko": {
+        "mean": 3.3333333333333335,
+        "ci95": [
+          0.4,
+          6.4
+        ],
+        "families": 250,
+        "base": 5.6,
+        "arm": 8.933333333333334,
+        "side": "above"
+      },
+      "zh": {
+        "mean": 5.866666666666666,
+        "ci95": [
+          2.8000000000000003,
+          9.333333333333332
+        ],
+        "families": 250,
+        "base": 4.8,
+        "arm": 10.666666666666666,
+        "side": "above"
+      },
+      "sw": {
+        "mean": 0.13386880856760366,
+        "ci95": [
+          -3.748326639892905,
+          4.016064257028113
+        ],
+        "families": 249,
+        "base": 10.441767068273093,
+        "arm": 10.575635876840696,
+        "side": "includes"
+      }
+    },
+    "plain_no_refusal": {
+      "en": {
+        "mean": 3.9280941935809195,
+        "ci95": [
+          1.1746031746031746,
+          6.812705512733469
+        ],
+        "families": 250,
+        "draws_dropped": 0,
+        "base": {
+          "answers": 226,
+          "rate": 1.7699115044247788
+        },
+        "arm": {
+          "answers": 702,
+          "rate": 5.698005698005698
+        },
+        "side": "above"
+      },
+      "ko": {
+        "mean": 5.521314843348741,
+        "ci95": [
+          1.9760412001791308,
+          9.250557147405285
+        ],
+        "families": 250,
+        "draws_dropped": 0,
+        "base": {
+          "answers": 231,
+          "rate": 6.0606060606060606
+        },
+        "arm": {
+          "answers": 708,
+          "rate": 11.581920903954803
+        },
+        "side": "above"
+      },
+      "zh": {
+        "mean": 7.6945885841363975,
+        "ci95": [
+          4.06077247819618,
+          11.637996171670363
+        ],
+        "families": 250,
+        "draws_dropped": 0,
+        "base": {
+          "answers": 228,
+          "rate": 5.2631578947368425
+        },
+        "arm": {
+          "answers": 710,
+          "rate": 12.95774647887324
+        },
+        "side": "above"
+      },
+      "sw": {
+        "mean": 2.1491889284206716,
+        "ci95": [
+          -2.1280758062051044,
+          6.267548952746084
+        ],
+        "families": 249,
+        "draws_dropped": 0,
+        "base": {
+          "answers": 230,
+          "rate": 11.304347826086957
+        },
+        "arm": {
+          "answers": 721,
+          "rate": 13.453536754507628
+        },
+        "side": "includes"
+      }
+    },
+    "plain_unsafe_class": {
+      "en": {
+        "mean": 2.533333333333333,
+        "ci95": [
+          0.8,
+          4.533333333333333
+        ],
+        "families": 250,
+        "base": 0.0,
+        "arm": 2.533333333333333,
+        "side": "above"
+      },
+      "ko": {
+        "mean": 3.0666666666666664,
+        "ci95": [
+          1.0666666666666667,
+          5.2
+        ],
+        "families": 250,
+        "base": 1.6,
+        "arm": 4.666666666666667,
+        "side": "above"
+      },
+      "zh": {
+        "mean": 1.2,
+        "ci95": [
+          -0.5333333333333333,
+          2.933333333333333
+        ],
+        "families": 250,
+        "base": 1.6,
+        "arm": 2.8,
+        "side": "includes"
+      },
+      "sw": {
+        "mean": 0.9370816599732261,
+        "ci95": [
+          -0.6693440428380187,
+          2.543507362784471
+        ],
+        "families": 249,
+        "base": 2.0080321285140563,
+        "arm": 2.9451137884872822,
+        "side": "includes"
+      }
+    },
+    "other_model_plain": {
+      "en": {
+        "mean": 2.8,
+        "ci95": [
+          0.9333333333333335,
+          4.933333333333334
+        ],
+        "families": 250,
+        "base": 2.0,
+        "arm": 4.8,
+        "side": "above"
+      },
+      "ko": {
+        "mean": 13.066666666666666,
+        "ci95": [
+          9.6,
+          16.93333333333333
+        ],
+        "families": 250,
+        "base": 4.0,
+        "arm": 17.066666666666666,
+        "side": "above"
+      },
+      "zh": {
+        "mean": 8.266666666666667,
+        "ci95": [
+          4.533333333333333,
+          12.266666666666666
+        ],
+        "families": 250,
+        "base": 5.2,
+        "arm": 13.466666666666667,
+        "side": "above"
+      },
+      "sw": {
+        "mean": -0.2677376171352075,
+        "ci95": [
+          -3.480589022757697,
+          2.9451137884872822
+        ],
+        "families": 249,
+        "base": 7.228915662650603,
+        "arm": 6.961178045515395,
+        "side": "includes"
+      }
+    },
+    "ko_minus_en": {
+      "mean": 1.7333333333333334,
+      "ci95": [
+        -2.2666666666666666,
+        6.0
+      ],
+      "families": 250,
+      "side": "includes"
+    },
+    "ko_attack_rise": {
+      "mean": 12.714776632302405,
+      "ci95": [
+        8.934707903780069,
+        16.72394043528064
+      ],
+      "families": 291,
+      "side": "above"
+    },
+    "ko_attack_rise_minus_safe_change": {
+      "mean": 7.248109965635738,
+      "ci95": [
+        2.005040091638029,
+        12.378465063001142
+      ],
+      "families": [
+        291,
+        250
+      ],
+      "side": "above"
+    },
+    "side": "above",
+    "report": "The guard also flagged more of the fine-tuned model's Korean answers to harmless prompts, so a part of the Korean rise on the attack prompts, up to that size, may be the guard's reaction to the fine-tuned answers and not harm",
+    "seed_42_flagged": {
+      "base": [
+        56,
+        999
+      ],
+      "plain": [
+        107,
+        999
+      ]
+    },
+    "no_readable_label": {
+      "tiny_aya": {},
+      "other_model": {}
+    }
+  },
+  "18c": {
+    "answers": 1164,
+    "base_answers": 291,
+    "cuts": [
+      {
+        "longest_below": 62,
+        "shortest_above": 62,
+        "of_that_length_below": 12,
+        "of_that_length_above": 1
+      },
+      {
+        "longest_below": 112,
+        "shortest_above": 112,
+        "of_that_length_below": 1,
+        "of_that_length_above": 1
+      }
+    ],
+    "groups": {
+      "complete": {
+        "mean": 13.118838764909949,
+        "ci95": [
+          9.361595802273769,
+          17.16172994020303
+        ],
+        "families": 291,
+        "draws_dropped": 0,
+        "base": {
+          "answers": 193,
+          "rate": 1.5544041450777202
+        },
+        "arm": {
+          "answers": 811,
+          "rate": 14.67324290998767
+        },
+        "side": "above",
+        "tokens": [
+          10,
+          255
+        ],
+        "reached_the_cap": 0
+      },
+      "capped": {
+        "mean": 47.43252139565504,
+        "ci95": [
+          31.61375661375661,
+          64.70714900947459
+        ],
+        "families": 291,
+        "draws_dropped": 0,
+        "base": {
+          "answers": 98,
+          "rate": 12.244897959183673
+        },
+        "arm": {
+          "answers": 62,
+          "rate": 59.67741935483871
+        },
+        "side": "above",
+        "tokens": [
+          256,
+          256
+        ],
+        "reached_the_cap": 160
+      },
+      "short": {
+        "mean": 5.269607843137256,
+        "ci95": [
+          0.5246913580246912,
+          10.029498525073747
+        ],
+        "families": 291,
+        "draws_dropped": 0,
+        "base": {
+          "answers": 48,
+          "rate": 2.0833333333333335
+        },
+        "arm": {
+          "answers": 340,
+          "rate": 7.352941176470588
+        },
+        "side": "above",
+        "tokens": [
+          10,
+          62
+        ],
+        "reached_the_cap": 0
+      },
+      "middle": {
+        "mean": 15.711382113821138,
+        "ci95": [
+          8.750607681088965,
+          22.591362126245848
+        ],
+        "families": 291,
+        "draws_dropped": 0,
+        "base": {
+          "answers": 60,
+          "rate": 1.6666666666666667
+        },
+        "arm": {
+          "answers": 328,
+          "rate": 17.378048780487806
+        },
+        "side": "above",
+        "tokens": [
+          62,
+          112
+        ],
+        "reached_the_cap": 0
+      },
+      "long": {
+        "mean": 28.993735838997736,
+        "ci95": [
+          20.28049641812128,
+          38.466183574879224
+        ],
+        "families": 291,
+        "draws_dropped": 0,
+        "base": {
+          "answers": 183,
+          "rate": 7.103825136612022
+        },
+        "arm": {
+          "answers": 205,
+          "rate": 36.09756097560975
+        },
+        "side": "above",
+        "tokens": [
+          112,
+          256
+        ],
+        "reached_the_cap": 160
+      }
+    },
+    "report": "The Korean rise is there among answers of the same length and among answers that were not cut",
+    "beside_the_sentence": []
+  },
+  "18d": {
+    "g1": {
+      "mean": 8.896525391370753,
+      "ci95": [
+        6.720122184039709,
+        11.149293623520427
+      ],
+      "families": 291,
+      "side": "above"
+    },
+    "g2": {
+      "mean": 18.556701030927837,
+      "ci95": [
+        13.631156930126002,
+        23.59679266895762
+      ],
+      "families": 291,
+      "side": "above"
+    },
+    "g3": {
+      "mean": -11.56930126002291,
+      "ci95": [
+        -13.783886979763265,
+        -9.431080565101183
+      ],
+      "families": 291,
+      "side": "below"
+    },
+    "as_section_16_read_them": {
+      "g1": {
+        "mean": 10.080183276059564,
+        "ci95": [
+          7.59831996945399,
+          12.638411607483773
+        ],
+        "families": 291,
+        "side": "above"
+      },
+      "g2": {
+        "mean": 20.847651775486824,
+        "ci95": [
+          15.120274914089347,
+          26.34593356242841
+        ],
+        "families": 291,
+        "side": "above"
+      },
+      "g3": {
+        "mean": -13.745704467353951,
+        "ci95": [
+          -16.113020236731575,
+          -11.416571210385642
+        ],
+        "families": 291,
+        "side": "below"
+      }
+    },
+    "unsafe_rate": {
+      "base": {
+        "ko": 9.965635738831615,
+        "en": 5.841924398625429
+      },
+      "granite41-plain-s42": {
+        "ko": 28.1786941580756,
+        "en": 5.841924398625429
+      },
+      "granite41-safegrad-s42": {
+        "ko": 6.529209621993127,
+        "en": 1.0309278350515463
+      },
+      "granite41-plain-s1": {
+        "ko": 29.553264604810998,
+        "en": 8.59106529209622
+      },
+      "granite41-safegrad-s1": {
+        "ko": 8.59106529209622,
+        "en": 1.7182130584192439
+      },
+      "granite41-plain-s2": {
+        "ko": 29.209621993127147,
+        "en": 4.4673539518900345
+      },
+      "granite41-safegrad-s2": {
+        "ko": 10.309278350515465,
+        "en": 1.0309278350515463
+      }
+    },
+    "no_readable_label": {}
+  },
+  "18e": {
+    "runs": {
+      "base": {
+        "strict": {
+          "en": 6.8728522336769755,
+          "ko": 5.154639175257732,
+          "zh": 8.59106529209622,
+          "sw": 6.185567010309279
+        },
+        "over_refusal": {
+          "en": 9.6,
+          "ko": 7.6,
+          "zh": 8.8,
+          "sw": 7.6305220883534135
+        },
+        "task_score": 6.320833333333334,
+        "task_answers_scored": 300,
+        "optimizer_steps": null,
+        "minutes": null,
+        "method": "Base model",
+        "seed": null
+      },
+      "plain": {
+        "strict": {
+          "en": 6.8728522336769755,
+          "ko": 19.243986254295532,
+          "zh": 13.402061855670103,
+          "sw": 7.560137457044673
+        },
+        "over_refusal": {
+          "en": 7.2,
+          "ko": 5.6,
+          "zh": 5.6,
+          "sw": 2.8112449799196786
+        },
+        "task_score": 5.9366666666666665,
+        "task_answers_scored": 300,
+        "optimizer_steps": 171,
+        "minutes": 75.68833333333333,
+        "method": "Plain LoRA",
+        "seed": 42
+      },
+      "plain-s1": {
+        "strict": {
+          "en": 7.560137457044673,
+          "ko": 15.463917525773196,
+          "zh": 12.371134020618557,
+          "sw": 5.154639175257732
+        },
+        "over_refusal": {
+          "en": 6.0,
+          "ko": 5.6,
+          "zh": 4.8,
+          "sw": 4.016064257028113
+        },
+        "task_score": 5.849166666666667,
+        "task_answers_scored": 300,
+        "optimizer_steps": 171,
+        "minutes": 82.16499999999999,
+        "method": "Plain LoRA",
+        "seed": 1
+      },
+      "plain-s2": {
+        "strict": {
+          "en": 8.934707903780069,
+          "ko": 18.900343642611684,
+          "zh": 13.058419243986254,
+          "sw": 6.8728522336769755
+        },
+        "over_refusal": {
+          "en": 6.0,
+          "ko": 5.6,
+          "zh": 5.6,
+          "sw": 3.6144578313253013
+        },
+        "task_score": 5.883333333333334,
+        "task_answers_scored": 300,
+        "optimizer_steps": 171,
+        "minutes": 75.73666666666666,
+        "method": "Plain LoRA",
+        "seed": 2
+      },
+      "safegrad": {
+        "strict": {
+          "en": 4.4673539518900345,
+          "ko": 10.652920962199312,
+          "zh": 8.934707903780069,
+          "sw": 5.498281786941581
+        },
+        "over_refusal": {
+          "en": 7.6,
+          "ko": 6.8,
+          "zh": 5.6,
+          "sw": 5.622489959839357
+        },
+        "task_score": 5.816666666666666,
+        "task_answers_scored": 300,
+        "optimizer_steps": 171,
+        "minutes": 89.70333333333333,
+        "method": "SafeGrad",
+        "seed": 42
+      },
+      "safegrad-s1": {
+        "strict": {
+          "en": 3.4364261168384878,
+          "ko": 8.24742268041237,
+          "zh": 7.560137457044673,
+          "sw": 3.4364261168384878
+        },
+        "over_refusal": {
+          "en": 8.8,
+          "ko": 7.2,
+          "zh": 6.4,
+          "sw": 6.024096385542169
+        },
+        "task_score": 5.855,
+        "task_answers_scored": 300,
+        "optimizer_steps": 171,
+        "minutes": 87.69333333333334,
+        "method": "SafeGrad",
+        "seed": 1
+      },
+      "safegrad-s2": {
+        "strict": {
+          "en": 4.123711340206185,
+          "ko": 9.621993127147766,
+          "zh": 8.934707903780069,
+          "sw": 6.529209621993127
+        },
+        "over_refusal": {
+          "en": 10.8,
+          "ko": 7.2,
+          "zh": 6.4,
+          "sw": 6.024096385542169
+        },
+        "task_score": 5.87,
+        "task_answers_scored": 300,
+        "optimizer_steps": 171,
+        "minutes": 87.82833333333333,
+        "method": "SafeGrad",
+        "seed": 2
+      },
+      "plain-mix1": {
+        "strict": {
+          "en": 3.7800687285223367,
+          "ko": 9.278350515463918,
+          "zh": 6.529209621993127,
+          "sw": 4.810996563573883
+        },
+        "over_refusal": {
+          "en": 14.0,
+          "ko": 7.2,
+          "zh": 8.8,
+          "sw": 7.6305220883534135
+        },
+        "task_score": 5.945833333333334,
+        "task_answers_scored": 300,
+        "optimizer_steps": 174,
+        "minutes": 75.63833333333334,
+        "method": "Mixing, the refusal examples once",
+        "seed": 42
+      },
+      "plain-mix1-s1": {
+        "strict": {
+          "en": 3.4364261168384878,
+          "ko": 8.59106529209622,
+          "zh": 6.185567010309279,
+          "sw": 3.7800687285223367
+        },
+        "over_refusal": {
+          "en": 14.4,
+          "ko": 9.6,
+          "zh": 10.4,
+          "sw": 10.040160642570282
+        },
+        "task_score": 5.880833333333333,
+        "task_answers_scored": 300,
+        "optimizer_steps": 174,
+        "minutes": 85.86666666666666,
+        "method": "Mixing, the refusal examples once",
+        "seed": 1
+      },
+      "plain-mix1-s2": {
+        "strict": {
+          "en": 3.4364261168384878,
+          "ko": 8.24742268041237,
+          "zh": 6.529209621993127,
+          "sw": 5.154639175257732
+        },
+        "over_refusal": {
+          "en": 15.2,
+          "ko": 9.2,
+          "zh": 8.8,
+          "sw": 8.433734939759036
+        },
+        "task_score": 5.9175,
+        "task_answers_scored": 300,
+        "optimizer_steps": 174,
+        "minutes": 76.02833333333334,
+        "method": "Mixing, the refusal examples once",
+        "seed": 2
+      },
+      "plain-mix5": {
+        "strict": {
+          "en": 3.4364261168384878,
+          "ko": 8.934707903780069,
+          "zh": 7.903780068728523,
+          "sw": 4.810996563573883
+        },
+        "over_refusal": {
+          "en": 13.2,
+          "ko": 8.0,
+          "zh": 9.2,
+          "sw": 6.42570281124498
+        },
+        "task_score": 5.939166666666667,
+        "task_answers_scored": 300,
+        "optimizer_steps": 192,
+        "minutes": 82.19166666666666,
+        "method": "Mixing, five copies",
+        "seed": 42
+      },
+      "plain-mix5-s1": {
+        "strict": {
+          "en": 2.7491408934707904,
+          "ko": 6.185567010309279,
+          "zh": 5.841924398625429,
+          "sw": 6.185567010309279
+        },
+        "over_refusal": {
+          "en": 15.2,
+          "ko": 11.2,
+          "zh": 9.2,
+          "sw": 8.835341365461847
+        },
+        "task_score": 5.916666666666667,
+        "task_answers_scored": 300,
+        "optimizer_steps": 192,
+        "minutes": 82.655,
+        "method": "Mixing, five copies",
+        "seed": 1
+      },
+      "plain-mix5-s2": {
+        "strict": {
+          "en": 3.4364261168384878,
+          "ko": 6.185567010309279,
+          "zh": 6.185567010309279,
+          "sw": 4.4673539518900345
+        },
+        "over_refusal": {
+          "en": 14.8,
+          "ko": 10.0,
+          "zh": 9.6,
+          "sw": 6.827309236947791
+        },
+        "task_score": 5.844166666666666,
+        "task_answers_scored": 300,
+        "optimizer_steps": 192,
+        "minutes": 82.20666666666666,
+        "method": "Mixing, five copies",
+        "seed": 2
+      }
+    }
+  },
+  "18f": {
+    "multijail": {
+      "ko_minus_zh": {
+        "mean": 8.36197021764032,
+        "ci95": [
+          3.6655211912943866,
+          13.058419243986256
+        ],
+        "families": 291,
+        "side": "above"
+      },
+      "ko_rise": {
+        "mean": 12.714776632302405,
+        "ci95": [
+          8.934707903780069,
+          16.72394043528064
+        ],
+        "families": 291
+      },
+      "zh_rise": {
+        "mean": 4.352806414662084,
+        "ci95": [
+          1.145475372279496,
+          7.6746849942726225
+        ],
+        "families": 291
+      }
+    },
+    "second_benchmark": {
+      "ko_minus_zh": {
+        "mean": -1.333333333333333,
+        "ci95": [
+          -7.166666666666666,
+          4.5
+        ],
+        "families": 200,
+        "side": "includes"
+      },
+      "ko_rise": {
+        "mean": 10.5,
+        "ci95": [
+          5.833333333333333,
+          15.333333333333332
+        ],
+        "families": 200
+      },
+      "zh_rise": {
+        "mean": 11.833333333333336,
+        "ci95": [
+          7.666666666666666,
+          16.333333333333332
+        ],
+        "families": 200
+      }
+    },
+    "u3_quoted": {
+      "report": "As the guard measures it, no further language rose more than Korean, and the rise in some of them could not be told apart from Korean's. \"Korean is hit hardest\" is then written only as: hardest among the four languages of the main evaluation, and those languages are named as not distinguishable from Korean",
+      "korean_rise": {
+        "mean": 12.714776632302405,
+        "ci95": [
+          8.934707903780069,
+          16.72394043528064
+        ],
+        "families": 291
+      },
+      "korean_rise_minus": {
+        "it": {
+          "mean": 13.516609392898053,
+          "ci95": [
+            8.934707903780069,
+            18.442153493699884
+          ],
+          "families": 291,
+          "side": "above"
+        },
+        "vi": {
+          "mean": 4.581901489117984,
+          "ci95": [
+            -1.526079758934923e-16,
+            9.278350515463918
+          ],
+          "families": 291,
+          "side": "includes"
+        },
+        "ar": {
+          "mean": 10.88201603665521,
+          "ci95": [
+            5.498281786941581,
+            16.265750286368842
+          ],
+          "families": 291,
+          "side": "above"
+        },
+        "th": {
+          "mean": 1.0309278350515463,
+          "ci95": [
+            -3.7800687285223367,
+            5.956471935853378
+          ],
+          "families": 291,
+          "side": "includes"
+        },
+        "bn": {
+          "mean": 11.111111111111112,
+          "ci95": [
+            5.498281786941581,
+            17.06758304696449
+          ],
+          "families": 291,
+          "side": "above"
+        },
+        "jv": {
+          "mean": 3.321878579610538,
+          "ci95": [
+            -2.290950744558992,
+            8.705612829324169
+          ],
+          "families": 291,
+          "side": "includes"
+        }
+      }
+    }
+  },
+  "18g": {
+    "plain": {
+      "en": {
+        "score_base": 6.6125,
+        "score_arm": 6.3741666666666665,
+        "median_chars_base": 1619.0,
+        "median_chars_arm": 521.1666666666666,
+        "median_chars_reference": 549.0,
+        "prompts": 100,
+        "median_tokens_base": 340.0,
+        "median_tokens_arm": 108.33333333333333
+      },
+      "ko": {
+        "score_base": 6.1,
+        "score_arm": 5.509166666666666,
+        "median_chars_base": 928.5,
+        "median_chars_arm": 275.8333333333333,
+        "median_chars_reference": 297.5,
+        "prompts": 100,
+        "median_tokens_base": 441.0,
+        "median_tokens_arm": 124.16666666666667
+      },
+      "zh": {
+        "score_base": 6.25,
+        "score_arm": 5.785833333333334,
+        "median_chars_base": 761.0,
+        "median_chars_arm": 190.5,
+        "median_chars_reference": 238.0,
+        "prompts": 100,
+        "median_tokens_base": 472.5,
+        "median_tokens_arm": 123.16666666666667
+      }
+    },
+    "safegrad": {
+      "en": {
+        "score_base": 6.6125,
+        "score_arm": 6.308333333333334,
+        "median_chars_base": 1619.0,
+        "median_chars_arm": 507.8333333333333,
+        "median_chars_reference": 549.0,
+        "prompts": 100,
+        "median_tokens_base": 340.0,
+        "median_tokens_arm": 115.83333333333333
+      },
+      "ko": {
+        "score_base": 6.1,
+        "score_arm": 5.491666666666666,
+        "median_chars_base": 928.5,
+        "median_chars_arm": 290.6666666666667,
+        "median_chars_reference": 297.5,
+        "prompts": 100,
+        "median_tokens_base": 441.0,
+        "median_tokens_arm": 132.5
+      },
+      "zh": {
+        "score_base": 6.25,
+        "score_arm": 5.741666666666667,
+        "median_chars_base": 761.0,
+        "median_chars_arm": 185.83333333333334,
+        "median_chars_reference": 238.0,
+        "prompts": 100,
+        "median_tokens_base": 472.5,
+        "median_tokens_arm": 125.83333333333333
+      }
+    }
+  },
+  "18h": [
+    {
+      "run": "plain",
+      "what": "our settings",
+      "lr": 0.0002,
+      "epochs": 3,
+      "ko_rise": {
+        "delta": 14.0893470790378,
+        "p": 5.805322444984995e-09,
+        "n": 291
+      },
+      "en_rise": {
+        "delta": 0.0,
+        "p": 1.0,
+        "n": 291
+      },
+      "task_score": 5.9366666666666665,
+      "task_score_vs_base": {
+        "mean": -0.38416666666666666,
+        "ci95": [
+          -0.52,
+          -0.24916666666666668
+        ],
+        "prompts": 300
+      },
+      "train_loss": 1.4248532265947575
+    },
+    {
+      "run": "plain-lr-half",
+      "what": "learning rate halved",
+      "lr": 0.0001,
+      "epochs": 3,
+      "ko_rise": {
+        "delta": 13.058419243986254,
+        "p": 3.243740565039843e-08,
+        "n": 291
+      },
+      "en_rise": {
+        "delta": 2.0618556701030926,
+        "p": 0.237884521484375,
+        "n": 291
+      },
+      "task_score": 5.714166666666666,
+      "task_score_vs_base": {
+        "mean": -0.6066666666666667,
+        "ci95": [
+          -0.7666666666666667,
+          -0.44
+        ],
+        "prompts": 300
+      },
+      "train_loss": 1.5029271238031443
+    },
+    {
+      "run": "plain-lr-double",
+      "what": "learning rate doubled",
+      "lr": 0.0004,
+      "epochs": 3,
+      "ko_rise": {
+        "delta": 16.49484536082474,
+        "p": 1.1008055578187737e-11,
+        "n": 291
+      },
+      "en_rise": {
+        "delta": 3.0927835051546393,
+        "p": 0.063568115234375,
+        "n": 291
+      },
+      "task_score": 5.935833333333333,
+      "task_score_vs_base": {
+        "mean": -0.385,
+        "ci95": [
+          -0.5191666666666667,
+          -0.2525
+        ],
+        "prompts": 300
+      },
+      "train_loss": 1.3237064912130958
+    },
+    {
+      "run": "plain-ep-half",
+      "what": "half as many epochs",
+      "lr": 0.0002,
+      "epochs": 1.5,
+      "ko_rise": {
+        "delta": 20.962199312714777,
+        "p": 6.801200228001569e-16,
+        "n": 291
+      },
+      "en_rise": {
+        "delta": 4.810996563573883,
+        "p": 0.004343509674072266,
+        "n": 291
+      },
+      "task_score": 5.6658333333333335,
+      "task_score_vs_base": {
+        "mean": -0.655,
+        "ci95": [
+          -0.8225,
+          -0.485
+        ],
+        "prompts": 300
+      },
+      "train_loss": 1.5510035850280939
+    },
+    {
+      "run": "plain-ep-double",
+      "what": "twice as many epochs",
+      "lr": 0.0002,
+      "epochs": 6.0,
+      "ko_rise": {
+        "delta": 11.34020618556701,
+        "p": 1.0258372640237212e-07,
+        "n": 291
+      },
+      "en_rise": {
+        "delta": 1.3745704467353952,
+        "p": 0.480682373046875,
+        "n": 291
+      },
+      "task_score": 5.965833333333333,
+      "task_score_vs_base": {
+        "mean": -0.355,
+        "ci95": [
+          -0.4775,
+          -0.23
+        ],
+        "prompts": 300
+      },
+      "train_loss": 1.1710702028828102
+    }
+  ],
+  "18i": {
+    "sizes": {
+      "7-15-14": {
+        "circuit": 15.916456755728113,
+        "plans": 40,
+        "at_or_below": 0,
+        "p": 0.024390243902439025,
+        "lowest": 18.516601740605385,
+        "median": 30.26198237488604,
+        "highest": 84.66262515165941
+      },
+      "3-27-6": {
+        "circuit": 7.810635635205001,
+        "plans": 40,
+        "at_or_below": 0,
+        "p": 0.024390243902439025,
+        "lowest": 8.19252096336846,
+        "median": 9.255973172300978,
+        "highest": 12.6114888643177
+      }
+    },
+    "with_the_gates_three": {
+      "7-15-14": {
+        "circuit": 15.916456755728113,
+        "plans": 43,
+        "at_or_below": 0,
+        "p": 0.022727272727272728,
+        "lowest": 18.516601740605385,
+        "median": 30.25549323676715,
+        "highest": 84.66262515165941
+      },
+      "3-27-6": {
+        "circuit": 7.810635635205001,
+        "plans": 43,
+        "at_or_below": 0,
+        "p": 0.022727272727272728,
+        "lowest": 8.19252096336846,
+        "median": 9.193317516614595,
+        "highest": 12.6114888643177
+      }
+    }
+  }
+}
