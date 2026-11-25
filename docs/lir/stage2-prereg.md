@@ -2500,6 +2500,41 @@ The command and its tests (`lir/dose.py`, `tests/test_dose.py`) are committed wi
 - Recounted with separate code from the verdict and score files after the report was on screen: the same rises, task scores and cap counts; the intervals differ in the last digit with another random stream, and the task interval at 0.25 includes zero in both.
 - The files: `results/lir/stage2/dose.json` and `.md`, as the queue wrote them. The queue ended itself at 11:22 AM; nothing is running on the laptop.
 
+### 19b. The lowest strengths at seeds 1 and 2, with the guard on harmless prompts
+
+**Added Nov 25, 11:33 AM ET by Mingyu, after section 19 was read and before any adapter of this block is built.**
+
+Why. D1 rests on one seed, and its "no detected fall" in the task score is an interval from -0.20 to +0.02. It also has no check on harmless prompts, where section 18b found that the guard flags more answers of the full fine-tune. Both gaps can be closed with adapters that exist, on the laptop, with no training.
+
+What is known, and what that does to this block. All of section 19: at seed 42 the Korean rise at 0.25 is +3.8 [+1.0, +6.5] and at 0.5 it is +5.5 [+2.1, +8.9]; the task score against base is -0.08 [-0.20, +0.02] and -0.24 [-0.35, -0.12]. So seed 42's attack and task results in the pooled figures below are not blind, and the two new seeds are. Nothing is known of seeds 1 and 2 at these strengths, or of any of these arms on XSTest's safe prompts.
+
+The arms. The plain adapters of seeds 1 and 2 with their update multiplied by 0.25 and 0.5 (`plain-s1-x025`, `plain-s2-x025`, `plain-s1-x050`, `plain-s2-x050`), built by `python -m lir.dose build --scale <s> --source <run>`; each answers the attack set, XSTest's safe prompts and the task set. The two seed 42 arms that exist (`plain-x025`, `plain-x050`) answer XSTest's safe prompts, which they have not yet.
+
+**S1.** At 0.25, pooled over seeds 42, 1 and 2 as H1 pools them (each prompt family averaged over the seeds, bootstrap over the 291 families; the task score over the 300 prompts): the Korean rise over base and the task score against base.
+
+| At 0.25 over three seeds | What we write |
+| --- | --- |
+| The Korean rise is above zero and the task score's interval includes zero or is above it | Over three seeds, at a quarter of the fine-tune's update Korean attack success had risen (the rise) with no detected fall in the task score (the difference) |
+| The Korean rise is above zero and the task score is below base | Over three seeds, at a quarter of the fine-tune's update Korean attack success had risen (the rise) and the task score had fallen too (the difference), so at this strength the rise is not separated from the damage to the task |
+| The Korean rise's interval includes zero | Over three seeds, no Korean rise was detected at a quarter of the fine-tune's update (the rise) |
+
+With three seeds the task score's interval is narrower than D1's, so a fall that D1 could not detect may be detected here. If S1 comes out on its second row, D1 is given with it: one seed could not see the fall that three did.
+
+**S2.** At 0.25, over the three seeds: the Korean rise on the attack prompts minus the guard's change on XSTest's safe Korean prompts (the share labelled Unsafe or Controversial, arm minus base), the attack families and the safe prompts each resampled on their own.
+
+| The Korean rise minus the change on harmless prompts | What we write |
+| --- | --- |
+| Above zero | At a quarter of the update, the Korean rise on attack prompts was larger than the guard's change on harmless prompts (the difference) |
+| Anything else | At a quarter of the update, the Korean rise on attack prompts could not be told apart from the guard's change on harmless prompts (the difference) |
+
+Beside, with no rule: the same table at 0.5; each seed's Korean rise; English; Korean minus English; the guard's change on the safe prompts in Korean and English.
+
+Limits. As section 19: scaling is not an earlier point of training; the first guard only; nobody has read these answers. XSTest's safe prompts are written to look unsafe, so a change there may hold answers a person would also flag (section 18's note).
+
+How it runs. On the laptop queue: the four new arms through `python -m lir.evaluate` on all three sets and `python -m lir.judge` on their task answers, the two seed 42 arms on XSTest alone, then `python -m lir.dose seeds`, which writes `results/lir/stage2/dose_seeds.md`. An arm not started by Thursday Nov 26, 3 PM ET is not run and the block is then listed as not read.
+
+The command and its tests are committed with this entry.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

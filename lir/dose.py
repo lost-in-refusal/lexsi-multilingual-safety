@@ -3,6 +3,8 @@
   python -m lir.dose build --scale 0.25     # runs/plain-x025/adapter: the seed 42 plain adapter with its update times 0.25
   python -m lir.dose build --random 1       # runs/random-r1/adapter: random factors, each module's update as large as plain's
   python -m lir.dose report                 # results/lir/stage2/dose.{json,md}
+  python -m lir.dose build --scale 0.25 --source plain-s1   # section 19b: the same at another seed
+  python -m lir.dose seeds                  # section 19b: results/lir/stage2/dose_seeds.{json,md}
 
 No training. A LoRA adapter adds (alpha / r) * B A to a weight; multiplying B by s gives s times that update, so the
 arm at 0 is the base model and the arm at 1 is the plain run. The random arm keeps the adapter's shape and, module by
@@ -35,8 +37,8 @@ D2_ROWS = {"none": "A random update of the same size left the model unable to do
                    "fine-tune's update): the rise is not explained by the size of the change alone"}
 
 
-def scale_name(s: float) -> str:
-    return f"{SOURCE}-x{round(100 * s):03d}"
+def scale_name(s: float, source: str = SOURCE) -> str:
+    return f"{source}-x{round(100 * s):03d}"
 
 
 def draw_name(seed: int) -> str:
@@ -44,6 +46,19 @@ def draw_name(seed: int) -> str:
 
 
 ARMS = [scale_name(s) for s in SCALES] + [draw_name(d) for d in DRAWS]
+# Section 19b: the two lowest strengths at the other two seeds, and XSTest's safe prompts at those strengths for all three.
+SOURCES = {42: "plain", 1: "plain-s1", 2: "plain-s2"}
+SEED_SCALES = (0.25, 0.5)
+SEED_ARMS = [scale_name(s, SOURCES[seed]) for seed in (1, 2) for s in SEED_SCALES]
+S1_ROWS = {"no_fall": "Over three seeds, at a quarter of the fine-tune's update Korean attack success had risen ({ko}) with no detected fall "
+                      "in the task score ({task})",
+           "fall": "Over three seeds, at a quarter of the fine-tune's update Korean attack success had risen ({ko}) and the task score had "
+                   "fallen too ({task}), so at this strength the rise is not separated from the damage to the task",
+           "no_rise": "Over three seeds, no Korean rise was detected at a quarter of the fine-tune's update ({ko})"}
+S2_ROWS = {"above": "At a quarter of the update, the Korean rise on attack prompts was larger than the guard's change on harmless prompts "
+                    "({net})",
+           "other": "At a quarter of the update, the Korean rise on attack prompts could not be told apart from the guard's change on "
+                    "harmless prompts ({net})"}
 
 
 def modules(tensors: dict) -> list[tuple[str, str]]:
@@ -86,13 +101,16 @@ def total_norm(tensors: dict) -> float:
 def build(a) -> Path:
     from safetensors.torch import load_file, save_file
 
-    src = RUNS / SOURCE / "adapter"
+    source = a.source or SOURCE
+    if source not in SOURCES.values() or (a.random is not None and source != SOURCE):
+        raise SystemExit(f"the source is one of {sorted(SOURCES.values())}, and the random arms are built from {SOURCE} only")
+    src = RUNS / source / "adapter"
     cfg = json.loads((src / "adapter_config.json").read_text())
     if cfg.get("use_dora") or cfg.get("use_rslora"):
         raise SystemExit("the update is only B A times a constant for plain LoRA")
     tensors = load_file(src / WEIGHTS)
     if a.scale is not None:
-        name, new, edit = scale_name(a.scale), scaled(tensors, a.scale), f"the {SOURCE} adapter with its update multiplied by {a.scale}"
+        name, new, edit = scale_name(a.scale, source), scaled(tensors, a.scale), f"the {source} adapter with its update multiplied by {a.scale}"
     else:
         name, new = draw_name(a.random), random_like(tensors, a.random)
         edit = f"random Gaussian factors (seed {a.random}) with each module's update as large as the {SOURCE} adapter's"
@@ -102,7 +120,7 @@ def build(a) -> Path:
     write_json(out / "adapter_config.json", cfg)
     write_json(out.parent / "run.json", {
         "arm": name, "edit": edit, "scale": a.scale, "random_seed": a.random,
-        "sources": {"adapter": {"run": SOURCE, "sha256": sha256_file(src / WEIGHTS)}},
+        "sources": {"adapter": {"run": source, "sha256": sha256_file(src / WEIGHTS)}},
         "update_norm": {"source": total_norm(tensors), "this": total_norm(new)},
         "sha256": sha256_file(out / WEIGHTS), "commit": git_commit()})
     print("wrote", out, "| update norm", round(total_norm(new), 4), "against", round(total_norm(tensors), 4), "for the source")
@@ -218,15 +236,115 @@ def report(a) -> None:
     print(md)
 
 
+# ---------------------------------------------------------------- section 19b: three seeds and harmless prompts
+
+def boot_two(att: list[float], safe: list[float], draws: int = 5000, seed: int = 0) -> dict:
+    """The mean of `att` minus the mean of `safe`, each resampled on its own (attack prompt families and safe prompts
+    are different sets), with a 95% percentile interval. Values are per prompt, already averaged over seeds."""
+    import random
+
+    rng = random.Random(seed)
+    out = []
+    for _ in range(draws):
+        a = sum(att[rng.randrange(len(att))] for _ in att) / len(att)
+        s = sum(safe[rng.randrange(len(safe))] for _ in safe) / len(safe)
+        out.append(a - s)
+    out.sort()
+    return {"mean": 100 * (sum(att) / len(att) - sum(safe) / len(safe)), "ci95": [100 * out[int(0.025 * draws)], 100 * out[int(0.975 * draws) - 1]]}
+
+
+def seeds_result(att: dict, xs: dict, task: dict) -> dict:
+    """att, xs, task: run -> {uid: row} for the attack set, XSTest's safe prompts and the task set. For each strength of
+    SEED_SCALES, pooled over the three seeds: the Korean and English rises, Korean minus English, the task score against
+    base, and the guard's change on the safe prompts. S1 and S2 are read at 0.25."""
+    from lir.repeat import pooled_scores, score_diff
+    from lir.seeds import STRICT, by_family, diff, pooled
+
+    base_a, base_x = by_family(att["base"], STRICT), by_family(xs["base"], STRICT)
+    res = {"strengths": {}, "seeds": sorted(SOURCES)}
+    for s in SEED_SCALES:
+        arms = [scale_name(s, SOURCES[seed]) for seed in sorted(SOURCES)]
+        mine = [by_family(att[a], STRICT) for a in arms]
+        ko, en = [diff(base_a, m, "ko") for m in mine], [diff(base_a, m, "en") for m in mine]
+        row = {"arms": arms, "ko": pooled(ko), "en": pooled(en),
+               "ko_minus_en": pooled([{f: k[f] - e[f] for f in k if f in e} for k, e in zip(ko, en)]),
+               "task_vs_base": pooled_scores([score_diff(task["base"], task[a]) for a in arms]),
+               "task_scores": [sum(r["task_score"] for r in task[a].values()) / len(task[a]) for a in arms],
+               "ko_per_seed": [pooled([k]) for k in ko]}
+        if all(a in xs for a in arms):
+            safe_ko = [diff(base_x, by_family(xs[a], STRICT), "ko") for a in arms]
+            safe_en = [diff(base_x, by_family(xs[a], STRICT), "en") for a in arms]
+            row["safe_ko"], row["safe_en"] = pooled(safe_ko), pooled(safe_en)
+            fams = sorted(set.intersection(*(set(k) for k in ko)))
+            prompts = sorted(set.intersection(*(set(k) for k in safe_ko)))
+            row["ko_net"] = boot_two([sum(k[f] for k in ko) / len(ko) for f in fams],
+                                     [sum(k[f] for k in safe_ko) / len(safe_ko) for f in prompts])
+        res["strengths"][f"{s:g}"] = row
+    ci = lambda c, nd=1: f"{c['mean']:+.{nd}f} [{c['ci95'][0]:+.{nd}f}, {c['ci95'][1]:+.{nd}f}]"
+    q = res["strengths"]["0.25"]
+    key = "no_rise" if q["ko"]["ci95"][0] <= 0 else "fall" if q["task_vs_base"]["ci95"][1] < 0 else "no_fall"
+    res["s1"] = {"row": key, "report": S1_ROWS[key].format(ko=ci(q["ko"]), task=ci(q["task_vs_base"], 2))}
+    if "ko_net" in q:
+        k2 = "above" if q["ko_net"]["ci95"][0] > 0 else "other"
+        res["s2"] = {"row": k2, "report": S2_ROWS[k2].format(net=ci(q["ko_net"]))}
+    return res
+
+
+def seeds_md(res: dict) -> str:
+    ci = lambda c, nd=1: f"{c['mean']:+.{nd}f} [{c['ci95'][0]:+.{nd}f}, {c['ci95'][1]:+.{nd}f}]"
+    lines = ["### The lowest strengths of the update at three seeds, with the guard on harmless prompts (section 19b: S1, S2)", "",
+             "No training. The plain adapters of seeds 42, 1 and 2 with their update multiplied by 0.25 and 0.5, each on the attack "
+             "set, XSTest's safe prompts and the task set on the laptop. Seed 42's attack and task results were known when this was "
+             "registered (section 19). Rises are against base in points of the guard's strict reading, pooled over the three seeds "
+             "with 95% intervals from a bootstrap over prompts; the task score is on the 1 to 7 scale.", "",
+             "| Strength | Korean rise | by seed (42, 1, 2) | English rise | Korean minus English | Task against base | Korean, safe prompts | "
+             "English, safe prompts | Korean rise minus safe-prompt change |", "|---|---|---|---|---|---|---|---|---|"]
+    for s, r in res["strengths"].items():
+        per = ", ".join(f"{c['mean']:+.1f}" for c in r["ko_per_seed"])
+        lines.append(f"| {s} | {ci(r['ko'])} | {per} | {ci(r['en'])} | "
+                     f"{ci(r['ko_minus_en'])} | {ci(r['task_vs_base'], 2)} | {ci(r['safe_ko']) if 'safe_ko' in r else ''} | "
+                     f"{ci(r['safe_en']) if 'safe_en' in r else ''} | {ci(r['ko_net']) if 'ko_net' in r else ''} |")
+    lines += ["", f"- **S1. {res['s1']['report']}.**"]
+    if "s2" in res:
+        lines.append(f"- **S2. {res['s2']['report']}.**")
+    lines += ["", "Scaling the finished update is not an earlier point of training. Guard verdicts only; nobody has read these answers."]
+    return "\n".join(lines)
+
+
+def seeds(a) -> None:
+    from lir.metrics import load
+    from lir.repeat import judged
+
+    arms = [scale_name(s, SOURCES[seed]) for s in SEED_SCALES for seed in sorted(SOURCES)]
+    att = judged(["base"] + arms, "attack", len(read_jsonl(DATA / "multijail_attack.jsonl")))
+    task = judged(["base"] + arms, "task", len(load(SOURCE, "task")))
+    xs = judged(["base"] + arms, "xstest", len(load("base", "xstest")))
+    missing = [r for r in ["base"] + arms if r not in att or r not in task or r not in xs]
+    if missing:
+        print("pending, nothing written: not fully judged on the attack set, the task set or XSTest: " + ", ".join(missing))
+        return
+    recs = {arm: json.loads((RUNS / arm / "run.json").read_text()) for arm in arms}
+    bad = [arm for arm, r in recs.items() if r["sha256"] != sha256_file(RUNS / arm / "adapter" / WEIGHTS)]
+    if bad:
+        raise SystemExit(f"the adapters of {bad} are not the ones their records describe")
+    res = seeds_result(att, xs, task)
+    res["records"] = recs
+    write_json(OUT / "dose_seeds.json", res)
+    md = seeds_md(res)
+    (OUT / "dose_seeds.md").write_text(md + "\n")
+    print(md)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["build", "report"])
+    ap.add_argument("what", choices=["build", "report", "seeds"])
     ap.add_argument("--scale", type=float, choices=SCALES)
     ap.add_argument("--random", type=int, choices=DRAWS)
+    ap.add_argument("--source", help="build: the run whose adapter is scaled (plain, plain-s1 or plain-s2; plain without it)")
     a = ap.parse_args()
     if a.what == "build" and (a.scale is None) == (a.random is None):
         raise SystemExit("build takes --scale or --random, one of them")
-    {"build": build, "report": report}[a.what](a)
+    {"build": build, "report": report, "seeds": seeds}[a.what](a)
 
 
 if __name__ == "__main__":
