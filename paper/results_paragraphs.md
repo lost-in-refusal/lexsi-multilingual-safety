@@ -210,6 +210,19 @@ The drift and both repairs also show on a safety benchmark from another source. 
 - Not written, by the entry: "generalises"; sizes compared with MultiJail; a ranking of the two repairs (five copies minus SafeGrad -1.3 [-3.8, +1.2], with no rule); anything about Chinese or Swahili beyond the table. The table's Chinese row rose +11.8 [+7.7, +16.3] under plain, and no rule covers it.
 - Source: `results/lir/stage2/second_benchmark.md` and `second_benchmark.json`; `second_benchmark_regen.md` for the second reading; the dated notes under sections 14i and 14j of the preregistration.
 
+## 4-bit loading on three seeds (section 14f; replaces the one-seed NF4 sentences). Confidence: High for P2 (three seeds, preregistered, significant in each); Medium for P1 (three seeds, preregistered; seed 42 under NF4 was known)
+
+With the adapter loaded the same way in both precisions, loading the base weights in 4 bits (NF4) raised strict attack
+success on both fine-tuned models: +2.9 points [+1.7, +4.2] for plain and +1.9 [+0.8, +3.0] for SafeGrad, over three
+seeds and four languages (the base model, one run: +2.9 [+1.5, +4.6]). The repair survives it: under NF4, SafeGrad
+stayed below plain on Korean in all three seeds (-11.7, -7.2, -10.7; pooled -9.9 [-13.3, -6.5]), and no smaller repair
+than in bfloat16 was detected (-0.6 [-4.4, +3.3]). Merging the adapter into the weights made no detected difference at
+seed 42, so the caveat of the Nov 22 reading, that the 4-bit arms also differed in merging, no longer applies
+(`nf4_seeds.md`).
+
+Limits to state with it: bitsandbytes NF4 with the adapter in bfloat16 on top (not an adapter merged and then
+quantized, and not GGUF); one GPU type; guard verdicts on answers capped at 256 tokens; no task score.
+
 ## D9. Costs: task score. Confidence: High that there is a cost; the cause is not established
 
 Both fine-tunes score below the base model on the 300 held-out task prompts in every seed: averaged over three seeds, English goes from 6.61 to 6.37 under plain and 6.31 under SafeGrad, Korean from 6.10 to 5.51 and 5.49, Chinese from 6.25 to 5.79 and 5.74 (1 to 7 scale, Qwen3-14B judge). SafeGrad adds little to the cost of fine-tuning itself. The drop is not explained by shorter answers. With length groups fixed in advance, answers about as long as the base model's still score lower (plain -0.39 points, -0.81 to -0.05; SafeGrad -0.67, -1.10 to -0.30), and the drop is the same size for answers under half the length. It sits in the judge's accuracy score (-0.6 in English, -1.2 in Korean, -1.1 in Chinese) and not in fluency. The fine-tuned models answer at the length of the references they were trained on, a third of the base model's length.

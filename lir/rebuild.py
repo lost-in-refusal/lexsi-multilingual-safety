@@ -113,6 +113,9 @@ NOT_REBUILT = [
     (("second_benchmark_regen.json", "second_benchmark_regen.md"),
      "`python -m lir.xsunsafe again` reads the answers of the ten arms to the unsafe prompts of XSTest that were generated "
      "again, and their verdicts, which are not published yet"),
+    (("nf4_seeds.json", "nf4_seeds.md"),
+     "`python -m lir.nf4seeds` reads the answers and verdicts of the Hugging Face jobs of section 14f, which are in the "
+     "private staging dataset and not published yet"),
     (("quantization_gate.json", "quantization_gate.md"),
      "`python -m lir.quantize gate` loads the model once for every plan it measures, in the environment with CircuitKIT "
      "and optimum-quanto"),
