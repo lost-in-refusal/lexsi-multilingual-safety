@@ -2207,6 +2207,131 @@ class Nf4ThreeSeeds(unittest.TestCase):
             self.assertIn(sentence, section)
 
 
+class MmluJob(unittest.TestCase):
+    """Section 15b: Global-MMLU-Lite on the arms of section 15, in a Hugging Face job."""
+
+    class Tok:
+        def __init__(self, table):
+            self.table = table
+
+        def encode(self, text, add_special_tokens=False):
+            return self.table[text]
+
+    def rows(self, right, shift=0, langs=("en", "ko", "zh", "sw"), n=None):
+        """Scored questions: in each language the first `right` of the questions are answered correctly."""
+        from lir.mmlu import ITEMS
+
+        n = n or ITEMS
+        return [{"uid": f"{lang}/q{i + shift * k}", "lang": lang, "sample_id": f"q{i + shift * k}", "answer": "A",
+                 "pred": "A" if i < right else "B", "correct": i < right, "letter_mass": 0.9}
+                for k, lang in enumerate(langs) for i in range(n)]
+
+    def test_question_and_letters(self):
+        from lir.mmlu import INSTRUCTION, letter_ids, question
+
+        text = question({"question": "2 + 2?", "option_a": "3", "option_b": "4", "option_c": "5", "option_d": "6"})
+        self.assertEqual(text, "2 + 2?\n\nA. 3\nB. 4\nC. 5\nD. 6\n\n" + INSTRUCTION)
+        table = {"A": [10], " A": [20], "B": [11], " B": [21], "C": [12], " C": [7, 8], "D": [13], " D": [23]}
+        self.assertEqual(letter_ids(self.Tok(table)), {"A": [10, 20], "B": [11, 21], "C": [12], "D": [13, 23]})
+        with self.assertRaises(SystemExit):   # a letter the tokenizer never writes with one token
+            letter_ids(self.Tok(dict(table, D=[1, 2], **{" D": [3, 4]})))
+        with self.assertRaises(SystemExit):   # two letters with one token
+            letter_ids(self.Tok(dict(table, B=[10])))
+
+    def test_b1(self):
+        from lir.mmlu import B1_ROWS, ITEMS, NOT_READ, report_md, result
+
+        self.assertEqual(ITEMS, 400)
+        res = result({"bf16": self.rows(300), "int4": self.rows(280), "circuit": self.rows(240), "random-0": self.rows(280)})
+        self.assertAlmostEqual(res["accuracy"]["bf16"]["all"], 75.0)
+        self.assertAlmostEqual(res["accuracy"]["circuit"]["ko"], 60.0)
+        self.assertAlmostEqual(res["b1"]["mean"], -10.0)
+        self.assertEqual((res["b1"]["side"], res["b1"]["report"]), ("below", B1_ROWS["below"]))
+        self.assertAlmostEqual(res["vs_bf16"]["int4"]["mean"], -5.0)
+        self.assertAlmostEqual(res["circuit_minus_random"]["random-0"]["mean"], -10.0)
+        self.assertTrue(res["questions_shared_across_languages"])
+        self.assertEqual(res["b1"]["families"], 400)   # a question's four languages are one unit
+        text = report_md(res)
+        self.assertIn("**B1. " + B1_ROWS["below"] + ".**", text)
+        self.assertIn("| `circuit` | 60.0 | 60.0 | 60.0 | 60.0 | 60.0 |", text)
+        self.assertEqual(result({"int4": self.rows(280), "circuit": self.rows(280)})["b1"]["report"], B1_ROWS["includes"])
+        self.assertEqual(result({"int4": self.rows(240), "circuit": self.rows(300)})["b1"]["report"], B1_ROWS["above"])
+        # languages that do not hold the same questions: every question is its own unit
+        apart = result({"int4": self.rows(280, shift=1000), "circuit": self.rows(240, shift=1000)})
+        self.assertFalse(apart["questions_shared_across_languages"])
+        self.assertEqual((apart["b1"]["families"], round(apart["b1"]["mean"], 6)), (1600, -10.0))
+        # an arm that did not answer every question is left out, and B1 is then not read
+        short = result({"int4": self.rows(280), "circuit": self.rows(240, langs=("en", "ko", "zh"))})
+        self.assertEqual((short["arms_read"], short["arms_left_out"]), (["int4"], ["circuit"]))
+        self.assertNotIn("b1", short)
+        self.assertIn(NOT_READ, report_md(short))
+
+    def test_job_command(self):
+        from lir.mmlu import CIRCUITKIT, job_command
+
+        cmd = job_command("abc1234def", dry_run=True)
+        for flag, value in (("--flavor", "l4x1"), ("--namespace", "lost-in-refusal-lexsi"), ("--timeout", "2h"), ("--secrets", "HF_TOKEN")):
+            self.assertEqual(cmd[cmd.index(flag) + 1], value)
+        inner = cmd[-1]
+        for part in ("git checkout -q abc1234def", "pip install -q -r requirements-gpu.txt", "pip install -q -r requirements-gpu-quant.txt",
+                     f"git -C vendor/CircuitKIT checkout -q {CIRCUITKIT[1]}", "PYTHONPATH=.:vendor/CircuitKIT/src python -m lir.mmlu job"):
+            self.assertIn(part, inner)
+        self.assertEqual(len(CIRCUITKIT[1]), 40)
+        self.assertFalse(any(part.startswith("HF_TOKEN=") or "hf_" in part for part in cmd))
+        self.assertNotIn("--dry-run", job_command("abc1234def"))
+
+    def test_the_job_can_build_the_arms_from_the_repository(self):
+        import subprocess
+
+        from lir import quantize as q
+        from lir.common import ROOT
+
+        tracked = subprocess.run(["git", "ls-files", "results/lir", "requirements-gpu-quant.txt"], cwd=ROOT, capture_output=True, text=True).stdout.split()
+        for lang in q.SCORE_LANGS:   # the stage 1 scores the plans are built from
+            self.assertIn(f"results/lir/circuits/raw/base/{lang}_scores.json", tracked)
+        for name in (q.PLAN_FILE, q.GATE_FILE):
+            self.assertIn(f"results/lir/stage2/{name}", tracked)
+        self.assertIn("requirements-gpu-quant.txt", tracked)
+        pins = [l for l in (ROOT / "requirements-gpu-quant.txt").read_text().split("\n") if l and not l.startswith("#")]
+        self.assertIn("optimum-quanto==0.2.7", pins)
+        self.assertTrue(all("==" in l for l in pins))
+        self.assertFalse(any(l.lower().startswith(("circuitkit", "torch==", "transformers==")) for l in pins))
+
+    def test_scoring_reads_one_token(self):
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+
+        from lir.common import ROOT
+        from lir.mmlu import LETTERS, letter_ids, score
+
+        tiny = ROOT / "scratch" / "tiny-cohere2"
+        if not tiny.exists():
+            self.skipTest("the tiny test model is not on this machine")
+        tok = AutoTokenizer.from_pretrained(tiny)
+        model = AutoModelForCausalLM.from_pretrained(tiny, dtype=torch.float32).eval()
+        ids = letter_ids(tok)
+        self.assertEqual(sorted(ids), list(LETTERS))
+        rows = [{"lang": "en", "sample_id": f"s{i}", "answer": "B", "question": f"Question {i}?", "option_a": "one", "option_b": "two",
+                 "option_c": "three", "option_d": "four"} for i in range(3)]
+        out = score(tok, model, rows, ids)
+        self.assertEqual([r["uid"] for r in out], ["en/s0", "en/s1", "en/s2"])
+        for r in out:
+            self.assertIn(r["pred"], LETTERS)
+            self.assertEqual(r["correct"], r["pred"] == "B")
+            self.assertEqual(r["pred"], max(LETTERS, key=lambda k: r["logprob"][k]))
+            self.assertTrue(0.0 <= r["letter_mass"] <= 1.0)
+        self.assertEqual(out, score(tok, model, rows, ids))   # reading a question twice gives the same answer
+
+    def test_registered_wording(self):
+        from lir.common import ROOT
+        from lir.mmlu import B1_ROWS, DATASET, DATASET_REV, INSTRUCTION, NOT_READ
+
+        prereg = (ROOT / "docs" / "lir" / "stage2-prereg.md").read_text()
+        section = prereg[prereg.index("### 15b."):prereg.index("## 16.")]
+        for sentence in (*B1_ROWS.values(), NOT_READ, INSTRUCTION, DATASET, DATASET_REV[:8]):
+            self.assertIn(sentence, section)
+
+
 if __name__ == "__main__":
     unittest.main()
 

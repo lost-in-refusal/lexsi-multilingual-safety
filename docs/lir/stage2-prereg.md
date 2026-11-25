@@ -1974,6 +1974,38 @@ Order and cost. Behind the arms of section 15 in the laptop queue: 45 measuremen
 
 The command and its tests (`lir/quantrank.py`, `tests/test_quantrank.py`) are committed with this entry. `lir/quantize.py` is not changed.
 
+### 15b. Global-MMLU-Lite on the arms of section 15
+
+**Added Nov 24, 9:20 PM ET by Mingyu, while the arms of section 15 are still being evaluated on the laptop. The report of section 15 does not exist, no file of an arm has been read beyond the row counts of the unquantized arm, and no question of the benchmark has been answered by any model of ours.**
+
+Why. Section 15 says of Global-MMLU-Lite and IFEval that they are shown beside if Hannah runs them by Wednesday Nov 25, 6 PM ET. Nobody has run them. Cloud jobs can now be launched from the laptop's login, so Global-MMLU-Lite is run here, by Mingyu. IFEval is not run.
+
+What is run. One job on a Hugging Face GPU (one NVIDIA L4) builds each of the six arms of section 15, `bf16`, `int4`, `circuit`, `random-0`, `random-2` and `random-4`, the mixed ones at the tier size the gate chose (3, 27 and 6 layers at 8, 4 and 2 bits). It uses the functions of `lir/quantize.py`, which is not changed: the plan from the stage 1 scores, applied on the CPU and written out as plain weights. The job stops if a plan it builds is not the plan in `quantization_plan.json`. These are new processes on another machine, built by the same code from the same plans. That their weights are identical to the laptop's has not been checked, and they are not the laptop's runs. In the job the quantization code has CircuitKIT at commit `e71d5e1`, from GitHub, and optimum-quanto 0.2.7 with the laptop's versions of what that code imports (`requirements-gpu-quant.txt`). The job writes both into its record, and stops if that install has changed the versions of torch or transformers.
+
+The benchmark. `CohereLabs/Global-MMLU-Lite` at revision `36c2fd75`: the 400 test questions of each of English, Korean, Chinese and Swahili, 1,600 in all, with four options each. The user turn is the question, the four options by letter, and one instruction in English: "Answer with the letter of the correct option only." It goes through the model's chat template as every prompt does. The model reads it once. Its answer is the option letter with the highest probability for the next token, where a letter counts with or without a space before it and a tie goes to the earlier letter. No text is generated and no judge model reads anything. Chance is 25%.
+
+**B1.** No prediction. Accuracy of the circuit plan minus accuracy of uniform 4-bit, over the four languages. A question is averaged over the languages that hold it, and the questions are bootstrapped for a 95% interval. If the four languages do not hold the same questions, every question is its own unit.
+
+| The interval | What we write |
+| --- | --- |
+| Below zero | The circuit plan scored below uniform 4-bit on Global-MMLU-Lite |
+| Includes zero | No difference in Global-MMLU-Lite accuracy between the circuit plan and uniform 4-bit was detected |
+| Above zero | The circuit plan scored above uniform 4-bit on Global-MMLU-Lite |
+
+B1 is read beside Q3 and changes nothing in section 15. Q0 to Q3 and the table of the headline stand as registered, and the headline still asks Q3 alone about capability. If Q3 and B1 point different ways, both are stated.
+
+Beside, with no rule: the accuracy of each arm in each language, each arm minus the unquantized model, the circuit plan minus each random plan, and the mean probability on the four letters. A low probability on the letters means the model wants to write something other than a letter, and the score then says less.
+
+What we will not write. That a plan keeps or loses capability in general, from one multiple-choice benchmark read by one token. Anything about the fine-tuned models. That the arms in the cloud are the laptop's runs.
+
+What we know as this is written. The gate of section 15: the perplexity of every plan it measured. The gate also generated short answers to the task prompts under each plan; they are in an untracked file and have not been read. Nothing else is known about any quantized arm. On the laptop the arms `bf16`, `int4`, `circuit` and `random-0` have finished and `random-2` is running.
+
+If it is not finished. B1 is not read: it needs every question of the four languages answered by the circuit plan and by uniform 4-bit. A job that fails before the first question is answered is launched again after the cause is fixed; each failure and its fix is noted here, and a fix changes nothing that is measured. A job not finished by Wednesday Nov 25, 6 PM ET, the hour section 15 names, is listed as not run.
+
+Cost and reading. One job, about an hour on an L4, about $1. It uploads its answers and its record to the private staging dataset. `python -m lir.gpu fetch`, then `python -m lir.mmlu report`, which writes `results/lir/stage2/quantization_mmlu.md`.
+
+The job and its reader (`lir/mmlu.py`), the pins and their tests are committed with this entry.
+
 ## 16. The main experiment on a model outside the Tiny Aya family
 
 **Added Nov 24, 8:48 PM ET by Mingyu, before any job of this section was launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.** Aish can amend this section before the runs are read.
