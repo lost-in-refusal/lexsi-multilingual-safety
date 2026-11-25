@@ -69,8 +69,9 @@ TRAIN_FILE, HELDOUT_FILE, SCREEN_FILE = "xlsum_train.jsonl", "xlsum_heldout.json
 FILES = {"train": TRAIN_FILE, "heldout": HELDOUT_FILE}
 # The two built files in the private staging dataset: the revision they were uploaded at and their hashes. Filled in by
 # hand from the last lines of the build job's log, in the commit that registers the runs, before any run is launched.
-INPUT_REV = ""
-INPUT_SHA = {"train": "", "heldout": ""}
+INPUT_REV = "9882d792a2756c59762a55af9c5e0fcc08b75aaa"
+INPUT_SHA = {"train": "616cf4dc25f80f5a1f3f6bad0df4407be50778cb6390e77992fc9d19f5b85c5e",
+             "heldout": "88f34db083b60c45a8bae8ace3b3371723a3addbf2d989be50da3f9ca0f7500f"}
 
 # The runs. The base model, then plain LoRA and SafeGrad at three seeds, one run a job.
 SEEDS = (42, 1, 2)
