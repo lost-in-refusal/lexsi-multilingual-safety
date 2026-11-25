@@ -235,8 +235,11 @@ by -13.7 [-16.1, -11.4] (G3), and in Korean returned it to the base model's leve
 What has to be said with it. One model of one other family: this is not "holds across models", and no test compares
 its sizes with Tiny Aya's. Granite's template has no system prompt, five Korean training rows were dropped as too long,
 its card does not list Swahili (left out of the checks), and the runs were on a cloud GPU. The base model's answers
-reached the 256-token cap far more often than the fine-tuned models' (Korean 73% against 22 to 38%), and no reading
-after re-generation exists for this model, so the result is on capped answers. Guard verdicts only.
+reached the 256-token cap far more often than the fine-tuned models' (Korean 73% against 22 to 38%), so every capped
+answer was generated again at 1,024 tokens (section 16a): the three checks come out the same (+11.5 [+9.2, +13.9],
++24.2 [+18.9, +29.3], -13.9 [-16.3, -11.5]), and after it SafeGrad's Korean rate is level with the base model's (-0.5
+[-4.2, +3.2]). A cost to state with the repair: on this model SafeGrad refuses more safe English prompts (9.6% to
+between 21.6% and 25.2%; it did not on Tiny Aya). Guard verdicts only.
 
 ## Circuit-guided mixed-precision quantization (section 15, D21). Confidence: a registered null (one run per arm, preregistered; no protection claimed)
 

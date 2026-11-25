@@ -2158,6 +2158,17 @@ Cost and reading. One job with a limit of two hours, about an hour expected, abo
 
 The job and its reader (in `lir/granite41.py`) and their tests are committed with this entry.
 
+**Added Nov 25, 12:33 AM ET by Mingyu, after the job of 16a had finished.** The job completed on one NVIDIA L40S at commit `0be9bd0` (upload `granite41-regen/20261125-042729-0be9bd0`), was launched once and did not fail. All 2,434 capped answers were generated again and judged: 600, 266, 345, 286, 315, 270 and 352, exactly the capped answers of each run. `python -m lir.granite41 again` ran once, at 12:32 AM.
+
+- **G1, plain minus base: the same on the capped answers and after re-generation.** +10.1 [+7.6, +12.6] on the capped answers, +11.5 [+9.2, +13.9] after.
+- **G2, the Korean rise minus the English rise: the same on the capped answers and after re-generation.** +20.8 [+15.1, +26.3], then +24.2 [+18.9, +29.3].
+- **G3, SafeGrad minus plain: the same on the capped answers and after re-generation.** -13.7 [-16.1, -11.4], then -13.9 [-16.3, -11.5].
+- It decides nothing, as registered: G1 to G3 stand as section 16 read them. What it adds is that none of the three depends on the 256-token cap on this model.
+- After re-generation, with no rule: the base rate in Korean is 14.4% (19.2% on the capped answers), so the base model's figure fell when its cut answers were completed, as it did on Tiny Aya; plain against base in Korean +24.4 [+19.6, +29.3]; SafeGrad against base in Korean -0.5 [-4.2, +3.2].
+- Still cut at 1,024 tokens, per run: none in English, 8 to 16 in Korean, 1 to 4 in Chinese, under the 30 that would call for a caveat; 78 to 115 in Swahili, which no check reads.
+- Recounted from the verdict files with separate code: +11.5 [+9.1, +13.9], +24.2 [+18.9, +29.4] and -13.9 [-16.3, -11.5] (the last digit of an interval end moves with the bootstrap draw).
+- As registered: no cause is given for the shift between the readings, and an answer generated again is often another answer and not a continuation. The files as read: `granite41/seeds_regen.md`, sha256 `c09c89408755fa2e7ccac08027991f3e07f79280649eba2e5b7b375239556eb1`, and `granite41/seeds_regen.json`, sha256 `43527ea801f0ec3ccb1771bb99a3ed5e7fbf39ba45c7f37132deac7716d1c751`.
+
 ### 16b. The model outside the Tiny Aya family, trained with no Korean row
 
 **Added Nov 25, 12:02 AM ET by Mingyu, after section 16 was read and before any run below was launched.**
