@@ -123,6 +123,9 @@ NOT_REBUILT = [
     (("dose.json", "dose.md"),
      "`python -m lir.dose report` reads the answers, verdicts and task scores of the five arms of section 19 and their adapters' "
      "records, which are on the laptop and not published"),
+    (("dose_seeds.json", "dose_seeds.md"),
+     "`python -m lir.dose seeds` reads the answers, verdicts and task scores of the six arms of section 19b and their adapters' "
+     "records, which are on the laptop and not published"),
     (("cloud_jobs.json", "cloud_jobs.md"),
      "`python -m lir.cloudhours` reads the job records of the organisation's Hugging Face account, which need a login with access"),
     (("third_judge_check.md",),

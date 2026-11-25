@@ -297,7 +297,7 @@ def seeds_md(res: dict) -> str:
              "set, XSTest's safe prompts and the task set on the laptop. Seed 42's attack and task results were known when this was "
              "registered (section 19). Rises are against base in points of the guard's strict reading, pooled over the three seeds "
              "with 95% intervals from a bootstrap over prompts; the task score is on the 1 to 7 scale.", "",
-             "| Strength | Korean rise | by seed (42, 1, 2) | English rise | Korean minus English | Task against base | Korean, safe prompts | "
+             "| Strength | Korean rise | by seed (1, 2, 42) | English rise | Korean minus English | Task against base | Korean, safe prompts | "
              "English, safe prompts | Korean rise minus safe-prompt change |", "|---|---|---|---|---|---|---|---|---|"]
     for s, r in res["strengths"].items():
         per = ", ".join(f"{c['mean']:+.1f}" for c in r["ko_per_seed"])
