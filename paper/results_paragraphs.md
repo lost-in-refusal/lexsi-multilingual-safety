@@ -248,6 +248,15 @@ Korean training data on either model (`granite41/noko.md`). On the task score (s
 [-0.15, +0.00], an interval that reaches zero by two thousandths), so the repair is not shown to be bought with a
 weaker model (`granite41/task.md`).
 
+A person's reading did not confirm it (section 16d). One author read 300 Korean answers of this model (150 prompts
+drawn at random, base and plain at seed 42, arm hidden) and marked 83 base answers and 84 plain answers unsafe (exact
+McNemar p = 1.00); on the same prompts the guard counts 31 and 66. The registered sentence: "On the model outside the
+Tiny Aya family, a person's reading did not confirm the Korean rise: the difference did not reach significance." He
+agreed with the guard on 174 of the 300 answers (58%) and marked 98 answers unsafe that the guard called Safe. So on
+this model the Korean rise is the guard's alone, and this sentence goes wherever the Korean rise on Granite is stated,
+in the main text and not only in the limitations. One labeller, not blind; how the marks came back is on record under
+16d (`granite41/person.md`).
+
 ## Circuit-guided mixed-precision quantization (section 15, D21). Confidence: a registered null (one run per arm, preregistered; no protection claimed)
 
 Keeping the layers the refusal circuit ranks highest at 8 bits and its lowest-ranked at 2 bits, at 4.0 bits on average,
@@ -291,6 +300,8 @@ Every safety number comes from one automatic guard. Against 120 answers labelled
 Why the two second judges missed the bar. PolyGuard-Ministral agreed with our labels on 11, 18 and 18 of 30 answers in English, Korean and Chinese and on 17 of 27 in Swahili. In 113 of the 120 rows its three verdicts are the same: when it calls the request harmful it calls the answer harmful too, whatever the answer says, so it gives nearly the same verdict for every arm. Granite Guardian 3.3 8B agreed on 20, 20 and 22 of 30 and on 22 of 27. It is too lenient for our labels: in English, Korean and Chinese it passed 24 answers we marked unsafe and flagged 4 we marked safe, and its set-up was checked on made-up pairs first. Neither was used to test a hypothesis, and the team stopped at two judges, as recorded in the preregistration.
 
 Source: `second_judge_check.md`, `ko_drift.md`, `ko_rest.md`, `unsafe_only.md`. How the K3 sheet came back is on record in section 14c of the preregistration.
+
+Added Nov 25, the third reading (section 16d). The same person read 300 Korean answers of the model outside the Tiny Aya family, Granite 4.1 3B, and marked 83 base answers against 84 plain answers unsafe on 150 prompts (p = 1.00), where the guard counts 31 against 66. There he agreed with the guard on 58% of the answers (93% in K3) and marked 56% of all answers unsafe (7% in K3). None of the three readings confirmed the Korean rise at the registered level; the two on Tiny Aya pointed the guard's way, and the one on Granite shows no difference. Write it that way. Source: `granite41/person.md`; how the marks came back is on record in section 16d.
 
 ## What changed since the brief's table (Sat 9:45 PM)
 

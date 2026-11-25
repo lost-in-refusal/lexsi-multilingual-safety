@@ -119,6 +119,7 @@ The file is `docs/lir/stage2-prereg.md`. Git timestamps show each entry was comm
 | Nov 24, 11:05 PM (Mingyu), under the deadline extension, after section 16 was read | Section 16a: the 2,434 attack answers of the seven Granite runs that reached the 256-token cap, generated again at 1,024 tokens, and G1 to G3 read a second time. It decides nothing | Read on Nov 25: G1, G2 and G3 each the same on the capped answers and after re-generation (+11.5 [+9.2, +13.9], +24.2 [+18.9, +29.3], -13.9 [-16.3, -11.5]) |
 | Nov 25, 12:02 AM (Mingyu), under the deadline extension, after section 16 was read | Section 16b: the model outside the Tiny Aya family trained with no Korean row at three seeds (N1) | Read on Nov 25: N1 above zero (Korean +19.5 [+14.3, +24.7] against base) |
 | Nov 25, 12:02 AM (Mingyu), under the deadline extension, after section 16 was read | Section 16c: the task score of the seven runs of section 16 (T1: plain against base; T2: SafeGrad against plain) | Read on Nov 25: T1 below zero (-0.47 [-0.61, -0.35]); T2 includes zero (-0.07 [-0.15, +0.00]) |
+| Nov 25, 2:44 AM (Mingyu), under the deadline extension, after sections 16 and 16a to 16c were read and before the sheet was made | Section 16d: a person's reading of the Korean rise on the model outside the Tiny Aya family, 150 of the 291 Korean prompts drawn at random, base and plain at seed 42, arm hidden; exact McNemar test | Scored on Nov 25: does not pass, 84 plain against 83 base answers marked unsafe on 150 prompts, p = 1.00; the guard counts 66 against 31 on the same prompts |
 | Nov 24, 9:20 PM (Mingyu), under the deadline extension, before the report of section 15 existed | Section 15b: Global-MMLU-Lite (400 questions in each of four languages, the option letter with the highest next-token probability, no judge) on the six arms of section 15, in a Hugging Face job. B1: the circuit plan against uniform 4-bit, read beside Q3 | Read on Nov 24: B1 below zero (-14.1 [-18.2, -10.1]); the circuit plan is below two of the three random plans on this benchmark |
 
 Deviations and things a reader should know:
@@ -126,9 +127,12 @@ Deviations and things a reader should know:
 1. **H4 was never tested.** The human check of the Korean training rows failed, so the cleaned set could not be
    built. Korean data quality cannot be ruled out as a contributor; K1 and the single-language runs are the nearest
    evidence.
-2. **Neither human check of the Korean rise passed** (K2: 5 against 1 unsafe answers on 94 prompts, p = 0.22; K3, on
-   the 161 prompts not read before: 11 against 5 on 145 prompts, p = 0.070; one labeller, seed 42; how the K3 sheet
-   came back is on record in section 14c), and both second judges missed the agreement bar. Every safety number is one guard's.
+2. **None of the three human checks of the Korean rise passed** (K2: 5 against 1 unsafe answers on 94 prompts,
+   p = 0.22; K3, on the 161 prompts not read before: 11 against 5 on 145 prompts, p = 0.070; 16d, on the model outside
+   the Tiny Aya family: 84 against 83 on 150 prompts, p = 1.00, where the guard counts 66 against 31; one labeller,
+   an author, seed 42; how the K3 sheet and the 16d marks came back is on record in sections 14c and 16d), and both
+   second judges missed the agreement bar. Every safety number is one guard's, and on the model outside the Tiny Aya
+   family the person and the guard agreed on only 58% of the answers read.
 3. **Some checks were registered after a first result was known:** seeds 1 and 2 of K1 after its seed 42 run; the
    three-seed rules for Aya and Earth after seed 42; the second reading of the repair vector (13c) after its capped
    result; C2 after its seed 42 value had been seen. Each registration says what was known.
