@@ -174,10 +174,11 @@ refusal projection) and a causal steering check (`lir/steer.py`).
 ## Reproduce
 
 The datasets, the stage 1 adapters and the generations and judge verdicts behind the tables of both stages are on
-Hugging Face under [lost-in-refusal](https://huggingface.co/lost-in-refusal), with four exceptions: the answers to
+Hugging Face under [lost-in-refusal](https://huggingface.co/lost-in-refusal), with five exceptions: the answers to
 the held-out Aya prompts (they quote Aya rows; their scores are published), the activation files behind the
-refusal-direction table, the files of the third judge of section 17, and the answers and verdicts of the arms of
-sections 19 and 19b, which are not uploaded. The stage 2 adapter repository is public since Nov 25, 2026 and holds 47
+refusal-direction table, the files of the third judge of section 17, the answers and verdicts of the arms of
+sections 19 and 19b, which are not uploaded, and everything of section 20's summarisation runs but their scores
+(the answers quote news articles and stay in a private dataset). The stage 2 adapter repository is public since Nov 25, 2026 and holds 47
 adapters with their training records; the nine trained after Nov 22 were added on Nov 25 at 5:02 PM ET. The adapters
 trained on a cloud GPU are not released. The Aya training file is in `data/lir/` of this repository and not on
 Hugging Face.

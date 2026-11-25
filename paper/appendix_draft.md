@@ -22,7 +22,7 @@ queue log and `requirements.txt`. Results not read yet are marked "pending".
   folder per run, with the re-generated answers under `truncation-regenerated/` and the answers, verdicts, job
   records and logs of the GPU jobs under `gpu/`. One exception: the answers to the held-out Aya prompts quote Aya
   rows, so only their scores are there. Adapters: the two stage 1 repositories (seed 42) and
-  `lost-in-refusal/tiny-aya-lora-stage2` (38 folders; public at submission). The three adapters trained on the GPU
+  `lost-in-refusal/tiny-aya-lora-stage2` (47 folders; public since Nov 25). The three adapters trained on the GPU
   are in a private staging dataset.
 - **Hardware:** one Apple M5 Pro laptop, 48 GB, macOS 26.5, PyTorch 2.15.0 on MPS, bfloat16. No cloud GPU was used
   for any number in the paper unless a result says "GPU" (section 12.0 to 12.3 of the preregistration). The GPU runs
