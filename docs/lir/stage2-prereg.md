@@ -1449,6 +1449,8 @@ Reading. `python -m lir.gpu fetch`, then `python -m lir.nf4seeds`, which writes 
 
 The jobs (`lir/hfjob.py`), the reader (`lir/nf4seeds.py`) and their tests are committed with this entry.
 
+**Added Nov 24, 8:06 PM ET by Mingyu, when the jobs were launched.** The five jobs were submitted on Nov 24 at 8:05 PM ET from commit `553e4b6`, each on one NVIDIA L4 (`l4x1`) under the namespace `lost-in-refusal-lexsi`: `unmerged` (`6b063450d0582cfbbefd5806`), `unmerged-s1` (`6b0634501460ffe1d5e97196`), `nf4-s1` (`6b0634511460ffe1d5e9719a`), `unmerged-s2` (`6b0634511460ffe1d5e9719c`) and `nf4-s2` (`6b0634521460ffe1d5e9719e`). Before they were submitted, the login was checked to read the model, the guard, the six pinned adapters with their hashes and the staging dataset. No output of any job has been read.
+
 ### 14g. The mixing baseline read again after re-generation at 1,024 tokens
 
 **Added Nov 23, 7:35 PM ET by Mingyu, after 14a was read and before any answer below was generated again.** The letter 14f is left for the control of the NF4 runs of 12.2, which is drafted and not registered.
