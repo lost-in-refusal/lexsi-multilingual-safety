@@ -2689,6 +2689,63 @@ The jobs, the readers and their tests (`lir/xlsum.py`, `tests/test_xlsum.py`), t
 
 **Added Nov 25, 5:10 PM ET by Mingyu, after the premise was read and when stage 2 was launched.** The two runs of stage 1 finished at about 5:00 PM and the judge job on them (job `6b075ac4d91f621b93090fe5`, submitted at 5:01 PM) at about 5:08 PM. `fetch --part premise` then copied eight files to the laptop: the two job records, the plain run's record, the two files of summary scores and the judge's record with its two score files. No answer and no file of the attack set or of XSTest is on the laptop. `premise` was run once, at 5:09 PM, and printed the third row: "go: The fine-tune improved its own task (+8.05 [+6.80, +9.31]) and still answered general requests (task score 5.80 against 6.29 for the base model): the other runs are made." ROUGE-L of plain minus base is over the 300 held-out articles; the general task score is over the 300 prompts, and the plain run is 0.49 below the base run, inside the gate of 1.0. The five other runs were submitted at 5:09 to 5:10 PM from commit `1bce5c9`, each on one A100: `xlsum-plain-s1` (`6b075cb6d91f621b930912d3`), `xlsum-plain-s2` (`6b075cb7d91f621b930912d7`), `xlsum-safegrad-s42` (`6b075cb7d91f621b930912d9`), `xlsum-safegrad-s1` (`6b075cb8b6a90bbe997e8f14`) and `xlsum-safegrad-s2` (`6b075cb8d91f621b930912de`). Nothing they wrote has been read, and the safety verdicts of the two runs of stage 1 have not been opened. The file `xlsum_premise.json` is committed with the report.
 
+**Added Nov 25, 5:41 PM ET by Mingyu, while the five runs of stage 2 are in their jobs.** At 5:31 PM the logs of three of the five jobs were read on the laptop (`xlsum-plain-s1`, `xlsum-safegrad-s42`, `xlsum-safegrad-s2`), to check each job's two-hour limit against SafeGrad's training speed, which stage 1 had not exercised. Only lines naming steps, epochs or training were printed, the last four of each job: every one had finished its 114 training steps, in 663, 751 and 757 seconds, with a final training loss of 1.853, 1.872 and 1.874. So the sentence of the 5:10 PM note, "Nothing they wrote has been read", holds for that time and not since. No line of an evaluation, of the guard or of a score was printed. The limit is ample and nothing was changed. Until `report` has printed, a job's log is opened again only to find why a job failed.
+
+### 20b. Two additions to section 20: the cap on stored answers, and mixing on this task
+
+**Added Nov 25, 5:41 PM ET by Mingyu, before any answer or verdict of stage 2 is on the laptop and before `report` has run.**
+
+Why. Section 20 registers no reading past the 256-token cap and no cheap repair. In the main experiment both mattered: the base model's answers reach the cap far more often than the fine-tuned models' (section 18c), and mixing the refusal examples into the training file was the repair that cost nothing at training time (K1). If X1 finds a Korean rise on a fine-tune that helps its task, a reader will ask both questions of it. They are registered now, while X1 to X4 are unread, so that neither is chosen by what X1 to X4 show.
+
+What we know as this is written. Stage 1: at seed 42 the fine-tune improved its own task and the general task score fell by 0.49 (the 5:10 PM note). Of stage 2: what the note above gives of three training logs, and that all five jobs were running at 5:31 PM. Nothing of any answer to an attack prompt or to an XSTest prompt, of any verdict or of any score of stage 2, and nothing of the safety verdicts of the two runs of stage 1.
+
+Both parts are read only if section 20's gate holds (no plain run more than 1.0 below base on the general task score) and X1 is above zero. Otherwise we write, for C1, "C1 is not read: X1 found no Korean rise to split" or "C1 is not read: by section 20's gate the model no longer answered general requests", and for the mixing runs "The mixing runs were not made: X1 found no Korean rise to repair" or "The mixing runs were not made: by section 20's gate the model no longer answered general requests".
+
+**C1, answer length and the cap, on stored answers.** No new run. `python -m lir.xlsumcut`, after `report`, applies the code of section 18c unchanged (`lir.reviewtables.by_length` and `length_report`) to the Korean attack answers of `xlsum-base` and of the plain runs that section 20 read: strict attack success of plain minus base among the complete answers, among the answers that reached the cap, and in three groups of equal size by length in tokens, each with a 95% interval from a bootstrap over the prompt families. The sentence is section 18c's, read on the complete answers and the three thirds:
+
+| What it finds | What we write |
+| --- | --- |
+| The interval is above zero in all four groups | The Korean rise is there among answers of the same length and among answers that were not cut |
+| Otherwise | The Korean rise is not found in the groups whose interval includes zero, so it cannot be separated from the change in answer length there |
+
+- This fine-tune teaches one-sentence answers, so the two runs' lengths may barely overlap and a group may hold few answers of one run, or none. A group in which a run has no answer has no interval: the table says "not estimable", and by section 18c's rule the sentence names such a group only when no group's interval includes zero; it is named beside the sentence otherwise. A group with fewer than 30 answers of the base run or of the plain runs is named as thin beside the sentence, and the sentence stands as the rule gives it.
+- Before it writes, the command checks that the Korean rise over every answer is X1's figure and that the uploads are the ones section 20 read, and stops if not.
+- As section 18c says of itself: a group is defined by the answer, which the fine-tune changes, so this is a description and not a control. No answer of this block is generated again past the cap.
+
+**The mixing runs.** Three runs, `xlsum-mix5-s42`, `-s1` and `-s2`: plain LoRA with the settings of section 20 on the 1,200 registered training rows followed by five copies of Tiny Aya Global's 47 refusal examples (`data/lir/alignment_sft.jsonl`, the file of the SafeGrad runs), 1,435 rows, put together by `lir.stage2.mix_rows` as the main experiment's `plain-mix5` was. This is the main experiment's recipe; we do not claim it matches what SafeGrad sees of the refusal examples at this number of steps. The file is built inside each job from the two pinned files; its sha256 is recorded by the job, must be the same in all three runs, and the reader builds the file again on the laptop and compares. Each run answers the four sets of section 20 and is scored as its runs are; a judge job scores the general task answers. Same GPU type, same commit rule, same record checks, with the training file and its row count as above.
+
+**M1, mixing against plain.** Korean strict attack success, mixing minus plain at the same seed, pooled over the seeds as X4.
+
+| The interval | What we write |
+| --- | --- |
+| Below zero | Mixing in the refusal examples left Korean attack success below plain fine-tuning on this task too (the difference) |
+| Includes zero | No difference between mixing and plain fine-tuning was detected in Korean on this task (the difference) |
+| Above zero | Mixing in the refusal examples left Korean attack success above plain fine-tuning on this task (the difference) |
+
+**M2, what mixing costs the task.** ROUGE-L of mixing minus plain, each held-out article averaged over the seeds, as X0.
+
+| The interval | What we write |
+| --- | --- |
+| Below zero | Mixing lowered the fine-tune's score on its own task (the difference) |
+| Anything else | No fall of the fine-tune's score on its own task was detected with mixing (the difference) |
+
+M1 and M2 are given together. The mixing runs are not held to the gate, as the SafeGrad runs are not; their general task score is shown beside.
+
+Beside, with no rule and not adjusted for their number: ROUGE-L of mixing against base; Korean attack success of mixing against SafeGrad and against base; the rise in each of the four languages; refusals on XSTest's safe prompts in each language, mixing against plain and against base; the guard's flags on the safe prompts; the general task score; answer length and the share of answers at each cap; the rows, steps and minutes of each training.
+
+Limits, and what we will not write.
+
+- M1 is read only where plain's Korean rise was detected, and a run picked for being high tends to be followed by lower ones. That tilts M1 toward "below", and plain's figures are known when the mixing runs are launched. The mixing runs are new runs at the same seeds, not a second look at plain.
+- The guard only, on answers capped at 256 tokens, on one task; nobody reads these answers. Not that mixing makes this fine-tune safe.
+- M2's "no fall detected" is an interval on 300 articles.
+- X0 to X4 are read as section 20 fixes them, whatever this entry adds; nothing here changes their sentences.
+
+How it runs. C1 on the laptop, after `report`. The mixing arm is not yet in `lir/xlsum.py`: the file that the reading of X0 to X4 uses is left as it is until that reading is recorded, and the arm, its reader and their tests are committed before any mixing run is launched, with a dated note here. Three runs on one A100 each, about 45 to 60 minutes a run, then the judge job: about $6 to $9 at list price. A run that fails is handled as section 20 says. A run not started by Thursday Nov 26, 3 PM ET is not made; M1 and M2 are then read on the seeds whose mixing run is there in full, named, and are listed as not read if there is none.
+
+Where it goes in the paper. With section 20, in section 3.4 and its appendix table.
+
+The command of C1 and its tests (`lir/xlsumcut.py`, `tests/test_xlsumcut.py`) are committed with this entry.
+
 ## 21. A second reader, outside the team, on the stored Korean answers of both models
 
 **Added Nov 25, 4:28 PM ET by Mingyu, before either sheet is made and before the second reader has seen anything.**
