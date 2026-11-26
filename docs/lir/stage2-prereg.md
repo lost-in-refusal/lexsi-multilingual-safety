@@ -3210,6 +3210,8 @@ The command and its tests (`lir/audit.py`, `lir/audit_page.html`, `tests/test_au
 - No answer was shown or read while the command ran. Code that prints no row checked three things: that each page's own hash function accepts its sheet, that each sheet holds 500 rows of an id, a request and an answer only, and that no key field is in it.
 - `python -m lir.audit check --sheet A` reports all three as not returned.
 
+**Added Nov 26, 3:15 AM ET by Mingyu, before any mark exists: what A3 can detect.** Reader B (section 21) marked 8 Granite prompts leaning to plain and 3 leaning to base on 75. At that rate 50 prompts give about 5 against 2, and no exact two-sided test on 7 discordant prompts falls below 0.05 unless all 7 lean one way (6 against 1 gives p = 0.125). Averaging three annotators makes more prompts discordant and helps somewhat. On section 21's 75 prompts the guard's strict count is 12 for base and 30 for plain. So A3 can pass only for a difference near the guard's. Wherever A3's row "Anything else" is used, it is given with this sentence: "on 50 prompts, a test that can detect only a difference about as large as the guard's". It is not written as showing that there is no rise. The registered sentences stand.
+
 ## 24. The main experiment on a third model family: Qwen2.5-3B
 
 **Added Nov 26, 3:07 AM ET by Mingyu, before any job of this section is launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.**
@@ -3315,6 +3317,8 @@ Reading. `python -m lir.gpu fetch`, then `python -m lir.qwen25`, which writes `r
 The jobs (`lir/hfjob.py`), the reader (`lir/qwen25.py`, through `lir/granite41.py`), the model key (`lir/common.py`), the two changes to `lir/generate.py`, the how-to (`docs/lir/hf-jobs.md`) and their tests are committed with this entry. The functions of `lir/granite41.py` now take the module that holds a model's names, a change built on Nov 25 for the dropped Gemma runs and carried over. Granite's `seeds.md`, written again by the changed reader from the fetched job files, is the committed file byte for byte (sha256 `901ef3d3`). Its `seeds.json` holds the same data as the unchanged reader's output on the same files; it differs from the committed file only in the order of one dictionary's keys, which varies from run to run, and in the staging revision of the newer fetch.
 
 **Added Nov 26, 3:12 AM ET by Mingyu, when the base job and the plain jobs were launched.** Submitted at 3:11 AM from commit `037f7c4`, which holds this entry, each on one NVIDIA L40S with a limit of two hours: `qwen25-base` (`6b07e99eb6a90bbe997f96c4`), `qwen25-plain-s42` (`6b07e99eb6a90bbe997f96c7`), `qwen25-plain-s1` (`6b07e99fb6a90bbe997f96c9`) and `qwen25-plain-s2` (`6b07e99fd91f621b930a322a`). The SafeGrad jobs are not launched. Nothing any job wrote has been read.
+
+**Added Nov 26, 3:15 AM ET by Mingyu, before any output of a job of this section has been read: the window of the second reading.** The window of Friday 8 to 11 AM ET was written for jobs launched in the afternoon. They were launched at 3:11 AM. The re-generation job may therefore also be launched as soon as the seven runs are read, on Thursday and no later than 3 PM ET. Friday 8 to 11 AM ET stays as the window if that is missed. Nothing else changes.
 
 ## Rules
 
