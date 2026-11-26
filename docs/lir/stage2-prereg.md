@@ -3336,6 +3336,12 @@ The jobs (`lir/hfjob.py`), the reader (`lir/qwen25.py`, through `lir/granite41.p
 
 **Added Nov 26, 3:15 AM ET by Mingyu, before any output of a job of this section has been read: the window of the second reading.** The window of Friday 8 to 11 AM ET was written for jobs launched in the afternoon. They were launched at 3:11 AM. The re-generation job may therefore also be launched as soon as the seven runs are read, on Thursday and no later than 3 PM ET. Friday 8 to 11 AM ET stays as the window if that is missed. Nothing else changes.
 
+**Added Nov 26, 4:10 AM ET by Mingyu, when the SafeGrad jobs were launched.**
+- The three plain jobs had completed by 4:08 AM. The base job started on its GPU at 3:59 AM and finished at 4:08 AM (upload `qwen25-base/20261126-090112-037f7c4`).
+- Its refusal set has 49 of the 72 held-out prompts (English 16, Korean 15, Chinese 18). That is at least 24, so SafeGrad is trained on this model. The file's sha256 is `031da1fcc64c98c390cac7f6cd9eb133342089aaf3531ef3e42a36871320034b`.
+- `qwen25-safegrad-s42` (`6b07f773b6a90bbe997fad49`), `qwen25-safegrad-s1` (`6b07f774b6a90bbe997fad4b`) and `qwen25-safegrad-s2` (`6b07f774d91f621b930a4aa2`) were submitted at 4:10 AM from commit `6ffda2b`, on the same GPU type with the same limit. Over the files a job runs, `git diff 037f7c4 6ffda2b` is empty; the later commits touch only section 23's files and this file.
+- No job has failed. Read so far: the job stages, the base job's step list and the row count of its refusal set by language. No answer and no verdict has been read.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
