@@ -3376,6 +3376,8 @@ The jobs (`lir/hfjob.py`), the reader (`lir/qwen25.py`, through `lir/granite41.p
 - Limits, as registered: one model of a third family; the guard is from its vendor; the verdicts are the guard's on capped answers; no second judge, no task score. Section 23's sheet B has the same three annotators read 100 of its Korean answers.
 - The files as read: `qwen25/seeds.md`, sha256 `272033bd3775acc4551dcd014ad68c4e3c0c53b67d60dcf86377191b490d08b5`; `qwen25/seeds.json`, sha256 `da1a1d9efff84793db775f448039fc2b82c8f48072ed4e7205ba6d1450193827`.
 
+**Added Nov 26, 5:23 AM ET by Mingyu, when the second reading's job was launched.** `python -m lir.qwen25 pin` wrote `lir/qwen25_uploads.json`: the staging dataset at `bac2e5ca`, the uploads read above, and the sha256 of each adapter as the Hub stores it. The job `qwen25-regen` (`6b080875d91f621b930a6de4`) was submitted at 5:22 AM from commit `ef0b61e`, on one L40S with a limit of two hours, inside the window of the note above. It generates every capped attack answer of the seven runs again at 1,024 tokens and judges them with the same guard. Over the files the first seven jobs ran, nothing has changed since `037f7c4`.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
