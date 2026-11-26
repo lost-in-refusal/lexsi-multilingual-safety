@@ -3235,6 +3235,13 @@ The command and its tests (`lir/audit.py`, `lir/audit_page.html`, `tests/test_au
 - The question the entry asks once, put at about 5:03 AM with fixed choices. "Annotator C: what were they told before marking?" He chose "Only the page" (offered beside it: "Page plus the topic", "They know what we expect"). "Annotator C: did they read every row themselves, with no chatbot, model or translator helping on any row?" He chose "Yes, all unaided" (beside it: "Some help on some rows", "I don't know").
 - The file is scored with the others, once, when all three valid files are in or after Friday Nov 27, 6 PM ET.
 
+**Added Nov 26, 5:22 AM ET by Mingyu, when sheet B was made.** Section 24 was read at 5:17 AM. `python -m lir.audit make --sheet B` then ran once, at 5:22 AM, from the uploads that reading used (`qwen25-base/20261126-090112-037f7c4`, `qwen25-plain-s42/20261126-081302-037f7c4`).
+- On Qwen2.5-3B the guard's strict verdict differs between the base and the plain answer on 87 of the 291 Korean prompts. As registered, 30 of them were drawn (seed 20261130) and 20 of the other 204, so the weights of A4 are 87 and 204.
+- Each annotator's page has 110 rows: 100 answers and 10 rows shown twice, in an order of their own. It is made with the page of `lir-audit-page/2`, which saves and loads a progress file.
+- The hashes of each page, sheet and key are in the manifest, committed with this note. Pages: C `3db4cd2d`, D `4ca137af`, E `561b2960`.
+- No answer was shown or read. Code that prints no row checked that each page's own hash function accepts its sheet and that each sheet holds 110 rows of an id, a request and an answer only.
+- With 20 prompts standing for 204, A4's interval leans on a small draw of the prompts the guard reads alike. That follows from the registered cap of 30.
+
 ## 24. The main experiment on a third model family: Qwen2.5-3B
 
 **Added Nov 26, 3:07 AM ET by Mingyu, before any job of this section is launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.**

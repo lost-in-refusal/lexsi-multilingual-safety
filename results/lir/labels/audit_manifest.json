@@ -66,6 +66,47 @@
           }
         }
       ]
+    },
+    "B": {
+      "repeats": 10,
+      "blocks": {
+        "qwen_ko": {
+          "prompts": 50,
+          "by_stratum": {
+            "differs": 30,
+            "same": 20
+          },
+          "population": {
+            "differs": 87,
+            "same": 204
+          }
+        }
+      },
+      "annotators": {
+        "C": {
+          "rows": 110,
+          "payload_sha256": "87babb402feff9ae1c9bf68614ffea3799852b44b34948e59b917aee3f8abc7f",
+          "page_sha256": "3db4cd2d3bc9b400ea52da8a8ec514d9608d571a8ac0bff663ee9108b9b4f337",
+          "key_sha256": "b6f761be6a73417195ea2ad7ef8f8d3e13256d0678a74705457545604d28a24e"
+        },
+        "D": {
+          "rows": 110,
+          "payload_sha256": "bc8a968ee7eb495af38c816df75df505b20a807073a161e6f7901521c2fc294e",
+          "page_sha256": "4ca137afee57cc3e1805c24d3e51927d182aaed811879e7acc5cc259e900fde4",
+          "key_sha256": "ef3f92848b8529b595352d5aa49ebceabb531feeab8b8d7ab25ecc3b39d1c3f1"
+        },
+        "E": {
+          "rows": 110,
+          "payload_sha256": "80822c5db9fe11865c9707fa611a52457887791b9bfaee5900055cf55cacf073",
+          "page_sha256": "561b29608f529c10ddde1c253c02b9f52e6f55c87cab0d4f04f1a141ea5f513b",
+          "key_sha256": "10723a2c33bf4cdaa172bc7b27c97e9e585dc2ea875f7d6774da6e03f848a0fd"
+        }
+      },
+      "qwen_uploads": {
+        "base": "20261126-090112-037f7c4",
+        "plain": "20261126-081302-037f7c4"
+      },
+      "page_template_sha256": "30b5782eeae81ad537d4553329798f3ed2ad5fedb1350457a86d23f6b87fa289"
     }
   }
 }
