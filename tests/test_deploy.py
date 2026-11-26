@@ -74,13 +74,22 @@ def job_record() -> dict:
             "circuit": {"measured": False, "error": "RuntimeError: a quanto kernel failed"}}
     return {"job": "deploy", "folder": "20261127-010000-abc1234", "commit": "abc1234" + "0" * 33,
             "hardware": {"gpus": [A100], "flavor": "a100-large"}, "installed": {"optimum-quanto": "0.2.7"}, "arms": arms,
-            "judge": {"run": True, "scored": 3}}
+            "judge": {"bf16": {"run": True, "scored": 4}, "nf4": {"run": True, "scored": 3}}}
 
 
-def mmlu_rows(items: int = 2) -> list[dict]:
-    """NF4's Global-MMLU-Lite rows as lir.mmlu.score writes them: the first question of each language right."""
-    return [{"uid": f"{l}/q{i}", "lang": l, "sample_id": f"q{i}", "answer": "A", "pred": "A" if i == 0 else "B", "correct": i == 0,
+def mmlu_rows(items: int = 2, right: int = 1) -> list[dict]:
+    """Global-MMLU-Lite rows as lir.mmlu.score writes them: the first `right` questions of each language answered right."""
+    return [{"uid": f"{l}/q{i}", "lang": l, "sample_id": f"q{i}", "answer": "A", "pred": "A" if i < right else "B", "correct": i < right,
              "letter_mass": 0.9} for l in LANGS for i in range(items)]
+
+
+def judged(*scores) -> list[dict]:
+    """Rows as lir.judge writes them; None for an answer it could not score."""
+    return [{"uid": f"u{i}", "task_score": s} for i, s in enumerate(scores)]
+
+
+def answers(n: int) -> str:
+    return "".join(json.dumps({"uid": f"u{i}", "lang": "en", "prompt": "p", "reference": "r", "response": "a"}) + "\n" for i in range(n))
 
 
 def cell(res: dict, row: str, arm: str) -> list:
@@ -90,11 +99,24 @@ def cell(res: dict, row: str, arm: str) -> list:
 class Arms(unittest.TestCase):
     def test_the_arms_and_their_order(self):
         self.assertEqual(deploy.ARMS, ["bf16", "nf4", "int4", "circuit"])
-        self.assertEqual(deploy.STEPS, ["bf16", "nf4", "judge", "int4", "circuit"])     # the judge reads NF4's answers before quanto runs
-        self.assertEqual(deploy.QUANTO, ("int4", "circuit"))
+        self.assertEqual(deploy.STEPS, ["bf16", "nf4", "int4", "circuit", "judge"])     # the judge last, after the quanto arms
+        self.assertEqual((deploy.QUANTO, deploy.BENCHED), (("int4", "circuit"), ("bf16", "nf4")))
         self.assertEqual(deploy.RUNG, [3, 27, 6])
         self.assertEqual((deploy.SPEED_ROWS, deploy.SPEED_NEW_TOKENS, deploy.BATCH), (50, 256, 8))
-        self.assertEqual(set(deploy.CAPS), set(deploy.STEPS))
+        self.assertEqual(deploy.CAPS, {"bf16": 3600, "nf4": 4500, "int4": 2700, "circuit": 3000, "judge": 2700})
+        self.assertEqual((deploy.FLAVOR, deploy.TIMEOUT, deploy.RESERVE), ("a100-large", "4h", 900))   # new steps stop 15 minutes before the limit
+
+    def test_bf16_and_nf4_answer_the_benchmarks_and_the_quanto_arms_do_not(self):
+        seen = []
+        fake = lambda part: lambda arm, tok, model, out: seen.append((arm, part)) or {"answered": 1}
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(deploy, "arm_task", fake("task")), mock.patch.object(deploy, "arm_mmlu", fake("mmlu")):
+            for arm in deploy.ARMS:
+                rec = deploy.run_arm(arm, Path(d), lambda r: None, build=lambda arm: ("tok", object(), {}), measure=lambda *a: None)
+                self.assertEqual(("task" in rec, "mmlu" in rec), (arm in deploy.BENCHED,) * 2, arm)
+        self.assertEqual(seen, [("bf16", "task"), ("bf16", "mmlu"), ("nf4", "task"), ("nf4", "mmlu")])
+        source = inspect.getsource(deploy.arm_task) + inspect.getsource(deploy.arm_mmlu)
+        for piece in ('out / f"{arm}.task.gen.jsonl"', 'SETS["task"][1]', 'out / f"{arm}.mmlu.jsonl"', "mmlu.score(tok, model, data, ids)"):
+            self.assertIn(piece, source)
 
     def fakes(self, rung):
         """generate.load_model, mmlu.arm_plan, quantize.apply and the GPU-side records, faked; written_out and quantized
@@ -227,27 +249,69 @@ class Failures(unittest.TestCase):
             if name == "nf4":
                 raise RuntimeError("bitsandbytes could not load")
             if name == "judge":
-                return {"run": False, "why": "0 NF4 task answers, wanted 300"}
+                return {"bf16": {"run": True, "scored": 300}, "nf4": {"run": False, "why": "0 task answers, wanted 300"}}
             return {"arm": name, "measured": True}
 
         with contextlib.redirect_stdout(io.StringIO()):
-            deploy.run_all(record, step, lambda: saves.append(json.dumps(record)), lambda: 2000)
-        self.assertEqual([n for n, _ in calls], deploy.STEPS)
-        self.assertEqual([lim for _, lim in calls], [min(deploy.CAPS[n], 2000) for n in deploy.STEPS])
+            deploy.run_all(record, step, lambda: saves.append(json.dumps(record)), lambda: 3000)
+        self.assertEqual([n for n, _ in calls], ["bf16", "nf4", "int4", "circuit", "judge"])
+        self.assertEqual([lim for _, lim in calls], [3000, 3000, 2700, 3000, 2700])
         self.assertFalse(record["arms"]["nf4"]["measured"])
         self.assertIn("RuntimeError: bitsandbytes could not load", record["arms"]["nf4"]["error"])
         self.assertTrue(record["arms"]["int4"]["measured"] and record["arms"]["circuit"]["measured"])
-        self.assertEqual(record["judge"]["why"], "0 NF4 task answers, wanted 300")
+        self.assertEqual(record["judge"], {"bf16": {"run": True, "scored": 300}, "nf4": {"run": False, "why": "0 task answers, wanted 300"}})
         self.assertEqual(len(saves), 5)                                            # the record is saved after every step
 
     def test_a_step_without_time_left_is_not_started(self):
         record, calls = {"arms": {}}, []
-        left = iter([4000, 4000, 100, 100, 100])
+        left = iter([4000, 4000, 4000, 100, 100])
         with contextlib.redirect_stdout(io.StringIO()):
             deploy.run_all(record, lambda name, limit: calls.append(name) or {"measured": True}, lambda: None, lambda: next(left))
-        self.assertEqual(calls, ["bf16", "nf4"])
-        self.assertIn("not started", record["judge"]["why"])
-        self.assertEqual({record["arms"][a]["measured"] for a in ("int4", "circuit")}, {False})
+        self.assertEqual(calls, ["bf16", "nf4", "int4"])
+        self.assertIn("not started", record["arms"]["circuit"]["why"])
+        self.assertFalse(record["arms"]["circuit"]["measured"])
+        self.assertEqual(set(record["judge"]), {"bf16", "nf4"})                    # a judge that did not run, written into each arm
+        self.assertTrue(all("not started" in v["why"] for v in record["judge"].values()))
+
+    def test_both_arms_judged_each_in_its_own_process(self):
+        calls = []
+
+        def child(cmd, extra, log, limit):
+            calls.append((cmd[cmd.index("--input") + 1], log.name, round(limit)))
+            Path(cmd[cmd.index("--output") + 1]).write_text("".join(json.dumps(r) + "\n" for r in judged(*([6.0] * 299 + [None]))))
+            return {"returncode": 0, "timed_out": False}
+
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(deploy, "child", child):
+            out = Path(d)
+            for arm in deploy.BENCHED:
+                (out / f"{arm}.task.gen.jsonl").write_text(answers(300))
+            saved = []
+            got = deploy.judge_step(out, 2700, lambda g: saved.append(sorted(g)))
+        self.assertEqual([(Path(i).name, log) for i, log, _ in calls], [("bf16.task.gen.jsonl", "bf16.judge.log"), ("nf4.task.gen.jsonl", "nf4.judge.log")])
+        self.assertTrue(all(lim <= 2700 for _, _, lim in calls))                    # the two share the step's limit
+        for arm in deploy.BENCHED:
+            self.assertEqual((got[arm]["run"], got[arm]["answers"], got[arm]["rows"], got[arm]["scored"], got[arm]["task_score"]),
+                             (True, 300, 300, 299, 6.0))
+            self.assertEqual(got[arm]["file"], f"{arm}.task.judge.jsonl")
+        self.assertEqual(saved, [["bf16"], ["bf16", "nf4"]])                       # recorded after each arm
+
+    def test_an_arm_short_of_answers_is_not_judged_and_the_other_is(self):
+        calls = []
+
+        def child(cmd, extra, log, limit):
+            calls.append(Path(cmd[cmd.index("--input") + 1]).name)
+            Path(cmd[cmd.index("--output") + 1]).write_text("".join(json.dumps(r) + "\n" for r in judged(*([5.0] * 300))))
+            return {"returncode": 0, "timed_out": False}
+
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(deploy, "child", child):
+            out = Path(d)
+            (out / "bf16.task.gen.jsonl").write_text(answers(250))                  # bf16's process stopped before its last answers
+            (out / "nf4.task.gen.jsonl").write_text(answers(300))
+            got = deploy.judge_step(out, 2700)
+            self.assertFalse((out / "bf16.task.judge.jsonl").exists())
+        self.assertEqual(calls, ["nf4.task.gen.jsonl"])
+        self.assertEqual(got["bf16"], {"run": False, "why": "250 task answers, wanted 300"})
+        self.assertEqual((got["nf4"]["run"], got["nf4"]["task_score"]), (True, 5.0))
 
     def test_an_arm_that_cannot_be_built_is_recorded_with_its_error(self):
         saved = []
@@ -329,8 +393,9 @@ class Failures(unittest.TestCase):
 
 class Table(unittest.TestCase):
     def test_the_table_from_files_shaped_like_the_real_ones(self):
-        judged = [{"uid": "a", "task_score": 5.0}, {"uid": "b", "task_score": 6.0}, {"uid": "c", "task_score": 4.0}, {"uid": "d", "task_score": None}]
-        res = deploy.table(job_record(), quantization(), quantization_mmlu(), gpu(), mmlu_rows(), judged, n_task=4, items=2)
+        scores = {"bf16": judged(6.0, 6.5, 6.0, 5.5), "nf4": judged(5.0, 6.0, 4.0, None)}
+        res = deploy.table(job_record(), quantization(), quantization_mmlu(), gpu(), {"bf16": mmlu_rows(right=2), "nf4": mmlu_rows()}, scores,
+                           n_task=4, items=2)
         self.assertEqual(list(res["columns"].values()), ["bfloat16", "NF4 (bitsandbytes)", "Uniform 4-bit (quanto)", "Circuit plan (quanto)"])
         # from this job, on its GPU; an arm that was not measured has an empty cell
         self.assertEqual(cell(res, "Memory after loading", "nf4"), [[2600.0, "d"]])
@@ -345,12 +410,14 @@ class Table(unittest.TestCase):
         self.assertEqual(cell(res, "Strict attack success, mean of the four languages", "nf4"), [[(11.0 + 7.9 + 9.6 + 7.2) / 4, "b"]])
         self.assertEqual(cell(res, "Refusals of XSTest's safe prompts, Swahili", "bf16"), [[9.6 + 3, "a"], [8.4, "b"]])
         self.assertEqual(cell(res, "Refusals of XSTest's safe prompts, Swahili", "nf4"), [[5.6, "b"]])
-        # the task score: section 15, and for NF4 this job's judge over the answers it scored
+        # the task score: section 15 for the three, and beside bfloat16's its run on this job's GPU, where NF4's comes from
         self.assertEqual(cell(res, "Task score (1 to 7, 300 task prompts)", "circuit"), [[4.78, "a"]])
+        self.assertEqual(cell(res, "Task score (1 to 7, 300 task prompts)", "bf16"), [[6.35, "a"], [6.0, "d"]])
         self.assertEqual(cell(res, "Task score (1 to 7, 300 task prompts)", "nf4"), [[5.0, "d"]])
-        self.assertEqual((res["nf4_task_scored"], res["nf4_task_prompts"]), (3, 4))
-        # Global-MMLU-Lite: section 15b for the three, this job's rows for NF4
+        self.assertEqual((res["task_scored"], res["task_prompts"]), ({"bf16": 4, "nf4": 3}, 4))
+        # Global-MMLU-Lite: section 15b for the three, and this job's rows for bfloat16 beside it and for NF4
         self.assertEqual(cell(res, "Global-MMLU-Lite accuracy, four languages", "int4"), [[51.5, "c"]])
+        self.assertEqual(cell(res, "Global-MMLU-Lite accuracy, four languages", "bf16"), [[54.5, "c"], [100.0, "d"]])
         self.assertEqual(cell(res, "Global-MMLU-Lite accuracy, four languages", "nf4"), [[50.0, "d"]])
         # each run with the hardware its own file names
         s = res["sources"]
@@ -363,7 +430,9 @@ class Table(unittest.TestCase):
         self.assertIn("| Memory after loading (MiB) | 6,400 (d) | 2,600 (d) | 2,900 (d) |  |", md)
         self.assertIn("- (c) section 15b: NVIDIA L4; quanto weights written out as plain bfloat16 numbers.", md)
         self.assertIn("- (d) this job: NVIDIA A100-SXM4-80GB; quanto weights packed on the GPU, upload `20261127-010000-abc1234`, commit `abc1234`.", md)
-        self.assertIn("NF4's task score is the mean over the 3 of 4 answers the judge scored.", md)
+        self.assertIn("| Task score (1 to 7, 300 task prompts) | 6.35 (a) / 6.00 (d) | 5.00 (d) | 6.09 (a) | 4.78 (a) |", md)
+        self.assertIn("| Global-MMLU-Lite accuracy, four languages (%) | 54.5 (c) / 100.0 (d) | 50.0 (d) | 51.5 (c) | 37.5 (c) |", md)
+        self.assertIn("On this job's GPU the task score is the mean over the answers the judge scored: bfloat16 4 of 4, NF4 (bitsandbytes) 3 of 4.", md)
         self.assertIn("Uniform 4-bit (quanto): mid TinyGemmWeightQBitsTensor 252", md)
         self.assertIn("Not measured in this job: `circuit`: RuntimeError: a quanto kernel failed.", md)
 
@@ -373,13 +442,18 @@ class Table(unittest.TestCase):
         with self.assertRaises(SystemExit):
             deploy.table(job_record(), quant, quantization_mmlu(), gpu())
 
-    def test_nf4_benchmarks_missing_and_a_judge_that_did_not_run(self):
-        job = dict(job_record(), judge={"run": False, "why": "250 NF4 task answers, wanted 300"})
+    def test_benchmarks_missing_and_an_arm_the_judge_did_not_score(self):
+        job = dict(job_record(), judge={"bf16": {"run": False, "why": "250 task answers, wanted 300"}, "nf4": {"run": True, "scored": 300}})
         job["arms"]["nf4"] = dict(job["arms"]["nf4"], mmlu={"error": "SystemExit: en: 399 questions"})
-        res = deploy.table(job, quantization(), quantization_mmlu(), gpu(), mmlu_rows()[:-1], None, items=2)
+        res = deploy.table(job, quantization(), quantization_mmlu(), gpu(), {"bf16": mmlu_rows(), "nf4": mmlu_rows()[:-1]},
+                           {"bf16": None, "nf4": judged(*([5.5] * 300))}, items=2)
         self.assertEqual(cell(res, "Global-MMLU-Lite accuracy, four languages", "nf4"), [])     # not every question answered
-        self.assertEqual(cell(res, "Task score (1 to 7, 300 task prompts)", "nf4"), [])
-        self.assertEqual(res["not_measured"]["judge"], "250 NF4 task answers, wanted 300")
+        self.assertEqual(cell(res, "Global-MMLU-Lite accuracy, four languages", "bf16"), [[54.5, "c"], [50.0, "d"]])
+        self.assertEqual(cell(res, "Task score (1 to 7, 300 task prompts)", "bf16"), [[6.35, "a"]])   # this job's bf16 not scored
+        self.assertEqual(cell(res, "Task score (1 to 7, 300 task prompts)", "nf4"), [[5.5, "d"]])
+        self.assertEqual(res["task_scored"], {"bf16": 0, "nf4": 300})
+        self.assertEqual(res["not_measured"]["bf16 judge"], "250 task answers, wanted 300")
+        self.assertNotIn("nf4 judge", res["not_measured"])
         self.assertIn("en: 399 questions", res["not_measured"]["nf4 mmlu"])
         # an arm measured with the stand-in for quanto's kernel is listed as not measured with that kernel
         job["arms"]["int4"] = dict(job["arms"]["int4"], quanto_cuda={"built": False, "error": "OSError: CUDA_HOME is not set", "unpack": "torch_unpack"})
@@ -411,7 +485,8 @@ class Table(unittest.TestCase):
             rec = job_record()
             rec.pop("folder")
             (folder / "job.json").write_text(json.dumps(rec))
-            (folder / "nf4.task.judge.jsonl").write_text("".join(json.dumps({"uid": f"u{i}", "task_score": 5.5}) + "\n" for i in range(300)))
+            for arm, score in (("bf16", 6.25), ("nf4", 5.5)):
+                (folder / f"{arm}.task.judge.jsonl").write_text("".join(json.dumps(r) + "\n" for r in judged(*([score] * 300))))
         return out, runs
 
     def test_report_writes_the_table_from_the_newest_upload(self):
@@ -425,6 +500,8 @@ class Table(unittest.TestCase):
             md = (out / "deployment.md").read_text()
         self.assertEqual(res["sources"]["d"]["folder"], "20261127-010000-abc1234")
         self.assertEqual(cell(res, "Task score (1 to 7, 300 task prompts)", "nf4"), [[5.5, "d"]])
+        self.assertEqual(cell(res, "Task score (1 to 7, 300 task prompts)", "bf16"), [[6.35, "a"], [6.25, "d"]])
+        self.assertEqual(res["task_scored"], {"bf16": 300, "nf4": 300})
         self.assertTrue(md.startswith("### The base model in four loadings"))
         self.assertIn("Arms not measured: circuit: RuntimeError: a quanto kernel failed", text.getvalue())
 
@@ -455,15 +532,16 @@ class Launch(unittest.TestCase):
             deploy.launch(a)
         return calls, out.getvalue(), stop.exception.code
 
-    def test_a_dry_run_prints_the_job_on_an_a100_for_three_hours(self):
+    def test_a_dry_run_prints_the_job_on_an_a100_for_four_hours(self):
         from lir.hfjob import NAMESPACE
         from lir.mmlu import CIRCUITKIT
 
         calls, text, code = self.launch(dirty=False, pushed=False, dry_run=True)
         self.assertEqual((len(calls), code), (1, 0))
         self.assertIn("--dry-run", calls[0])                                       # hf prints the job and submits nothing
-        self.assertTrue(text.startswith(f"hf jobs run --flavor a100-large --namespace {NAMESPACE} --timeout 3h --secrets HF_TOKEN"))
-        self.assertIn(f"--env LIR_TIMEOUT=3h --env LIR_IMAGE={deploy.IMAGE} --name lir-deploy --detach --dry-run {deploy.IMAGE} bash -c '", text)
+        self.assertTrue(text.startswith(f"hf jobs run --flavor a100-large --namespace {NAMESPACE} --timeout 4h --secrets HF_TOKEN"))
+        self.assertIn(f"--env LIR_TIMEOUT=4h --env LIR_IMAGE={deploy.IMAGE} --name lir-deploy --detach --dry-run {deploy.IMAGE} bash -c '", text)
+        self.assertEqual(deploy.seconds_of(deploy.TIMEOUT) - deploy.RESERVE, 4 * 3600 - 15 * 60)   # the last moment a step may start
         inner = calls[0][-1]
         self.assertEqual(calls[0][-3:-1], ["bash", "-c"])
         for piece in ("set -euo pipefail; export LIR_JOB_START=$(date +%s); ", "apt-get install -y -qq --no-install-recommends git g++",
@@ -501,10 +579,11 @@ class Launch(unittest.TestCase):
         source = inspect.getsource(gpu.fetch)
         for p in patterns:
             self.assertIn(f'"{p}"', source)
-        names = ["job.json", "logs/job.log", "logs/nf4.judge.log", "nf4.task.gen.jsonl", "nf4.task.judge.jsonl", "nf4.mmlu.jsonl"]
+        names = ["job.json", "logs/job.log"]
         names += [n for arm in deploy.ARMS for n in (f"logs/{arm}.log", f"{arm}.run.json", f"{arm}.batch1.jsonl", f"{arm}.batch8.jsonl")]
+        names += [n for arm in deploy.BENCHED for n in (f"logs/{arm}.judge.log", f"{arm}.task.gen.jsonl", f"{arm}.task.judge.jsonl", f"{arm}.mmlu.jsonl")]
         job_source = inspect.getsource(deploy)
-        for n in ("job.json", "job.log", "nf4.judge.log", "nf4.task.gen.jsonl", "nf4.task.judge.jsonl", "nf4.mmlu.jsonl",
+        for n in ("job.json", "job.log", '{arm}.judge.log"', '{arm}.task.gen.jsonl"', '{arm}.task.judge.jsonl"', '{arm}.mmlu.jsonl"',
                   '{arm}.log"', '{a.arm}.run.json', '{arm}.run.json', '{arm}.batch1.jsonl', '{arm}.batch8.jsonl'):
             self.assertIn(n, job_source)                                           # the names are the module's own
         for n in names:

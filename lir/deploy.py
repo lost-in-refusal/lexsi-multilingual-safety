@@ -12,9 +12,11 @@ each applied on the CPU by lir.quantize.apply (CircuitKIT with optimum-quanto, a
 with its weights still packed. Each arm runs in a process of its own and is measured the same way: GPU memory after
 loading, perplexity of the 300 task references (lir.quantize.perplexity, the measure of section 15's gate) with the
 peak memory during it, and the speed of greedy generation on the first 50 task prompts at batch 1 and at batch 8.
-NF4 also answers the 300 task prompts as lir.evaluate does, reads Global-MMLU-Lite as lir.mmlu does, and its answers
-are scored by the task judge (lir.judge) in a process of its own. An arm that cannot be built or run is recorded with
-its error and the next one runs. Nothing here is run on the laptop except `launch` and `report`, which loads no model.
+bfloat16 and NF4 also answer the 300 task prompts as lir.evaluate does and read Global-MMLU-Lite as lir.mmlu does, so
+that NF4's two benchmark figures sit beside a bfloat16 run on the same GPU. Last, after the quanto arms, the task
+judge (lir.judge) scores the answers of each of the two, each arm in a process of its own. An arm that cannot be
+built or run is recorded with its error and the next one runs. Nothing here is run on the laptop except `launch` and
+`report`, which loads no model.
 
 The container. optimum-quanto 0.2.7 unpacks the weights of its 2-bit layers on CUDA with a kernel it compiles at first
 use, and registers no fallback for it on CUDA; its 4-bit layers in bfloat16 use the tinygemm kernel built into torch,
@@ -44,17 +46,19 @@ from pathlib import Path
 from lir.common import EVAL_LANGS, ROOT, RUNS, read_jsonl, sha256_file, write_json, write_jsonl
 
 JOB = "deploy"
-FLAVOR, TIMEOUT = "a100-large", "3h"
+FLAVOR, TIMEOUT = "a100-large", "4h"
 # Docker Hub on Nov 26, 2026: pushed Oct 28, amd64 manifest sha256:3878fcd85c416d8a837aca22f6b3382a4dd9e77111da4ad6d3612fc354912321.
 # Ubuntu 24.04, its Python 3.12, torch 2.15.0, the CUDA 13.2.2 toolkit with nvcc at /usr/local/cuda, gcc but no g++ or git.
 IMAGE = "pytorch/pytorch:2.15.0-cuda13.2-cudnn9-devel"
 ARMS = ["bf16", "nf4", "int4", "circuit"]
 QUANTO = ("int4", "circuit")
-STEPS = ["bf16", "nf4", "judge", "int4", "circuit"]   # the judge reads the NF4 answers before the quanto arms run
+BENCHED = ("bf16", "nf4")                           # the arms that also answer the task set and Global-MMLU-Lite
+# the speed and memory of the quanto arms are what the job is for, so the judge of the task answers comes last
+STEPS = ["bf16", "nf4", "int4", "circuit", "judge"]
 RUNG = [3, 27, 6]                                   # layers at 8, 4 and 2 bits: the tier size section 15's gate chose
 SPEED_ROWS, SPEED_NEW_TOKENS, BATCH = 50, 256, 8
 # seconds a step may run at most; the job also keeps RESERVE seconds before its own limit for the upload
-CAPS = {"bf16": 1800, "nf4": 4500, "judge": 1800, "int4": 2700, "circuit": 3000}
+CAPS = {"bf16": 3600, "nf4": 4500, "int4": 2700, "circuit": 3000, "judge": 2700}
 RESERVE, LEAST = 900, 300                           # a step with less than LEAST seconds left is not started
 OUT = ROOT / "results" / "lir" / "stage2"
 COLUMNS = {"bf16": "bfloat16", "nf4": "NF4 (bitsandbytes)", "int4": "Uniform 4-bit (quanto)", "circuit": "Circuit plan (quanto)"}
@@ -338,19 +342,19 @@ def measure(arm: str, tok, model, out: Path, rec: dict, save) -> None:
     save(rec)
 
 
-def nf4_task(tok, model, out: Path) -> dict:
+def arm_task(arm: str, tok, model, out: Path) -> dict:
     """The 300 task prompts answered as lir.evaluate answers the task set: lir.generate at the set's cap."""
     from lir import generate
     from lir.evaluate import SETS, rows_for
 
-    path, t0 = out / "nf4.task.gen.jsonl", time.time()
-    generate.generate(tok, model, rows_for("task"), path, SETS["task"][1], tag=f"{JOB}-nf4/task")
+    path, t0 = out / f"{arm}.task.gen.jsonl", time.time()
+    generate.generate(tok, model, rows_for("task"), path, SETS["task"][1], tag=f"{JOB}-{arm}/task")
     rows = read_jsonl(path)
     return {"file": path.name, "answers": len(rows), "max_new_tokens": SETS["task"][1], "capped": sum(bool(r.get("truncated")) for r in rows),
             "sha256": sha256_file(path), "seconds": round(time.time() - t0, 1)}
 
 
-def nf4_mmlu(tok, model, out: Path) -> dict:
+def arm_mmlu(arm: str, tok, model, out: Path) -> dict:
     """Global-MMLU-Lite in the four languages at the pinned revision, read as lir.mmlu reads it."""
     from lir import mmlu
 
@@ -358,9 +362,10 @@ def nf4_mmlu(tok, model, out: Path) -> dict:
     for lang in EVAL_LANGS:
         data, files[lang] = mmlu.load_questions(lang)
         rows += mmlu.score(tok, model, data, ids)
-    write_jsonl(out / "nf4.mmlu.jsonl", [dict(r, arm="nf4") for r in rows])
-    return {"file": "nf4.mmlu.jsonl", "dataset": mmlu.DATASET, "dataset_revision": mmlu.DATASET_REV, "files_sha256": files,
-            "answered": len(rows), "accuracy": mmlu.result({"nf4": rows})["accuracy"].get("nf4"), "letter_tokens": ids,
+    path = out / f"{arm}.mmlu.jsonl"
+    write_jsonl(path, [dict(r, arm=arm) for r in rows])
+    return {"file": path.name, "dataset": mmlu.DATASET, "dataset_revision": mmlu.DATASET_REV, "files_sha256": files,
+            "answered": len(rows), "accuracy": mmlu.result({arm: rows})["accuracy"].get(arm), "letter_tokens": ids,
             "seconds": round(time.time() - t0, 1)}
 
 
@@ -370,12 +375,14 @@ def error_text(e: BaseException) -> dict:
 
 def run_arm(arm: str, out: Path, save, build=build, measure=measure, extras=None) -> dict:
     """Build and measure one arm. Any error, a stop included, is written into the record with its traceback and ends
-    the arm; what was measured before it stays. measured is true only when every phase ended. For nf4, once the model
-    is built, the task answers and Global-MMLU-Lite follow, each recorded on its own."""
+    the arm; what was measured before it stays. measured is true only when every phase ended. For bf16 and nf4, once
+    the model is built, the task answers and Global-MMLU-Lite follow, each recorded on its own."""
+    from functools import partial
+
     from lir.common import empty_cache
 
     if extras is None:
-        extras = {"task": nf4_task, "mmlu": nf4_mmlu} if arm == "nf4" else {}
+        extras = {"task": partial(arm_task, arm), "mmlu": partial(arm_mmlu, arm)} if arm in BENCHED else {}
     rec = {"arm": arm, "measured": False, "started_utc": time.strftime("%Y%m%d-%H%M%S", time.gmtime())}
     tok = model = None
     with warnings.catch_warnings(record=True) as caught:
@@ -447,27 +454,39 @@ def arm_step(arm: str, out: Path, limit: float) -> dict:
     return dict(rec, process=proc)
 
 
-def judge_step(out: Path, limit: float) -> dict:
-    """The NF4 task answers scored by the task judge, in a process of its own, as lir.xlsum's judge job does."""
+def judge_step(out: Path, limit: float, save=lambda got: None) -> dict:
+    """The task answers of bf16 and of nf4 scored by the task judge, each arm in a process of its own, as lir.xlsum's
+    judge job runs it. An arm without all its answers is recorded as not judged, and the other is judged all the same.
+    The arms share the step's `limit`."""
     from lir.common import JUDGE
     from lir.evaluate import rows_for
     from lir.judge import JUDGE_REV
 
-    gen, scored = out / "nf4.task.gen.jsonl", out / "nf4.task.judge.jsonl"
-    n = len(rows_for("task"))
-    have = len(read_jsonl(gen)) if gen.exists() else 0
-    if have != n:
-        return {"run": False, "why": f"{have} NF4 task answers, wanted {n}"}
-    proc = child([sys.executable, "-m", "lir.judge", "--input", str(gen), "--output", str(scored)], {}, out / "logs" / "nf4.judge.log", limit)
-    rows = read_jsonl(scored) if scored.exists() else []
-    got = [r["task_score"] for r in rows if r.get("task_score") is not None]
-    return {"run": True, "judge": f"{JUDGE}@{JUDGE_REV}", "answers_sha256": sha256_file(gen), "rows": len(rows), "scored": len(got),
-            "task_score": sum(got) / len(got) if got else None, "file": scored.name, "process": proc}
+    n, end, got = len(rows_for("task")), time.time() + limit, {}
+    for arm in BENCHED:
+        gen, scored = out / f"{arm}.task.gen.jsonl", out / f"{arm}.task.judge.jsonl"
+        have = len(read_jsonl(gen)) if gen.exists() else 0
+        left = end - time.time()
+        if have != n:
+            got[arm] = {"run": False, "why": f"{have} task answers, wanted {n}"}
+        elif left < LEAST:
+            got[arm] = {"run": False, "why": f"not started: {round(max(left, 0))} s were left to the judge"}
+        else:
+            proc = child([sys.executable, "-m", "lir.judge", "--input", str(gen), "--output", str(scored)], {},
+                         out / "logs" / f"{arm}.judge.log", left)
+            rows = read_jsonl(scored) if scored.exists() else []
+            scores = [r["task_score"] for r in rows if r.get("task_score") is not None]
+            got[arm] = {"run": True, "judge": f"{JUDGE}@{JUDGE_REV}", "answers_sha256": sha256_file(gen), "answers": have,
+                        "rows": len(rows), "scored": len(scores), "task_score": sum(scores) / len(scores) if scores else None,
+                        "file": scored.name, "process": proc}
+        save(got)
+    return got
 
 
 def run_all(record: dict, step, save, left) -> None:
     """The steps in order. step(name, limit) returns the record of one step; left() is the seconds the job may still
-    spend. A step that raises, or has too little time left, is recorded and the next step runs."""
+    spend. A step that raises, or has too little time left, is recorded and the next step runs. The judge's record
+    has one entry per arm it judges, and a judge that did not run is written into each."""
     for name in STEPS:
         limit = min(CAPS[name], left())
         if limit < LEAST:
@@ -479,7 +498,7 @@ def run_all(record: dict, step, save, left) -> None:
             except (Exception, SystemExit) as e:
                 got = {"measured": False, **error_text(e)}
         if name == "judge":
-            record["judge"] = got
+            record["judge"] = got if all(a in got for a in BENCHED) else {a: dict(got) for a in BENCHED}
         else:
             record["arms"][name] = got
         save()
@@ -522,7 +541,8 @@ def settings() -> dict:
                       "prompts": [r["uid"] for r in counted], "warmup_batch1": spare[0]["uid"], "warmup_batch8": [r["uid"] for r in spare],
                       "max_new_tokens": SPEED_NEW_TOKENS, "batch": BATCH, "decoding": "greedy",
                       "batch8_order": "longest prompt first, as lir.generate sorts, file order among equal lengths"},
-            "nf4_task_max_new_tokens": SETS["task"][1], "caps_seconds": CAPS, "reserve_seconds": RESERVE}
+            "benchmarks": {"arms": list(BENCHED), "task_max_new_tokens": SETS["task"][1]}, "steps": STEPS, "caps_seconds": CAPS,
+            "reserve_seconds": RESERVE}
 
 
 class Tee:
@@ -562,7 +582,7 @@ def job(a) -> None:
               "installed": installed(), "settings": settings(), "arms": {}}
     save = lambda: write_json(out / "job.json", record)   # kept current, so that what ran is recorded whatever happens next
     save()
-    steps = {"judge": lambda limit: judge_step(out, limit)}
+    steps = {"judge": lambda limit: judge_step(out, limit, lambda got: (record.update(judge=dict(got)), save()))}
     try:
         run_all(record, lambda name, limit: steps.get(name, lambda lim: arm_step(name, out, lim))(limit), save,
                 lambda: deadline - time.time())
@@ -575,7 +595,7 @@ def job(a) -> None:
         api = HfApi()
         api.create_repo(STAGING, repo_type="dataset", private=True, exist_ok=True)
         api.upload_folder(folder_path=out, repo_id=STAGING, repo_type="dataset", path_in_repo=dest,
-                          commit_message=f"{JOB}: memory, speed and perplexity of four loadings; NF4 task answers, scores and Global-MMLU-Lite")
+                          commit_message=f"{JOB}: memory, speed and perplexity of four loadings; bf16 and NF4 task answers, scores and Global-MMLU-Lite")
         print(f"uploaded to {STAGING}/{dest}", flush=True)
         sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
         log.close()
@@ -603,12 +623,12 @@ def task_mean(rows: list[dict] | None) -> tuple[float | None, int]:
     return (sum(got) / len(got) if got else None), len(got)
 
 
-def table(job: dict, quant: dict, mm15: dict, gpu12: dict, nf4_mmlu: list[dict] | None = None, nf4_judge: list[dict] | None = None,
+def table(job: dict, quant: dict, mm15: dict, gpu12: dict, mmlu_rows: dict | None = None, judge_rows: dict | None = None,
           n_task: int = 300, items: int | None = None) -> dict:
     """The table, from this job's record, section 15's quantization.json, section 15b's quantization_mmlu.json and
-    section 12's gpu.json, and NF4's Global-MMLU-Lite rows and judge rows from this job. A cell is a list of
-    [value, source] pairs; a source is one of the keys of "sources". Nothing is recomputed from answers but NF4's two
-    benchmark figures, which only this job holds."""
+    section 12's gpu.json, and this job's Global-MMLU-Lite rows and judge rows of bf16 and nf4 (arm -> rows). A cell
+    is a list of [value, source] pairs; a source is one of the keys of "sources". Nothing is recomputed from answers
+    but the two benchmark figures of bf16 and nf4 on this job's GPU, which only this job holds."""
     from lir import mmlu
 
     langs = quant["languages"]
@@ -661,14 +681,18 @@ def table(job: dict, quant: dict, mm15: dict, gpu12: dict, nf4_mmlu: list[dict] 
         row(f"Refusals of XSTest's safe prompts, {LANG_NAMES.get(l, l)}", "%", {
             "bf16": [(o["bf16"], "a"), (xs12["bf16"][l], "b")], "nf4": [(xs12["nf4"][l], "b")],
             "int4": [(o["int4"], "a")], "circuit": [(o["circuit"], "a")]}, "pct")
-    nf4_score, nf4_scored = task_mean(nf4_judge)
+    # bf16 and nf4 on this job's GPU: the mean task score over the answers the judge scored, and Global-MMLU-Lite when
+    # every question of the four languages has an answer
+    scores = {a: task_mean((judge_rows or {}).get(a)) for a in BENCHED}
+    here = {a: mmlu.result({a: (mmlu_rows or {})[a]}, items=items or mmlu.ITEMS)["accuracy"].get(a) if (mmlu_rows or {}).get(a) else None
+            for a in BENCHED}
     ts = quant["task_score"]
-    row("Task score (1 to 7, 300 task prompts)", "", {"bf16": [(ts["bf16"], "a")], "nf4": [(nf4_score, "d")],
+    row("Task score (1 to 7, 300 task prompts)", "", {"bf16": [(ts["bf16"], "a"), (scores["bf16"][0], "d")], "nf4": [(scores["nf4"][0], "d")],
                                                       "int4": [(ts["int4"], "a")], "circuit": [(ts["circuit"], "a")]}, "score")
-    nf4_acc = mmlu.result({"nf4": nf4_mmlu}, items=items or mmlu.ITEMS)["accuracy"].get("nf4") if nf4_mmlu else None
     acc = mm15["accuracy"]
-    row("Global-MMLU-Lite accuracy, four languages", "%", {"bf16": [(acc["bf16"]["all"], "c")], "nf4": [((nf4_acc or {}).get("all"), "d")],
-                                                           "int4": [(acc["int4"]["all"], "c")], "circuit": [(acc["circuit"]["all"], "c")]}, "pct")
+    row("Global-MMLU-Lite accuracy, four languages", "%", {
+        "bf16": [(acc["bf16"]["all"], "c"), ((here["bf16"] or {}).get("all"), "d")], "nf4": [((here["nf4"] or {}).get("all"), "d")],
+        "int4": [(acc["int4"]["all"], "c")], "circuit": [(acc["circuit"]["all"], "c")]}, "pct")
     not_measured = {}
     for a in ARMS:
         r = arms.get(a)
@@ -682,16 +706,17 @@ def table(job: dict, quant: dict, mm15: dict, gpu12: dict, nf4_mmlu: list[dict] 
         if kernel.get("built") is False:
             not_measured[f"{a} with quanto's kernel"] = (f"quanto's CUDA kernel did not build ({kernel.get('error')}); the figures of "
                                                          "this arm use lir.deploy.torch_unpack in its place")
-    nf4 = arms.get("nf4", {})
-    for part, what in (("task", "NF4 task answers"), ("mmlu", "NF4 Global-MMLU-Lite")):
-        if isinstance(nf4.get(part), dict) and nf4[part].get("error"):
-            not_measured[f"nf4 {part}"] = f"{what}: {nf4[part]['error']}"
     judge = job.get("judge") or {}
-    if not judge.get("run"):
-        not_measured["judge"] = judge.get("why") or judge.get("error") or "the judge did not run"
+    for a in BENCHED:
+        for part, what in (("task", "task answers"), ("mmlu", "Global-MMLU-Lite")):
+            if isinstance(get(a, part), dict) and get(a, part, "error"):
+                not_measured[f"{a} {part}"] = f"{what}: {get(a, part, 'error')}"
+        j = judge.get(a) or {}
+        if not j.get("run"):
+            not_measured[f"{a} judge"] = j.get("why") or j.get("error") or "the judge did not run"
     return {"columns": {a: COLUMNS[a] for a in ARMS}, "sources": sources, "rows": rows, "not_measured": not_measured,
             "four_language_mean": "the plain mean of the four languages' rates; uniform 4-bit minus bfloat16 reproduces Q0's mean",
-            "nf4_task_scored": nf4_scored, "nf4_task_prompts": n_task, "nf4_mmlu_accuracy": nf4_acc,
+            "task_scored": {a: scores[a][1] for a in BENCHED}, "task_prompts": n_task, "mmlu_accuracy": here,
             "tokens": {a: {"batch1": get(a, "batch1", "new_tokens"), "batch8": get(a, "batch8", "new_tokens")} for a in ARMS},
             "kernels": {a: {"weight_classes": get(a, "kernels", "weight_classes"), "unpack": get(a, "quanto_cuda", "unpack")} for a in QUANTO},
             "job": {k: job.get(k) for k in ("folder", "commit", "started_utc", "finished_utc")} | {"hardware": hw, "installed": job.get("installed")}}
@@ -737,15 +762,16 @@ def report_md(res: dict) -> str:
               "", "The strict attack success over the four languages is not stored in quantization.json or gpu.json: it is the plain "
               "mean of the four languages' rates, which have the same 291 prompt families each; for section 15 uniform 4-bit minus "
               "bfloat16 of these means is Q0's mean."]
-    if res["nf4_task_scored"] and res["nf4_task_scored"] != res["nf4_task_prompts"]:
-        lines += ["", f"NF4's task score is the mean over the {res['nf4_task_scored']} of {res['nf4_task_prompts']} answers the judge scored."]
+    lines += ["", "On this job's GPU the task score is the mean over the answers the judge scored: " + ", ".join(
+        f"{res['columns'][a]} {n} of {res['task_prompts']}" for a, n in res["task_scored"].items()) + ". Section 15 read an arm's "
+        "task score only when all 300 were scored."]
     k = res["kernels"]
     if any(v["weight_classes"] for v in k.values()):
         lines += ["", "The quanto weights on the GPU, by tier (class of the weight tensor and number of layers): " + "; ".join(
             f"{res['columns'][a]}: " + ", ".join(f"{t} " + ", ".join(f"{c} {n}" for c, n in v.items()) for t, v in (k[a]["weight_classes"] or {}).items())
             + (f"; 2-bit unpacking by {k[a]['unpack']}" if a == "circuit" and k[a]["unpack"] else "") for a in k if k[a]["weight_classes"]) + "."]
-    lines += ["", "Not measured on this job's GPU: the safety sets, and the task score and Global-MMLU-Lite of bfloat16, uniform 4-bit and "
-              "the circuit plan. The table holds the base model only."]
+    lines += ["", "Not measured on this job's GPU: the safety sets, and the task score and Global-MMLU-Lite of uniform 4-bit and the "
+              "circuit plan. The table holds the base model only."]
     if res["not_measured"]:
         lines += ["", "Not measured in this job: " + "; ".join(f"`{a}`: {why}" for a, why in res["not_measured"].items()) + "."]
     return "\n".join(lines)
@@ -761,7 +787,8 @@ def report(a) -> None:
     job_rec = dict(json.loads((folder / "job.json").read_text()), folder=folder.name)
     rows = lambda name: read_jsonl(folder / name) if (folder / name).exists() else None
     res = table(job_rec, json.loads((OUT / "quantization.json").read_text()), json.loads((OUT / "quantization_mmlu.json").read_text()),
-                json.loads((OUT / "gpu.json").read_text()), rows("nf4.mmlu.jsonl"), rows("nf4.task.judge.jsonl"))
+                json.loads((OUT / "gpu.json").read_text()), {a: rows(f"{a}.mmlu.jsonl") for a in BENCHED},
+                {a: rows(f"{a}.task.judge.jsonl") for a in BENCHED})
     text = report_md(res)
     write_json(OUT / "deployment.json", res)
     (OUT / "deployment.md").write_text(text + "\n")
