@@ -17,9 +17,11 @@ EVAL_LANGS = ["en", "ko", "zh", "sw"]  # sw is evaluation-only
 # LIR_MODEL=earth switches every script to Tiny Aya Earth; the default is Tiny Aya Global.
 # LIR_MODEL=granite41 switches them to IBM Granite 4.1 3B, a model outside the Tiny Aya family. It is run in the
 # Hugging Face GPU jobs only (lir.hfjob). The key is not "granite": lir.granite is the Granite Guardian second judge.
+# LIR_MODEL=qwen25 switches them to Qwen2.5-3B-Instruct, a third family (section 24), also for the jobs only.
 MODELS = {"global": ("CohereLabs/tiny-aya-global", "af89d219b53ed9b13b8a4645f9c8028973510324"),
           "earth": ("CohereLabs/tiny-aya-earth", "0624fafbe200f930b89566fc4ec4da314ba48d89"),
-          "granite41": ("ibm-granite/granite-4.1-3b", "c0650403e44e78ec0262dab1c90914c65b196c4e")}
+          "granite41": ("ibm-granite/granite-4.1-3b", "c0650403e44e78ec0262dab1c90914c65b196c4e"),
+          "qwen25": ("Qwen/Qwen2.5-3B-Instruct", "aa8e72537993ba99e69dfaafa59ed015b17504d1")}
 MODEL_KEY = os.environ.get("LIR_MODEL", "global")
 MODEL, MODEL_REV = MODELS[MODEL_KEY]
 

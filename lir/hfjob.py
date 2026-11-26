@@ -1,5 +1,6 @@
 """Runs on a Hugging Face GPU for preregistration sections 12.0 to 12.2 and 14f (deliverable D20), and the main
-experiment on a model outside the Tiny Aya family (the granite41 jobs; read by lir.granite41).
+experiment on a model outside the Tiny Aya family (the granite41 jobs; read by lir.granite41) and on a third family
+(the qwen25 jobs of section 24; read by lir.qwen25).
 
   python -m lir.hfjob launch --job control --dry-run    # print the job, submit nothing
   python -m lir.hfjob launch --job control              # submit it; needs a login with Jobs rights on the namespace
@@ -47,6 +48,11 @@ UNMERGED = {"LIR_MERGE": "0"}
 # The main experiment on a model outside the Tiny Aya family, by its key in lir.common.MODELS: the base model, then
 # plain and SafeGrad at three seeds, one training a job, so that the six can run side by side.
 OTHER, OTHER_SEEDS = "granite41", (42, 1, 2)
+# The same seven jobs on a third family, Qwen2.5-3B-Instruct (section 24). Two things differ from Granite's jobs. They
+# are launched on one L40S with a two-hour limit unless another is given. And a SafeGrad job stops unless the base job's
+# refusal set has MIN_REFUSALS rows, the rule of section 16.
+THIRD, MIN_REFUSALS = "qwen25", 24
+DEFAULTS = {THIRD: ("l40sx1", "2h")}   # model key -> the GPU type and the time limit of its jobs
 # SafeGrad needs SafeTune, which requirements-gpu.txt leaves out. A job that trains SafeGrad installs
 # requirements-gpu-safegrad.txt and then SafeTune without its dependencies, at the commit the laptop trains with.
 SAFETUNE = ("https://github.com/Lexsi-Labs/SafeTune.git", "3901a9f48a88984a181c8c9493be2d3a20ab160f")
@@ -58,7 +64,20 @@ SAFETUNE = ("https://github.com/Lexsi-Labs/SafeTune.git", "3901a9f48a88984a181c8
 # A step on another model also has "model", its key, set as LIR_MODEL for training and generation. It may have "sets"
 # (the sets it answers; SETS without it), "method" and "seed" (what lir.train is called with; plain at its own seed
 # without them), "refusals" (the file its safe refusals to the held-out prompts are written to) and "align" (the job
-# whose refusal file a SafeGrad step trains against).
+# whose refusal file a SafeGrad step trains against) with "min_refusals" (the rows that file must have; one without it).
+
+
+def family_jobs(key: str, min_refusals: int | None = None) -> dict:
+    """The seven jobs of the main experiment on one model, by its key: the base job, which also answers the held-out
+    prompts and writes the model's own refusal set from them, then plain and SafeGrad at three seeds, one training a
+    job. Each SafeGrad job trains against that file, taken from the base job's upload."""
+    align = {"align": f"{key}-base", **({"min_refusals": min_refusals} if min_refusals else {})}
+    return {f"{key}-base": [{"arm": f"{key}-base", "model": key, "sets": ["alignment", *SETS], "refusals": f"alignment_sft_{key}.jsonl"}],
+            **{f"{key}-{method}-s{seed}": [{"arm": f"{key}-{method}-s{seed}", "model": key, "train": "bactrian_train.jsonl", "method": method,
+                                            "seed": seed, **(align if method == "safegrad" else {})}]
+               for method in ("plain", "safegrad") for seed in OTHER_SEEDS}}
+
+
 JOBS = {
     "control": [{"arm": "gpu-base"}, {"arm": "gpu-plain", "hub": "plain"}],                                   # 12.0
     "only-ko": [{"arm": "plain-ko", "train": "bactrian_train_only_ko.jsonl"}],                                  # 12.1
@@ -72,15 +91,13 @@ JOBS = {
     # Section 14f. Seeds 1 and 2, plain and SafeGrad: bfloat16 with the adapter unmerged, and NF4. Two arms a job.
     **{f"{how}-s{seed}": [{"arm": f"gpu-{arm}-s{seed}-{how}", "stage2": f"{arm}-s{seed}", "env": env} for arm in ("plain", "safegrad")]
        for seed in (1, 2) for how, env in (("unmerged", UNMERGED), ("nf4", NF4))},
-    # The model outside the Tiny Aya family. The base job also answers the held-out prompts and writes the model's own
-    # refusal set from them. Each SafeGrad job trains against that file, taken from the base job's upload.
-    f"{OTHER}-base": [{"arm": f"{OTHER}-base", "model": OTHER, "sets": ["alignment", *SETS], "refusals": f"alignment_sft_{OTHER}.jsonl"}],
-    **{f"{OTHER}-{method}-s{seed}": [{"arm": f"{OTHER}-{method}-s{seed}", "model": OTHER, "train": "bactrian_train.jsonl", "method": method,
-                                      "seed": seed, **({"align": f"{OTHER}-base"} if method == "safegrad" else {})}]
-       for method in ("plain", "safegrad") for seed in OTHER_SEEDS},
+    # The model outside the Tiny Aya family (section 16).
+    **family_jobs(OTHER),
     # Section 16b. Plain LoRA on that model with no Korean training row, at the three seeds.
     **{f"{OTHER}-noko-s{seed}": [{"arm": f"{OTHER}-noko-s{seed}", "model": OTHER, "train": "bactrian_train_noko.jsonl", "method": "plain",
                                   "seed": seed}] for seed in OTHER_SEEDS},
+    # The third family.
+    **family_jobs(THIRD, MIN_REFUSALS),
 }
 
 
@@ -97,9 +114,15 @@ def install_command(job: str) -> str:
     return "pip install -q -r requirements-gpu.txt; " + extra
 
 
-def job_command(job: str, commit: str, flavor: str = FLAVOR, timeout: str = TIMEOUT, namespace: str = NAMESPACE,
+def defaults(job: str) -> tuple[str, str]:
+    """The GPU type and the time limit a job is launched with when none is given."""
+    return DEFAULTS.get(JOBS[job][0].get("model"), (FLAVOR, TIMEOUT))
+
+
+def job_command(job: str, commit: str, flavor: str | None = None, timeout: str | None = None, namespace: str = NAMESPACE,
                 dry_run: bool = False) -> list[str]:
     """The `hf jobs run` command for one job. The token is passed by name only and is read from the environment."""
+    flavor, timeout = flavor or defaults(job)[0], timeout or defaults(job)[1]
     inner = (f"set -euo pipefail; git clone -q {REPO_URL} repo; cd repo; git checkout -q {commit}; "
              f"{install_command(job)}python -m lir.hfjob run --job {job}")
     return (["hf", "jobs", "run", "--flavor", flavor, "--namespace", namespace, "--timeout", timeout, "--secrets", "HF_TOKEN",
@@ -231,7 +254,8 @@ def train_command(step: dict, align: Path | None = None) -> list[str]:
 
 def refusal_set(step: dict, out: Path, files: list[str] | None = None, download=None) -> tuple[Path, dict]:
     """The refusal file a SafeGrad step trains against: the one the newest upload of the base job holds in the staging
-    dataset, copied into the job's folder so that it is uploaded with the record. Stops if there is none or it is empty.
+    dataset, copied into the job's folder so that it is uploaded with the record. Stops if there is none or it is empty,
+    and for a step with "min_refusals" if it has fewer rows than that.
     files, download: the paths in the staging dataset and a function that fetches one, for tests."""
     job = step["align"]
     name = JOBS[job][0]["refusals"]
@@ -247,6 +271,9 @@ def refusal_set(step: dict, out: Path, files: list[str] | None = None, download=
     rows = read_jsonl(got)
     if not rows:
         raise SystemExit(f"{STAGING}/{found[-1]} holds no refusal: SafeGrad has nothing to train against")
+    if len(rows) < step.get("min_refusals", 0):
+        raise SystemExit(f"{STAGING}/{found[-1]} holds {len(rows)} refusals, fewer than the {step['min_refusals']} "
+                         "SafeGrad is trained with on this model: not trained")
     out.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(got, out / name)
     return out / name, {"file": name, "from": f"{STAGING}/{found[-1]}", "rows": len(rows), "sha256": sha256_file(out / name)}
@@ -325,8 +352,8 @@ def main() -> None:
     ap.add_argument("what", choices=["launch", "run", "guard"])
     ap.add_argument("--job", required=True, choices=sorted(JOBS))
     ap.add_argument("--arm", help="guard: the arm whose answers are judged (used inside a job)")
-    ap.add_argument("--flavor", default=FLAVOR)
-    ap.add_argument("--timeout", default=TIMEOUT)
+    ap.add_argument("--flavor", help=f"launch: the GPU type; {FLAVOR} if not given, or the job's own in DEFAULTS")
+    ap.add_argument("--timeout", help=f"launch: the time limit; {TIMEOUT} if not given, or the job's own in DEFAULTS")
     ap.add_argument("--namespace", default=NAMESPACE)
     ap.add_argument("--dry-run", action="store_true", help="launch: print the job and submit nothing")
     a = ap.parse_args()

@@ -104,6 +104,56 @@ Section 16 of the preregistration registers these seven jobs. It runs all of the
 `--flavor l40sx1` to every launch. If that type does not start the base job within 30 minutes, cancel it and run all
 seven on the default `l4x1`. Launch the SafeGrad jobs only when the base job's refusal set has at least 24 rows.
 
+## A third model family: the `qwen25` jobs (section 24)
+
+The same seven jobs as `granite41`, built by the same function of `lir/hfjob.py`, on `Qwen/Qwen2.5-3B-Instruct` at
+revision `aa8e7253`: 3.09 billion parameters, `Qwen2ForCausalLM`, under the Qwen research licence (research and
+evaluation), not gated. The key is `qwen25` (`LIR_MODEL=qwen25`).
+
+| Command | What it runs | Arm it writes |
+|---|---|---|
+| `python -m lir.hfjob launch --job qwen25-base` | The base model on the held-out prompts, the attack set and XSTest; then writes the model's own refusal set `alignment_sft_qwen25.jsonl` | `qwen25-base` |
+| `python -m lir.hfjob launch --job qwen25-plain-s42`, `-s1`, `-s2` | Trains plain LoRA at that seed on `bactrian_train.jsonl`, then evaluates on the attack set and XSTest | `qwen25-plain-s42`, `-s1`, `-s2` |
+| `python -m lir.hfjob launch --job qwen25-safegrad-s42`, `-s1`, `-s2` | Trains SafeGrad at that seed against the refusal set of the base job, then evaluates | `qwen25-safegrad-s42`, `-s1`, `-s2` |
+
+- **Two changes to `lir/generate.py`, which leave every earlier model's generation as it was** (tests pin the stop
+  lists of `global`, `earth` and `granite41` with the real tokenizers).
+  - *The stop list leaves out a token the tokenizer lacks.* The list is the tokenizer's eos and Tiny Aya's
+    `<EOS_TOKEN>`. This tokenizer has no `<EOS_TOKEN>` and no unknown token, so the second came back as `None` and
+    generation would fail; it is now left out, and the list is `[151645]` (`<|im_end|>`, which ends the model's turn).
+  - *No repetition penalty.* This model's `generation_config.json` sets `repetition_penalty` 1.05, which `generate`
+    would apply to greedy decoding too. `lir/generate.py` now passes 1.0. Tiny Aya's and Granite's configurations
+    set none, so for them this changes nothing.
+- **The guard is from the same vendor.** Qwen3Guard-Gen-4B is a fine-tune of Qwen3-4B. This model is not from those
+  weights, but a guard that reads its vendor's style differently would bear on these runs more than on the others.
+  The report says so; section 23's sheet B has the same annotators read 100 of its Korean answers.
+- **Defaults.** With no flag these jobs are launched on one L40S (`l40sx1`) with a two-hour limit. Every other job
+  keeps `l4x1` and three hours. `--flavor` and `--timeout` still decide when given.
+- **Order.** The base job and the three plain jobs need nothing from each other. A SafeGrad job takes the refusal set
+  from the newest upload of `qwen25-base` and stops unless it has at least 24 rows, the rule of section 16. Before
+  launching one: `python -m lir.gpu fetch`, then `python -m lir.qwen25 refusals`.
+- **Reading.** `python -m lir.gpu fetch`, then `python -m lir.qwen25` writes `results/lir/stage2/qwen25/seeds.md`
+  once the base run and all six arms are in (`--partial` earlier, with every verdict pending). The checks are G1 to
+  G3 of section 16, computed by the functions of `lir/granite41.py` with this model's names. `python -m lir.qwen25
+  sentences` prints every sentence a check can write. It writes nothing of Granite's.
+- **The second reading.** Every attack answer that reached the 256-token cap, generated again at 1,024 tokens, in one
+  job, read by the same checks and deciding nothing. `python -m lir.qwen25 pin` writes each run's newest upload and the
+  sha256 of its adapter to `lir/qwen25_uploads.json` once all seven are complete; commit and push it, then
+  `python -m lir.qwen25 launch-again` (`--dry-run` prints the job). `python -m lir.qwen25 again` writes
+  `results/lir/stage2/qwen25/seeds_regen.md`.
+- **What differs from the other models.** No training row is over the 1,024-token limit under this tokenizer, so a
+  run trains on all 1,800 rows (395,012 tokens an epoch; Granite 1,795 rows, Tiny Aya 1,800). The template adds a
+  one-line default system prompt, "You are Qwen, created by Alibaba Cloud. You are a helpful assistant.", with no
+  safety content (Tiny Aya's adds a safety preamble of about 370 tokens, Granite's nothing). The card lists Korean and
+  Chinese among "over 29 languages" and does not name Swahili.
+- **Time and cost**, on one L40S at $1.80 an hour, from the Granite job records (`granite41-base` 10 minutes, a plain
+  job 23 to 24, a SafeGrad job 25 to 26): all seven about 2.5 GPU hours, about $4.50. The second reading is one more
+  job, about an hour.
+- **Not checked on a GPU.** No weight of this model has been loaded. Checked without one: the unit tests, `--dry-run`,
+  the tokenizer with the project's `encode()` on every training row, and `lir/train.py` (plain and SafeGrad, two
+  optimizer steps each) and `lir/generate.py` on a small random model of this architecture with the real tokenizer,
+  on a CPU.
+
 ## Suggested order tonight
 
 `control`, then `nf4`, then `unmerged` if Aish agrees. NF4 is the only run that fills the organizers' write-up line

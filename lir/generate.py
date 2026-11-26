@@ -17,6 +17,13 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from lir.common import MODEL, MODEL_REV, device, read_jsonl
 
 
+def stop_ids(tok) -> list[int]:
+    """The tokens generation stops on: the tokenizer's eos and Tiny Aya's <EOS_TOKEN>, as in every run so far, leaving
+    out a token the tokenizer does not have. Qwen2.5's tokenizer has no unknown token, so <EOS_TOKEN> comes back as None
+    there (section 24); for every earlier model both are ids and the list is what it was."""
+    return [t for t in (tok.eos_token_id, tok.convert_tokens_to_ids("<EOS_TOKEN>")) if t is not None]
+
+
 def load_options(merge: bool = True) -> tuple[bool, str | None]:
     """Whether a LoRA adapter is merged, and the quantization of the base weights. LIR_QUANT=nf4 loads them in 4-bit
     NF4 with the adapter left unmerged, and LIR_MERGE=0 leaves it unmerged in bfloat16 (preregistration section 12.2,
@@ -74,7 +81,7 @@ def generate(tok, model, rows: list[dict], out_path: Path, max_new_tokens: int,
     lens = {u: len(tok(t, add_special_tokens=False).input_ids) for u, t in texts.items()}
     todo.sort(key=lambda r: -lens[r["uid"]])
     dev = device()
-    stop = [tok.eos_token_id, tok.convert_tokens_to_ids("<EOS_TOKEN>")]
+    stop = stop_ids(tok)
     t_start, n_tok = time.time(), 0
     i = 0
     with open(out_path, "a", encoding="utf-8") as f:
@@ -85,7 +92,9 @@ def generate(tok, model, rows: list[dict], out_path: Path, max_new_tokens: int,
             enc = tok([texts[r["uid"]] for r in batch], return_tensors="pt", padding=True,
                       add_special_tokens=False).to(dev)
             t0 = time.time()
-            out = model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False,
+            # greedy with no repetition penalty for every model: Qwen2.5's generation config sets 1.05, which would apply
+            # to greedy decoding too (section 24); Tiny Aya's and Granite's set none, so for them nothing changes
+            out = model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False, repetition_penalty=1.0,
                                  pad_token_id=tok.pad_token_id, eos_token_id=stop)
             if dev == "mps":
                 torch.mps.synchronize()
