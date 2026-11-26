@@ -1,0 +1,743 @@
+{
+  "columns": {
+    "bf16": "bfloat16",
+    "nf4": "NF4 (bitsandbytes)",
+    "int4": "Uniform 4-bit (quanto)",
+    "circuit": "Circuit plan (quanto)"
+  },
+  "sources": {
+    "a": {
+      "run": "section 15",
+      "file": "results/lir/stage2/quantization.json",
+      "hardware": "Apple laptop GPU (MPS)",
+      "weights": "quanto weights written out as plain bfloat16 numbers"
+    },
+    "b": {
+      "run": "sections 12.0 and 12.2",
+      "file": "results/lir/stage2/gpu.json",
+      "hardware": "NVIDIA L4",
+      "detail": "bfloat16 from job control (arm gpu-base), NF4 from job nf4 (arm gpu-base-nf4)"
+    },
+    "c": {
+      "run": "section 15b",
+      "file": "results/lir/stage2/quantization_mmlu.json",
+      "hardware": "NVIDIA L4",
+      "weights": "quanto weights written out as plain bfloat16 numbers"
+    },
+    "d": {
+      "run": "this job",
+      "folder": "20261126-061511-be37c5c",
+      "commit": "be37c5cd825d065d9c61f90e38199d223fad21fc",
+      "flavor": "a100-large",
+      "hardware": "NVIDIA A100-SXM4-80GB",
+      "weights": "quanto weights packed on the GPU"
+    }
+  },
+  "rows": [
+    {
+      "row": "Memory after loading",
+      "unit": "MiB",
+      "format": "mib",
+      "cells": {
+        "bf16": [
+          [
+            6496.1,
+            "d"
+          ]
+        ],
+        "nf4": [
+          [
+            2418.1,
+            "d"
+          ]
+        ],
+        "int4": [
+          [
+            2475.2,
+            "d"
+          ]
+        ],
+        "circuit": [
+          [
+            2470.0,
+            "d"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Peak memory during perplexity",
+      "unit": "MiB",
+      "format": "mib",
+      "cells": {
+        "bf16": [
+          [
+            7436.6,
+            "d"
+          ]
+        ],
+        "nf4": [
+          [
+            3358.4,
+            "d"
+          ]
+        ],
+        "int4": [
+          [
+            3415.5,
+            "d"
+          ]
+        ],
+        "circuit": [
+          [
+            3410.3,
+            "d"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Peak memory at batch 8",
+      "unit": "MiB",
+      "format": "mib",
+      "cells": {
+        "bf16": [
+          [
+            7045.0,
+            "d"
+          ]
+        ],
+        "nf4": [
+          [
+            2965.9,
+            "d"
+          ]
+        ],
+        "int4": [
+          [
+            3024.9,
+            "d"
+          ]
+        ],
+        "circuit": [
+          [
+            3020.7,
+            "d"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Output tokens per second, batch 1",
+      "unit": "tokens/s",
+      "format": "rate",
+      "cells": {
+        "bf16": [
+          [
+            24.430192201447806,
+            "d"
+          ]
+        ],
+        "nf4": [
+          [
+            17.265106487388206,
+            "d"
+          ]
+        ],
+        "int4": [
+          [
+            20.404289732860846,
+            "d"
+          ]
+        ],
+        "circuit": [
+          [
+            16.568629357418605,
+            "d"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Median tokens per second of a prompt, batch 1",
+      "unit": "tokens/s",
+      "format": "rate",
+      "cells": {
+        "bf16": [
+          [
+            24.519260740501593,
+            "d"
+          ]
+        ],
+        "nf4": [
+          [
+            17.840529363906676,
+            "d"
+          ]
+        ],
+        "int4": [
+          [
+            20.62284170159363,
+            "d"
+          ]
+        ],
+        "circuit": [
+          [
+            16.536364421377563,
+            "d"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Output tokens per second, batch 8",
+      "unit": "tokens/s",
+      "format": "rate",
+      "cells": {
+        "bf16": [
+          [
+            142.06800595294257,
+            "d"
+          ]
+        ],
+        "nf4": [
+          [
+            100.36633294606177,
+            "d"
+          ]
+        ],
+        "int4": [
+          [
+            114.14238059527813,
+            "d"
+          ]
+        ],
+        "circuit": [
+          [
+            87.85243007609695,
+            "d"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Perplexity of the 300 task references",
+      "unit": "",
+      "format": "ppl",
+      "cells": {
+        "bf16": [
+          [
+            6.21550436549245,
+            "d"
+          ]
+        ],
+        "nf4": [
+          [
+            6.394832191646048,
+            "d"
+          ]
+        ],
+        "int4": [
+          [
+            6.489167071961047,
+            "d"
+          ]
+        ],
+        "circuit": [
+          [
+            7.80622488636427,
+            "d"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Strict attack success, English",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            7.216494845360825,
+            "a"
+          ],
+          [
+            5.498281786941581,
+            "b"
+          ]
+        ],
+        "nf4": [
+          [
+            10.996563573883162,
+            "b"
+          ]
+        ],
+        "int4": [
+          [
+            6.185567010309279,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            8.934707903780069,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Strict attack success, Korean",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            5.154639175257732,
+            "a"
+          ],
+          [
+            5.498281786941581,
+            "b"
+          ]
+        ],
+        "nf4": [
+          [
+            7.903780068728523,
+            "b"
+          ]
+        ],
+        "int4": [
+          [
+            7.903780068728523,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            11.683848797250858,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Strict attack success, Chinese",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            9.278350515463918,
+            "a"
+          ],
+          [
+            7.903780068728523,
+            "b"
+          ]
+        ],
+        "nf4": [
+          [
+            9.621993127147766,
+            "b"
+          ]
+        ],
+        "int4": [
+          [
+            8.24742268041237,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            13.402061855670103,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Strict attack success, Swahili",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            5.498281786941581,
+            "a"
+          ],
+          [
+            5.154639175257732,
+            "b"
+          ]
+        ],
+        "nf4": [
+          [
+            7.216494845360825,
+            "b"
+          ]
+        ],
+        "int4": [
+          [
+            5.498281786941581,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            5.841924398625429,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Strict attack success, mean of the four languages",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            6.7869415807560145,
+            "a"
+          ],
+          [
+            6.013745704467354,
+            "b"
+          ]
+        ],
+        "nf4": [
+          [
+            8.934707903780069,
+            "b"
+          ]
+        ],
+        "int4": [
+          [
+            6.958762886597938,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            9.965635738831615,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Refusals of XSTest's safe prompts, English",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            9.6,
+            "a"
+          ],
+          [
+            9.6,
+            "b"
+          ]
+        ],
+        "nf4": [
+          [
+            7.6,
+            "b"
+          ]
+        ],
+        "int4": [
+          [
+            8.4,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            18.8,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Refusals of XSTest's safe prompts, Korean",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            7.6,
+            "a"
+          ],
+          [
+            8.4,
+            "b"
+          ]
+        ],
+        "nf4": [
+          [
+            8.8,
+            "b"
+          ]
+        ],
+        "int4": [
+          [
+            10.0,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            28.4,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Refusals of XSTest's safe prompts, Chinese",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            8.8,
+            "a"
+          ],
+          [
+            8.4,
+            "b"
+          ]
+        ],
+        "nf4": [
+          [
+            6.4,
+            "b"
+          ]
+        ],
+        "int4": [
+          [
+            8.4,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            20.8,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Refusals of XSTest's safe prompts, Swahili",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            7.6305220883534135,
+            "a"
+          ],
+          [
+            8.433734939759036,
+            "b"
+          ]
+        ],
+        "nf4": [
+          [
+            5.622489959839357,
+            "b"
+          ]
+        ],
+        "int4": [
+          [
+            8.433734939759036,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            10.040160642570282,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Task score (1 to 7, 300 task prompts)",
+      "unit": "",
+      "format": "score",
+      "cells": {
+        "bf16": [
+          [
+            6.346666666666667,
+            "a"
+          ],
+          [
+            6.2941666666666665,
+            "d"
+          ]
+        ],
+        "nf4": [
+          [
+            6.195,
+            "d"
+          ]
+        ],
+        "int4": [
+          [
+            6.093333333333334,
+            "a"
+          ]
+        ],
+        "circuit": [
+          [
+            4.780833333333334,
+            "a"
+          ]
+        ]
+      }
+    },
+    {
+      "row": "Global-MMLU-Lite accuracy, four languages",
+      "unit": "%",
+      "format": "pct",
+      "cells": {
+        "bf16": [
+          [
+            54.5,
+            "c"
+          ],
+          [
+            54.75,
+            "d"
+          ]
+        ],
+        "nf4": [
+          [
+            51.4375,
+            "d"
+          ]
+        ],
+        "int4": [
+          [
+            51.1875,
+            "c"
+          ]
+        ],
+        "circuit": [
+          [
+            37.0625,
+            "c"
+          ]
+        ]
+      }
+    }
+  ],
+  "not_measured": {},
+  "four_language_mean": "the plain mean of the four languages' rates; uniform 4-bit minus bfloat16 reproduces Q0's mean",
+  "task_scored": {
+    "bf16": 300,
+    "nf4": 300
+  },
+  "task_prompts": 300,
+  "mmlu_accuracy": {
+    "bf16": {
+      "en": 59.25,
+      "ko": 55.75,
+      "zh": 55.0,
+      "sw": 49.0,
+      "all": 54.75
+    },
+    "nf4": {
+      "en": 56.0,
+      "ko": 49.75,
+      "zh": 52.5,
+      "sw": 47.5,
+      "all": 51.4375
+    }
+  },
+  "tokens": {
+    "bf16": {
+      "batch1": 11506,
+      "batch8": 11293
+    },
+    "nf4": {
+      "batch1": 10773,
+      "batch8": 10833
+    },
+    "int4": {
+      "batch1": 11148,
+      "batch8": 11035
+    },
+    "circuit": {
+      "batch1": 10821,
+      "batch8": 10784
+    }
+  },
+  "kernels": {
+    "int4": {
+      "weight_classes": {
+        "mid": {
+          "TinyGemmWeightQBitsTensor": 252
+        }
+      },
+      "unpack": "quanto_cuda kernel"
+    },
+    "circuit": {
+      "weight_classes": {
+        "mid": {
+          "TinyGemmWeightQBitsTensor": 189
+        },
+        "high": {
+          "WeightQBytesTensor": 21
+        },
+        "low": {
+          "WeightQBitsTensor": 42
+        }
+      },
+      "unpack": "quanto_cuda kernel"
+    }
+  },
+  "job": {
+    "folder": "20261126-061511-be37c5c",
+    "commit": "be37c5cd825d065d9c61f90e38199d223fad21fc",
+    "started_utc": "20261126-061511",
+    "finished_utc": "20261126-073301",
+    "hardware": {
+      "gpus": [
+        "NVIDIA A100-SXM4-80GB, 595.112.07, 81920 MiB"
+      ],
+      "flavor": "a100-large",
+      "cuda_available": true,
+      "torch_cuda": "13.2",
+      "cudnn": 92600,
+      "python": "3.12.3",
+      "platform": "Linux-6.12.115-140.210.amzn2023.x86_64-x86_64-with-glibc2.39",
+      "libraries": {
+        "torch": "2.15.0+cu132",
+        "transformers": "5.22.1",
+        "peft": "0.21.2",
+        "accelerate": "1.15.0",
+        "bitsandbytes": "0.50.2",
+        "safetensors": "0.8.0",
+        "tokenizers": "0.23.3",
+        "huggingface_hub": "2.4.0",
+        "numpy": "2.5.4"
+      }
+    },
+    "installed": {
+      "torch": "2.15.0+cu132",
+      "transformers": "5.22.1",
+      "bitsandbytes": "0.50.2",
+      "optimum-quanto": "0.2.7",
+      "torch_cuda": "13.2",
+      "nvcc": "Cuda compilation tools, release 13.2, V13.2.86",
+      "circuitkit_commit": "e71d5e17fe6e2abfde47ec9a7fbaf31649601b78",
+      "image": "pytorch/pytorch:2.15.0-cuda13.2-cudnn9-devel"
+    }
+  }
+}

@@ -13,16 +13,16 @@
       "list_price_dollars": 10.11
     },
     "a100-large": {
-      "jobs": 16,
-      "completed": 16,
-      "running_hours": 7.35,
-      "list_price_dollars": 18.38
+      "jobs": 17,
+      "completed": 17,
+      "running_hours": 8.66,
+      "list_price_dollars": 21.65
     }
   },
-  "jobs": 43,
-  "running_hours": 26.16,
-  "list_price_dollars": 39.6,
-  "read_utc": "2026-11-26 01:30",
+  "jobs": 44,
+  "running_hours": 27.47,
+  "list_price_dollars": 42.87,
+  "read_utc": "2026-11-26 07:35",
   "namespace": "lost-in-refusal-lexsi",
   "prices": {
     "l4x1": 0.8,
@@ -373,6 +373,14 @@
       "stage": "COMPLETED",
       "started_utc": "2026-11-25 23:58",
       "running_secs": 5259
+    },
+    {
+      "id": "6b07ce33d91f621b9309f811",
+      "name": "lir-deploy",
+      "flavor": "a100-large",
+      "stage": "COMPLETED",
+      "started_utc": "2026-11-26 06:14",
+      "running_secs": 4727
     }
   ]
 }

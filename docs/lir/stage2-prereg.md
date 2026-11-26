@@ -3014,6 +3014,24 @@ Where it goes in the paper. A table in the quantization appendix.
 
 **Added Nov 26, 1:15 AM ET by Mingyu, when the job was launched.** Submitted at 1:14 AM from commit `be37c5c` on one A100 with a limit of four hours (job `6b07ce33d91f621b9309f811`). Nothing it wrote has been read.
 
+**Added Nov 26, 2:35 AM ET by Mingyu, after the table was read.** The job ran from 1:15 to 2:34 AM on one A100 (upload `20261126-061511-be37c5c`, commit `be37c5c`) and every arm was measured; the 2-bit layers were unpacked by quanto's own CUDA kernel, which compiled in the image. `python -m lir.gpu fetch` ran at 2:34 AM and `python -m lir.deploy report` once, at 2:34 AM; it writes `results/lir/stage2/deployment.json` and `.md`. A description, as registered; no rule.
+
+| On one A100, the base model | bfloat16 | NF4 | Uniform 4-bit | Circuit plan |
+| --- | ---: | ---: | ---: | ---: |
+| Memory after loading (MiB) | 6,496 | 2,418 | 2,475 | 2,470 |
+| Peak memory at batch 8 (MiB) | 7,045 | 2,966 | 3,025 | 3,021 |
+| Output tokens per second, batch 1 | 24.4 | 17.3 | 20.4 | 16.6 |
+| Output tokens per second, batch 8 | 142.1 | 100.4 | 114.1 | 87.9 |
+| Perplexity of the 300 task references | 6.22 | 6.39 | 6.49 | 7.81 |
+| Task score (1 to 7), all 300 scored | 6.29 | 6.20 | | |
+| Global-MMLU-Lite accuracy, four languages (%) | 54.8 | 51.4 | | |
+
+- The perplexities of uniform 4-bit and the circuit plan with packed weights on the GPU are the figures section 15's gate measured on the laptop with the weights written out (6.49 and 7.81): the two ways of running the same quantized weights agree on this measure.
+- Every 4-bit loading takes about 38% of bfloat16's memory after loading. Each is slower than bfloat16 at both batch sizes with these kernels; the circuit plan is the slowest, its 2-bit layers being unpacked at each step.
+- Beside, from earlier sections and other hardware, as the table in `deployment.md` marks them: strict attack success over four languages 6.8% (bfloat16, laptop), 7.0% (uniform 4-bit, laptop), 10.0% (circuit plan, laptop), and 6.0% (bfloat16, L4) against 8.9% (NF4, L4).
+- The recount, after the report had printed, with code that shares nothing with `lir/deploy.py`: the tokens and seconds of the 50 prompts at batch 1 and of the seven batches at batch 8 in each arm's timing files give the same tokens per second (24.4, 17.3, 20.4, 16.6; 142.1, 100.4, 114.1, 87.9), the same 50 prompts in both batch sizes, and the task scores (6.294 and 6.195, 300 of 300) and Global-MMLU-Lite accuracies (54.75% and 51.44%, 1,600 questions) from the answer files. The memory figures are the job's records and were not recounted.
+- What it says, and what it does not. On this GPU with these libraries, every 4-bit loading cuts the memory after loading by about 62% and costs speed; against bfloat16 on the same GPU NF4 is 0.10 lower on the task score and 3.4 points lower on Global-MMLU-Lite, with no interval computed. It says nothing of safety beyond the figures from earlier sections, which are on other hardware, and nothing of other GPUs, batch sizes or kernels.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
