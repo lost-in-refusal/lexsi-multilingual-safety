@@ -3012,6 +3012,8 @@ If it is not finished. An arm that fails is recorded with its error, and the nex
 
 Where it goes in the paper. A table in the quantization appendix.
 
+**Added Nov 26, 1:15 AM ET by Mingyu, when the job was launched.** Submitted at 1:14 AM from commit `be37c5c` on one A100 with a limit of four hours (job `6b07ce33d91f621b9309f811`). Nothing it wrote has been read.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
