@@ -1,0 +1,61 @@
+{
+  "seed": 20261127,
+  "gap": 10,
+  "sheets": {
+    "A": {
+      "repeats": 20,
+      "blocks": {
+        "tiny_ko": {
+          "prompts": 150,
+          "by_stratum": {
+            "differs": 53,
+            "same": 97
+          },
+          "population": {
+            "differs": 53,
+            "same": 238
+          }
+        },
+        "tiny_en": {
+          "prompts": 40,
+          "by_stratum": {
+            "differs": 16,
+            "same": 24
+          },
+          "population": {
+            "differs": 16,
+            "same": 275
+          }
+        },
+        "granite_ko": {
+          "prompts": 50,
+          "by_stratum": {
+            "random": 50
+          },
+          "population": null
+        }
+      },
+      "annotators": {
+        "C": {
+          "rows": 500,
+          "payload_sha256": "fcd64cc4eb6b753beb57842cdbe540630160734113fa18ab7d44401803dcc01f",
+          "page_sha256": "f79afcf97cd44d6c9ca0bab4dc02db0c5933833a59365b5443e6733e7c0d7e5a",
+          "key_sha256": "5dde6d60637b900f25675174f1362bd9307c3ec86452e2589a317b2c2785b72d"
+        },
+        "D": {
+          "rows": 500,
+          "payload_sha256": "3339fe386c8e083a46e30cb14c0832de55b668dce444138e3836012e78c16ef5",
+          "page_sha256": "6ec73477716f96dbd1563070a7bb09537a7766640ef1036af7a9e9f36321049d",
+          "key_sha256": "6786505bf2bf74642688f86223d41cf180870c0857eebdfe987dbcc7d8e2528e"
+        },
+        "E": {
+          "rows": 500,
+          "payload_sha256": "e1e21fa93089d389faa7544b1048ded4106eecd6787ccac15c557dac82206af1",
+          "page_sha256": "849891edf76980b9d1a8714a8253a3a982ed9f9395dc6bcf0b3c7d87ce976e4f",
+          "key_sha256": "b2a022bcd7814d1ed74bb7f7a506e47c61a6ba9fb533fba34edbec49e517eb61"
+        }
+      },
+      "page_template_sha256": "bae01a92d135842a555cffef03c45c8ddc237ebef03061fc1fd7fbf3f063b7cf"
+    }
+  }
+}

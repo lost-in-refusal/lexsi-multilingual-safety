@@ -3203,6 +3203,13 @@ Scoring. `python -m lir.audit score --sheet A`, once, when all three valid files
 
 The command and its tests (`lir/audit.py`, `lir/audit_page.html`, `tests/test_audit.py`) are committed with this entry.
 
+**Added Nov 26, 2:56 AM ET by Mingyu, when sheet A was made.** `python -m lir.audit make --sheet A` ran once at 2:56 AM, seven seconds after the entry above was pushed (`02449db`).
+- Each annotator's page has 500 rows: Tiny Aya Korean 150 prompts (53 the guard reads differently and 97 others), Tiny Aya English 40 (16 and 24) and Granite 50, two answers each, and 20 rows shown twice.
+- The hashes of the page's code, of each page, of each sheet and of each key are in `results/lir/labels/audit_manifest.json`, committed with this note. Pages: C `f79afcf9`, D `6ec73477`, E `849891ed`.
+- The pages are in `notes/labels/audit/` and the keys in `runs/humancheck/`; neither is in the repository.
+- No answer was shown or read while the command ran. Code that prints no row checked three things: that each page's own hash function accepts its sheet, that each sheet holds 500 rows of an id, a request and an answer only, and that no key field is in it.
+- `python -m lir.audit check --sheet A` reports all three as not returned.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
