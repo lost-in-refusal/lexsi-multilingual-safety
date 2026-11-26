@@ -3212,6 +3212,20 @@ The command and its tests (`lir/audit.py`, `lir/audit_page.html`, `tests/test_au
 
 **Added Nov 26, 3:15 AM ET by Mingyu, before any mark exists: what A3 can detect.** Reader B (section 21) marked 8 Granite prompts leaning to plain and 3 leaning to base on 75. At that rate 50 prompts give about 5 against 2, and no exact two-sided test on 7 discordant prompts falls below 0.05 unless all 7 lean one way (6 against 1 gives p = 0.125). Averaging three annotators makes more prompts discordant and helps somewhat. On section 21's 75 prompts the guard's strict count is 12 for base and 30 for plain. So A3 can pass only for a difference near the guard's. Wherever A3's row "Anything else" is used, it is given with this sentence: "on 50 prompts, a test that can detect only a difference about as large as the guard's". It is not written as showing that there is no rise. The registered sentences stand.
 
+**Added Nov 26, 3:25 AM ET by Mingyu, before any page is handed over: the page is changed, and the three pages of sheet A are written again.**
+- Why. At about 3:18 AM Mingyu opened the page with six made-up rows from the file in his own browsers. Its saved file downloaded and passed the scorer's checks (`read_export`). But the yellow box showed, first in the browser a double-click opened and then in Chrome: neither let a page opened from a file keep its progress. An annotator who closed the window would have started again from the first row.
+- What changes:
+  - Every row offers "Save progress file", which downloads a file of the rows marked so far.
+  - On the first screen a progress file of the same sheet can be loaded. The page checks its sheet hash, its checksum and that its rows are the sheet's first rows in order, then continues from the next row.
+  - Where the browser cannot keep progress, the yellow box says so, and the page warns before a window with unsaved rows is closed.
+  - The instructions on the page say all this in Korean and in English.
+  - A progress file has its own format and is never scored. Each saving and loading is recorded in the events of the file that is scored, and the descriptions report how many there were.
+  - The page's version mark is `lir-audit-page/2`.
+- A limit this adds. A progress file could be loaded again after a later one was saved, to mark rows a second time. The page cannot tell that from carrying on.
+- The pages are written again by `python -m lir.audit remake --sheet A`, which stops unless every sheet and every key comes out as made, by their hashes in the manifest. Only the page hashes change, and the old ones stay in the manifest. The draw, the orders, the rows and the keys are those of 2:56 AM. No annotator has seen a page.
+- The new Korean text is the session's. Mingyu is asked to check it before hand-over, and his answer is added here.
+- The message Mingyu sends with a page now names Chrome or Edge and one tab only.
+
 ## 24. The main experiment on a third model family: Qwen2.5-3B
 
 **Added Nov 26, 3:07 AM ET by Mingyu, before any job of this section is launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.**

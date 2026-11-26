@@ -37,7 +37,7 @@ def export(rows, key, sheet="A", letter="C", sha="0" * 64, marks=None, t0=1_764_
         m = (marks or {}).get(k["id"], "no")
         out.append({"id": k["id"], "mark": m, "shown_at": t, "first_mark_at": t + 4000, "locked_at": t + 5000, "changes": 0})
         t += 5200
-    obj = {"format": "lir-audit-export/1", "page": "lir-audit-page/1", "sheet": sheet, "annotator": letter, "sheet_sha256": sha,
+    obj = {"format": "lir-audit-export/1", "page": "lir-audit-page/2", "sheet": sheet, "annotator": letter, "sheet_sha256": sha,
            "started_at": t0, "finished_at": out[-1]["locked_at"], "events": [[t0, "start"], [t, "finished"], [t + 9, "saved"]], "rows": out}
     obj["checksum"] = audit.checksum(obj)
     return obj
@@ -341,5 +341,30 @@ class Recount(unittest.TestCase):
             self.assertIn(f"prompts leaning plain {t['leaning_plain']}, base {t['leaning_base']}, of {t['prompts']}; two-sided sign test p = {t['p']:.4f}", text)
             self.assertIn(f"alpha over the sheet: {res['alpha']:.4f}", text)
             self.assertEqual(text.count("taken"), 3)
+        finally:
+            shutil.rmtree(tmp)
+
+
+class Remake(unittest.TestCase):
+    def test_pages_are_written_again_only_if_rows_and_keys_come_out_as_made(self):
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            with mock.patch.object(audit, "NOTES", tmp / "notes"), mock.patch.object(audit, "HUMAN", tmp / "keys"), \
+                    mock.patch.object(audit, "MANIFEST", tmp / "manifest.json"), \
+                    mock.patch.object(audit, "draw", lambda sheet, sources=None: DRAW(sheet, sources_a())):
+                audit.make("A")
+                before = json.loads((tmp / "manifest.json").read_text())["sheets"]["A"]
+                page = tmp / "notes" / "audit_A_C.html"
+                page.write_text(page.read_text().replace("lir-audit-page/2", "an older page"))
+                audit.remake("A")
+                after = json.loads((tmp / "manifest.json").read_text())["sheets"]["A"]
+                for x in audit.LETTERS:
+                    self.assertEqual(after["annotators"][x]["payload_sha256"], before["annotators"][x]["payload_sha256"])
+                    self.assertEqual(after["annotators"][x]["key_sha256"], before["annotators"][x]["key_sha256"])
+                self.assertIn("lir-audit-page/2", page.read_text())
+                self.assertEqual(after["remade"][0]["page_sha256_before"], {x: before["annotators"][x]["page_sha256"] for x in audit.LETTERS})
+                (tmp / "keys" / "audit_A_D_key.json").write_text("[]")
+                with self.assertRaises(SystemExit):
+                    audit.remake("A")
         finally:
             shutil.rmtree(tmp)

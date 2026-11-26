@@ -3,6 +3,7 @@
   python -m lir.audit demo                    # a page of made-up rows, to check the wording and the page itself
   python -m lir.audit make --sheet A          # the first sheet, drawn once: a page and a key per annotator, one manifest
   python -m lir.audit make --sheet B          # the second sheet (Qwen2.5-3B), after section 24 has been read
+  python -m lir.audit remake --sheet A        # its pages again with the current page code, before hand-over; rows and keys checked
   python -m lir.audit check --sheet A         # is each returned file whole and the drawn sheet? Shows no mark
   python -m lir.audit score --sheet A [--exclude C]   # once, after the deadline
 
@@ -300,6 +301,34 @@ def make(sheet: str) -> None:
     write_json(MANIFEST, man)
 
 
+def remake(sheet: str) -> None:
+    """The pages of a sheet written again with the current page code, before any of them is handed over. The draw, the
+    order, the rows and the keys must come out exactly as made: the sheet hashes and key hashes are checked against the
+    manifest, and only the page hashes change."""
+    man = json.loads(MANIFEST.read_text())
+    entry = man["sheets"][sheet]
+    drawn = draw(sheet, {"qwen_ko": qwen_source(entry["qwen_uploads"])} if "qwen_uploads" in entry else None)
+    out = {}
+    for letter in LETTERS:
+        rows, key = sheet_rows(sheet, letter, drawn)
+        data = payload(sheet, letter, rows)
+        a = entry["annotators"][letter]
+        if hashlib.sha256(data).hexdigest() != a["payload_sha256"] or sha256_file(key_file(sheet, letter)) != a["key_sha256"]:
+            raise SystemExit(f"sheet {sheet}, annotator {letter}: the rows or the key do not come out as made; nothing is written")
+        if json.loads(key_file(sheet, letter).read_text()) != key:
+            raise SystemExit(f"sheet {sheet}, annotator {letter}: the key on disk is not the one the draw gives; nothing is written")
+        out[letter] = html(sheet, letter, data)
+    remade = {"page_template_sha256_before": entry["page_template_sha256"],
+              "page_sha256_before": {x: entry["annotators"][x]["page_sha256"] for x in LETTERS}}
+    for letter, text in out.items():
+        page_file(sheet, letter).write_text(text, encoding="utf-8")
+        entry["annotators"][letter]["page_sha256"] = sha256_file(page_file(sheet, letter))
+        print(f"sheet {sheet}, annotator {letter}: page written again, rows and key as made -> {page_file(sheet, letter)}")
+    entry["page_template_sha256"] = sha256_file(PAGE)
+    entry.setdefault("remade", []).append(remade)
+    write_json(MANIFEST, man)
+
+
 def demo() -> Path:
     """A page of six made-up rows (harmless), to check the wording and the page. It is never scored."""
     rows = [{"id": f"XD{i + 1:03d}", "prompt": p, "response": r} for i, (p, r) in enumerate([
@@ -483,7 +512,10 @@ def descriptors(rows: list[dict], key: list[dict], events: list) -> dict:
             "hours_first_to_last": (rows[-1]["locked_at"] - rows[0]["shown_at"]) / 3.6e6 if rows else None,
             "minutes_on_rows": sum(min(s, 600) for s in secs) / 60, "median_seconds_a_row": statistics.median(secs) if secs else None,
             "rows_under_3_seconds": sum(s < 3 for s in secs), "breaks_over_10_minutes": sum(g > 600 for g in gaps),
-            "resumes": sum(1 for e in events if e[1] == "resume"), "rows_with_a_changed_mark": sum(r["changes"] > 0 for r in rows),
+            "resumes": sum(1 for e in events if e[1] == "resume"),
+            "progress_files_saved": sum(1 for e in events if str(e[1]).startswith("progress saved")),
+            "progress_files_loaded": sum(1 for e in events if str(e[1]).startswith("progress loaded")),
+            "rows_with_a_changed_mark": sum(r["changes"] > 0 for r in rows),
             "times_in_order": all(r["shown_at"] <= r["first_mark_at"] <= r["locked_at"] for r in rows)
             and all(a["locked_at"] <= b["shown_at"] for a, b in zip(rows, rows[1:]))}
 
@@ -635,7 +667,8 @@ def report_md(res: dict, drawn: dict, excluded: dict[str, str]) -> str:
                    + f"; {d['repeated_with_the_same_mark']} of {d['repeated_rows']} rows shown twice got the same mark both times; "
                    f"{d['hours_first_to_last']:.1f} hours from the first row to the last, {d['minutes_on_rows']:.0f} minutes on the rows, a median of "
                    f"{d['median_seconds_a_row']:.1f} seconds a row, {d['rows_under_3_seconds']} rows under 3 seconds, {d['breaks_over_10_minutes']} breaks "
-                   f"over 10 minutes, {d['resumes']} reopenings, {d['rows_with_a_changed_mark']} rows whose mark was changed before moving on"
+                   f"over 10 minutes, {d['resumes']} reopenings, {d['progress_files_saved']} progress files saved and {d['progress_files_loaded']} loaded, "
+                   f"{d['rows_with_a_changed_mark']} rows whose mark was changed before moving on"
                    + ("" if d["times_in_order"] else "; the times are not in order") + ".")
     out += ["", "What we know of the annotators comes through one author, who recruited them and passed on the pages. The times are those "
                 "of each annotator's computer, as the page recorded them. The reading is not blind to style: the two runs' answers differ in "
@@ -683,7 +716,7 @@ def score(sheet: str, exclude: dict[str, str]) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["demo", "make", "check", "score"])
+    ap.add_argument("what", choices=["demo", "make", "remake", "check", "score"])
     ap.add_argument("--sheet", choices=sorted(SHEETS))
     ap.add_argument("--exclude", action="append", default=[], metavar="LETTER=REASON",
                     help="an annotator whose sheet is not scored, and why (for example, help from a tool, by the author's account)")
@@ -695,6 +728,8 @@ def main() -> None:
         raise SystemExit(f"{a.what} takes --sheet A or --sheet B")
     if a.what == "make":
         make(a.sheet)
+    elif a.what == "remake":
+        remake(a.sheet)
     elif a.what == "check":
         check(a.sheet)
     else:
