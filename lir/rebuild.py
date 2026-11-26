@@ -166,6 +166,10 @@ NOT_REBUILT = [
      "`python -m lir.granite41 again` writes the languages of its `per_lang` counts in the order of a Python set, which is "
      "not the same from one run of the command to the next. The .md comes out the same, and the .json holds the same "
      "numbers with those keys in another order"),
+    (("qwen25/seeds_regen.json", "qwen25/seeds_regen.md"),
+     "`python -m lir.qwen25 again` writes the languages of its `per_lang` counts in the order of a Python set, which is "
+     "not the same from one run of the command to the next. The .md comes out the same, and the .json holds the same "
+     "numbers with those keys in another order"),
     (("qwen25/seeds.json", "qwen25/seeds.md"),
      "`python -m lir.qwen25` copies the revision of the private staging dataset that runs/gpu was read from, and writes the "
      "three languages of the refusal set in the order of a Python set. The .md comes out the same, and the .json differs in "

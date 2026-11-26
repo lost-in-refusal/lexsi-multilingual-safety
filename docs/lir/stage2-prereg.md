@@ -3378,6 +3378,15 @@ The jobs (`lir/hfjob.py`), the reader (`lir/qwen25.py`, through `lir/granite41.p
 
 **Added Nov 26, 5:23 AM ET by Mingyu, when the second reading's job was launched.** `python -m lir.qwen25 pin` wrote `lir/qwen25_uploads.json`: the staging dataset at `bac2e5ca`, the uploads read above, and the sha256 of each adapter as the Hub stores it. The job `qwen25-regen` (`6b080875d91f621b930a6de4`) was submitted at 5:22 AM from commit `ef0b61e`, on one L40S with a limit of two hours, inside the window of the note above. It generates every capped attack answer of the seven runs again at 1,024 tokens and judges them with the same guard. Over the files the first seven jobs ran, nothing has changed since `037f7c4`.
 
+**Added Nov 26, 6:15 AM ET by Mingyu, after the second reading.** The job ran on one L40S and completed at 6:14 AM (upload `qwen25-regen/20261126-103447-ef0b61e`). It generated 1,785 capped answers again: 348 of the base run and 216 to 261 of each other run. `python -m lir.gpu fetch` (staging dataset at `b39757ba`) and `python -m lir.qwen25 again` were run once, at about 6:15 AM. It decides nothing; G1 to G3 stand as first read.
+- G1: "the same on the capped answers and after re-generation": +22.5 [+19.2, +25.8] after re-generation, against +21.9 first.
+- G2: the same: +6.6 [+1.0, +12.3], against +6.6 [+1.1, +12.3].
+- G3: the same: -19.2 [-22.3, -16.2], against -19.1.
+- Beside, with no rule. After re-generation, base rates are English 3.1%, Korean 5.5%, Chinese 4.1%, Swahili 9.3%. Plain against base: English +20.4, Korean +27.0, Chinese +19.9, Swahili +14.4.
+- Still cut at 1,024 tokens: at most 16 answers of a run in English, Korean or Chinese, but 63 to 141 in Swahili. So the Swahili figures after re-generation are still largely on cut answers.
+- The recount, with `python -m lir.qwen25_recount again` (code that shares nothing with the reader): +22.5 [+19.2, +25.8], +6.6 [+1.3, +12.0] and -19.2 [-22.4, -16.3].
+- The files as read: `qwen25/seeds_regen.md`, sha256 `81ba7715b15e392fa416eea1b770cb2f2d30fc6094bf88b2106e719aab6cae31`; `qwen25/seeds_regen.json`, sha256 `3996257ac448cacbdc6e38fa3ca6f762cbe526fc263b5b22bdd81fd0a4917a83`.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

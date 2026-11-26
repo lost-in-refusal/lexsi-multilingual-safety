@@ -224,7 +224,7 @@ Not rebuilt, and why:
 - The `.md` comes out the same and the `.json` does not. `aya/checks`: the public copy of one stage 1 training
   record still names a folder on the training machine, and the table copies that field. `nf4_seeds`,
   `granite41/seeds` and `qwen25/seeds`: each copies the revision of the private staging dataset its files were read from, and the
-  published files name another one. `granite41/seeds` and `granite41/seeds_regen`: a few counts by language are
+  published files name another one. `granite41/seeds`, `granite41/seeds_regen` and `qwen25/seeds_regen`: a few counts by language are
   written in an order that changes from one run of the command to the next; the numbers are the same.
 - No command here writes it. `ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a
   write-up), `third_judge_inputs.json` (its command writes elsewhere; from the published answers it gives the same
