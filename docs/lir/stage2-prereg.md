@@ -3228,6 +3228,13 @@ The command and its tests (`lir/audit.py`, `lir/audit_page.html`, `tests/test_au
 
 **Added Nov 26, 3:29 AM ET by Mingyu, when the rebuilt page was tried, before hand-over.** The three pages were written again at 3:25 AM by `remake`. Every sheet and key came out as made, and the page's own hash function accepts each sheet. Mingyu then opened the rebuilt page of made-up rows in Chrome, marked two rows, saved a progress file, closed the tab, reopened it and loaded the file. Asked how it went, he chose "Worked, saved elsewhere": the progress file downloaded, and the page continued at row 3. The page did not warn when he closed the tab, because no row had been marked since the progress file was saved, and the warning is only for unsaved rows; the warning itself was not seen in his browser. On the new Korean text, he answered "Wording is right".
 
+**Added Nov 26, 5:02 AM ET by Mingyu, when annotator C's file came back.**
+- What arrived. At about 5:00 AM Mingyu reported "audit C is done and the file is in". The file `audit_A_C.json` was in `notes/labels/audit/` rather than `returned/`, the same byte for byte as the copy in his downloads, and was moved unchanged into `returned/`.
+- `python -m lir.audit check --sheet A` gives: valid, 500 rows, sha256 beginning `ffc521f8`.
+- Read of it so far: only the page version (`lir-audit-page/2`), the times of the first and last row and the kinds of its events. The page recorded the first row shown at 3:31 AM and the last locked at 5:00 AM, in one sitting: the events are one start, one finish and one save, with no reopening and no progress file. No mark has been read or counted.
+- The question the entry asks once, put at about 5:03 AM with fixed choices. "Annotator C: what were they told before marking?" He chose "Only the page" (offered beside it: "Page plus the topic", "They know what we expect"). "Annotator C: did they read every row themselves, with no chatbot, model or translator helping on any row?" He chose "Yes, all unaided" (beside it: "Some help on some rows", "I don't know").
+- The file is scored with the others, once, when all three valid files are in or after Friday Nov 27, 6 PM ET.
+
 ## 24. The main experiment on a third model family: Qwen2.5-3B
 
 **Added Nov 26, 3:07 AM ET by Mingyu, before any job of this section is launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.**
