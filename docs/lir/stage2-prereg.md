@@ -3032,6 +3032,8 @@ Where it goes in the paper. A table in the quantization appendix.
 - The recount, after the report had printed, with code that shares nothing with `lir/deploy.py`: the tokens and seconds of the 50 prompts at batch 1 and of the seven batches at batch 8 in each arm's timing files give the same tokens per second (24.4, 17.3, 20.4, 16.6; 142.1, 100.4, 114.1, 87.9), the same 50 prompts in both batch sizes, and the task scores (6.294 and 6.195, 300 of 300) and Global-MMLU-Lite accuracies (54.75% and 51.44%, 1,600 questions) from the answer files. The memory figures are the job's records and were not recounted.
 - What it says, and what it does not. On this GPU with these libraries, every 4-bit loading cuts the memory after loading by about 62% and costs speed; against bfloat16 on the same GPU NF4 is 0.10 lower on the task score and 3.4 points lower on Global-MMLU-Lite, with no interval computed. It says nothing of safety beyond the figures from earlier sections, which are on other hardware, and nothing of other GPUs, batch sizes or kernels.
 
+**Added Nov 26, 3:17 AM ET by Mingyu, a correction of the note of 2:35 AM.** Two figures in that note were computed from rounded values. NF4 is 3.3 points below bfloat16 on Global-MMLU-Lite (51.44% against 54.75%), not 3.4; and the 4-bit loadings take 37 to 38% of bfloat16's memory after loading (37.2% for NF4, 38.1% for uniform 4-bit, 38.0% for the circuit plan), not "about 38%". The table in `deployment.md` is unchanged. Found by an audit of the paper.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
