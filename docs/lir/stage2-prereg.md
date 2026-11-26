@@ -3314,6 +3314,8 @@ Reading. `python -m lir.gpu fetch`, then `python -m lir.qwen25`, which writes `r
 
 The jobs (`lir/hfjob.py`), the reader (`lir/qwen25.py`, through `lir/granite41.py`), the model key (`lir/common.py`), the two changes to `lir/generate.py`, the how-to (`docs/lir/hf-jobs.md`) and their tests are committed with this entry. The functions of `lir/granite41.py` now take the module that holds a model's names, a change built on Nov 25 for the dropped Gemma runs and carried over. Granite's `seeds.md`, written again by the changed reader from the fetched job files, is the committed file byte for byte (sha256 `901ef3d3`). Its `seeds.json` holds the same data as the unchanged reader's output on the same files; it differs from the committed file only in the order of one dictionary's keys, which varies from run to run, and in the staging revision of the newer fetch.
 
+**Added Nov 26, 3:12 AM ET by Mingyu, when the base job and the plain jobs were launched.** Submitted at 3:11 AM from commit `037f7c4`, which holds this entry, each on one NVIDIA L40S with a limit of two hours: `qwen25-base` (`6b07e99eb6a90bbe997f96c4`), `qwen25-plain-s42` (`6b07e99eb6a90bbe997f96c7`), `qwen25-plain-s1` (`6b07e99fb6a90bbe997f96c9`) and `qwen25-plain-s2` (`6b07e99fd91f621b930a322a`). The SafeGrad jobs are not launched. Nothing any job wrote has been read.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
