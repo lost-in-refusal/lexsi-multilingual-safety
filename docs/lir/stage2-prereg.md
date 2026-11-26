@@ -3226,6 +3226,8 @@ The command and its tests (`lir/audit.py`, `lir/audit_page.html`, `tests/test_au
 - The new Korean text is the session's. Mingyu is asked to check it before hand-over, and his answer is added here.
 - The message Mingyu sends with a page now names Chrome or Edge and one tab only.
 
+**Added Nov 26, 3:29 AM ET by Mingyu, when the rebuilt page was tried, before hand-over.** The three pages were written again at 3:25 AM by `remake`. Every sheet and key came out as made, and the page's own hash function accepts each sheet. Mingyu then opened the rebuilt page of made-up rows in Chrome, marked two rows, saved a progress file, closed the tab, reopened it and loaded the file. Asked how it went, he chose "Worked, saved elsewhere": the progress file downloaded, and the page continued at row 3. The page did not warn when he closed the tab, because no row had been marked since the progress file was saved, and the warning is only for unsaved rows; the warning itself was not seen in his browser. On the new Korean text, he answered "Wording is right".
+
 ## 24. The main experiment on a third model family: Qwen2.5-3B
 
 **Added Nov 26, 3:07 AM ET by Mingyu, before any job of this section is launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.**
