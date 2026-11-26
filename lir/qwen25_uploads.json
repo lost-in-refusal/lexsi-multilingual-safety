@@ -1,0 +1,34 @@
+{
+  "staging": "lost-in-refusal/lost-in-refusal-gpu-runs",
+  "staging_revision": "bac2e5ca423b32ec72780eaaaec4f0132012c5f1",
+  "uploads": {
+    "qwen25-base": [
+      "20261126-090112-037f7c4",
+      null
+    ],
+    "qwen25-plain-s42": [
+      "20261126-081302-037f7c4",
+      "c141b9c81f82744eaebe4b2826e889b3cdd2e0e6fc489b4cff755f83a2617b8e"
+    ],
+    "qwen25-safegrad-s42": [
+      "20261126-091319-6ffda2b",
+      "8f89968b65a9741757bba4d5de7add5f1b6f74caa7b8ab68a3f70a4ab8c428be"
+    ],
+    "qwen25-plain-s1": [
+      "20261126-083158-037f7c4",
+      "42a586381e49ab2f5bdbfe26c2f00035f03ea67c0042f6fdb12cd55e19e741e3"
+    ],
+    "qwen25-safegrad-s1": [
+      "20261126-092057-6ffda2b",
+      "f40c46647f087a4f5c967e5e8f08ac46a51d3c0cdce94d28302f42c21405f3f9"
+    ],
+    "qwen25-plain-s2": [
+      "20261126-085032-037f7c4",
+      "08c3cce2123d009191bef5c070c732c34bfbd8bf96a66d02e4ac24ea30bf5634"
+    ],
+    "qwen25-safegrad-s2": [
+      "20261126-095706-6ffda2b",
+      "e4d7004bc0bb48b8b279d08a17aee733d0d6058e7dcc709cd99032cb1bd611e2"
+    ]
+  }
+}
