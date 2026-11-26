@@ -3349,6 +3349,26 @@ The jobs (`lir/hfjob.py`), the reader (`lir/qwen25.py`, through `lir/granite41.p
 - `qwen25-safegrad-s42` (`6b07f773b6a90bbe997fad49`), `qwen25-safegrad-s1` (`6b07f774b6a90bbe997fad4b`) and `qwen25-safegrad-s2` (`6b07f774d91f621b930a4aa2`) were submitted at 4:10 AM from commit `6ffda2b`, on the same GPU type with the same limit. Over the files a job runs, `git diff 037f7c4 6ffda2b` is empty; the later commits touch only section 23's files and this file.
 - No job has failed. Read so far: the job stages, the base job's step list and the row count of its refusal set by language. No answer and no verdict has been read.
 
+**Added Nov 26, 5:18 AM ET by Mingyu, after the seven jobs had finished and were read.** All seven completed, each on one NVIDIA L40S; none failed and none was launched twice. The last, `qwen25-safegrad-s2`, finished at 5:16 AM. Every run has 1,164 attack answers, each with a verdict the guard's output could be read into. Each training ran 171 optimizer steps on 1,800 rows, and the three SafeGrad runs record the refusal file of the launch note (49 rows). The library versions are the same in every job. `python -m lir.gpu fetch` (staging dataset at revision `bac2e5ca`) and `python -m lir.qwen25` were run once, at 5:17 AM.
+- **G1: above zero.** Plain fine-tuning raised attack success on Qwen2.5-3B: plain minus base +21.9 points [+18.7, +25.1] over the three seeds and English, Korean and Chinese.
+- **G2: above zero.** On Qwen2.5-3B, Korean again rose more than English: the Korean rise minus the English rise is +6.6 [+1.1, +12.3].
+- **G3: below zero**, and read, because G1 is above zero. SafeGrad left attack success below plain fine-tuning on Qwen2.5-3B: SafeGrad minus plain -19.1 [-22.1, -16.1].
+- Beside, with no rule.
+  - Base rates: English 3.8%, Korean 6.9%, Chinese 4.5%, Swahili 10.7%.
+  - Plain against base: English +19.7 [+15.6, +24.1], Korean +26.3 [+21.5, +31.2], Chinese +19.6 [+14.9, +24.1], Swahili +10.5 [+6.8, +14.4]. Korean under plain is 35.4%, 30.6% and 33.7% at the three seeds.
+  - SafeGrad against base: English +0.3 [-1.6, +2.2], Korean +5.3 [+2.3, +8.4], Chinese +2.7 [-0.2, +5.6], Swahili +6.4 [+2.9, +10.1].
+  - The rules of H1 to H3 applied as they are: all three pass in every seed. Swahili refusals fall under plain: -16.5 [-23.4, -9.5].
+  - Refusals on the safe prompts of XSTest fall under plain in every language (English from 15.6% to 6.0% to 7.2%, Korean from 22.8% to 6.4% to 7.6%). Under SafeGrad they stay near the base model's in English (16.4% to 18.4%) and are 12.0% to 12.4% in Korean.
+- What it says, and what it does not.
+  - On this model plain fine-tuning raised attack success in every language, English by about 20 points. On Tiny Aya English showed no detectable change, and on Granite +0.2.
+  - Korean rose more than English by 6.6 points, whose interval comes within 1.1 points of zero, against 11.8 on Tiny Aya and 20.8 on Granite. No test compares the models.
+  - So on this model the rise is broad, and Korean's excess over English is smaller.
+- The cap. Fewer of this base model's Korean answers reached the cap than on Granite: 20.6%, against 17.2% to 19.6% under plain. In English 18.2% against 5.2% to 5.8%; in Swahili 71.8% against 45% to 54%. The second reading after re-generation is launched within the window of the note above.
+- Training peaked at 14.8 to 37.4 GB of GPU memory and took 9.8 to 11.6 minutes a run.
+- The recount, with code that shares nothing with the reader (`lir/qwen25_recount.py`, committed before the reading): +21.9 [+18.7, +25.2], +6.6 [+1.3, +12.0] and -19.1 [-22.2, -16.1]. The last digit of an interval end moves with the bootstrap draw. The per-language rates and changes are as reported.
+- Limits, as registered: one model of a third family; the guard is from its vendor; the verdicts are the guard's on capped answers; no second judge, no task score. Section 23's sheet B has the same three annotators read 100 of its Korean answers.
+- The files as read: `qwen25/seeds.md`, sha256 `272033bd3775acc4551dcd014ad68c4e3c0c53b67d60dcf86377191b490d08b5`; `qwen25/seeds.json`, sha256 `da1a1d9efff84793db775f448039fc2b82c8f48072ed4e7205ba6d1450193827`.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.

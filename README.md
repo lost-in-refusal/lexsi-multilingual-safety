@@ -222,8 +222,8 @@ Not rebuilt, and why:
 - The command reads more runs today than when the table was written. `gpu` is the reading of Nov 23; the arms with
   the adapter left unmerged are published since, and its command now reads NF4 against them.
 - The `.md` comes out the same and the `.json` does not. `aya/checks`: the public copy of one stage 1 training
-  record still names a folder on the training machine, and the table copies that field. `nf4_seeds` and
-  `granite41/seeds`: each copies the revision of the private staging dataset its files were read from, and the
+  record still names a folder on the training machine, and the table copies that field. `nf4_seeds`,
+  `granite41/seeds` and `qwen25/seeds`: each copies the revision of the private staging dataset its files were read from, and the
   published files name another one. `granite41/seeds` and `granite41/seeds_regen`: a few counts by language are
   written in an order that changes from one run of the command to the next; the numbers are the same.
 - No command here writes it. `ko_drift.md`, `ko_rest.md` and `second_judge_check.md` (a person's labels and a
