@@ -2965,6 +2965,53 @@ The command and its tests (`lir/reader2.py`, `tests/test_reader2.py`) and the re
 - What the file cannot tell us. Its copy was created and last changed at 6:38 PM, after the list was pasted (6:12 PM) and after the tool was asked for, so it is a copy saved after the reading. That this is the tool the reader used, that the two registered sheets are what was loaded into it, and on whose computer, rest on Mingyu's account; the list's row names are the sheets' item names in their order.
 - The words that go with R1 and R2 from now on. In place of "a tool set up by an author, which nobody else has seen": "a labelling page set up by an author, which shows only what is in the sheet loaded into it and whose copy we were given after the reading". The other words stand: a pasted list, which the registration said would not be taken; 640 rows in at most 72 to 101 minutes by that author's account; who the reader is rests on an author's account.
 
+## 22. Deployment: the base model in bfloat16, under 4-bit loading, under uniform 4-bit and under the circuit plan, on one GPU
+
+**Added Nov 26, 1:14 AM ET by Mingyu, before the job is launched.**
+
+Why. The team's mentor asked on Nov 25 for one table that sets the original model, default 4-bit loading (NF4) and the mixed-precision plan side by side on each benchmark, with output tokens per second and GPU memory. Section 15 measured bfloat16, uniform 4-bit and the circuit plan on the laptop with the quantized weights written out as plain numbers, so it says that no speed or memory claim can be made. Section 12.2 measured NF4 on an L4 for attack success and over-refusal only. This block measures what is missing, on one GPU. It is registered after the stop on new registrations of Wednesday, 9 PM ET, at the mentor's request.
+
+What runs. One Hugging Face job on one NVIDIA A100 (80 GB), `python -m lir.deploy launch`, in PyTorch's development image (`pytorch/pytorch:2.15.0-cuda13.2-cudnn9-devel`) so that optimum-quanto can compile its 2-bit kernel. Four arms of Tiny Aya Global with no adapter, each in a process of its own:
+
+- `bf16`: the model in bfloat16.
+- `nf4`: bitsandbytes 4-bit NF4 with double quantization and bfloat16 compute, through the code path of section 12.2.
+- `int4`: uniform 4-bit with optimum-quanto 0.2.7 through CircuitKIT, built as section 15 built it (`lir.quantize.apply`), the packed model moved to the GPU.
+- `circuit`: the circuit plan of section 15 at the tier size its gate chose (3 layers at 8 bits, 27 at 4 bits, 6 at 2 bits), built the same way.
+
+Each arm records:
+
+- the GPU memory after loading (`torch.cuda.memory_allocated`, MiB);
+- perplexity on the reference answers of the 300 task prompts (`lir.quantize.perplexity`, the measure of section 15's gate) with its peak memory;
+- output tokens per second at batch size 1 on the first 50 task prompts in file order, greedy, at most 256 new tokens, one warm-up generation not counted;
+- the same at batch size 8, with a warm-up batch not counted, and its peak memory;
+- for the quanto arms, the matrix-multiplication path each tier's weights used.
+
+`bf16` and `nf4` also answer the 300 task prompts at 1,024 new tokens and Global-MMLU-Lite in four languages at the pinned revision. A last step scores both arms' task answers with the task judge (Qwen3-14B). The job uploads to the private staging dataset under `deploy/`.
+
+How it is read. `python -m lir.deploy report` writes `results/lir/stage2/deployment.json` and `.md`: one table with the four arms as columns. It holds this job's figures and, beside them and marked by run and hardware, section 15's attack success, over-refusal, task score and Global-MMLU-Lite for bfloat16, uniform 4-bit and the circuit plan, and section 12.2's NF4 attack success and over-refusal next to the bfloat16 base run on the same GPU. **There is no rule: the table is a description, and no sentence of judgement is registered.**
+
+What we know as this is written. All of section 15, 15a and 15b:
+
+- uniform 4-bit did not raise attack success detectably;
+- the circuit plan scored below uniform 4-bit on the task score and on Global-MMLU-Lite;
+- the circuit plan's perplexity was below that of 43 random plans of the same shape.
+
+Also known: sections 12.2 and 14f on NF4. Not known: the speed or memory of any packed model, and any figure on an A100 for these arms. The job's code (`lir/deploy.py`, `tests/test_deploy.py`, commit `2db9536`) is committed with this entry. It was run end to end only on the tiny test model on the CPU, with the GPU calls stubbed.
+
+What we will not write.
+
+- That any 4-bit scheme is safer.
+- That the circuit plan protects anything.
+- That a speed is a property of a number format. It is the speed of these libraries' kernels at these versions, on one GPU, at two batch sizes. The 2-bit layers are unpacked by a kernel that quanto compiles at run time. If that build fails, quanto's own unpacking in plain PyTorch stands in, and the table says so for that arm.
+- That the memory figures are a whole process's memory: they are what PyTorch allocates, without the CUDA context or the allocator's reserve.
+- That NF4's task score or Global-MMLU-Lite against section 15's laptop or L4 figures is a test. They are compared with this job's bfloat16 run.
+
+Limits. One GPU type, one run per arm, 50 prompts for speed, 256 new tokens, batch sizes 1 and 8. The container image differs from the earlier jobs'. No adapter and no fine-tuned model is measured.
+
+If it is not finished. An arm that fails is recorded with its error, and the next arm runs. A job that fails before its first arm is launched again once, with the cause noted here. Nothing of this block is launched after Thursday Nov 26, 3 PM ET, and nothing of it runs at 9 PM ET. Expected cost: about 1.5 to 2.5 hours on one A100 at $2.50 an hour; the job's limit is four hours.
+
+Where it goes in the paper. A table in the quantization appendix.
+
 ## Rules
 
 - Every run that finishes is reported. A run that crashes is rerun with the same seed and settings.
