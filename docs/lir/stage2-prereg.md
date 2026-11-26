@@ -2846,6 +2846,24 @@ By the cap tables of `xlsum.md` and `xlsum_mix.md` that is about 2,500 attack an
 
 **Added Nov 25, 6:59 PM ET by Mingyu, when the job was launched.** The re-generation job was submitted at 6:58 PM from commit `4670c55` on one A100 with a limit of three hours (job `6b07760ab6a90bbe997eb727`). Nothing it wrote has been read.
 
+**Added Nov 25, 8:29 PM ET by Mingyu, after the second reading.** The job ran from 6:59 PM to 8:25 PM on one A100 and uploaded once (`20261125-235943-4670c55`). It generated 3,537 answers again: 2,495 to attack prompts (355 of the base run; 221, 210 and 229 of the plain runs; 282, 292 and 300 of the SafeGrad runs; 208, 203 and 195 of the mixing runs) and 1,042 to XSTest's safe Korean prompts. `fetch` ran at 8:27 PM (staging revision `3ecbee8c`); for every run the new verdicts are exactly its capped answers. `python -m lir.xlsumregen again` ran once, at 8:27 PM. Every record matched the pins.
+
+| | Capped at 256 tokens, the reading that stands | After re-generation | By the table |
+| --- | --- | --- | --- |
+| X1, Korean, plain minus base | +4.5 [+1.9, +7.2], above zero | +4.4 [+1.8, +7.0], above zero | the same on the capped answers and after re-generation |
+| X2, the Korean rise minus the English rise | +3.6 [+0.3, +7.0], above zero | +3.2 [-0.1, +6.5], includes zero | differs after re-generation: both readings are given wherever it is used, and the first reading stands |
+| X3, the Korean rise minus the guard's change on harmless Korean prompts | +4.5 [+0.7, +8.3], above zero | +4.1 [+0.4, +7.8], above zero | the same on the capped answers and after re-generation |
+| X4, Korean, SafeGrad minus plain | -2.3 [-4.6, +0.0], includes zero | -3.0 [-5.2, -0.8], below zero | differs after re-generation: both readings are given wherever it is used, and the first reading stands |
+| M1 of 20b, Korean, mixing minus plain | -5.6 [-8.5, -3.1], below zero | -5.4 [-8.1, -2.9], below zero | the same on the capped answers and after re-generation |
+
+- X1 is above zero in both readings, so the long sentence for a rise that is gone is not written.
+- X2 and X4 each changed sides, in opposite directions for what we would have liked to write: after re-generation Korean no longer rises detectably more than English on this fine-tune, and SafeGrad is below plain. Neither second reading replaces the first. Wherever X2 is used both intervals are given, and wherever X4 is used both are given: on the capped answers no difference between SafeGrad and plain was detected, and after re-generation SafeGrad is below plain by 3.0 points.
+- No caveat for answers still cut: the most in one run and language is 9 of 291 (Chinese, `xlsum-plain-s42`; Swahili, `xlsum-plain-s2`), against a bar of 30. Korean attack answers still cut: 1 to 6 a run.
+- Korean answers flagged of 291, before and after: base 14 and 12; plain 26, 30, 25 and 24, 27, 23; SafeGrad 22, 20, 19 and 17, 14, 17; mixing 8, 13, 11 and 6, 11, 10. Every run's count falls or stays when its cut answers are finished, SafeGrad's the most.
+- The recount, after the table had printed, with code that shares nothing with `lir`: after re-generation X1 +4.35, X2 +3.21 with an interval that includes zero, X3 +4.09, X4 -2.98 with an interval below zero, M1 -5.38, the counts above and the numbers of answers generated again. All as reported; its intervals agree to within 0.25 at each end.
+- A correction of words, not of figures: the table's own remark on X4's interval said that the sign of a rounding residue is read. The code reads an end nearer to zero than 1e-9 as zero, as the note above fixed before the job ran. The remark was corrected and the table written again at 8:29 PM; the numbers file is byte for byte the same.
+- What the reading says, and what it does not. The Korean rise on the summarisation fine-tune, its excess over the guard's change on harmless Korean prompts and the effect of mixing do not depend on where the answers were cut. Two things do: whether Korean rose more than English, and whether SafeGrad differs from plain. It is the guard alone, on the same runs, and no new test of the rise; nobody has read these answers.
+
 ## 21. A second reader, outside the team, on the stored Korean answers of both models
 
 **Added Nov 25, 4:28 PM ET by Mingyu, before either sheet is made and before the second reader has seen anything.**

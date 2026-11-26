@@ -1,13 +1,13 @@
 ### Cloud GPU time (Hugging Face Jobs)
 
-From the job records of the `lost-in-refusal-lexsi` account, read on 2026-11-25 23:53 UTC. Running time is what the record gives for each job; every job is counted, also the ones that failed or were stopped. Cost is running time at the list price of the GPU type, not the invoice.
+From the job records of the `lost-in-refusal-lexsi` account, read on 2026-11-26 01:30 UTC. Running time is what the record gives for each job; every job is counted, also the ones that failed or were stopped. Cost is running time at the list price of the GPU type, not the invoice.
 
 | GPU type | Jobs | Completed | Running hours | List price an hour | Cost at list price |
 |---|---:|---:|---:|---:|---:|
-| `a100-large` | 15 | 15 | 5.89 | $2.50 | $14.72 |
+| `a100-large` | 16 | 16 | 7.35 | $2.50 | $18.38 |
 | `l40sx1` | 14 | 12 | 6.17 | $1.80 | $11.11 |
 | `l4x1` | 13 | 11 | 12.64 | $0.80 | $10.11 |
-| all | 42 | | 24.70 | | $35.94 |
+| all | 43 | | 26.16 | | $39.60 |
 
 | Job | GPU type | Started (UTC) | End | Running minutes |
 |---|---|---|---|---:|
@@ -53,3 +53,4 @@ From the job records of the `lost-in-refusal-lexsi` account, read on 2026-11-25 
 | `lir-xlsum-mix5-s1` | `a100-large` | 2026-11-25 23:11 | completed | 31.6 |
 | `lir-xlsum-mix5-s42` | `a100-large` | 2026-11-25 23:11 | completed | 31.2 |
 | `lir-xlsum-judge` | `a100-large` | 2026-11-25 23:43 | completed | 8.6 |
+| `lir-xlsum-regen` | `a100-large` | 2026-11-25 23:58 | completed | 87.7 |

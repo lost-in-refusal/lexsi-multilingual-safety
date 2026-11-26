@@ -326,8 +326,8 @@ def again_md(res: dict) -> str:
     lines += [""] + [f"- {k.upper()}: {c['report']}." for k, c in res["checks"].items()]
     if res["x1_gone"]:
         lines.append(f"- **{res['x1_gone']}.**")
-    lines += [f"- {k.upper()} has an interval that ends at zero: {', '.join(c['ends_at_zero'])}. An end of exactly zero counts as including zero; "
-              "where rounding leaves a residue, its sign is read, as the project's `side` reads every interval." for k, c in res["checks"].items() if c["ends_at_zero"]]
+    lines += [f"- {k.upper()} has an interval that ends at zero: {', '.join(c['ends_at_zero'])}. An interval that ends at zero includes it, and "
+              "an end nearer to zero than 1e-9 is read as zero, so the sign of a rounding residue does not choose the side." for k, c in res["checks"].items() if c["ends_at_zero"]]
     lines += [f"- {k.upper()} is not read again: {why}." for k, why in res["not_read_again"].items()]
     for k, where in res["still_cut_caveat"].items():
         if where:

@@ -140,6 +140,9 @@ NOT_REBUILT = [
     (("xlsum_mix.json", "xlsum_mix.md"),
      "`python -m lir.xlsum mix` reads the answers, verdicts and scores of the three mixing runs of section 20b and of the runs "
      "of section 20, which are in the private staging dataset"),
+    (("xlsum_regen.json", "xlsum_regen.md"),
+     "`python -m lir.xlsumregen again` reads the verdicts of the runs of sections 20 and 20b and of the answers generated again, "
+     "which are in the private staging dataset"),
     (("xlsum_cut.json", "xlsum_cut.md"),
      "`python -m lir.xlsumcut` reads the Korean attack verdicts of the base run and the plain runs of section 20, which are in "
      "the private staging dataset"),
