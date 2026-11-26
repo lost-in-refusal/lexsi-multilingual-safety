@@ -302,3 +302,44 @@ DRAW = audit.draw
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Recount(unittest.TestCase):
+    def test_the_recount_agrees_with_the_scorer_on_made_up_files(self):
+        import contextlib
+        import io
+
+        from lir import audit_recount
+
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            d = DRAW("A", sources_a())
+            man = {"sheets": {"A": {"blocks": {b: {"population": v["population"]} for b, v in d.items()}, "annotators": {}}}}
+            sheets = {}
+            for n, x in enumerate(audit.LETTERS):
+                rows, key = audit.sheet_rows("A", x, d)
+                sha = hashlib.sha256(audit.payload("A", x, rows)).hexdigest()
+                man["sheets"]["A"]["annotators"][x] = {"payload_sha256": sha}
+                marks = {k["id"]: ("yes" if (k["arm"] == "plain" and k["stratum"] == "differs") or (n == 1 and int(k["family"][1:]) % 7 == 0)
+                                   else "unsure" if n == 2 and int(k["family"][1:]) % 11 == 0 else "no") for k in key}
+                obj = export(rows, key, letter=x, sha=sha, marks=marks)
+                (tmp / "notes/labels/audit/returned").mkdir(parents=True, exist_ok=True)
+                (tmp / "runs/humancheck").mkdir(parents=True, exist_ok=True)
+                (tmp / f"notes/labels/audit/returned/audit_A_{x}.json").write_text(json.dumps(obj, indent=1))
+                (tmp / f"runs/humancheck/audit_A_{x}_key.json").write_text(json.dumps(key))
+                sheets[x] = (obj["rows"], key, obj["events"])
+            (tmp / "results/lir/labels").mkdir(parents=True)
+            (tmp / "results/lir/labels/audit_manifest.json").write_text(json.dumps(man))
+            res = audit.result("A", sheets, d)
+            out = io.StringIO()
+            with mock.patch.object(audit_recount, "HERE", tmp), mock.patch("sys.argv", ["x", "--sheet", "A"]), contextlib.redirect_stdout(out):
+                audit_recount.main()
+            text = out.getvalue()
+            for block in ("tiny_ko", "tiny_en"):
+                self.assertIn(f"{res['blocks'][block]['weighted']['mean']:+.2f} points", text)
+            t = res["blocks"]["granite_ko"]["sign_test"]
+            self.assertIn(f"prompts leaning plain {t['leaning_plain']}, base {t['leaning_base']}, of {t['prompts']}; two-sided sign test p = {t['p']:.4f}", text)
+            self.assertIn(f"alpha over the sheet: {res['alpha']:.4f}", text)
+            self.assertEqual(text.count("taken"), 3)
+        finally:
+            shutil.rmtree(tmp)
