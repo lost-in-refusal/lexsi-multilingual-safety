@@ -1,11 +1,41 @@
 ---
 license: cc-by-nc-4.0
 language: [en, ko, zh, sw, it, vi, ar, th, bn, jv]
-tags: [safety, red-teaming, evaluation, multilingual, lexsi-hackathon, lost-in-refusal]
+tags: [safety, red-teaming, evaluation, multilingual, lost-in-refusal]
 pretty_name: Lost in Refusal evaluation outputs
 ---
 
 # Lost in Refusal: every generation and every judge verdict
+
+> From the paper *Lost in Refusal: Uneven Guard-Measured Safety Drift After Benign Multilingual Fine-Tuning, and How
+> Much of It Is the Guard* (Mingyu Kang, Aishwarya Nikkumbh, Hannah Pham, 2026). Code, preregistration and every
+> table: [GitHub](https://github.com/lost-in-refusal/lexsi-multilingual-safety). Everything in one place: [the collection](https://huggingface.co/collections/lost-in-refusal/lost-in-refusal-6b07c29a5b461cd1af8df254). The final model:
+> [tiny-aya-global-bactrian-lora-mix5](https://huggingface.co/lost-in-refusal/tiny-aya-global-bactrian-lora-mix5).
+
+## The study in brief
+
+- **What was done.** Tiny Aya Global was fine-tuned with LoRA on 1,800 harmless instruction rows in English, Korean
+  and Chinese, at three seeds, under a preregistration. Safety was then measured in ten languages by one automatic
+  safety classifier, Qwen3Guard-Gen-4B.
+- **What the guard shows.**
+  - The share of Korean answers to MultiJail attack prompts labelled unsafe rose from 5.2% to 17.9% (+12.7 points,
+    95% interval [+8.9, +16.7]).
+  - English showed no detectable change (+0.9 [−1.8, +3.8]).
+  - No Korean training rows were needed for the rise.
+- **How much of it is the guard.**
+  - The guard also flagged more of the fine-tuned model's Korean answers to harmless prompts (+5.5 [+2.1, +9.1]).
+  - No second automatic judge reached the agreement bar in Korean.
+  - One author's readings did not confirm the rise, and a second reading came back by a route the registration had
+    ruled out (paper, section 3.3).
+  - Every safety number in these repositories is the guard's label, not shown harm.
+- **Not only a damaged model.** The rise appeared again on a second fine-tune, one-sentence news summarisation, which
+  improved the task it was trained for (+4.5 [+1.9, +7.2]). The general task score fell there too.
+- **Repairs.** Two repairs lowered guard-measured Korean attack success: mixing 47 of the base model's own refusals
+  into the training data, and SafeGrad gradient surgery. Mixing made the model refuse more harmless requests. The
+  two are points on a trade-off.
+- **Scope.** One model family, Tiny Aya. A second model, IBM Granite 4.1 3B, is unconfirmed. Single-turn, direct
+  requests only.
+
 
 All model outputs behind the Lost in Refusal results table, so any number can be recomputed or audited.
 
@@ -38,7 +68,7 @@ Every generation row has `uid`, `lang`, `prompt`, `response`, `n_tokens` and `tr
 
 ## Stage 2 additions
 
-Added in November 2026 for the second stage of the hackathon, with the same prompts, decoding, guard and task judge
+Added in November 2026, with the same prompts, decoding, guard and task judge
 as above unless a row says otherwise. Every generation row keeps its `truncated` flag.
 
 | Folder | What |
