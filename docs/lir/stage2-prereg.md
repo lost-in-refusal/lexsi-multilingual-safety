@@ -3250,6 +3250,8 @@ The command and its tests (`lir/audit.py`, `lir/audit_page.html`, `tests/test_au
 
 **Added Nov 26, 11:27 PM ET by Mingyu: who computed the early figures is not settled.** The main session answered that draft v5 (a PDF of 10:38 PM) did not come from it. It says its own paper source contains nothing of this entry: no figure of C or D and no Qwen run. That contradicts the answer recorded above ("The main session"). Both accounts are recorded, and this working session cannot tell which is right. What stands either way: the v5 figures for C and D were computed outside the registered command, from two of three files, and are not this entry's readings. The main session holds them and will use only the registered reading.
 
+**Added Nov 26, 11:40 PM ET by Mingyu.** Asked who made draft v5's figures for C and D, with the choices "I made them" and "Another session", Mingyu answered "Another session". This replaces "The main session" above, and agrees with the main session's account. Which session, and how it got the marks and joined them, is not known here.
+
 ## 24. The main experiment on a third model family: Qwen2.5-3B
 
 **Added Nov 26, 3:07 AM ET by Mingyu, before any job of this section is launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.**
