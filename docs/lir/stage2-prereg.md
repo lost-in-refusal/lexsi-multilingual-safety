@@ -3248,6 +3248,8 @@ The command and its tests (`lir/audit.py`, `lir/audit_page.html`, `tests/test_au
 - The marks in this session. At the same time Mingyu attached C's and D's returned files to this working session, so their contents were shown here. Nothing was counted from them.
 - The guard's verdict on every answer. At Mingyu's request, for the paper's account of where readers and the guard disagree, `score` now also writes the first guard's strict verdict beside each mark in `audit_<sheet>_marks.csv` (column `guard_flagged`). It is an added column of the file the entry already names; no reading changes. It is written when the sheet is scored, as registered: when E's file is in or after Friday Nov 27, 6 PM ET.
 
+**Added Nov 26, 11:27 PM ET by Mingyu: who computed the early figures is not settled.** The main session answered that draft v5 (a PDF of 10:38 PM) did not come from it. It says its own paper source contains nothing of this entry: no figure of C or D and no Qwen run. That contradicts the answer recorded above ("The main session"). Both accounts are recorded, and this working session cannot tell which is right. What stands either way: the v5 figures for C and D were computed outside the registered command, from two of three files, and are not this entry's readings. The main session holds them and will use only the registered reading.
+
 ## 24. The main experiment on a third model family: Qwen2.5-3B
 
 **Added Nov 26, 3:07 AM ET by Mingyu, before any job of this section is launched. No weight of the model below has been loaded by us on any machine, and no answer of it exists.**
