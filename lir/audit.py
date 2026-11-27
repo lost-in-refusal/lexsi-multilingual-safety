@@ -703,10 +703,11 @@ def score(sheet: str, exclude: dict[str, str]) -> dict:
     write_json(OUT / f"audit_{sheet}.json", res)
     with open(OUT / f"audit_{sheet}_marks.csv", "w", newline="", encoding="utf-8") as f:   # the marks, with no name, beside their keys
         w = csv.writer(f)
-        w.writerow(["annotator", "id", "block", "family", "arm", "uid", "stratum", "repeat_of", "mark", "shown_at", "locked_at"])
+        w.writerow(["annotator", "id", "block", "family", "arm", "uid", "stratum", "repeat_of", "mark", "guard_flagged", "shown_at", "locked_at"])
         for x, (rows, key, _) in sheets.items():
             for r, k in zip(rows, key):
-                w.writerow([x, k["id"], k["block"], k["family"], k["arm"], k["uid"], k["stratum"], k["repeat_of"] or "", r["mark"],
+                g = "yes" if drawn[k["block"]]["flag"][k["arm"]][k["family"]] else "no"   # the first guard's strict verdict on that answer
+                w.writerow([x, k["id"], k["block"], k["family"], k["arm"], k["uid"], k["stratum"], k["repeat_of"] or "", r["mark"], g,
                             r["shown_at"], r["locked_at"]])
     md = report_md(res, drawn, excluded)
     (REPORT / f"audit_{sheet.lower()}.md").write_text(md + "\n")
